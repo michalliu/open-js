@@ -10,6 +10,8 @@
  * @requires base
  *           queryString
  *           deferred
+ *           ext.XML
+ *           ext.JSON
  */
 
 QQWB.extend("io", {
@@ -152,28 +154,7 @@ QQWB.extend("io", {
 
                                 // parse to JSON
                                 if (cfg.dataType == "json") {
-                                    var responseText = responses.text;
-                                    if (typeof responseText !== "string" || !responseText) {
-                                        response = {};
-                                    } else {
-                                        // Make sure leading/trailing whitespace is removed (IE can't handle it)
-                                        response = responseText.replace(/^\s+/,"").replace(/\s+$/,"");
-
-                                        if ( window.JSON && window.JSON.parse ) {
-                                            response = window.JSON.parse( response );
-                                        } else {
-                                            // Make sure the incoming data is actual JSON
-                                            // Logic borrowed from http://json.org/json2.js
-                                            if ( /^[\],:{}\s]*$/.test( response.replace( /\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g, "@" )
-                                                .replace( /"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, "]" )
-                                                .replace( /(?:^|:|,)(?:\s*\[)+/g, "")) ) {
-
-                                                response = (new Function( "return " + data ))();
-                                            } else {
-                                                throw new SyntaxError ("Invalid JSON: " + response);
-                                            }
-                                        }
-                                    }
+									response = QQWB.JSON.fromString(responses.text);
                                 } else if (cfg.dataType == "xml") { // parse to xml
                                     response = responses.xml;
                                 } else { // as normal text
@@ -208,6 +189,101 @@ QQWB.extend("io", {
 	   
     }
     /**
+     * The Flash IO mechanism
+     *
+     * @access private
+     * @param cfg {Object} the configration for script io
+     * @return {Object} to send/abort the request
+     */
+   ,_IOFlash: function (cfg) {
+
+	   var callback,
+	       readyState,
+	       cfg = cfg || {};
+	   
+       if (cfg.dataType) {
+	       cfg.dataType = cfg.dataType.toLowerCase();
+	   }
+
+	   return {
+		   send: function (complete) {
+
+			   readyState = 1;
+               // the call is allowed call once
+			   callback = function (_, isAbort) {
+				   var
+				       status,
+					   statusText,
+					   responseHeaders,
+					   responses,
+                       response,
+					   xml,
+					   readyState = 4;
+
+				   try{
+				       if (callback && (isAbort || readyState == 4)) {
+
+				           callback = null;
+
+				           if (isAbort) {
+				        	   complete(-1, "request has aborted");
+				           } else {
+				        	   var success = /complete/i.test(_.type);
+				        	   status = success ? 200 : 204;
+				        	   statusText = success ? "ok" : _.type;
+				        	   responseHeaders = "";
+				        	   responses = {}; // internal object
+				        	   responses.text = _.target.data;
+
+				        	   if (cfg.dataType == "json") {
+				        		   response = QQWB.JSON.fromString(responses.text);
+                               } else if (cfg.dataType == "xml"){
+				        		   response = QQWB.XML.fromString(responses.text);
+                               } else {
+				        		   response = responses.text;
+                               }
+				           }
+
+				           // has response
+				           if (response) {
+				        	   complete(status, statusText, response, responseHeaders);
+				           }
+					   }
+					} catch (ex) {
+						if (!isAbort) {
+							complete(-1, ex + "");
+						}
+					}
+			   };
+
+			   // register flash message callback
+			   // lazy initialize flash message callbacks
+			   if (!window.onFlashRequestComplete_8df046) {
+
+				   // this function will be called by flash when httpRequest is done
+                   window.onFlashRequestComplete_8df046 = function (event) {
+					   // first in first out
+					   onFlashRequestComplete_8df046.callbacks.shift()(event);
+                   };
+
+				   // our callback queue
+                   window.onFlashRequestComplete_8df046.callbacks = [];
+		       }
+
+			   // push to queue
+               window.onFlashRequestComplete_8df046.callbacks.push(callback);
+
+	           QQWBFlashTransport.httpRequest(cfg.url,cfg.data,cfg.type);
+
+		   }
+		  ,abort: function () {
+			  if (callback) {
+			      callback(0,1);
+			  }
+		   }
+	   };
+    }
+    /**
      * Helper method to make api ajax call
      *
      */
@@ -226,6 +302,47 @@ QQWB.extend("io", {
        return QQWB.io.ajax(opts);
     }
 	/**
+	 * Helper method to make api ajax call via flash
+	 *
+	 */
+  ,_apiFlashAjax: function (api, apiParams, dataType, type) {
+       var opts = {
+               type: type.toUpperCase()
+              ,url: QQWB._domain.api + api
+              ,data: QQWB.queryString.encode(apiParams)
+              ,dataType: dataType
+           };
+       if (opts.type == "GET") {
+           opts.url += opts.data ? "?" + opts.data : "";
+           delete opts.data;
+       }
+       return QQWB.io.flashAjax(opts);
+   }
+   /**
+	* Emulate AJAX request via flash
+	*
+	* @access public
+	* @param opts {Object} url configuration object
+	* @return {Object} promise object
+	*/
+  ,flashAjax: function (opts) {
+       var deferred = QQWB.deferred.deferred();
+
+	   if (!opts.type) {
+		   opts.type = "get";
+	   }
+
+       this._IOFlash(opts).send(function (status, statusText, responses, responseHeaders) {
+       	if (status !== 200) {
+       		deferred.reject(status, statusText);
+       	} else {
+       		deferred.resolve(status, statusText, responses, responseHeaders);
+       	}
+       });
+
+	   return deferred.promise();
+   }
+	/**
 	 * Ajax request sender
 	 * 
 	 * @access public
@@ -235,6 +352,10 @@ QQWB.extend("io", {
    ,ajax: function (opts) {
 
 	    var deferred = QQWB.deferred.deferred();
+
+	    if (!opts.type) {
+	        opts.type = "get";
+	    }
 
 		this._IOAjax(opts).send(function (status, statusText, responses, responseHeaders, dataType) {
 			if (status !== 200) {

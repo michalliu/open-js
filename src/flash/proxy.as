@@ -10,13 +10,15 @@
 	import flash.net.URLRequest; 
 	import flash.net.URLRequestMethod; 
 	import flash.net.URLVariables; 
+	import flash.system.Security;
+    Security.allowDomain("*");
 	
 	public class proxy extends MovieClip
 	{
 		public function proxy()
 		{
 			ExternalInterface.addCallback("httpRequest", httpRequest);
-			ExternalInterface.call("onFlashProxyReady");
+			ExternalInterface.call("onFlashReady_a1f5b4ce");
 		}
 		
 		private function httpRequest (uri:String, param:String="", method:String="GET"):void
@@ -47,11 +49,11 @@
 		}
 		
 		private function urlRequestComplete(e:Event):void {
-			ExternalInterface.call("onFlashProxyMessage",e);
+			ExternalInterface.call("onFlashRequestComplete_8df046",e);
 		}
 		
 		private function urlRequestError(e:ErrorEvent):void {
-			ExternalInterface.call("onFlashProxyMessage",e);
+			ExternalInterface.call("onFlashProxyMessage_8df046",e);
 		}
 		
 	}

@@ -236,6 +236,9 @@ if (window.opener) {
 					// if dataType is xml, the ajax will return a xml object, which can't call
 					// postMessage directly (will raise an exception) , instead we request to tranfer
 					// XML as String, then parse it back to XML object.
+					// io.js will fall to response.text
+					// api.js will detect that convert it back to xml
+					// @see io.js,api.js
 					args[2] = "xmltext";
 				}
 
@@ -256,6 +259,7 @@ if (window.opener) {
 					} else {
 						// everything goes well
 						// we directly pass the data to the reciever regardless its success or not
+						//
 						QQWB.io._apiAjax.apply(this,args).complete(function () {
 				        	external.postMessage(JSON.stringify({
 				        		id: id
