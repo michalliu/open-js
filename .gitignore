@@ -1,3 +1,7 @@
 # log file #
 ############
 log.txt
+
+# helper bat file #
+# ############### #
+build_all.bat
