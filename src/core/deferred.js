@@ -223,6 +223,8 @@ QQWB.extend("deferred", {
 });
 
 // expose to global namespace
-QQWB.provide("when", function () {
+QQWB._alias("when", QQWB.deferred.when);
+
+/*QQWB.provide("when", function () {
     return QQWB.deferred.when.apply(this,QQWB.Array.fromArguments(arguments));
-});
+});*/

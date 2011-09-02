@@ -168,13 +168,14 @@
         * Alias names
         *
         * @access private
+        * @param alias {String|Array} single name in string format to alias or an array of String
         * @return {Void}
         */
        ,_alias: function (alias, origin) {
            origin = origin || twb;
            if(typeof alias === 'string') {
                this[alias] = origin;
-           } else if (typeof alias === 'object' && alias.constructor === Array) {
+           } else if (Object.prototype.toString.call(alias) === "[object Array]") {
                for (var i=0,l=alias.length;i<l;i++) {
                    this[alias[i]] = origin;
                }

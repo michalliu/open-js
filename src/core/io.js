@@ -84,10 +84,6 @@ QQWB.extend("io", {
 	             new window.XMLHttpRequest() :
 	             new window.ActiveXObject("Microsoft.XMLHTTP");
 
-       if (cfg.dataType) {
-           cfg.dataType = cfg.dataType.toLowerCase();
-       }
-
        if (!cfg.async) {
            cfg.async = "async";
        }
@@ -153,9 +149,9 @@ QQWB.extend("io", {
 								}
 
                                 // parse to JSON
-                                if (cfg.dataType == "json") {
+                                if (cfg.dataType.toLowerCase() == "json") {
 									response = QQWB.JSON.fromString(responses.text);
-                                } else if (cfg.dataType == "xml") { // parse to xml
+                                } else if (cfg.dataType.toLowerCase() == "xml") { // parse to xml
                                     response = responses.xml;
                                 } else { // as normal text
                                     response = responses.text;
@@ -201,10 +197,6 @@ QQWB.extend("io", {
 	       readyState,
 	       cfg = cfg || {};
 	   
-       if (cfg.dataType) {
-	       cfg.dataType = cfg.dataType.toLowerCase();
-	   }
-
 	   return {
 		   send: function (complete) {
 
@@ -235,9 +227,9 @@ QQWB.extend("io", {
 				        	   responses = {}; // internal object
 				        	   responses.text = _.target.data;
 
-				        	   if (cfg.dataType == "json") {
+				        	   if (cfg.dataType.toLowerCase() == "json") {
 				        		   response = QQWB.JSON.fromString(responses.text);
-                               } else if (cfg.dataType == "xml"){
+                               } else if (cfg.dataType.toLowerCase() == "xml"){
 				        		   response = QQWB.XML.fromString(responses.text);
                                } else {
 				        		   response = responses.text;
@@ -332,7 +324,7 @@ QQWB.extend("io", {
 		   opts.type = "get";
 	   }
 
-       this._IOFlash(opts).send(function (status, statusText, responses, responseHeaders) {
+       QQWB.io._IOFlash(opts).send(function (status, statusText, responses, responseHeaders) {
        	if (status !== 200) {
        		deferred.reject(status, statusText);
        	} else {
@@ -351,13 +343,16 @@ QQWB.extend("io", {
 	 */
    ,ajax: function (opts) {
 
-	    var deferred = QQWB.deferred.deferred();
+       var 
+           deferred = QQWB.deferred.deferred(),
+           default_opts = {
+               type: "get"
+              ,dataType: "json"
+           };
 
-	    if (!opts.type) {
-	        opts.type = "get";
-	    }
+        QQWB.extend(default_opts, opts, true);
 
-		this._IOAjax(opts).send(function (status, statusText, responses, responseHeaders, dataType) {
+		QQWB.io._IOAjax(default_opts).send(function (status, statusText, responses, responseHeaders, dataType) {
 			if (status !== 200) {
 				deferred.reject(status, statusText);
 			} else {
@@ -380,7 +375,7 @@ QQWB.extend("io", {
            optCharset = optCharset || "utf-8",
            deferred = QQWB.deferred.deferred();
 
-       this._IOScript({
+       QQWB.io._IOScript({
            charset: optCharset
           ,url: src
        }).send(function (status, statusText) {
@@ -398,21 +393,39 @@ QQWB.extend("io", {
      *
      * TODO: modified to as documention described
      * @access public
-     * @param url {String} jsonp url callback is added automaticlly
+     * @param opts {Object} jsonp config
      * @return {Object} promise
      */
-    ,jsonp: function (url) {
+    ,jsonp: function (opts) {
         var 
             deferred = QQWB.deferred.deferred(),
             callbackQueryName = "callback", // callback name in query string
             callbackNamePrefix = "jsonp_", // jsonp callback function name prefix
             callbackName = callbackNamePrefix + QQWB.uid(), //random jsonp callback name
-            _oldcallback = window.callbackName; // keep a reference to the variable we will overwrite(very little chance)
+            _oldcallback = window.callbackName, // keep a reference to the variable we will overwrite(very little chance)
+            default_opts = {
+                dataType: "text"
+               ,charset: "utf-8"
+               ,url: ""
+            };
+
+        QQWB.extend(default_opts, opts, true);
+
+        if (default_opts.data) {
+            default_opts.url += ("?" + default_opts.data +  "&" + callbackQueryName + "=" + callbackName)
+        } 
 
         window[callbackName] = function (data) {
 
+            var response = data;
+
+            if (default_opts.dataType.toLowerCase() === "json") {
+                response = QQWB.JSON.fromString(data);
+            } else if (default_opts.dataType.toLowerCase() === "xml") {
+                response = QQWB.XML.fromString(data);
+            }
             // jsonp successed
-            deferred.resolve(data);
+            deferred.resolve(response);
 
             window[callbackName] = _oldcallback; // restore back to original value
             
@@ -421,10 +434,7 @@ QQWB.extend("io", {
             }
         };
 
-        this._IOScript({
-            charset: "utf-8"
-           ,url: url + "&" + callbackQueryName + "=" + callbackName
-        }).send(function (status, statusText) {
+        QQWB.io._IOScript(default_opts).send(function (status, statusText) {
             if (status !== 200) {
                 deferred.reject(status, statusText);
             }
@@ -436,15 +446,6 @@ QQWB.extend("io", {
 });
 
 // expose to global namespace
-QQWB.provide("ajax", function (opts) {
-    return QQWB.io.ajax.call(QQWB.io, opts);
-});
-
-
-QQWB.provide("jsonp", function (url) {
-    return QQWB.io.jsonp.call(QQWB.io, url);
-})
-
-QQWB.provide("script", function (src, optCharset) {
-    return QQWB.io.script.apply(QQWB.io, [src, optCharset]);
-})
+QQWB._alias("ajax",QQWB.io.ajax);
+QQWB._alias("jsonp",QQWB.io.jsonp);
+QQWB._alias("script",QQWB.io.script);

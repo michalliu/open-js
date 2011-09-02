@@ -276,6 +276,2181 @@
 /**
  * Tencent weibo javascript library
  *
+ * format string with python style
+ *
+ * @author michalliu
+ * @version 1.0
+ * @package format
+ * @module sprintf
+ * @requires base
+ */
+
+/**
+ * sprintf() for JavaScript 0.7-beta1
+ * http://www.diveintojavascript.com/projects/javascript-sprintf
+ * 
+ * Copyright (c) Alexandru Marasteanu <alexaholic [at) gmail (dot] com>
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of sprintf() for JavaScript nor the
+ *       names of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL Alexandru Marasteanu BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+(function (){
+    var sprintf = (function() {
+    	function get_type(variable) {
+    		return Object.prototype.toString.call(variable).slice(8, -1).toLowerCase();
+    	}
+    	function str_repeat(input, multiplier) {
+    		for (var output = []; multiplier > 0; output[--multiplier] = input) {/* do nothing */}
+    		return output.join('');
+    	}
+    
+    	var str_format = function() {
+    		if (!str_format.cache.hasOwnProperty(arguments[0])) {
+    			str_format.cache[arguments[0]] = str_format.parse(arguments[0]);
+    		}
+    		return str_format.format.call(null, str_format.cache[arguments[0]], arguments);
+    	};
+    
+    	str_format.format = function(parse_tree, argv) {
+    		var cursor = 1, tree_length = parse_tree.length, node_type = '', arg, output = [], i, k, match, pad, pad_character, pad_length;
+    		for (i = 0; i < tree_length; i++) {
+    			node_type = get_type(parse_tree[i]);
+    			if (node_type === 'string') {
+    				output.push(parse_tree[i]);
+    			}
+    			else if (node_type === 'array') {
+    				match = parse_tree[i]; // convenience purposes only
+    				if (match[2]) { // keyword argument
+    					arg = argv[cursor];
+    					for (k = 0; k < match[2].length; k++) {
+    						if (!arg.hasOwnProperty(match[2][k])) {
+    							throw(sprintf('[sprintf] property "%s" does not exist', match[2][k]));
+    						}
+    						arg = arg[match[2][k]];
+    					}
+    				}
+    				else if (match[1]) { // positional argument (explicit)
+    					arg = argv[match[1]];
+    				}
+    				else { // positional argument (implicit)
+    					arg = argv[cursor++];
+    				}
+    
+    				if (/[^s]/.test(match[8]) && (get_type(arg) != 'number')) {
+    					throw(sprintf('[sprintf] expecting number but found %s', get_type(arg)));
+    				}
+    				switch (match[8]) {
+    					case 'b': arg = arg.toString(2); break;
+    					case 'c': arg = String.fromCharCode(arg); break;
+    					case 'd': arg = parseInt(arg, 10); break;
+    					case 'e': arg = match[7] ? arg.toExponential(match[7]) : arg.toExponential(); break;
+    					case 'f': arg = match[7] ? parseFloat(arg).toFixed(match[7]) : parseFloat(arg); break;
+    					case 'o': arg = arg.toString(8); break;
+                        //case 's': arg = ((arg = String(arg)) && match[7] ? arg.substring(0, match[7]) : arg); break;
+                        case 's': arg = ((arg = arg ? String(arg):"") && match[7] ? arg.substring(0, match[7]) : arg); break;
+    					case 'u': arg = Math.abs(arg); break;
+    					case 'x': arg = arg.toString(16); break;
+    					case 'X': arg = arg.toString(16).toUpperCase(); break;
+    				}
+    				arg = (/[def]/.test(match[8]) && match[3] && arg >= 0 ? '+'+ arg : arg);
+    				pad_character = match[4] ? match[4] == '0' ? '0' : match[4].charAt(1) : ' ';
+    				pad_length = match[6] - String(arg).length;
+    				pad = match[6] ? str_repeat(pad_character, pad_length) : '';
+    				output.push(match[5] ? arg + pad : pad + arg);
+    			}
+    		}
+    		return output.join('');
+    	};
+    
+    	str_format.cache = {};
+    
+    	str_format.parse = function(fmt) {
+    		var _fmt = fmt, match = [], parse_tree = [], arg_names = 0;
+    		while (_fmt) {
+    			if ((match = /^[^\x25]+/.exec(_fmt)) !== null) {
+    				parse_tree.push(match[0]);
+    			}
+    			else if ((match = /^\x25{2}/.exec(_fmt)) !== null) {
+    				parse_tree.push('%');
+    			}
+    			else if ((match = /^\x25(?:([1-9]\d*)\$|\(([^\)]+)\))?(\+)?(0|'[^$])?(-)?(\d+)?(?:\.(\d+))?([b-fosuxX])/.exec(_fmt)) !== null) {
+    				if (match[2]) {
+    					arg_names |= 1;
+    					var field_list = [], replacement_field = match[2], field_match = [];
+    					if ((field_match = /^([a-z_][a-z_\d]*)/i.exec(replacement_field)) !== null) {
+    						field_list.push(field_match[1]);
+    						while ((replacement_field = replacement_field.substring(field_match[0].length)) !== '') {
+    							if ((field_match = /^\.([a-z_][a-z_\d]*)/i.exec(replacement_field)) !== null) {
+    								field_list.push(field_match[1]);
+    							}
+    							else if ((field_match = /^\[(\d+)\]/.exec(replacement_field)) !== null) {
+    								field_list.push(field_match[1]);
+    							}
+    							else {
+    								throw('[sprintf] huh?');
+    							}
+    						}
+    					}
+    					else {
+    						throw('[sprintf] huh?');
+    					}
+    					match[2] = field_list;
+    				}
+    				else {
+    					arg_names |= 2;
+    				}
+    				if (arg_names === 3) {
+    					throw('[sprintf] mixing positional and named placeholders is not (yet) supported');
+    				}
+    				parse_tree.push(match);
+    			}
+    			else {
+    				throw('[sprintf] huh?');
+    			}
+    			_fmt = _fmt.substring(match[0].length);
+    		}
+    		return parse_tree;
+    	};
+    
+    	return str_format;
+    })();
+
+    var vsprintf = function(fmt, argv) {
+    	argv.unshift(fmt);
+    	return sprintf.apply(null, argv);
+    };
+
+    QQWB.extend("format", {
+
+        sprintf: sprintf
+
+       ,vsprintf: vsprintf
+    })
+
+}());
+/**
+ * Tencent weibo javascript library
+ *
+ * Time
+ *
+ * Example:
+ * 
+ * T.time.getTime()
+ *
+ * @author michalliu
+ * @version 1.0
+ * @package core
+ * @module time
+ * @requires base
+ *           format.sprintf
+ */
+
+QQWB.extend("time", {
+    /**
+     * Get current time stamp in milliseconds
+     *
+     * @access public
+     * @return {Date} current date
+     */
+    now: function () {
+        return +this.dateNow();
+    }
+    /**
+     * Get current time stamp in seconds
+     *
+     * @access public
+     * @return {Date} current date
+     */
+   ,secondsNow: function () {
+        return Math.round(this.now() / 1000);
+    }
+    /**
+     * Get current time stamp
+     *
+     * @access public
+     * @return {Date} current date
+     */
+    ,dateNow: function () {
+        return new Date;
+    }
+    /**
+     * Get a short time description
+     * 
+     * Example:
+     * 
+     * T.time.shortTime(); // output is 08:04:34
+     * T.time.shortTime(new Date()); // output date
+     * T.time.shortTime(new Date(),"%(year)s"); // output date with format
+     * T.time.shortTime("%(year)s"); // output current date with format
+     *
+     * @access public
+     * @param date {Date} date or current date if date not provided
+     *        format {String} format of date object        
+     * @return {String} formatted time string
+     */
+   ,shortTime: function (date, format) {
+        if (!(date instanceof Date)) {
+            format = date;
+            date = this.dateNow();
+        }
+        format = format || "%(year)s/%(month)s/%(day)s %(hour)02d:%(minute)02d:%(second)02d";
+        return QQWB.format.sprintf(format,{
+            year: date.getFullYear()
+           ,month: date.getMonth()
+           ,day: date.getDate()
+           ,hour: date.getHours()
+           ,minute: date.getMinutes()
+           ,second: date.getSeconds()
+        });
+    }
+});
+
+/**
+ * Tencent weibo javascript library
+ *
+ * Log messages
+ *
+ * Example:
+ * 
+ * T.log.info("your message")
+ *
+ * @author michalliu
+ * @version 1.0
+ * @package core
+ * @module log
+ * @requires base
+ *           time
+ *           format.sprintf
+ */
+
+QQWB.extend("log", {
+	
+	 // critical level
+     CRITICAL: 50
+
+	 // error level
+    ,ERROR: 40
+
+	 // warning level
+    ,WARNING: 30
+
+	 // infomation level
+    ,INFO: 20
+
+	 // debug level
+    ,DEBUG: 10
+
+	 // notset level, will log out all the messages
+    ,NOTSET: 0
+
+	// log level messages less than this level will be ingored
+	// default level set to QQWB.log.NOTSET
+    ,_level: 0 
+
+	// log message format
+    //,_format:"{{name}} : [{{levelname}}] {{time}} {{message}}"
+
+	// log message format
+    ,_format:"%(frame)s%(name)s: [%(levelname)s] %(time)s %(message)s"
+
+	/**
+	 * Set log message level
+	 * 
+	 * @access public
+	 * @param level {Number} log level
+	 * @return {Object} log object
+	 */
+    ,setLevel: function (level) {
+        this._level = level;
+        return this;
+     }
+
+	/**
+	 * Set log message format
+	 * 
+	 * @access public
+	 * @param format {String} log format
+	 * @return {Object} log object
+	 */
+    ,setFormat: function (format) {
+        this._format = format;
+		return this;
+     }
+
+	/**
+	 * Log a debug message
+	 * 
+	 * @access public
+	 * @param message {String} message
+	 * @return {Object} log object
+	 */
+    ,debug: function (message) {
+        this.DEBUG >= this._level && this._out("DEBUG",message);
+        return this;
+     }
+
+	/**
+	 * Log a info message
+	 * 
+	 * @access public
+	 * @param message {String} message
+	 * @return {Object} log object
+	 */
+    ,info: function (message) {
+        this.INFO >= this._level && this._out("INFO",message);
+        return this;
+     }
+
+	/**
+	 * Log a warning message
+	 * 
+	 * @access public
+	 * @param message {String} message
+	 * @return {Object} log object
+	 */
+    ,warning: function (message) {
+        this.WARNING >= this._level && this._out("WARNING",message);
+        return this;
+     }
+
+	/**
+	 * Log a error message
+	 * 
+	 * @access public
+	 * @param message {String} message
+	 * @return {Object} log object
+	 */
+    ,error: function (message) {
+        this.ERROR >= this._level && this._out("ERROR",message);
+        return this;
+     }
+
+	/**
+	 * Log a critical message
+	 * 
+	 * @access public
+	 * @param message {String} message
+	 * @return {Object} log object
+	 */
+    ,critical: function (message) {
+        this.CRITICAL >= this._level && this._out("CRITICAL",message);
+        return this;
+     }
+
+	/**
+	 * Log out message
+	 *
+	 * @access private
+	 * @param level {String} message level
+	 *        message {String} message to log out
+	 * @return {Void}
+	 */
+    ,_out: function (level,message) {
+        var output = this._format;
+        //output = output.replace("{{time}}", this._getTime())
+                       //.replace("{{levelname}}", level)
+                       //.replace("{{name}}", QQWB._name)
+                       //.replace("{{message}}", message);
+        //output = output.replace(/\{\{.*?\}\}/g,output);
+        output = QQWB.format.sprintf(output,{
+            name: QQWB._name
+           ,levelname: level
+           ,time: QQWB.time.shortTime()
+           ,message: message
+           ,frame: window != window.parent ? "*":""
+        });
+
+        // no frame messages
+        QQWB._debug && window.console && window.console.log(output);
+     }
+});
+
+/**
+ * Tencent weibo javascript library
+ *
+ * Cookie manipulation
+ *
+ * @author michalliu
+ * @version 1.0
+ * @package core
+ * @module cookie
+ * @requires base
+ *           log
+ */
+
+QQWB.extend("cookie", {
+    /**
+     * Set cookie
+     *
+     * @param name {String} cookie name
+     *        value {String} cookie value
+     *        maxage {Number} seconds from now. If present -1 it means a session cookie(default by browser)
+     *        path {String} cookie path. If not present then use full request path(default by browser)
+     *        domain {String} cookie domain. If not present then use full request host name(default by browser)
+     * @access public
+     * @return {Void}
+     */
+    set: function (name, value, opt_maxage, opt_path, opt_domain) {
+
+       if ( typeof opt_maxage === "undefined" || opt_maxage === null) {
+           opt_maxage = -1;
+       }
+
+       var cookieDomain = opt_domain ? "domain=" + opt_domain : "";
+       var cookiePath = opt_path ? "path=" + opt_path : "";
+       var cookieExpire = "";
+
+       if (opt_maxage === 0) {
+           // expire the cookie
+           cookieExpire = "expires=" + new Date(1970,1,1).toUTCString();
+       } else if (opt_maxage > 0) {
+           cookieExpire = "expires=" + new Date(+new Date+opt_maxage*1000).toUTCString();
+       }
+
+       document.cookie = [name + "=" + value, cookieExpire, cookiePath, cookieDomain].join("; ");
+
+       return this;
+    }
+
+    /**
+     * Return the first value for the given cookie name 
+     *
+     * @access public
+     * @param name {String} cookie name
+     * @return {String} value for cookie
+     */
+   ,get: function (name) {
+       var 
+           cookieName = name + "=";
+           cookies = (document.cookie || "").split(/\s*;\s*/);
+       for (var i=0,l=cookies.length; i<l; i++) {
+           var cookie = cookies[i];
+           if (cookie.indexOf(cookieName) === 0) {
+               return cookie.substr(cookieName.length);
+           }
+       }
+    }
+
+    /**
+     * Delete cookie
+     *
+     * @access public
+     * @param name {String} cookie name
+     *        opt_path {String} the path of cookie
+     *        opt_domain {String} the domain of cookie
+     * @return {Void}
+     */
+   ,del: function (name, opt_path, opt_domain) {
+
+       this.set(name, '', 0, opt_path, opt_domain);
+
+       if (document.cookie.indexOf(name+"=") >= 0) {
+           QQWB.log.warning("Cookie may not be deleted as you expected");
+       }
+
+       return this;
+    }
+});
+/**
+ * Tencent weibo javascript library
+ *
+ * Function extension
+ *
+ * @author michalliu
+ * @version 1.0
+ * @package ext
+ * @module Function
+ * @requires base
+ */
+QQWB.extend("Function",{
+    /**
+     * Determine whether an object is Function
+     *
+     * @access public
+     * @param arg {Mixed} anything
+     * @return {Boolean}
+     */
+    isFunction: function (arg) {
+        return typeof arg === "function";
+    }
+});
+/**
+ * Tencent weibo javascript library
+ *
+ * String extension
+ *
+ * //TODO: encoding libraries
+ *
+ * http://www.cnblogs.com/cgli/archive/2011/05/17/2048869.html
+ * http://www.blueidea.com/tech/web/2006/3622.asp
+ *
+ * @author michalliu
+ * @version 1.0
+ * @package ext
+ * @module String
+ * @requires base
+ */
+QQWB.extend("String",{
+    /**
+     * Determine whether an object is string
+     *
+     * @access public
+     * @param source {Mixed} anything
+     * @return {Boolean}
+     */
+    isString: function (source) {
+        return typeof source === "string";
+    }
+
+});
+/**
+ * Tencent weibo javascript library
+ *
+ * Array extension
+ *
+ * @author michalliu
+ * @version 1.0
+ * @package ext
+ * @module Array
+ * @requires base
+ *           String
+ */
+QQWB.extend("Array",{
+    /**
+     * Get whether an object is array
+     *
+     * @access public
+     * @param arg {Mixed} anything
+     * @return {Boolean}
+     */
+    isArray: function (arg) {
+        return Object.prototype.toString.call(arg) === "[object Array]";
+    }
+    /**
+     * Get whether an object in the array
+     *
+     * @access public
+     * @param arr {Array} the array object
+     *        arg {Mixed} anything
+     * @return {Boolean}
+     */
+   ,inArray: function (arr, arg) {
+       for (var i=0,l=arr.length; i<l; i++) {
+           if (arg === arr[i]) {
+               return true;
+           }
+       }
+       return false;
+    }
+    /**
+     * Build array from String
+     *
+     * @access public
+     * @param source {String} the source string
+     * @param optSep {Regexp|String} the seprator passed into String.split method
+     * @param optMax {Number} the maxCount of the newly builded array
+     * @return {Array}
+     */
+   ,fromString: function (source, optSep, optMax) {
+       if (!QQWB.String.isString(source)) {
+           return [];
+       } 
+       optSep = optSep || "";
+       return optMax ? source.split(optSep, optMax) : source.split(optSep);
+    }
+    /**
+     * Build array from an array-like object
+     *
+     * @access public
+     * @param source {Object} the source object
+     * @param optMax {Number} the maxCount of the newly builded array
+     * @return {Array}
+     */
+   ,fromArguments: function (source, optMax) {
+       if (typeof source !== "object") {
+           return [];
+       } 
+       return optMax ? Array.prototype.slice.call(source, optMax) : Array.prototype.slice.call(source);
+    }
+    /**
+     * Argument object to array
+     * 
+     * @deprecated use fromString,fromArguments instead
+     * @access public
+     * @param arg {Mixed} source
+     * @return {Array}
+     */
+   ,toArray: function (arg) {
+       if (typeof arg == "string") {
+           return arg.split("");
+       } else if (typeof arg == "object") {
+           return Array.prototype.slice.call(arg,0);
+       } else {
+           return this.toArray(arg.toString());
+       }
+    }
+    /**
+     * Enumerate the array
+     *
+     * Note:
+     * If handler executed and returned false,
+     * The enumeration will stop immediately
+     *
+     * @access public
+     * @param arr {Array} the array object
+     *        handler {Function} the callback function
+     */
+   ,each: function (arr, handler) {
+       for (var i=0,l=arr.length; i<l; i++) {
+           if (false === handler(i,arr[i])) {
+               break;
+           }
+       }
+    }
+});
+/**
+ * Tencent weibo javascript library
+ *
+ * Deferred object
+ *
+ * Note:
+ *
+ * Code is ported from jquery
+ * A good explaination at 
+ * http://stackoverflow.com/questions/4866721/what-are-deferred-objects/4867928#comment-8591160
+ *
+ * @author michalliu
+ * @version 1.0
+ * @package core
+ * @module deferred
+ * @requires base
+ *           ext.Array
+ *           ext.Function
+ */
+
+QQWB.extend("deferred", {
+	 /**
+	  * Deferered object read-only methods
+	  */
+	_promiseMethods: "done fail isResolved isRejected promise then always success error complete whatever".split(" ")
+	/**
+	 * Create a simple deferred object (one callback list)
+	 *
+	 * @access private
+	 * @return a deferred object
+	 */
+   ,_deferred: function () {
+		var 
+		    callbacks = [], // callback list
+			fired, // stored [ context, args], use to fire again
+			firing, // to avoid firing when already doing so
+			cancelled, // flag to know if the deferred has been cancelled
+			deferred = { // the deferred itself
+				done: function () {
+					if (!cancelled) {
+						var 
+						    args = arguments
+						   ,elem
+						   ,_fired;
+
+						   // we should consider about fired status here
+						   // this is neccesary to handle how done deals
+						   // with arrays recursively
+						   if (fired) {
+							   _fired = fired;
+							   fired = 0;
+						   }
+
+						   // add callbacks smartly
+						   for (var i=0,l=args.length; i<l; i++) { 
+							    elem = args[i];
+							    if (QQWB.Array.isArray(elem)) {
+								   deferred.done.apply(deferred, elem);
+							   } else if (QQWB.Function.isFunction(elem)) {
+								   callbacks.push(elem);
+						    	}
+						   }
+
+						   // consider fired here
+						   // if it's already been resolved then call resolveWith
+						   // using the cached context and arguments to call the 
+						   // callbacks immediatly
+						   if (_fired) {
+							   deferred.resolveWith(_fired[0], _fired[1]);
+						   }
+					}
+					return this;
+				}
+
+				// resolve with given context and args
+			   ,resolveWith: function (context, args) {
+				   // if its been cancelled then we can't resolve
+				   // if it has fired then we can't fire again
+				   // if it's currently firing then we can't fire
+				   if (!cancelled && !fired && !firing) {
+					   args = args || [];
+					   firing = 1;
+					   // using try {} finally {} block because you are
+					   // calling external callbacks, maybe these callbacks
+					   // made by the user which are not bugfree.
+
+					   // the finally block will always run no matter how bad
+					   // the internal code is
+					   try { 
+					       while (callbacks[0]) {
+							   callbacks.shift().apply(context, args);// first in first out
+						   }
+					   }
+					   finally {
+						   fired = [context, args]; // cache the the context and args
+						   firing = 0;
+					   }
+				   }
+				   return this;
+			    }
+
+				// Resolve with this as context and given arguments
+			   ,resolve: function () {
+				   deferred.resolveWith(this, arguments);
+				   return this;
+			    }
+
+				// Has this deferred been resolved?
+			   ,isResolved: function () {
+				   return !!(firing || fired);
+			    }
+				// Cancel
+			   ,cancel: function () {
+				   cancelled = 1;
+				   callbacks = [];
+				   return this;
+			    }
+	    };
+		return deferred;
+	}
+	/**
+	 * Full fledged deferred (two callback list success and fail)
+	 */
+   ,deferred: function (func) {
+	   var
+	       promise,
+	       deferred = QQWB.deferred._deferred(),
+	       failDeferred = QQWB.deferred._deferred();
+
+	   // Add errorDeferred methods, then and promise
+	   QQWB.extend(deferred, {
+		   // send to failed deferred object
+		   fail: failDeferred.done
+		   // send to sucess callback and failcallbacks at a time
+		  ,then: function (doneCallbacks, failCallbacks) {
+			  deferred.done(doneCallbacks).fail(failCallbacks);
+			  return this;
+		   }
+		   // send to success callback and to fail callback aslo
+		  ,always: function () {
+			  return deferred.done.apply(deferred, arguments).fail.apply(this, arguments);
+		   }
+		   // invoke callbacks in failed deferred with context and arguments
+		  ,rejectWith: failDeferred.resolveWith
+		   // invoke callbacks in failed deferred
+		  ,reject: failDeferred.resolve
+		   // is callbacks in failed deferred invoked
+		  ,isRejected: failDeferred.isResolved
+		  // promise to return a read-only copy(cant call resolve resolveWith
+		  // reject and rejectWith) of deferred
+		  ,promise: function (obj) {
+			  if (obj == null) {
+				  if (promise) {
+				      return promise;
+				  }
+				  promise = obj = {};
+			  }
+			  var i = QQWB.deferred._promiseMethods.length;
+			  while (i--) {
+				  obj[QQWB.deferred._promiseMethods[i]] = deferred[QQWB.deferred._promiseMethods[i]];
+			  }
+			  return obj;
+		   }
+	   });
+
+	   // lovely alternative function names
+	   deferred.success = deferred.done;
+       deferred.error = deferred.fail;
+       deferred.complete = deferred.whatever = deferred.always;
+
+	   // funciton either success or fail
+	   // if success fail deferer will cancel,vice versa
+	   deferred.done(failDeferred.cancel).fail(deferred.cancel);
+
+	   // unexpose cancel
+	   delete deferred.cancel;
+
+	   // a chance allow outer function to get a pointer to deferred object
+	   func &&  func.call(deferred, deferred);
+
+	   return deferred;
+    }
+	/**
+	 * Deferred helper
+	 */
+   ,when: function (firstParam) {
+	   var 
+	       args = arguments,
+		   length = args.length,
+		   count = length,
+		   deferred = length <= 1 && firstParam && QQWB.Function.isFunction(firstParam.promise) ?
+		              firstParam :
+					  QQWB.deferred.deferred(); // generate a deferred object or use the exists one
+
+	    function resolveFunc (i) {
+			return function (value) {
+				args[i] = arguments.length > 1 ? QQWB.Array.fromArguments(arguments) : value;
+				if (!(--count)) { // the last operation is resolved, resolve the when deffered
+					deferred.resolveWith(deferred, QQWB.Array.fromArguments(args));
+				}
+			}
+		}
+
+		if (length > 1) { // more than one deferred object
+		    for ( var i=0; i < length; i++) {
+				if (args[i] && QQWB.Function.isFunction(args[i].promise)) { // arg is deferred object
+				    // deferred.reject will called if any operation in when in rejected
+				    args[i].promise().then(resolveFunc(i),deferred.reject);
+				} else { // ingore arg that not a deferred object
+					--count; // total arg -- 
+				}
+
+				if (!count) { // nothing is deferred
+				    deferred.resolveWith (deferred, args);// let new deferred object handle it
+				}
+			}
+		} else if ( deferred !== firstParam) {
+			deferred.resolveWith(deferred, length ? [firstParam] : []);
+		}
+
+		return deferred.promise();
+    }
+});
+
+// expose to global namespace
+QQWB.provide("when", function () {
+    return QQWB.deferred.when.apply(this,QQWB.Array.fromArguments(arguments));
+});
+/**
+ * Tencent weibo javascript library
+ *
+ * Querystring encoder and decoder
+ *
+ * @author michalliu
+ * @version 1.0
+ * @package core
+ * @module queryString
+ * @requires base
+ */
+
+QQWB.extend("queryString",{
+    /**
+     * Encode parameter object to query string
+     *
+     * @access public
+     * @param params {Object} the object contains params
+     *        opt_sep {String} the seprator string, default is '&'
+     *        opt_encode {Function} the function to encode param, default is encodeURIComponent
+     * @return {String} the encoded query string
+     */
+    encode: function (params, opt_sep, opt_encode) {
+        var 
+            regexp = /%20/g,
+            sep = opt_sep || '&',
+            encode = opt_encode || encodeURIComponent,
+            pairs = [];
+
+        for (var key in params) {
+            if (params.hasOwnProperty(key)) {
+                var val = params[key];
+                if (val !== null && typeof val != 'undefined') {
+                    pairs.push(encode(key).replace(regexp,"+") + "=" + encode(val).replace(regexp,"+"));
+                }
+            }
+        }
+
+        pairs.sort();
+        return pairs.join(sep);
+    }
+    /**
+     * Decode query string to parameter object
+     *
+     * @param str {String} query string
+     *        opt_sep {String} the seprator string default is '&'
+     *        opt_decode {Function} the function to decode string default is decodeURIComponent
+     * @return {Object} the parameter object
+     */
+   ,decode: function (str, opt_sep, opt_decode) {
+       var
+           decode = opt_decode || decodeURIComponent,
+           sep = opt_sep || '&',
+           parts = str.split(sep),
+           params = {},
+           pair;
+
+       for (var i = 0,l = parts.length; i<l; i++) {
+           pair = parts[i].split('=',2);
+           if (pair && pair[0]) {
+               params[decode(pair[0])] = decode(pair[1]);
+           }
+       }
+
+       return params;
+    }
+});
+/**
+ * Tencent weibo javascript library
+ *
+ * String extension
+ *
+ * @author michalliu
+ * @version 1.0
+ * @package ext
+ * @module XML
+ * @requires base
+ */
+QQWB.extend("XML",{
+    /**
+     * Determine is XML object or not
+     *
+     * @access public
+     * @param xml {Object} xml object
+     * @return {Boolean}
+     */
+    isXML: function (xml) {
+       //TODO: not implement yet
+    }
+    /**
+     * xml object to string
+     *
+     * @access public
+     * @param xml {Object} xml object
+     * @return {String}
+     */
+   ,toString: function (xml) {
+        var str;
+        if (window.ActiveXObject) {
+            str = xml.xml;
+        } else {
+            str = (new XMLSerializer()).serializeToString(xml);
+        }
+        return str;
+    }
+    /**
+     * create xml object from string
+     *
+     * @access public
+     * @param str {String} xml string
+     * @return {Object} xml object
+     */
+   ,fromString: function (str) {
+       var xml;
+       if (window.ActiveXObject) {
+           xml = new ActiveXObject("Microsoft.XMLDOM");
+           xml.async = "false";
+           xml.loadXML(str);
+       } else {
+           var parser = new DOMParser();
+           xml = parser.parseFromString(str, "text/xml");
+       }
+       return xml;
+    }
+});
+/**
+ * Tencent weibo javascript library
+ *
+ * JSON manipulate
+ *
+ * @author michalliu
+ * @version 1.0
+ * @package ext
+ * @module JSON
+ * @requires base
+ *           String
+ */
+QQWB.extend("JSON",{
+    /**
+     * Get JSON Object from string
+     *
+     * @access public
+     * @param source {String} the source string
+     * @throws {SyntaxError} sytaxError if failed to parse string to JSON object
+     * @return {Object} json object
+     */
+    fromString: function (source) {
+        if (!source || !QQWB.String.isString(source)) {
+            return {};
+        } else {
+            // Make sure leading/trailing whitespace is removed (IE can't handle it)
+            source = source.replace(/^\s+/,"").replace(/\s+$/,"");
+
+            if ( window.JSON && window.JSON.parse ) {
+                source = window.JSON.parse( source );
+            } else {
+                // Make sure the incoming data is actual JSON
+                // Logic borrowed from http://json.org/json2.js
+                if ( /^[\],:{}\s]*$/.test( source.replace( /\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g, "@" )
+                    .replace( /"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, "]" )
+                    .replace( /(?:^|:|,)(?:\s*\[)+/g, "")) ) {
+
+                    source = (new Function( "return " + data ))();
+                } else {
+                    throw new SyntaxError ("Invalid JSON: " + source);
+                }
+            }
+
+            return source;
+        } // end if
+    } // end fromString
+});
+/**
+ * Tencent weibo javascript library
+ *
+ * Input and output,AJAX,JSONP
+ *
+ * @author michalliu
+ * @version 1.0
+ * @package core
+ * @module io
+ * @requires base
+ *           queryString
+ *           deferred
+ *           ext.XML
+ *           ext.JSON
+ */
+
+QQWB.extend("io", {
+    /**
+     * The script IO mechanism
+     *
+     * @access private
+     * @param cfg {Object} the configration for script io
+     * @return {Object} to send/abort the request
+     */
+    _IOScript: function (cfg) {
+        var 
+            script,
+            head = document.head || document.getElementsByTagName("head")[0] || document.documentElement;
+        return {
+            send: function (complete) {
+                script = document.createElement("script");
+                script.async = "async";
+
+                if (cfg.charset) {
+                    script.charset = cfg.charset;
+                }
+
+                script.src = cfg.url;
+
+                script.onload = script.onreadystatechange = function (e,isAbort) {
+
+                    if (isAbort || !script.readyState || /loaded|complete/.test(script.readyState)) {
+
+                        script.onload = script.onreadystatechange = null;
+
+                        if (head && script.parentNode) {
+                            head.removeChild(script);
+                        }
+
+                        script = null;
+
+                        !isAbort && complete && complete.apply(QQWB,[200,"success"]);
+                        isAbort && complete && complete.apply(QQWB,[-1,"aborted"]);
+                    }
+                };
+
+                script.onerror = function (e) { // ie 6/7/8/opera not supported(not tested)
+                    complete && complete.apply(QQWB,[404,e]);
+                };
+
+                head.insertBefore(script, head.firstChild);
+            }
+
+           ,abort: function () {
+               if (script) {
+                   script.onload(0,1);
+               }
+            }
+        };
+    }
+
+    /**
+     * The AJAX IO mechanism
+     *
+     * @access private
+     * @param cfg {Object} the configration for ajax io
+     * @return {Object} to send/abort the request
+     */
+   ,_IOAjax: function (cfg) {
+	   
+	   var callback,
+	       cfg = cfg || {},
+	       xhr = window.XMLHttpRequest ? 
+	             new window.XMLHttpRequest() :
+	             new window.ActiveXObject("Microsoft.XMLHTTP");
+
+       if (cfg.dataType) {
+           cfg.dataType = cfg.dataType.toLowerCase();
+       }
+
+       if (!cfg.async) {
+           cfg.async = "async";
+       }
+
+	   return {
+		   send: function (complete) {
+
+			   if (cfg.username) {
+				   xhr.open(cfg.type, cfg.url, cfg.async, cfg.username, cfg.password);
+			   } else {
+				   xhr.open(cfg.type, cfg.url, cfg.async);
+			   }
+
+			   try {
+                   if (cfg.type == "POST") {
+                       xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+                   }
+				   xhr.setRequestHeader("X-Requested-With","XMLHttpRequest");
+			   } catch (ex) {}
+
+			   xhr.send(cfg.data || null);
+
+			   callback = function (_, isAbort) {
+				   var
+				       status,
+					   statusText,
+					   responseHeaders,
+					   responses,
+                       response,
+					   xml;
+
+				   try {
+					   // never called and (is aborted or complete)
+				       if (callback && (isAbort || xhr.readyState === 4)) {
+						   
+						   // only call once
+						   callback = null;
+
+						   if (isAbort) {
+							   if (xhr.readyState !== 4) {
+								   xhr.abort();
+							   }
+						    } else {
+								status = xhr.status;
+								responseHeaders = xhr.getAllResponseHeaders();
+								responses = {};
+								xml = xhr.responseXML;
+
+								if (xml && xml.documentElement) {
+								    responses.xml = xml;
+								}
+
+								responses.text = xhr.responseText;
+
+								try {
+								    statusText = xhr.statusText;
+								} catch (webkitException) {
+									statusText = "";
+								}
+
+								if (status === 1223) {
+								    status = 204;
+								}
+
+                                // parse to JSON
+                                if (cfg.dataType == "json") {
+									response = QQWB.JSON.fromString(responses.text);
+                                } else if (cfg.dataType == "xml") { // parse to xml
+                                    response = responses.xml;
+                                } else { // as normal text
+                                    response = responses.text;
+                                }
+
+					    	}
+					   }
+			       } catch (firefoxException) {
+					   if (!isAbort) {
+					       complete(-1, firefoxException);
+					   }
+			       }
+
+				   if (response) {
+					   complete(status, statusText, response, responseHeaders, cfg.dataType); // take cfg.dataType back
+				   }
+			   };
+
+			   if (!cfg.async || xhr.readyState === 4) {
+			       callback();
+			   } else {
+				   xhr.onreadystatechange = callback;
+			   }
+		   }
+		  ,abort: function () {
+			  if (callback) {
+			      callback(0, 1);
+			  }
+		   }
+	   };
+	   
+    }
+    /**
+     * The Flash IO mechanism
+     *
+     * @access private
+     * @param cfg {Object} the configration for script io
+     * @return {Object} to send/abort the request
+     */
+   ,_IOFlash: function (cfg) {
+
+	   var callback,
+	       readyState,
+	       cfg = cfg || {};
+	   
+       if (cfg.dataType) {
+	       cfg.dataType = cfg.dataType.toLowerCase();
+	   }
+
+	   return {
+		   send: function (complete) {
+
+			   readyState = 1;
+               // the call is allowed call once
+			   callback = function (_, isAbort) {
+				   var
+				       status,
+					   statusText,
+					   responseHeaders,
+					   responses,
+                       response,
+					   xml,
+					   readyState = 4;
+
+				   try{
+				       if (callback && (isAbort || readyState == 4)) {
+
+				           callback = null;
+
+				           if (isAbort) {
+				        	   complete(-1, "request has aborted");
+				           } else {
+				        	   var success = /complete/i.test(_.type);
+				        	   status = success ? 200 : 204;
+				        	   statusText = success ? "ok" : _.type;
+				        	   responseHeaders = "";
+				        	   responses = {}; // internal object
+				        	   responses.text = _.target.data;
+
+				        	   if (cfg.dataType == "json") {
+				        		   response = QQWB.JSON.fromString(responses.text);
+                               } else if (cfg.dataType == "xml"){
+				        		   response = QQWB.XML.fromString(responses.text);
+                               } else {
+				        		   response = responses.text;
+                               }
+				           }
+
+				           // has response
+				           if (response) {
+				        	   complete(status, statusText, response, responseHeaders);
+				           }
+					   }
+					} catch (ex) {
+						if (!isAbort) {
+							complete(-1, ex + "");
+						}
+					}
+			   };
+
+			   // register flash message callback
+			   // lazy initialize flash message callbacks
+			   if (!window.onFlashRequestComplete_8df046) {
+
+				   // this function will be called by flash when httpRequest is done
+                   window.onFlashRequestComplete_8df046 = function (event) {
+					   // first in first out
+					   onFlashRequestComplete_8df046.callbacks.shift()(event);
+                   };
+
+				   // our callback queue
+                   window.onFlashRequestComplete_8df046.callbacks = [];
+		       }
+
+			   // push to queue
+               window.onFlashRequestComplete_8df046.callbacks.push(callback);
+
+	           QQWBFlashTransport.httpRequest(cfg.url,cfg.data,cfg.type);
+
+		   }
+		  ,abort: function () {
+			  if (callback) {
+			      callback(0,1);
+			  }
+		   }
+	   };
+    }
+    /**
+     * Helper method to make api ajax call
+     *
+     */
+   ,_apiAjax: function (api, apiParams, dataType, type) {
+       // build ajax acceptable opt object from arguments
+       var opts = {
+               type: type.toUpperCase()
+              ,url: QQWB._domain.api + api
+              ,data: QQWB.queryString.encode(apiParams)
+              ,dataType: dataType
+           };
+       if (opts.type == "GET") {
+           opts.url += opts.data ? "?" + opts.data : "";
+           delete opts.data;
+       }
+       return QQWB.io.ajax(opts);
+    }
+	/**
+	 * Helper method to make api ajax call via flash
+	 *
+	 */
+  ,_apiFlashAjax: function (api, apiParams, dataType, type) {
+       var opts = {
+               type: type.toUpperCase()
+              ,url: QQWB._domain.api + api
+              ,data: QQWB.queryString.encode(apiParams)
+              ,dataType: dataType
+           };
+       if (opts.type == "GET") {
+           opts.url += opts.data ? "?" + opts.data : "";
+           delete opts.data;
+       }
+       return QQWB.io.flashAjax(opts);
+   }
+   /**
+	* Emulate AJAX request via flash
+	*
+	* @access public
+	* @param opts {Object} url configuration object
+	* @return {Object} promise object
+	*/
+  ,flashAjax: function (opts) {
+       var deferred = QQWB.deferred.deferred();
+
+	   if (!opts.type) {
+		   opts.type = "get";
+	   }
+
+       this._IOFlash(opts).send(function (status, statusText, responses, responseHeaders) {
+       	if (status !== 200) {
+       		deferred.reject(status, statusText);
+       	} else {
+       		deferred.resolve(status, statusText, responses, responseHeaders);
+       	}
+       });
+
+	   return deferred.promise();
+   }
+	/**
+	 * Ajax request sender
+	 * 
+	 * @access public
+	 * @param opts {Object} ajax settings
+	 * @return {Object} deferred object
+	 */
+   ,ajax: function (opts) {
+
+	    var deferred = QQWB.deferred.deferred();
+
+	    if (!opts.type) {
+	        opts.type = "get";
+	    }
+
+		this._IOAjax(opts).send(function (status, statusText, responses, responseHeaders, dataType) {
+			if (status !== 200) {
+				deferred.reject(status, statusText);
+			} else {
+				deferred.resolve(status, statusText, responses, responseHeaders, dataType);
+			}
+		});
+
+		return deferred.promise();
+    }
+    /**
+     * Dynamiclly load script
+     *
+     * @access public
+     * @param src {String} script src
+     * @param optCharset {String} script charset
+     * @return {Object} promise
+     */
+   ,script: function (src, optCharset) {
+       var
+           optCharset = optCharset || "utf-8",
+           deferred = QQWB.deferred.deferred();
+
+       this._IOScript({
+           charset: optCharset
+          ,url: src
+       }).send(function (status, statusText) {
+           if (status !== 200) {
+               deferred.reject(status, statusText);
+           } else {
+               deferred.resolve(status, statusText);
+           }
+       });
+
+       return deferred.promise();
+    }
+    /**
+     * JSONP request
+     *
+     * TODO: modified to as documention described
+     * @access public
+     * @param url {String} jsonp url callback is added automaticlly
+     * @return {Object} promise
+     */
+    ,jsonp: function (url) {
+        var 
+            deferred = QQWB.deferred.deferred(),
+            callbackQueryName = "callback", // callback name in query string
+            callbackNamePrefix = "jsonp_", // jsonp callback function name prefix
+            callbackName = callbackNamePrefix + QQWB.uid(), //random jsonp callback name
+            _oldcallback = window.callbackName; // keep a reference to the variable we will overwrite(very little chance)
+
+        window[callbackName] = function (data) {
+
+            // jsonp successed
+            deferred.resolve(data);
+
+            window[callbackName] = _oldcallback; // restore back to original value
+            
+            if (typeof window[callbackName] == "undefined") { // original value is undefined
+                delete window[callbackName]; // delete it
+            }
+        };
+
+        this._IOScript({
+            charset: "utf-8"
+           ,url: url + "&" + callbackQueryName + "=" + callbackName
+        }).send(function (status, statusText) {
+            if (status !== 200) {
+                deferred.reject(status, statusText);
+            }
+        });
+
+
+       return deferred.promise();
+    }
+});
+
+// expose to global namespace
+QQWB.provide("ajax", function (opts) {
+    return QQWB.io.ajax.call(QQWB.io, opts);
+});
+
+
+QQWB.provide("jsonp", function (url) {
+    return QQWB.io.jsonp.call(QQWB.io, url);
+})
+
+QQWB.provide("script", function (src, optCharset) {
+    return QQWB.io.script.apply(QQWB.io, [src, optCharset]);
+})
+/**
+ * Tencent weibo javascript library
+ *
+ * Token management
+ *
+ * @author michalliu
+ * @version 1.0
+ * @package auth
+ * @module token
+ * @requires base
+ *           core.time
+ *           core.cookie
+ *           core.io
+ */
+QQWB.extend("_token",{
+    /**
+     * Save access token to cookie
+     *
+     * @access public
+     * @param accessToken {String} access token string
+     *        expireIn {Number} expire after seconds from now
+     *        optUsername {String} username associate with accesstoken
+     *        optNickname {String} nickname associate with accesstoken
+     * @return {Object} QQWB object
+     */
+    setAccessToken: function (accessToken, expireIn, optUsername, optNickname) {
+        var tokenUser = this.getTokenUser(true); // retrieve the old user info accesstoken
+        QQWB.cookie.set(QQWB._cookie.names.accessToken
+                       ,[accessToken
+                           ,QQWB.time.now() + expireIn * 1000
+                           ,optUsername || (tokenUser && tokenUser.name) || ""
+                           ,optNickname || (tokenUser && tokenUser.nick) || ""
+                        ].join("|")
+                       ,365 * 24 * 3600
+                       ,QQWB._cookie.path
+                       ,QQWB._cookie.domain
+            );
+        return QQWB;
+    }
+    /**
+     * Get access token saved before
+     *
+     * @access public
+     * @param optRaw {Boolean} if set to true, will not consider about accesstoken expiration
+     * @return {String|undefined} a string represent access token if available
+     */
+   ,getAccessToken: function (optRaw) {
+       var token = QQWB.cookie.get(QQWB._cookie.names.accessToken);
+       if (token) {
+           token = token.split("|",2);
+           if (optRaw || parseInt(token[1],10) > QQWB.time.now()) {
+               return token[0];
+           }
+       }
+    }
+    /**
+     * Get user infomation associated with access token
+     *
+     * @access public
+     * @param optRaw {Boolean} if set to true, will not consider about expiration
+     * @return {Object|undefined} an user object associated with access token if available
+     */
+   ,getTokenUser: function (optRaw) {
+       var token = QQWB.cookie.get(QQWB._cookie.names.accessToken);
+       if (token) {
+           token = token.split("|",4);
+           if (optRaw || parseInt(token[1],10) > QQWB.time.now()) {
+               return {
+                   name: token[2]
+                  ,nick: token[3]
+               };
+           }
+       }
+    }
+    /**
+     * Clear access token
+     *
+     * @access public
+     * @return {Object} QQWB object
+     */
+   ,clearAccessToken: function () {
+        QQWB.cookie.del(QQWB._cookie.names.accessToken,QQWB._cookie.path,QQWB._cookie.domain);
+        return QQWB;
+    }
+    /**
+     * Save refresh token to cookie
+     *
+     * @param refreshToken {String} refresh token string
+     * @return {Object} QQWB object
+     */
+   ,setRefreshToken: function (refreshToken) {
+        QQWB.cookie.set(QQWB._cookie.names.refreshToken
+                       ,refreshToken
+                       ,365 * 24 * 3600
+                       ,QQWB._cookie.path
+                       ,QQWB._cookie.domain
+            );
+        return QQWB;
+    }
+    /**
+     * Get refresh token saved before
+     *
+     * @return {String|undefined} a string represent refresh token if available
+     */
+   ,getRefreshToken: function () {
+        return QQWB.cookie.get(QQWB._cookie.names.refreshToken);
+    }
+    /**
+     * Clear refresh token
+     *
+     * @access public
+     * @return {Object} QQWB object
+     */
+   ,clearRefreshToken: function () {
+        QQWB.cookie.del(QQWB._cookie.names.refreshToken,QQWB._cookie.path,QQWB._cookie.domain);
+        return QQWB;
+    }
+    /**
+     * Use refresh token to obtain an access token
+     *
+     * @access public
+     * @param optSuccessCallback {Function} callback function when result returned
+     */
+   ,exchangeForToken: function (optSuccessCallback) {
+       QQWB.io.jsonp(QQWB._domain.exchange + "?" + QQWB.queryString.encode({
+           response_type: "token"
+          ,client_id: QQWB._appkey
+          ,scope: "all"
+          ,state: "1"
+          ,refresh_token: this.getRefreshToken()
+          ,access_token: this.getAccessToken(true)
+       })).success(function (response) {
+
+           var _response = response;
+
+           response = QQWB.queryString.decode(response);
+
+           if(response.access_token){
+
+               !response.expires_in && QQWB.log.error("token expires_in not retrieved");
+               !response.wbname && QQWB.log.warning("weibo username not retrieved, will not update username");
+               !response.wbnick && QQWB.log.warning("weibo usernick not retrieved, will not update usernick");
+
+               QQWB._token.setAccessToken(response.access_token, parseInt(response.expires_in,10), response.wbname, response.wbnick);
+
+               if (response.refresh_token) { // which should exists if accesstoken exists
+                    QQWB._token.setRefreshToken(response.refresh_token);
+               } else {
+                   QQWB.log.error("refresh token not retrieved");
+               }
+
+               QQWB.log.info("exchange token succeed");
+
+           } else if (response.error) {
+               QQWB.log.error("exchange token error " + response.error );
+           } else {
+               QQWB.log.error("unexpected result returned from server " + _response + " while exchanging for new access token");
+           }
+
+           optSuccessCallback && optSuccessCallback.call(QQWB,response);
+
+       }).error(function (status, statusText) {
+           if (status === 404) {
+               QQWB.log.error("exchange token has failed, script not found");
+           } else {
+               QQWB.log.error("exchange token has failed, " + statusText);
+           }
+       });
+
+       return QQWB;
+    }
+    /**
+     * Obtain an access token
+     *
+     * @access public
+     * @param optSuccessCallback {Function} callback function when result returned
+     */
+   ,getNewAccessToken: function (optSuccessCallback) {
+       QQWB.io.jsonp(QQWB._domain.query + "?" + QQWB.queryString.encode({
+           response_type: "token"
+          ,client_id: QQWB._appkey
+          ,scope: "all"
+          ,state: "1"
+       })).success(function (response) {
+
+           var _response = response;
+
+           response = QQWB.queryString.decode(response);
+
+           if(response.access_token){
+
+               !response.expires_in && QQWB.log.error("token expires_in not retrieved");
+               !response.wbname && QQWB.log.warning("weibo username not retrieved");
+               !response.wbnick && QQWB.log.warning("weibo usernick not retrieved");
+
+               QQWB._token.setAccessToken(response.access_token, parseInt(response.expires_in,10), response.wbname, response.wbnick);
+
+               if (response.refresh_token) { // which should exists if accesstoken exists
+                    QQWB._token.setRefreshToken(response.refresh_token);
+               } else {
+                   QQWB.log.error("refresh token not retrieved");
+               }
+
+               QQWB.log.info("retrieve new access token succeed");
+
+           } else if (response.error) {
+               QQWB.log.error("retrieve new access token error " + response.error );
+           } else {
+               QQWB.log.error("unexpected result returned from server " + _response + " while retrieving new access token");
+           }
+
+           optSuccessCallback && optSuccessCallback.call(QQWB,response);
+
+       }).error(function (status, statusText) {
+           if (status === 404) {
+               QQWB.log.error("get token has failed, script not found");
+           } else {
+               QQWB.log.error("get token failed, " + statusText);
+           }
+       });
+
+       return QQWB;
+    }
+    /**
+     * Auto resolve response from server
+     *
+     * @param responseText {String} the server response
+     * @param optGlobal {Object} the global window object,default is current window
+     */
+   ,resolveResponse: function (responseText, optGlobal) {
+       var 
+           loginStatus,
+           global = (optGlobal || window)["QQWB"],
+           response = global.queryString.decode(responseText);
+
+       if (response.access_token) {
+
+           global._token.setAccessToken(response.access_token, parseInt(response.expires_in,10), response.wbname, response.wbnick);
+
+           if (response.refresh_token) { // which should exists if accesstoken exists
+               global._token.setRefreshToken(response.refresh_token);
+           } else {
+               global.log.error("refresh token not retrieved");
+           }
+
+           loginStatus = global.loginStatus(); // get current login status
+           global.log.info("user " + loginStatus.name + " logged in");
+           global.trigger(global.events.USER_LOGGEDIN_EVENT,loginStatus);
+       } else if (response.error) {
+           global.log.error("login error occurred " + response.error);
+           response.message = response.error; // alternative error name
+           global.trigger(global.events.USER_LOGIN_FAILED_EVENT,response);
+       } else {
+           global.log.error("unexpected result returned from server " + _response);
+           global.trigger(global.events.USER_LOGIN_FAILED_EVENT,response);
+       }
+    }
+});
+/**
+ * Tencent weibo javascript library
+ *
+ * A simple event system provide hooks
+ *
+ * @author michalliu
+ * @version 1.0
+ * @package event
+ * @module eventProvider
+ * @requires base
+ *           ext.Array
+ */
+QQWB.extend("_eventProvider",{
+
+    /**
+     * Get event system's internal map or create it if not exists
+     *
+     * @access private
+     * @return {Object} the internal event map
+     */
+    _getEventsMap: function () {
+        if (!this._eventsMap) {
+            this._eventsMap = {};
+        }
+        return this._eventsMap;
+    }
+
+    /**
+     * Bind an event
+     *
+     * @access public
+     * @param name {String} the event name to bind
+     * @param handler {Function} the handler for this event
+     * @return {Void}
+     */
+   ,bind: function (name, handler) {
+       var evts = this._getEventsMap();
+       if (!evts[name]) {
+           evts[name] = [handler];
+       } else {
+           if (!QQWB.Array.inArray(evts[name],handler)) {
+               evts[name].push(handler);
+           }
+       }
+    }
+
+    /**
+     * Unbind an event
+	 * 
+	 * If no handler provided, it will unbind all the handlers to this event
+     * @access public
+     * @param name {String} the event name to unbind
+     *        handler {Function} the handler's reference for this event to unbind
+     * @return {Void}
+     */
+   ,unbind: function (name, handler) {
+	   var handlers = this._getEventsMap()[name];
+	   if (handlers) {
+		   if (handler) { // unbind specific handler,do nothing if handler not registered
+			   for (var i=0,l=handlers.length; i<l; i++) {
+				   if (handler === handlers[i]) {
+					   handlers[i] = null;
+				   }
+			   }
+		   } else { // unbind all the handlers
+			   //handlers.length = 0;
+			   delete this._getEventsMap()[name];
+		   }
+	   }
+    }
+
+   /**
+	* Trigger a named event
+	*
+	* @access private
+	* @param name {String} the event name
+	*        data {Mixed} the event data
+	*/
+   ,trigger: function (name, data) {
+	   var handlers = this._getEventsMap()[name];
+	   if (handlers) {
+           for (var i=0,l=handlers.length; i<l; i++) {
+			   var handler = handlers[i];
+			   if (handler) {
+				   handler.call(QQWB,data);
+			   }
+           }
+	   }
+    }
+});
+/**
+ * Tencent weibo javascript library
+ *
+ * Event API
+ *
+ * @author michalliu
+ * @version 1.0
+ * @package event
+ * @module event
+ * @requires base
+ *           eventProvider
+ */
+
+// event methods
+//
+QQWB.extend("",{
+    /**
+     * Bind an event
+     *
+     * Example:
+     * 
+     * T.bind("UserLoggedIn", function () {
+     *     T.log.info("user logged in");
+     * });
+     *
+     * @param name {String} event name to bind
+     * @param handler {Function} the handler for this event
+     */
+    bind: function (name, handler) {
+        name = name.toLowerCase();
+        this._eventProvider.bind(name, handler);
+    	return this;
+    }
+
+    /**
+     * Unbind an event
+     *
+     * Example:
+     *
+     * // handler for when user logged in
+     * // keep a reference to this handler
+     * var userlogin = function () {
+     *     T.log.info("user logged in");
+     * }
+     *
+     * // bind handler
+     * T.bind("UserLoggedIn", userlogin);
+     *
+     * // unbind this handler 
+     * T.unbind("UserLoggedIn", userlogin);
+     *
+     * // unbind all the handlers
+     * T.unbind("UserLoggedIn")
+     *
+     * @param name {String} event name to unbind
+     *        handler {Function} the handler's reference for this event to unbind
+     */
+   ,unbind: function (name, handler) {
+        name = name.toLowerCase();
+        this._eventProvider.unbind(name, handler);
+	    return this;
+    }
+
+    /**
+     * Trigger an event manually
+     *
+     * Example:
+     *
+     * T.trigger("UserLoggedIn");
+     *
+     * @param eventName {String} the event's name to bind
+     * @param data {Mixed} the data passed to the callback function
+     */
+   ,trigger: function (name, data) {
+        name = name.toLowerCase();
+        this._eventProvider.trigger(name, data);
+        return this;
+    }
+});
+
+// internal supported events names
+QQWB.extend("events", {
+    USER_LOGGEDIN_EVENT: "UserLoggedIn"
+   ,USER_LOGIN_FAILED_EVENT: "UserLoginFailed"
+   ,USER_LOGOUT_EVENT: "UserLoggedOut"
+   ,TOKEN_READY_EVENT: "tokenReady"
+   ,DOCUMENT_READY_EVENT: "documentReady"
+   ,EVERYTHING_READY_EVENT: "everythingReady"
+});
+/**
+ * Tencent weibo javascript library
+ *
+ * Authenticate user
+ *
+ * @author michalliu
+ * @version 1.0
+ * @package auth
+ * @module auth
+ * @requires base
+ *           token
+ *           event.event
+ *           core.queryString
+ *           core.log
+ */
+QQWB.extend("",{
+    /**
+     * Login in user
+     *
+     * @access public
+     * @param optSuccessHandler {Function} handlers when login is success
+     * @param optFailHandler {Function} handlers when login is fail
+     * @return {Object|undefined}
+     */
+    login: function (optSuccessHandler, optFailHandler) {
+
+        if (!this._inited) {
+            this.log.critical("Library not initialized, call T.init() to initialize");
+        }
+
+        var loginStatus = this.loginStatus(); 
+
+        // user already logged in
+        if (loginStatus) {
+
+            optSuccessHandler && optSuccessHandler.call(this,loginStatus);
+
+        } else { // open authorization window
+
+            optSuccessHandler && this.bind(this.events.USER_LOGGEDIN_EVENT, optSuccessHandler);
+            optFailHandler && this.bind(this.events.USER_LOGIN_FAILED_EVENT, optFailHandler);
+
+            var 
+                currWindow = {
+                    x: window.screenX || window.screenLeft
+                   ,y: window.screenY || window.screenTop
+                   ,width: window.outerWidth || document.documentElement.clientWidth
+                   ,height: window.outerHeight || document.documentElement.clientHeight
+                },
+
+                authWindow = {
+                    width: 500
+                   ,height: 300
+                   ,authQuery: function () {
+                      return QQWB.queryString.encode({
+                               response_type: "token"
+                              ,client_id: QQWB._appkey
+                              ,redirect_uri: QQWB._domain.clientproxy
+                              ,referer: document.location.href // IE will lost http referer when new window opened
+                              ,scope: "all"
+                           });
+                    }
+                   ,x: function () {
+                       return parseInt(currWindow.x + (currWindow.width - this.width) / 2, 10);
+                    }
+                   ,y: function () {
+                       return parseInt(currWindow.y + (currWindow.height - this.height) / 2, 10);
+                    }
+                   ,popup: function () {
+                       this.contentWindow = window.open(QQWB._domain.auth + "?" + this.authQuery(), "", ["height="
+                                                                                                   ,this.height
+                                                                                                   ,", width="
+                                                                                                   ,this.width
+                                                                                                   ,", top="
+                                                                                                   ,this.y()
+                                                                                                   ,", left="
+                                                                                                   ,this.x()
+                                                                                                   ,", toobar="
+                                                                                                   ,"no"
+                                                                                                   ,", menubar="
+                                                                                                   ,"no"
+                                                                                                   ,", scrollbars="
+                                                                                                   ,"no"
+                                                                                                   ,", resizable="
+                                                                                                   ,"yes"
+                                                                                                   ,", location="
+                                                                                                   ,"yes"
+                                                                                                   ,", status="
+                                                                                                   ,"no"
+                           ].join(""));
+                       return this;
+                    }
+                   ,focus: function () {
+                       this.contentWindow && this.contentWindow.focus && this.contentWindow.focus();
+                       return this;
+                    }
+                };
+
+            authWindow.popup().focus();
+
+            if (this.browser.msie) {// a timer is running to check autheciation and window status
+                (function () {
+
+                    var responseText;
+
+                    if (authWindow.contentWindow.closed) {
+                        responseText = "error=access_denied";
+                        QQWB._token.resolveResponse(responseText);
+                        return;
+                    }
+
+                    try {
+                        responseText = authWindow.contentWindow.location.hash.split("#").pop();
+                        QQWB._token.resolveResponse(responseText);
+                        authWindow.contentWindow.close();
+                    } catch (ex) {
+                        setTimeout(arguments.callee,0);
+                    }
+
+                }());
+            } else {
+
+                QQWB._startTrackingAuthWindowStatus();
+
+                (function () {
+
+                    var responseText;
+
+                    if (!QQWB._isTrackingAuthWindowStatus()) {
+                        return;
+                    }
+
+                    if (authWindow.contentWindow.closed) {
+                        responseText = "error=access_denied";
+                        QQWB._token.resolveResponse(responseText);
+                        return;
+                    } else {
+                        setTimeout(arguments.callee, 0);
+                    }
+
+                }());
+            }
+        } // end if loginStatus
+
+        return this;
+    }
+
+    /**
+     * Logout user
+     *
+     * @return {Object} QQWB object
+     */
+   ,logout: function (optHandler) {
+       if (!this.loginStatus()) {
+           this.log.info("user not logged in");
+       } else {
+           this._token.clearAccessToken();
+           this._token.clearRefreshToken();
+       }
+       optHandler && optHandler.call(this);
+       this.trigger(this.events.USER_LOGOUT_EVENT);
+       return this;
+    }
+
+   /**
+    * Get login status object
+    *
+    * @access public
+    * @param optCallback {Function} callback handler
+    * @return {Object|undefined}
+    */
+   ,loginStatus: function (optCallback) {
+       var 
+           status,
+           accessToken = this._token.getAccessToken(),
+           user = this._token.getTokenUser();
+
+       if (accessToken) {
+           status = {
+               access_token: accessToken
+              ,name: user.name
+              ,nick: user.nick
+           };
+       }
+
+       optCallback && optCallback.call(this, status);
+
+       return status;
+    }
+    /**
+     * Are we tracking autheciate window status?
+     * This is usefull in non-IE browser
+     *
+     * In IE,when autheciate window opened,there is a timer in the opener
+     * keep tracking the opended window's location to parse and save token
+     * then the autheciate window is closed by force.
+     *
+     * In non-IE browser,the way is different. Once the browser's token come back
+     * the autheciate window will push that token to opener then close itself. but
+     * there is aslo a timer is running in the opener to keep tracking if user manaually
+     * closed the autheciate window. If user close that window (window.closed equal to
+     * true),we will simulate a error response.The problem is when the user finished the
+     * authoriztion task normally the autheciate window will closed aslo.the timer inside
+     * the opener will detect that and set response incorrectly. to correct this, If the
+     * user finished the authorization task normally, we should stop the timer immediatly.
+     * that is before the autheciate window close itself, it told the opener, "don't track 
+     * my status anymore,i will close my self normally",If the timer see that, the timer will
+     * not running anymore, and the set error reponse will never called.
+     *
+     */
+    ,_isTrackingAuthWindowStatus: function () {
+        return !!this._trackAuthWindowStatus;
+    }
+   /**
+    * Don't track if autheciate window is closed or not
+    * 
+    * @access private
+    * @return {undefined}
+    */
+   ,_startTrackingAuthWindowStatus: function() {
+       this._trackAuthWindowStatus = true;
+    }
+   /**
+    * Don't track if autheciate window is closed or not
+    * 
+    * @access private
+    * @return {undefined}
+    */
+   ,_stopTrackingAuthWindowStatus: function() {
+       this._trackAuthWindowStatus = false;
+    }
+});
+/**
+ * Tencent weibo javascript library
+ *
  * static variables
  *
  * @author michalliu
@@ -1726,6 +3901,278 @@ QQWB.extend("_apiProvider", {
 /**
  * Tencent weibo javascript library
  *
+ * API call
+ *
+ * Example:
+  
+    T.api(
+       "/status/home_timeline"
+      ,{
+          maxpage: 20
+       }
+      ,"json","GET")
+ *  .success(function (response) {
+ *  })
+ *  .error(function (error) {
+ *  });
+ *
+ *  Note:
+ *
+ *  T.api method supports cache, when the condition meets.
+ *  The cached api will run automaticlly.
+ *
+ *  If there is a problem when processing to meet the condition.
+ *  then the api call will failed too.
+ *
+ * @access public
+ * @param api {String} the rest-style api interface
+ * @param apiParams {Object} api params
+ * @param optDataType {String} the dataType supports either "json","xml","text", case-insensitive, default is "json"
+ * @param optType {String} the request method supports either "get","post", case-insensitive, default is "get"
+ * @param optSolution {String} use solution by force @see QQWB.solution
+ * @return {Object} promise object
+ *
+ * @author michalliu
+ * @version 1.0
+ * @package core
+ * @module api
+ * @requires base
+ *           ext.XML
+ *           ext.Array
+ *           apiProvider
+ *           deferred
+ *           auth.token
+ *           auth.auth
+ */
+
+QQWB.provide("api", function (api, apiParams, optDataType, optType, optSolution) {
+
+	apiParams = apiParams || {};
+    optDataType = (optDataType || "json").toLowerCase();
+    optType = optType || "GET";
+
+	var 
+    	promise,
+		solution,
+		format = optDataType, // the format string in oauth querystring
+		supportedFormats = {json:true,xml:true/*,text:true*/},
+    	deferred = QQWB.deferred.deferred();
+	
+	if (!(format in supportedFormats)) {
+		format = "json";
+	}
+
+	apiParams["access_token"] = QQWB._token.getAccessToken();
+	apiParams["version"] = "2.0";
+	apiParams["format"] = format;
+
+
+    promise = deferred.promise();
+
+	// force to use specified solution
+	if (optSolution && QQWB.Array.inArray([QQWB._solution.HTML5_SOLUTION
+                                          ,QQWB._solution.FLASH_SOLUTION
+										  ,QQWB._solution.SILVER_LIGHT_SOLUTION]
+										  ,optSolution)) {
+		QQWB.log.warning("forced to use solution " + optSolution);
+		// solution has initialized let that solution handle the request
+		if(!QQWB._solution[optSolution]) { // solution not initiallize, initialize it
+		    QQWB.log.warning("forced to use solution " + optSolution + ", this solution is not inited, initialzing...");
+		    QQWB._solution.initSolution[optSolution];
+		}
+	    solution = QQWB._solution[optSolution];
+	} else {
+        // solutions with following priority order
+        solution =  (QQWB.browser.feature.postmessage && QQWB._solution[QQWB._solution.HTML5_SOLUTION])
+            || (QQWB.browser.feature.flash && QQWB._solution[QQWB._solution.FLASH_SOLUTION])
+            || (QQWB.browser.feature.silverlight && QQWB._solution[QQWB._solution.SILVER_LIGHT_SOLUTION]);
+
+	}
+
+	// don't handle that, let server to the job
+	// then pass a failed message to the callback
+    //
+	/*if (false && !QQWB._apiProvider.isProvide(api)) {
+		QQWB.log.error("can't call \"" + api +"\", not supported");
+		deferred.reject(-1, "api not supported"); // immediately error
+		return promise;
+	}*/
+
+	// no solution or solution not correctly initialzed
+	// its not possible to implement to QQWB.api method working
+	// very little chance
+	if (!solution || solution.readyState === 2) {
+		QQWB.log.critical("solution error");
+		deferred.reject(-1, "solution error"); // immediately error
+		return promise;
+	}
+
+    //TODO: if api call required solution is flash
+    //then cache the function do flash solution init
+	//if (!solution.support(api)) {
+		// choose other solution
+		// return  QQWB.api(api, apiParams, optDataType, optType, other solution);
+	//}
+
+	// if api called before the solution is ready, we cached it and waiting the solution ready
+	// when solution is ready, regardless success or fail, these cached function will be invoke again immediately
+	if (solution.readyState === 0) { //solution not ready
+		QQWB.log.warning("solution is not ready, your api call request has been cached, will invoke immediately when solution is ready");
+    	solution.promise.done(function () { // when solution is ready
+		    QQWB.log.info("invoking cached api call \"QQWB.api( " + [api, apiParams, optDataType, optType].join(",") + " )\"...");
+
+			// emulate the request send it to server
+			// when data backs, resolve or reject the deferred object previously saved.
+			// then pass the data in accordingly
+			QQWB.api(api, apiParams, optDataType, optType)
+			    .success(function () {
+				    deferred.resolveWith(deferred,QQWB.Array.fromArguments(arguments));
+				 })
+			    .error(function (){
+				    deferred.rejectWith(deferred,QQWB.Array.fromArguments(arguments));
+			     }); // keep the arguments
+		}).fail(function () { // solution failed, we use the arguments from boot section (boot.js)
+		    QQWB.log.error("can't invoking cached api call \"QQWB.api( " + [api, apiParams, optDataType, optType].join(",") + " )\"");
+		    deferred.rejectWith(deferred,QQWB.Array.fromArguments(arguments));
+		});
+		return promise;
+	}
+
+	// must be here everything must be ready already from here
+	
+    // user not logged in, don't bother to try to get data
+	if (!QQWB.loginStatus()) {
+		deferred.reject(-1, "not login"); // immediately error
+		return promise;
+	}
+
+	// describe what we are to do now
+    QQWB.log.info("[" + (QQWB.api.id ? QQWB.api.id + 1 : "_") + "] requesting data \"" + QQWB._apiProvider.describe(api) + "\" from server...");
+
+    // html5 solution
+    if (solution === QQWB._solution[QQWB._solution.HTML5_SOLUTION]) {
+			var serverProxy = document.getElementById(solution.id);
+			if (!serverProxy) { // double check to avoid the server frame was removed from dom unexpectly
+	            QQWB.log.critical("server proxy not found");
+	            deferred.reject(-1,"server proxy not found");
+			} else {
+                // server proxy's url should be same as QQWB._domain.serverproxy, if not may be we got the wrong element
+				if (serverProxy.src !== QQWB._domain.serverproxy) { // double check to avoid the server frame src was modified unexpectly 
+	                QQWB.log.critical("server proxy is not valid, src attribute has unexpected value");
+	                deferred.reject(-1,"server proxy not valid");
+				} else {
+					// everything goes well
+                 	// lazy create an collection object to maintain the deferred object
+                 	// only html5 solution need this
+                 	if (!QQWB.api.deferrsCollection) {
+                 		QQWB.extend(QQWB.api, {
+                 			id : 0
+                 		   ,_deferredCollection: {
+                 		   }
+                 		   ,deferredAt: function (deferredId) {
+                 			   if (this._deferredCollection[deferredId]) {
+                 			       return this._deferredCollection[deferredId];
+                 			   } else {
+                 	               QQWB.log.warning("get deferred object has failed, that object does not exist at index " + deferredId);
+                 			   }
+                 		    }
+                 			// uncollect the deferred object
+                 		   ,uncollect: function (deferredId) {
+                 			   if (this._deferredCollection[deferredId]) {
+                 			       delete this._deferredCollection[deferredId];
+                 			   } else {
+                 	               QQWB.log.warning("uncollect deferred object has failed, that object does not exist at index " + deferredId);
+                 			   }
+                 		    }
+                 			// collect an deferred object to collections
+                 		   ,collect: function (deferredObj) {
+                 			   if (deferredObj.promise) { // it's an deferred object
+                 			       this._deferredCollection[++this.id] = deferredObj;
+                 			       return this.id;
+                 			   } else { // we dont accpept other than deferred object
+                 	               QQWB.log.warning("collect a non-deferred object is illegal");
+                 			   }
+                 		    }
+                 		  
+                 			// how many api call this page does?
+                 		   ,total: function () {
+                 			   return QQWB.api.id;
+                 		    }
+                 		});
+                 	}
+
+					if (!QQWB.api.messageHandler) {
+						// add listeners for the data when data comes back
+						QQWB.provide("api.messageHandler", function (e) {
+							// we only trust the data back from the API server, ingore others
+							// This is important for security reson
+							if (QQWB._domain.serverproxy.indexOf(e.origin) !== 0) {
+	                            QQWB.log.warning("unexpected message arrived from " + e.origin + " with data " + e.data);
+							} else {
+								// here is the result comes back
+
+								// data.id represent the caller's id to know which deferred object should handle the data
+								// data.data reprent the result return from API server
+								var 
+							    	data = JSON.parse(e.data),
+									id = data.id,
+									relateDeferred = QQWB.api.deferredAt(id),
+							    	response = data.data;
+
+								if (relateDeferred) {
+							        if (response[0] !== 200) {
+										relateDeferred.reject.apply(relateDeferred,response);
+									} else {
+										if (response[4] == "xmltext") {
+											response[2] = QQWB.XML.fromString(response[2])
+										}
+										relateDeferred.resolve.apply(relateDeferred,[response[2],response[3]]);
+							    	}
+									QQWB.api.uncollect(id);
+								} else {
+	                                QQWB.log.warning("related deferred object not found, it shouldn't happen");
+								}
+							}
+						}); // end provide
+
+                        if (window.addEventListener) {
+                            window.addEventListener("message", QQWB.api.messageHandler, false);
+                        } else if (window.attachEvent) {
+                            window.attachEvent("onmessage", QQWB.api.messageHandler);
+                        }
+					}
+                 
+					try {
+						// send to proxy server
+						// IE only support String type as the message
+						// @see http://msdn.microsoft.com/en-us/library/cc197015(v=vs.85).aspx
+						serverProxy.contentWindow.postMessage(JSON.stringify({ 
+							id: QQWB.api.collect(deferred)
+						   ,data: [api, apiParams, optDataType, optType]
+						}),QQWB._domain.serverproxy);
+
+					} catch (ex) {
+	                    QQWB.log.critical("post message to server proxy has failed, " + ex);
+	                    deferred.reject(-1,ex);
+					}
+				} // end server proxy src modified check
+			} // end server proxy existance check
+
+	} else if (solution === QQWB._solution[QQWB._solution.FLASH_SOLUTION]) {
+		QQWB.io._apiFlashAjax(api, apiParams, optDataType, optType).complete(function () {
+			var response = QQWB.Array.fromArguments(arguments);
+			if (response[0] !== 200) {
+				deferred.reject.apply(relateDeferred,response);
+			} else {
+				deferred.resolve.apply(deferred,[response[2],response[3]]);
+			}
+		});
+	}
+    return promise;
+});
+/**
+ * Tencent weibo javascript library
+ *
  * Incode document
  *
  * Example:
@@ -1744,35 +4191,6 @@ QQWB.provide("man", function (api) {
     return this._apiProvider.getDescriptor(api);
 });
 
-/**
- * Tencent weibo javascript library
- *
- * String extension
- *
- * //TODO: encoding libraries
- *
- * http://www.cnblogs.com/cgli/archive/2011/05/17/2048869.html
- * http://www.blueidea.com/tech/web/2006/3622.asp
- *
- * @author michalliu
- * @version 1.0
- * @package ext
- * @module String
- * @requires base
- */
-QQWB.extend("String",{
-    /**
-     * Determine whether an object is string
-     *
-     * @access public
-     * @param source {Mixed} anything
-     * @return {Boolean}
-     */
-    isString: function (source) {
-        return typeof source === "string";
-    }
-
-});
 /**
  * Tencent weibo javascript library
  *
@@ -1886,1739 +4304,6 @@ QQWB.extend("dom", {
     }
 });
 
-/**
- * Tencent weibo javascript library
- *
- * Querystring encoder and decoder
- *
- * @author michalliu
- * @version 1.0
- * @package core
- * @module queryString
- * @requires base
- */
-
-QQWB.extend("queryString",{
-    /**
-     * Encode parameter object to query string
-     *
-     * @access public
-     * @param params {Object} the object contains params
-     *        opt_sep {String} the seprator string, default is '&'
-     *        opt_encode {Function} the function to encode param, default is encodeURIComponent
-     * @return {String} the encoded query string
-     */
-    encode: function (params, opt_sep, opt_encode) {
-        var 
-            regexp = /%20/g,
-            sep = opt_sep || '&',
-            encode = opt_encode || encodeURIComponent,
-            pairs = [];
-
-        for (var key in params) {
-            if (params.hasOwnProperty(key)) {
-                var val = params[key];
-                if (val !== null && typeof val != 'undefined') {
-                    pairs.push(encode(key).replace(regexp,"+") + "=" + encode(val).replace(regexp,"+"));
-                }
-            }
-        }
-
-        pairs.sort();
-        return pairs.join(sep);
-    }
-    /**
-     * Decode query string to parameter object
-     *
-     * @param str {String} query string
-     *        opt_sep {String} the seprator string default is '&'
-     *        opt_decode {Function} the function to decode string default is decodeURIComponent
-     * @return {Object} the parameter object
-     */
-   ,decode: function (str, opt_sep, opt_decode) {
-       var
-           decode = opt_decode || decodeURIComponent,
-           sep = opt_sep || '&',
-           parts = str.split(sep),
-           params = {},
-           pair;
-
-       for (var i = 0,l = parts.length; i<l; i++) {
-           pair = parts[i].split('=',2);
-           if (pair && pair[0]) {
-               params[decode(pair[0])] = decode(pair[1]);
-           }
-       }
-
-       return params;
-    }
-});
-/**
- * Tencent weibo javascript library
- *
- * format string with python style
- *
- * @author michalliu
- * @version 1.0
- * @package format
- * @module sprintf
- * @requires base
- */
-
-/**
- * sprintf() for JavaScript 0.7-beta1
- * http://www.diveintojavascript.com/projects/javascript-sprintf
- * 
- * Copyright (c) Alexandru Marasteanu <alexaholic [at) gmail (dot] com>
- * All rights reserved.
- * 
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of sprintf() for JavaScript nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL Alexandru Marasteanu BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-
-(function (){
-    var sprintf = (function() {
-    	function get_type(variable) {
-    		return Object.prototype.toString.call(variable).slice(8, -1).toLowerCase();
-    	}
-    	function str_repeat(input, multiplier) {
-    		for (var output = []; multiplier > 0; output[--multiplier] = input) {/* do nothing */}
-    		return output.join('');
-    	}
-    
-    	var str_format = function() {
-    		if (!str_format.cache.hasOwnProperty(arguments[0])) {
-    			str_format.cache[arguments[0]] = str_format.parse(arguments[0]);
-    		}
-    		return str_format.format.call(null, str_format.cache[arguments[0]], arguments);
-    	};
-    
-    	str_format.format = function(parse_tree, argv) {
-    		var cursor = 1, tree_length = parse_tree.length, node_type = '', arg, output = [], i, k, match, pad, pad_character, pad_length;
-    		for (i = 0; i < tree_length; i++) {
-    			node_type = get_type(parse_tree[i]);
-    			if (node_type === 'string') {
-    				output.push(parse_tree[i]);
-    			}
-    			else if (node_type === 'array') {
-    				match = parse_tree[i]; // convenience purposes only
-    				if (match[2]) { // keyword argument
-    					arg = argv[cursor];
-    					for (k = 0; k < match[2].length; k++) {
-    						if (!arg.hasOwnProperty(match[2][k])) {
-    							throw(sprintf('[sprintf] property "%s" does not exist', match[2][k]));
-    						}
-    						arg = arg[match[2][k]];
-    					}
-    				}
-    				else if (match[1]) { // positional argument (explicit)
-    					arg = argv[match[1]];
-    				}
-    				else { // positional argument (implicit)
-    					arg = argv[cursor++];
-    				}
-    
-    				if (/[^s]/.test(match[8]) && (get_type(arg) != 'number')) {
-    					throw(sprintf('[sprintf] expecting number but found %s', get_type(arg)));
-    				}
-    				switch (match[8]) {
-    					case 'b': arg = arg.toString(2); break;
-    					case 'c': arg = String.fromCharCode(arg); break;
-    					case 'd': arg = parseInt(arg, 10); break;
-    					case 'e': arg = match[7] ? arg.toExponential(match[7]) : arg.toExponential(); break;
-    					case 'f': arg = match[7] ? parseFloat(arg).toFixed(match[7]) : parseFloat(arg); break;
-    					case 'o': arg = arg.toString(8); break;
-                        //case 's': arg = ((arg = String(arg)) && match[7] ? arg.substring(0, match[7]) : arg); break;
-                        case 's': arg = ((arg = arg ? String(arg):"") && match[7] ? arg.substring(0, match[7]) : arg); break;
-    					case 'u': arg = Math.abs(arg); break;
-    					case 'x': arg = arg.toString(16); break;
-    					case 'X': arg = arg.toString(16).toUpperCase(); break;
-    				}
-    				arg = (/[def]/.test(match[8]) && match[3] && arg >= 0 ? '+'+ arg : arg);
-    				pad_character = match[4] ? match[4] == '0' ? '0' : match[4].charAt(1) : ' ';
-    				pad_length = match[6] - String(arg).length;
-    				pad = match[6] ? str_repeat(pad_character, pad_length) : '';
-    				output.push(match[5] ? arg + pad : pad + arg);
-    			}
-    		}
-    		return output.join('');
-    	};
-    
-    	str_format.cache = {};
-    
-    	str_format.parse = function(fmt) {
-    		var _fmt = fmt, match = [], parse_tree = [], arg_names = 0;
-    		while (_fmt) {
-    			if ((match = /^[^\x25]+/.exec(_fmt)) !== null) {
-    				parse_tree.push(match[0]);
-    			}
-    			else if ((match = /^\x25{2}/.exec(_fmt)) !== null) {
-    				parse_tree.push('%');
-    			}
-    			else if ((match = /^\x25(?:([1-9]\d*)\$|\(([^\)]+)\))?(\+)?(0|'[^$])?(-)?(\d+)?(?:\.(\d+))?([b-fosuxX])/.exec(_fmt)) !== null) {
-    				if (match[2]) {
-    					arg_names |= 1;
-    					var field_list = [], replacement_field = match[2], field_match = [];
-    					if ((field_match = /^([a-z_][a-z_\d]*)/i.exec(replacement_field)) !== null) {
-    						field_list.push(field_match[1]);
-    						while ((replacement_field = replacement_field.substring(field_match[0].length)) !== '') {
-    							if ((field_match = /^\.([a-z_][a-z_\d]*)/i.exec(replacement_field)) !== null) {
-    								field_list.push(field_match[1]);
-    							}
-    							else if ((field_match = /^\[(\d+)\]/.exec(replacement_field)) !== null) {
-    								field_list.push(field_match[1]);
-    							}
-    							else {
-    								throw('[sprintf] huh?');
-    							}
-    						}
-    					}
-    					else {
-    						throw('[sprintf] huh?');
-    					}
-    					match[2] = field_list;
-    				}
-    				else {
-    					arg_names |= 2;
-    				}
-    				if (arg_names === 3) {
-    					throw('[sprintf] mixing positional and named placeholders is not (yet) supported');
-    				}
-    				parse_tree.push(match);
-    			}
-    			else {
-    				throw('[sprintf] huh?');
-    			}
-    			_fmt = _fmt.substring(match[0].length);
-    		}
-    		return parse_tree;
-    	};
-    
-    	return str_format;
-    })();
-
-    var vsprintf = function(fmt, argv) {
-    	argv.unshift(fmt);
-    	return sprintf.apply(null, argv);
-    };
-
-    QQWB.extend("format", {
-
-        sprintf: sprintf
-
-       ,vsprintf: vsprintf
-    })
-
-}());
-/**
- * Tencent weibo javascript library
- *
- * Time
- *
- * Example:
- * 
- * T.time.getTime()
- *
- * @author michalliu
- * @version 1.0
- * @package core
- * @module time
- * @requires base
- *           format.sprintf
- */
-
-QQWB.extend("time", {
-    /**
-     * Get current time stamp in milliseconds
-     *
-     * @access public
-     * @return {Date} current date
-     */
-    now: function () {
-        return +this.dateNow();
-    }
-    /**
-     * Get current time stamp in seconds
-     *
-     * @access public
-     * @return {Date} current date
-     */
-   ,secondsNow: function () {
-        return Math.round(this.now() / 1000);
-    }
-    /**
-     * Get current time stamp
-     *
-     * @access public
-     * @return {Date} current date
-     */
-    ,dateNow: function () {
-        return new Date;
-    }
-    /**
-     * Get a short time description
-     * 
-     * Example:
-     * 
-     * T.time.shortTime(); // output is 08:04:34
-     * T.time.shortTime(new Date()); // output date
-     * T.time.shortTime(new Date(),"%(year)s"); // output date with format
-     * T.time.shortTime("%(year)s"); // output current date with format
-     *
-     * @access public
-     * @param date {Date} date or current date if date not provided
-     *        format {String} format of date object        
-     * @return {String} formatted time string
-     */
-   ,shortTime: function (date, format) {
-        if (!(date instanceof Date)) {
-            format = date;
-            date = this.dateNow();
-        }
-        format = format || "%(year)s/%(month)s/%(day)s %(hour)02d:%(minute)02d:%(second)02d";
-        return QQWB.format.sprintf(format,{
-            year: date.getFullYear()
-           ,month: date.getMonth()
-           ,day: date.getDate()
-           ,hour: date.getHours()
-           ,minute: date.getMinutes()
-           ,second: date.getSeconds()
-        });
-    }
-});
-
-/**
- * Tencent weibo javascript library
- *
- * Log messages
- *
- * Example:
- * 
- * T.log.info("your message")
- *
- * @author michalliu
- * @version 1.0
- * @package core
- * @module log
- * @requires base
- *           time
- *           format.sprintf
- */
-
-QQWB.extend("log", {
-	
-	 // critical level
-     CRITICAL: 50
-
-	 // error level
-    ,ERROR: 40
-
-	 // warning level
-    ,WARNING: 30
-
-	 // infomation level
-    ,INFO: 20
-
-	 // debug level
-    ,DEBUG: 10
-
-	 // notset level, will log out all the messages
-    ,NOTSET: 0
-
-	// log level messages less than this level will be ingored
-	// default level set to QQWB.log.NOTSET
-    ,_level: 0 
-
-	// log message format
-    //,_format:"{{name}} : [{{levelname}}] {{time}} {{message}}"
-
-	// log message format
-    ,_format:"%(frame)s%(name)s: [%(levelname)s] %(time)s %(message)s"
-
-	/**
-	 * Set log message level
-	 * 
-	 * @access public
-	 * @param level {Number} log level
-	 * @return {Object} log object
-	 */
-    ,setLevel: function (level) {
-        this._level = level;
-        return this;
-     }
-
-	/**
-	 * Set log message format
-	 * 
-	 * @access public
-	 * @param format {String} log format
-	 * @return {Object} log object
-	 */
-    ,setFormat: function (format) {
-        this._format = format;
-		return this;
-     }
-
-	/**
-	 * Log a debug message
-	 * 
-	 * @access public
-	 * @param message {String} message
-	 * @return {Object} log object
-	 */
-    ,debug: function (message) {
-        this.DEBUG >= this._level && this._out("DEBUG",message);
-        return this;
-     }
-
-	/**
-	 * Log a info message
-	 * 
-	 * @access public
-	 * @param message {String} message
-	 * @return {Object} log object
-	 */
-    ,info: function (message) {
-        this.INFO >= this._level && this._out("INFO",message);
-        return this;
-     }
-
-	/**
-	 * Log a warning message
-	 * 
-	 * @access public
-	 * @param message {String} message
-	 * @return {Object} log object
-	 */
-    ,warning: function (message) {
-        this.WARNING >= this._level && this._out("WARNING",message);
-        return this;
-     }
-
-	/**
-	 * Log a error message
-	 * 
-	 * @access public
-	 * @param message {String} message
-	 * @return {Object} log object
-	 */
-    ,error: function (message) {
-        this.ERROR >= this._level && this._out("ERROR",message);
-        return this;
-     }
-
-	/**
-	 * Log a critical message
-	 * 
-	 * @access public
-	 * @param message {String} message
-	 * @return {Object} log object
-	 */
-    ,critical: function (message) {
-        this.CRITICAL >= this._level && this._out("CRITICAL",message);
-        return this;
-     }
-
-	/**
-	 * Log out message
-	 *
-	 * @access private
-	 * @param level {String} message level
-	 *        message {String} message to log out
-	 * @return {Void}
-	 */
-    ,_out: function (level,message) {
-        var output = this._format;
-        //output = output.replace("{{time}}", this._getTime())
-                       //.replace("{{levelname}}", level)
-                       //.replace("{{name}}", QQWB._name)
-                       //.replace("{{message}}", message);
-        //output = output.replace(/\{\{.*?\}\}/g,output);
-        output = QQWB.format.sprintf(output,{
-            name: QQWB._name
-           ,levelname: level
-           ,time: QQWB.time.shortTime()
-           ,message: message
-           ,frame: window != window.parent ? "*":""
-        });
-
-        // no frame messages
-        QQWB._debug && window.console && window.console.log(output);
-     }
-});
-
-/**
- * Tencent weibo javascript library
- *
- * Function extension
- *
- * @author michalliu
- * @version 1.0
- * @package ext
- * @module Function
- * @requires base
- */
-QQWB.extend("Function",{
-    /**
-     * Determine whether an object is Function
-     *
-     * @access public
-     * @param arg {Mixed} anything
-     * @return {Boolean}
-     */
-    isFunction: function (arg) {
-        return typeof arg === "function";
-    }
-});
-/**
- * Tencent weibo javascript library
- *
- * Array extension
- *
- * @author michalliu
- * @version 1.0
- * @package ext
- * @module Array
- * @requires base
- *           String
- */
-QQWB.extend("Array",{
-    /**
-     * Get whether an object is array
-     *
-     * @access public
-     * @param arg {Mixed} anything
-     * @return {Boolean}
-     */
-    isArray: function (arg) {
-        return Object.prototype.toString.call(arg) === "[object Array]";
-    }
-    /**
-     * Get whether an object in the array
-     *
-     * @access public
-     * @param arr {Array} the array object
-     *        arg {Mixed} anything
-     * @return {Boolean}
-     */
-   ,inArray: function (arr, arg) {
-       for (var i=0,l=arr.length; i<l; i++) {
-           if (arg === arr[i]) {
-               return true;
-           }
-       }
-       return false;
-    }
-    /**
-     * Build array from String
-     *
-     * @access public
-     * @param source {String} the source string
-     * @param optSep {Regexp|String} the seprator passed into String.split method
-     * @param optMax {Number} the maxCount of the newly builded array
-     * @return {Array}
-     */
-   ,fromString: function (source, optSep, optMax) {
-       if (!QQWB.String.isString(source)) {
-           return [];
-       } 
-       optSep = optSep || "";
-       return optMax ? source.split(optSep, optMax) : source.split(optSep);
-    }
-    /**
-     * Build array from an array-like object
-     *
-     * @access public
-     * @param source {Object} the source object
-     * @param optMax {Number} the maxCount of the newly builded array
-     * @return {Array}
-     */
-   ,fromArguments: function (source, optMax) {
-       if (typeof source !== "object") {
-           return [];
-       } 
-       return optMax ? Array.prototype.slice.call(source, optMax) : Array.prototype.slice.call(source);
-    }
-    /**
-     * Argument object to array
-     * 
-     * @deprecated use fromString,fromArguments instead
-     * @access public
-     * @param arg {Mixed} source
-     * @return {Array}
-     */
-   ,toArray: function (arg) {
-       if (typeof arg == "string") {
-           return arg.split("");
-       } else if (typeof arg == "object") {
-           return Array.prototype.slice.call(arg,0);
-       } else {
-           return this.toArray(arg.toString());
-       }
-    }
-    /**
-     * Enumerate the array
-     *
-     * Note:
-     * If handler executed and returned false,
-     * The enumeration will stop immediately
-     *
-     * @access public
-     * @param arr {Array} the array object
-     *        handler {Function} the callback function
-     */
-   ,each: function (arr, handler) {
-       for (var i=0,l=arr.length; i<l; i++) {
-           if (false === handler(i,arr[i])) {
-               break;
-           }
-       }
-    }
-});
-/**
- * Tencent weibo javascript library
- *
- * Deferred object
- *
- * Note:
- *
- * Code is ported from jquery
- * A good explaination at 
- * http://stackoverflow.com/questions/4866721/what-are-deferred-objects/4867928#comment-8591160
- *
- * @author michalliu
- * @version 1.0
- * @package core
- * @module deferred
- * @requires base
- *           ext.Array
- *           ext.Function
- */
-
-QQWB.extend("deferred", {
-	 /**
-	  * Deferered object read-only methods
-	  */
-	_promiseMethods: "done fail isResolved isRejected promise then always success error complete whatever".split(" ")
-	/**
-	 * Create a simple deferred object (one callback list)
-	 *
-	 * @access private
-	 * @return a deferred object
-	 */
-   ,_deferred: function () {
-		var 
-		    callbacks = [], // callback list
-			fired, // stored [ context, args], use to fire again
-			firing, // to avoid firing when already doing so
-			cancelled, // flag to know if the deferred has been cancelled
-			deferred = { // the deferred itself
-				done: function () {
-					if (!cancelled) {
-						var 
-						    args = arguments
-						   ,elem
-						   ,_fired;
-
-						   // we should consider about fired status here
-						   // this is neccesary to handle how done deals
-						   // with arrays recursively
-						   if (fired) {
-							   _fired = fired;
-							   fired = 0;
-						   }
-
-						   // add callbacks smartly
-						   for (var i=0,l=args.length; i<l; i++) { 
-							    elem = args[i];
-							    if (QQWB.Array.isArray(elem)) {
-								   deferred.done.apply(deferred, elem);
-							   } else if (QQWB.Function.isFunction(elem)) {
-								   callbacks.push(elem);
-						    	}
-						   }
-
-						   // consider fired here
-						   // if it's already been resolved then call resolveWith
-						   // using the cached context and arguments to call the 
-						   // callbacks immediatly
-						   if (_fired) {
-							   deferred.resolveWith(_fired[0], _fired[1]);
-						   }
-					}
-					return this;
-				}
-
-				// resolve with given context and args
-			   ,resolveWith: function (context, args) {
-				   // if its been cancelled then we can't resolve
-				   // if it has fired then we can't fire again
-				   // if it's currently firing then we can't fire
-				   if (!cancelled && !fired && !firing) {
-					   args = args || [];
-					   firing = 1;
-					   // using try {} finally {} block because you are
-					   // calling external callbacks, maybe these callbacks
-					   // made by the user which are not bugfree.
-
-					   // the finally block will always run no matter how bad
-					   // the internal code is
-					   try { 
-					       while (callbacks[0]) {
-							   callbacks.shift().apply(context, args);// first in first out
-						   }
-					   }
-					   finally {
-						   fired = [context, args]; // cache the the context and args
-						   firing = 0;
-					   }
-				   }
-				   return this;
-			    }
-
-				// Resolve with this as context and given arguments
-			   ,resolve: function () {
-				   deferred.resolveWith(this, arguments);
-				   return this;
-			    }
-
-				// Has this deferred been resolved?
-			   ,isResolved: function () {
-				   return !!(firing || fired);
-			    }
-				// Cancel
-			   ,cancel: function () {
-				   cancelled = 1;
-				   callbacks = [];
-				   return this;
-			    }
-	    };
-		return deferred;
-	}
-	/**
-	 * Full fledged deferred (two callback list success and fail)
-	 */
-   ,deferred: function (func) {
-	   var
-	       promise,
-	       deferred = QQWB.deferred._deferred(),
-	       failDeferred = QQWB.deferred._deferred();
-
-	   // Add errorDeferred methods, then and promise
-	   QQWB.extend(deferred, {
-		   // send to failed deferred object
-		   fail: failDeferred.done
-		   // send to sucess callback and failcallbacks at a time
-		  ,then: function (doneCallbacks, failCallbacks) {
-			  deferred.done(doneCallbacks).fail(failCallbacks);
-			  return this;
-		   }
-		   // send to success callback and to fail callback aslo
-		  ,always: function () {
-			  return deferred.done.apply(deferred, arguments).fail.apply(this, arguments);
-		   }
-		   // invoke callbacks in failed deferred with context and arguments
-		  ,rejectWith: failDeferred.resolveWith
-		   // invoke callbacks in failed deferred
-		  ,reject: failDeferred.resolve
-		   // is callbacks in failed deferred invoked
-		  ,isRejected: failDeferred.isResolved
-		  // promise to return a read-only copy(cant call resolve resolveWith
-		  // reject and rejectWith) of deferred
-		  ,promise: function (obj) {
-			  if (obj == null) {
-				  if (promise) {
-				      return promise;
-				  }
-				  promise = obj = {};
-			  }
-			  var i = QQWB.deferred._promiseMethods.length;
-			  while (i--) {
-				  obj[QQWB.deferred._promiseMethods[i]] = deferred[QQWB.deferred._promiseMethods[i]];
-			  }
-			  return obj;
-		   }
-	   });
-
-	   // lovely alternative function names
-	   deferred.success = deferred.done;
-       deferred.error = deferred.fail;
-       deferred.complete = deferred.whatever = deferred.always;
-
-	   // funciton either success or fail
-	   // if success fail deferer will cancel,vice versa
-	   deferred.done(failDeferred.cancel).fail(deferred.cancel);
-
-	   // unexpose cancel
-	   delete deferred.cancel;
-
-	   // a chance allow outer function to get a pointer to deferred object
-	   func &&  func.call(deferred, deferred);
-
-	   return deferred;
-    }
-	/**
-	 * Deferred helper
-	 */
-   ,when: function (firstParam) {
-	   var 
-	       args = arguments,
-		   length = args.length,
-		   count = length,
-		   deferred = length <= 1 && firstParam && QQWB.Function.isFunction(firstParam.promise) ?
-		              firstParam :
-					  QQWB.deferred.deferred(); // generate a deferred object or use the exists one
-
-	    function resolveFunc (i) {
-			return function (value) {
-				args[i] = arguments.length > 1 ? QQWB.Array.fromArguments(arguments) : value;
-				if (!(--count)) { // the last operation is resolved, resolve the when deffered
-					deferred.resolveWith(deferred, QQWB.Array.fromArguments(args));
-				}
-			}
-		}
-
-		if (length > 1) { // more than one deferred object
-		    for ( var i=0; i < length; i++) {
-				if (args[i] && QQWB.Function.isFunction(args[i].promise)) { // arg is deferred object
-				    // deferred.reject will called if any operation in when in rejected
-				    args[i].promise().then(resolveFunc[i],deferred.reject);
-				} else { // ingore arg that not a deferred object
-					--count; // total arg -- 
-				}
-
-				if (!count) { // nothing is deferred
-				    deferred.resolveWith (deferred, args);// let new deferred object handle it
-				}
-			}
-		} else if ( deferred !== firstParam) {
-			deferred.resolveWith(deferred, length ? [firstParam] : []);
-		}
-
-		return deferred.promise();
-    }
-});
-/**
- * Tencent weibo javascript library
- *
- * Combine time-waiting operations together
- *
- * @author michalliu
- * @version 1.0
- * @package core
- * @module when
- * @requires base
- *           deferred
- *           ext.Array
- */
-
-QQWB.provide("when", function () {
-    return QQWB.deferred.when.apply(this,QQWB.Array.fromArguments(arguments));
-});
-/**
- * Tencent weibo javascript library
- *
- * Cookie manipulation
- *
- * @author michalliu
- * @version 1.0
- * @package core
- * @module cookie
- * @requires base
- *           log
- */
-
-QQWB.extend("cookie", {
-    /**
-     * Set cookie
-     *
-     * @param name {String} cookie name
-     *        value {String} cookie value
-     *        maxage {Number} seconds from now. If present -1 it means a session cookie(default by browser)
-     *        path {String} cookie path. If not present then use full request path(default by browser)
-     *        domain {String} cookie domain. If not present then use full request host name(default by browser)
-     * @access public
-     * @return {Void}
-     */
-    set: function (name, value, opt_maxage, opt_path, opt_domain) {
-
-       if ( typeof opt_maxage === "undefined" || opt_maxage === null) {
-           opt_maxage = -1;
-       }
-
-       var cookieDomain = opt_domain ? "domain=" + opt_domain : "";
-       var cookiePath = opt_path ? "path=" + opt_path : "";
-       var cookieExpire = "";
-
-       if (opt_maxage === 0) {
-           // expire the cookie
-           cookieExpire = "expires=" + new Date(1970,1,1).toUTCString();
-       } else if (opt_maxage > 0) {
-           cookieExpire = "expires=" + new Date(+new Date+opt_maxage*1000).toUTCString();
-       }
-
-       document.cookie = [name + "=" + value, cookieExpire, cookiePath, cookieDomain].join("; ");
-
-       return this;
-    }
-
-    /**
-     * Return the first value for the given cookie name 
-     *
-     * @access public
-     * @param name {String} cookie name
-     * @return {String} value for cookie
-     */
-   ,get: function (name) {
-       var 
-           cookieName = name + "=";
-           cookies = (document.cookie || "").split(/\s*;\s*/);
-       for (var i=0,l=cookies.length; i<l; i++) {
-           var cookie = cookies[i];
-           if (cookie.indexOf(cookieName) === 0) {
-               return cookie.substr(cookieName.length);
-           }
-       }
-    }
-
-    /**
-     * Delete cookie
-     *
-     * @access public
-     * @param name {String} cookie name
-     *        opt_path {String} the path of cookie
-     *        opt_domain {String} the domain of cookie
-     * @return {Void}
-     */
-   ,del: function (name, opt_path, opt_domain) {
-
-       this.set(name, '', 0, opt_path, opt_domain);
-
-       if (document.cookie.indexOf(name+"=") >= 0) {
-           QQWB.log.warning("Cookie may not be deleted as you expected");
-       }
-
-       return this;
-    }
-});
-/**
- * Tencent weibo javascript library
- *
- * String extension
- *
- * @author michalliu
- * @version 1.0
- * @package ext
- * @module XML
- * @requires base
- */
-QQWB.extend("XML",{
-    /**
-     * Determine is XML object or not
-     *
-     * @access public
-     * @param xml {Object} xml object
-     * @return {Boolean}
-     */
-    isXML: function (xml) {
-       //TODO: not implement yet
-    }
-    /**
-     * xml object to string
-     *
-     * @access public
-     * @param xml {Object} xml object
-     * @return {String}
-     */
-   ,toString: function (xml) {
-        var str;
-        if (window.ActiveXObject) {
-            str = xml.xml;
-        } else {
-            str = (new XMLSerializer()).serializeToString(xml);
-        }
-        return str;
-    }
-    /**
-     * create xml object from string
-     *
-     * @access public
-     * @param str {String} xml string
-     * @return {Object} xml object
-     */
-   ,fromString: function (str) {
-       var xml;
-       if (window.ActiveXObject) {
-           xml = new ActiveXObject("Microsoft.XMLDOM");
-           xml.async = "false";
-           xml.loadXML(str);
-       } else {
-           var parser = new DOMParser();
-           xml = parser.parseFromString(str, "text/xml");
-       }
-       return xml;
-    }
-});
-/**
- * Tencent weibo javascript library
- *
- * JSON manipulate
- *
- * @author michalliu
- * @version 1.0
- * @package ext
- * @module JSON
- * @requires base
- *           String
- */
-QQWB.extend("JSON",{
-    /**
-     * Get JSON Object from string
-     *
-     * @access public
-     * @param source {String} the source string
-     * @throws {SyntaxError} sytaxError if failed to parse string to JSON object
-     * @return {Object} json object
-     */
-    fromString: function (source) {
-        if (!source || !QQWB.String.isString(source)) {
-            return {};
-        } else {
-            // Make sure leading/trailing whitespace is removed (IE can't handle it)
-            source = source.replace(/^\s+/,"").replace(/\s+$/,"");
-
-            if ( window.JSON && window.JSON.parse ) {
-                source = window.JSON.parse( source );
-            } else {
-                // Make sure the incoming data is actual JSON
-                // Logic borrowed from http://json.org/json2.js
-                if ( /^[\],:{}\s]*$/.test( source.replace( /\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g, "@" )
-                    .replace( /"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, "]" )
-                    .replace( /(?:^|:|,)(?:\s*\[)+/g, "")) ) {
-
-                    source = (new Function( "return " + data ))();
-                } else {
-                    throw new SyntaxError ("Invalid JSON: " + source);
-                }
-            }
-
-            return source;
-        } // end if
-    } // end fromString
-});
-/**
- * Tencent weibo javascript library
- *
- * Input and output,AJAX,JSONP
- *
- * @author michalliu
- * @version 1.0
- * @package core
- * @module io
- * @requires base
- *           queryString
- *           deferred
- *           ext.XML
- *           ext.JSON
- */
-
-QQWB.extend("io", {
-    /**
-     * The script IO mechanism
-     *
-     * @access private
-     * @param cfg {Object} the configration for script io
-     * @return {Object} to send/abort the request
-     */
-    _IOScript: function (cfg) {
-        var 
-            script,
-            head = document.head || document.getElementsByTagName("head")[0] || document.documentElement;
-        return {
-            send: function (complete) {
-                script = document.createElement("script");
-                script.async = "async";
-
-                if (cfg.charset) {
-                    script.charset = cfg.charset;
-                }
-
-                script.src = cfg.url;
-
-                script.onload = script.onreadystatechange = function (e,isAbort) {
-
-                    if (isAbort || !script.readyState || /loaded|complete/.test(script.readyState)) {
-
-                        script.onload = script.onreadystatechange = null;
-
-                        if (head && script.parentNode) {
-                            head.removeChild(script);
-                        }
-
-                        script = null;
-
-                        !isAbort && complete && complete.apply(QQWB,[200,"success"]);
-                        isAbort && complete && complete.apply(QQWB,[-1,"aborted"]);
-                    }
-                };
-
-                script.onerror = function (e) { // ie 6/7/8/opera not supported(not tested)
-                    complete && complete.apply(QQWB,[404,e]);
-                };
-
-                head.insertBefore(script, head.firstChild);
-            }
-
-           ,abort: function () {
-               if (script) {
-                   script.onload(0,1);
-               }
-            }
-        };
-    }
-
-    /**
-     * The AJAX IO mechanism
-     *
-     * @access private
-     * @param cfg {Object} the configration for ajax io
-     * @return {Object} to send/abort the request
-     */
-   ,_IOAjax: function (cfg) {
-	   
-	   var callback,
-	       cfg = cfg || {},
-	       xhr = window.XMLHttpRequest ? 
-	             new window.XMLHttpRequest() :
-	             new window.ActiveXObject("Microsoft.XMLHTTP");
-
-       if (cfg.dataType) {
-           cfg.dataType = cfg.dataType.toLowerCase();
-       }
-
-       if (!cfg.async) {
-           cfg.async = "async";
-       }
-
-	   return {
-		   send: function (complete) {
-
-			   if (cfg.username) {
-				   xhr.open(cfg.type, cfg.url, cfg.async, cfg.username, cfg.password);
-			   } else {
-				   xhr.open(cfg.type, cfg.url, cfg.async);
-			   }
-
-			   try {
-                   if (cfg.type == "POST") {
-                       xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-                   }
-				   xhr.setRequestHeader("X-Requested-With","XMLHttpRequest");
-			   } catch (ex) {}
-
-			   xhr.send(cfg.data || null);
-
-			   callback = function (_, isAbort) {
-				   var
-				       status,
-					   statusText,
-					   responseHeaders,
-					   responses,
-                       response,
-					   xml;
-
-				   try {
-					   // never called and (is aborted or complete)
-				       if (callback && (isAbort || xhr.readyState === 4)) {
-						   
-						   // only call once
-						   callback = null;
-
-						   if (isAbort) {
-							   if (xhr.readyState !== 4) {
-								   xhr.abort();
-							   }
-						    } else {
-								status = xhr.status;
-								responseHeaders = xhr.getAllResponseHeaders();
-								responses = {};
-								xml = xhr.responseXML;
-
-								if (xml && xml.documentElement) {
-								    responses.xml = xml;
-								}
-
-								responses.text = xhr.responseText;
-
-								try {
-								    statusText = xhr.statusText;
-								} catch (webkitException) {
-									statusText = "";
-								}
-
-								if (status === 1223) {
-								    status = 204;
-								}
-
-                                // parse to JSON
-                                if (cfg.dataType == "json") {
-									response = QQWB.JSON.fromString(responses.text);
-                                } else if (cfg.dataType == "xml") { // parse to xml
-                                    response = responses.xml;
-                                } else { // as normal text
-                                    response = responses.text;
-                                }
-
-					    	}
-					   }
-			       } catch (firefoxException) {
-					   if (!isAbort) {
-					       complete(-1, firefoxException);
-					   }
-			       }
-
-				   if (response) {
-					   complete(status, statusText, response, responseHeaders, cfg.dataType); // take cfg.dataType back
-				   }
-			   };
-
-			   if (!cfg.async || xhr.readyState === 4) {
-			       callback();
-			   } else {
-				   xhr.onreadystatechange = callback;
-			   }
-		   }
-		  ,abort: function () {
-			  if (callback) {
-			      callback(0, 1);
-			  }
-		   }
-	   };
-	   
-    }
-    /**
-     * The Flash IO mechanism
-     *
-     * @access private
-     * @param cfg {Object} the configration for script io
-     * @return {Object} to send/abort the request
-     */
-   ,_IOFlash: function (cfg) {
-
-	   var callback,
-	       readyState,
-	       cfg = cfg || {};
-	   
-       if (cfg.dataType) {
-	       cfg.dataType = cfg.dataType.toLowerCase();
-	   }
-
-	   return {
-		   send: function (complete) {
-
-			   readyState = 1;
-               // the call is allowed call once
-			   callback = function (_, isAbort) {
-				   var
-				       status,
-					   statusText,
-					   responseHeaders,
-					   responses,
-                       response,
-					   xml,
-					   readyState = 4;
-
-				   try{
-				       if (callback && (isAbort || readyState == 4)) {
-
-				           callback = null;
-
-				           if (isAbort) {
-				        	   complete(-1, "request has aborted");
-				           } else {
-				        	   var success = /complete/i.test(_.type);
-				        	   status = success ? 200 : 204;
-				        	   statusText = success ? "ok" : _.type;
-				        	   responseHeaders = "";
-				        	   responses = {}; // internal object
-				        	   responses.text = _.target.data;
-
-				        	   if (cfg.dataType == "json") {
-				        		   response = QQWB.JSON.fromString(responses.text);
-                               } else if (cfg.dataType == "xml"){
-				        		   response = QQWB.XML.fromString(responses.text);
-                               } else {
-				        		   response = responses.text;
-                               }
-				           }
-
-				           // has response
-				           if (response) {
-				        	   complete(status, statusText, response, responseHeaders);
-				           }
-					   }
-					} catch (ex) {
-						if (!isAbort) {
-							complete(-1, ex + "");
-						}
-					}
-			   };
-
-			   // register flash message callback
-			   // lazy initialize flash message callbacks
-			   if (!window.onFlashRequestComplete_8df046) {
-
-				   // this function will be called by flash when httpRequest is done
-                   window.onFlashRequestComplete_8df046 = function (event) {
-					   // first in first out
-					   onFlashRequestComplete_8df046.callbacks.shift()(event);
-                   };
-
-				   // our callback queue
-                   window.onFlashRequestComplete_8df046.callbacks = [];
-		       }
-
-			   // push to queue
-               window.onFlashRequestComplete_8df046.callbacks.push(callback);
-
-	           QQWBFlashTransport.httpRequest(cfg.url,cfg.data,cfg.type);
-
-		   }
-		  ,abort: function () {
-			  if (callback) {
-			      callback(0,1);
-			  }
-		   }
-	   };
-    }
-    /**
-     * Helper method to make api ajax call
-     *
-     */
-   ,_apiAjax: function (api, apiParams, dataType, type) {
-       // build ajax acceptable opt object from arguments
-       var opts = {
-               type: type.toUpperCase()
-              ,url: QQWB._domain.api + api
-              ,data: QQWB.queryString.encode(apiParams)
-              ,dataType: dataType
-           };
-       if (opts.type == "GET") {
-           opts.url += opts.data ? "?" + opts.data : "";
-           delete opts.data;
-       }
-       return QQWB.io.ajax(opts);
-    }
-	/**
-	 * Helper method to make api ajax call via flash
-	 *
-	 */
-  ,_apiFlashAjax: function (api, apiParams, dataType, type) {
-       var opts = {
-               type: type.toUpperCase()
-              ,url: QQWB._domain.api + api
-              ,data: QQWB.queryString.encode(apiParams)
-              ,dataType: dataType
-           };
-       if (opts.type == "GET") {
-           opts.url += opts.data ? "?" + opts.data : "";
-           delete opts.data;
-       }
-       return QQWB.io.flashAjax(opts);
-   }
-   /**
-	* Emulate AJAX request via flash
-	*
-	* @access public
-	* @param opts {Object} url configuration object
-	* @return {Object} promise object
-	*/
-  ,flashAjax: function (opts) {
-       var deferred = QQWB.deferred.deferred();
-
-	   if (!opts.type) {
-		   opts.type = "get";
-	   }
-
-       this._IOFlash(opts).send(function (status, statusText, responses, responseHeaders) {
-       	if (status !== 200) {
-       		deferred.reject(status, statusText);
-       	} else {
-       		deferred.resolve(status, statusText, responses, responseHeaders);
-       	}
-       });
-
-	   return deferred.promise();
-   }
-	/**
-	 * Ajax request sender
-	 * 
-	 * @access public
-	 * @param opts {Object} ajax settings
-	 * @return {Object} deferred object
-	 */
-   ,ajax: function (opts) {
-
-	    var deferred = QQWB.deferred.deferred();
-
-	    if (!opts.type) {
-	        opts.type = "get";
-	    }
-
-		this._IOAjax(opts).send(function (status, statusText, responses, responseHeaders, dataType) {
-			if (status !== 200) {
-				deferred.reject(status, statusText);
-			} else {
-				deferred.resolve(status, statusText, responses, responseHeaders, dataType);
-			}
-		});
-
-		return deferred.promise();
-    }
-    /**
-     * Dynamiclly load script
-     *
-     * @access public
-     * @param src {String} script src
-     * @param optCharset {String} script charset
-     * @return {Object} promise
-     */
-   ,script: function (src, optCharset) {
-       var
-           optCharset = optCharset || "utf-8",
-           deferred = QQWB.deferred.deferred();
-
-       this._IOScript({
-           charset: optCharset
-          ,url: src
-       }).send(function (status, statusText) {
-           if (status !== 200) {
-               deferred.reject(status, statusText);
-           } else {
-               deferred.resolve(status, statusText);
-           }
-       });
-
-       return deferred.promise();
-    }
-    /**
-     * JSONP request
-     *
-     * @access public
-     * @param url {String} jsonp url callback is added automaticlly
-     * @return {Object} promise
-     */
-    ,jsonp: function (url) {
-        var 
-            deferred = QQWB.deferred.deferred(),
-            callbackQueryName = "callback", // callback name in query string
-            callbackNamePrefix = "jsonp_", // jsonp callback function name prefix
-            callbackName = callbackNamePrefix + QQWB.uid(), //random jsonp callback name
-            _oldcallback = window.callbackName; // keep a reference to the variable we will overwrite(very little chance)
-
-        window[callbackName] = function (data) {
-
-            // jsonp successed
-            deferred.resolve(data);
-
-            window[callbackName] = _oldcallback; // restore back to original value
-            
-            if (typeof window[callbackName] == "undefined") { // original value is undefined
-                delete window[callbackName]; // delete it
-            }
-        };
-
-        this._IOScript({
-            charset: "utf-8"
-           ,url: url + "&" + callbackQueryName + "=" + callbackName
-        }).send(function (status, statusText) {
-            if (status !== 200) {
-                deferred.reject(status, statusText);
-            }
-        });
-
-
-       return deferred.promise();
-    }
-});
-
-/**
- * Tencent weibo javascript library
- *
- * Token management
- *
- * @author michalliu
- * @version 1.0
- * @package auth
- * @module token
- * @requires base
- *           core.time
- *           core.cookie
- *           core.io
- */
-QQWB.extend("_token",{
-    /**
-     * Save access token to cookie
-     *
-     * @access public
-     * @param accessToken {String} access token string
-     *        expireIn {Number} expire after seconds from now
-     *        optUsername {String} username associate with accesstoken
-     *        optNickname {String} nickname associate with accesstoken
-     * @return {Object} QQWB object
-     */
-    setAccessToken: function (accessToken, expireIn, optUsername, optNickname) {
-        var tokenUser = this.getTokenUser(true); // retrieve the old user info accesstoken
-        QQWB.cookie.set(QQWB._cookie.names.accessToken
-                       ,[accessToken
-                           ,QQWB.time.now() + expireIn * 1000
-                           ,optUsername || (tokenUser && tokenUser.name) || ""
-                           ,optNickname || (tokenUser && tokenUser.nick) || ""
-                        ].join("|")
-                       ,365 * 24 * 3600
-                       ,QQWB._cookie.path
-                       ,QQWB._cookie.domain
-            );
-        return QQWB;
-    }
-    /**
-     * Get access token saved before
-     *
-     * @access public
-     * @param optRaw {Boolean} if set to true, will not consider about accesstoken expiration
-     * @return {String|undefined} a string represent access token if available
-     */
-   ,getAccessToken: function (optRaw) {
-       var token = QQWB.cookie.get(QQWB._cookie.names.accessToken);
-       if (token) {
-           token = token.split("|",2);
-           if (optRaw || parseInt(token[1],10) > QQWB.time.now()) {
-               return token[0];
-           }
-       }
-    }
-    /**
-     * Get user infomation associated with access token
-     *
-     * @access public
-     * @param optRaw {Boolean} if set to true, will not consider about expiration
-     * @return {Object|undefined} an user object associated with access token if available
-     */
-   ,getTokenUser: function (optRaw) {
-       var token = QQWB.cookie.get(QQWB._cookie.names.accessToken);
-       if (token) {
-           token = token.split("|",4);
-           if (optRaw || parseInt(token[1],10) > QQWB.time.now()) {
-               return {
-                   name: token[2]
-                  ,nick: token[3]
-               };
-           }
-       }
-    }
-    /**
-     * Clear access token
-     *
-     * @access public
-     * @return {Object} QQWB object
-     */
-   ,clearAccessToken: function () {
-        QQWB.cookie.del(QQWB._cookie.names.accessToken,QQWB._cookie.path,QQWB._cookie.domain);
-        return QQWB;
-    }
-    /**
-     * Save refresh token to cookie
-     *
-     * @param refreshToken {String} refresh token string
-     * @return {Object} QQWB object
-     */
-   ,setRefreshToken: function (refreshToken) {
-        QQWB.cookie.set(QQWB._cookie.names.refreshToken
-                       ,refreshToken
-                       ,365 * 24 * 3600
-                       ,QQWB._cookie.path
-                       ,QQWB._cookie.domain
-            );
-        return QQWB;
-    }
-    /**
-     * Get refresh token saved before
-     *
-     * @return {String|undefined} a string represent refresh token if available
-     */
-   ,getRefreshToken: function () {
-        return QQWB.cookie.get(QQWB._cookie.names.refreshToken);
-    }
-    /**
-     * Clear refresh token
-     *
-     * @access public
-     * @return {Object} QQWB object
-     */
-   ,clearRefreshToken: function () {
-        QQWB.cookie.del(QQWB._cookie.names.refreshToken,QQWB._cookie.path,QQWB._cookie.domain);
-        return QQWB;
-    }
-    /**
-     * Use refresh token to obtain an access token
-     *
-     * @access public
-     * @param optSuccessCallback {Function} callback function when result returned
-     */
-   ,exchangeForToken: function (optSuccessCallback) {
-       QQWB.io.jsonp(QQWB._domain.exchange + "?" + QQWB.queryString.encode({
-           response_type: "token"
-          ,client_id: QQWB._appkey
-          ,scope: "all"
-          ,state: "1"
-          ,refresh_token: this.getRefreshToken()
-          ,access_token: this.getAccessToken(true)
-       })).success(function (response) {
-
-           var _response = response;
-
-           response = QQWB.queryString.decode(response);
-
-           if(response.access_token){
-
-               !response.expires_in && QQWB.log.error("token expires_in not retrieved");
-               !response.wbname && QQWB.log.warning("weibo username not retrieved, will not update username");
-               !response.wbnick && QQWB.log.warning("weibo usernick not retrieved, will not update usernick");
-
-               QQWB._token.setAccessToken(response.access_token, parseInt(response.expires_in,10), response.wbname, response.wbnick);
-
-               if (response.refresh_token) { // which should exists if accesstoken exists
-                    QQWB._token.setRefreshToken(response.refresh_token);
-               } else {
-                   QQWB.log.error("refresh token not retrieved");
-               }
-
-               QQWB.log.info("exchange token succeed");
-
-           } else if (response.error) {
-               QQWB.log.error("exchange token error " + response.error );
-           } else {
-               QQWB.log.error("unexpected result returned from server " + _response + " while exchanging for new access token");
-           }
-
-           optSuccessCallback && optSuccessCallback.call(QQWB,response);
-
-       }).error(function (status, statusText) {
-           if (status === 404) {
-               QQWB.log.error("exchange token has failed, script not found");
-           } else {
-               QQWB.log.error("exchange token has failed, " + statusText);
-           }
-       });
-
-       return QQWB;
-    }
-    /**
-     * Obtain an access token
-     *
-     * @access public
-     * @param optSuccessCallback {Function} callback function when result returned
-     */
-   ,getNewAccessToken: function (optSuccessCallback) {
-       QQWB.io.jsonp(QQWB._domain.query + "?" + QQWB.queryString.encode({
-           response_type: "token"
-          ,client_id: QQWB._appkey
-          ,scope: "all"
-          ,state: "1"
-       })).success(function (response) {
-
-           var _response = response;
-
-           response = QQWB.queryString.decode(response);
-
-           if(response.access_token){
-
-               !response.expires_in && QQWB.log.error("token expires_in not retrieved");
-               !response.wbname && QQWB.log.warning("weibo username not retrieved");
-               !response.wbnick && QQWB.log.warning("weibo usernick not retrieved");
-
-               QQWB._token.setAccessToken(response.access_token, parseInt(response.expires_in,10), response.wbname, response.wbnick);
-
-               if (response.refresh_token) { // which should exists if accesstoken exists
-                    QQWB._token.setRefreshToken(response.refresh_token);
-               } else {
-                   QQWB.log.error("refresh token not retrieved");
-               }
-
-               QQWB.log.info("retrieve new access token succeed");
-
-           } else if (response.error) {
-               QQWB.log.error("retrieve new access token error " + response.error );
-           } else {
-               QQWB.log.error("unexpected result returned from server " + _response + " while retrieving new access token");
-           }
-
-           optSuccessCallback && optSuccessCallback.call(QQWB,response);
-
-       }).error(function (status, statusText) {
-           if (status === 404) {
-               QQWB.log.error("get token has failed, script not found");
-           } else {
-               QQWB.log.error("get token failed, " + statusText);
-           }
-       });
-
-       return QQWB;
-    }
-    /**
-     * Auto resolve response from server
-     *
-     * @param responseText {String} the server response
-     * @param optGlobal {Object} the global window object,default is current window
-     */
-   ,resolveResponse: function (responseText, optGlobal) {
-       var 
-           loginStatus,
-           global = (optGlobal || window)["QQWB"],
-           response = global.queryString.decode(responseText);
-
-       if (response.access_token) {
-
-           global._token.setAccessToken(response.access_token, parseInt(response.expires_in,10), response.wbname, response.wbnick);
-
-           if (response.refresh_token) { // which should exists if accesstoken exists
-               global._token.setRefreshToken(response.refresh_token);
-           } else {
-               global.log.error("refresh token not retrieved");
-           }
-
-           loginStatus = global.loginStatus(); // get current login status
-           global.log.info("user " + loginStatus.name + " logged in");
-           global.trigger(global.events.USER_LOGGEDIN_EVENT,loginStatus);
-       } else if (response.error) {
-           global.log.error("login error occurred " + response.error);
-           response.message = response.error; // alternative error name
-           global.trigger(global.events.USER_LOGIN_FAILED_EVENT,response);
-       } else {
-           global.log.error("unexpected result returned from server " + _response);
-           global.trigger(global.events.USER_LOGIN_FAILED_EVENT,response);
-       }
-    }
-});
 /*
  * @author crockford
  * @url https://raw.github.com/douglascrockford/JSON-js/master/json2.js
@@ -4105,185 +4790,6 @@ if (!JSON) {
         };
     }
 }());
-/**
- * Tencent weibo javascript library
- *
- * A simple event system provide hooks
- *
- * @author michalliu
- * @version 1.0
- * @package event
- * @module eventProvider
- * @requires base
- *           ext.Array
- */
-QQWB.extend("_eventProvider",{
-
-    /**
-     * Get event system's internal map or create it if not exists
-     *
-     * @access private
-     * @return {Object} the internal event map
-     */
-    _getEventsMap: function () {
-        if (!this._eventsMap) {
-            this._eventsMap = {};
-        }
-        return this._eventsMap;
-    }
-
-    /**
-     * Bind an event
-     *
-     * @access public
-     * @param name {String} the event name to bind
-     * @param handler {Function} the handler for this event
-     * @return {Void}
-     */
-   ,bind: function (name, handler) {
-       var evts = this._getEventsMap();
-       if (!evts[name]) {
-           evts[name] = [handler];
-       } else {
-           if (!QQWB.Array.inArray(evts[name],handler)) {
-               evts[name].push(handler);
-           }
-       }
-    }
-
-    /**
-     * Unbind an event
-	 * 
-	 * If no handler provided, it will unbind all the handlers to this event
-     * @access public
-     * @param name {String} the event name to unbind
-     *        handler {Function} the handler's reference for this event to unbind
-     * @return {Void}
-     */
-   ,unbind: function (name, handler) {
-	   var handlers = this._getEventsMap()[name];
-	   if (handlers) {
-		   if (handler) { // unbind specific handler,do nothing if handler not registered
-			   for (var i=0,l=handlers.length; i<l; i++) {
-				   if (handler === handlers[i]) {
-					   handlers[i] = null;
-				   }
-			   }
-		   } else { // unbind all the handlers
-			   //handlers.length = 0;
-			   delete this._getEventsMap()[name];
-		   }
-	   }
-    }
-
-   /**
-	* Trigger a named event
-	*
-	* @access private
-	* @param name {String} the event name
-	*        data {Mixed} the event data
-	*/
-   ,trigger: function (name, data) {
-	   var handlers = this._getEventsMap()[name];
-	   if (handlers) {
-           for (var i=0,l=handlers.length; i<l; i++) {
-			   var handler = handlers[i];
-			   if (handler) {
-				   handler.call(QQWB,data);
-			   }
-           }
-	   }
-    }
-});
-/**
- * Tencent weibo javascript library
- *
- * Event API
- *
- * @author michalliu
- * @version 1.0
- * @package event
- * @module event
- * @requires base
- *           eventProvider
- */
-
-// event methods
-//
-QQWB.extend("",{
-    /**
-     * Bind an event
-     *
-     * Example:
-     * 
-     * T.bind("UserLoggedIn", function () {
-     *     T.log.info("user logged in");
-     * });
-     *
-     * @param name {String} event name to bind
-     * @param handler {Function} the handler for this event
-     */
-    bind: function (name, handler) {
-        name = name.toLowerCase();
-        this._eventProvider.bind(name, handler);
-    	return this;
-    }
-
-    /**
-     * Unbind an event
-     *
-     * Example:
-     *
-     * // handler for when user logged in
-     * // keep a reference to this handler
-     * var userlogin = function () {
-     *     T.log.info("user logged in");
-     * }
-     *
-     * // bind handler
-     * T.bind("UserLoggedIn", userlogin);
-     *
-     * // unbind this handler 
-     * T.unbind("UserLoggedIn", userlogin);
-     *
-     * // unbind all the handlers
-     * T.unbind("UserLoggedIn")
-     *
-     * @param name {String} event name to unbind
-     *        handler {Function} the handler's reference for this event to unbind
-     */
-   ,unbind: function (name, handler) {
-        name = name.toLowerCase();
-        this._eventProvider.unbind(name, handler);
-	    return this;
-    }
-
-    /**
-     * Trigger an event manually
-     *
-     * Example:
-     *
-     * T.trigger("UserLoggedIn");
-     *
-     * @param eventName {String} the event's name to bind
-     * @param data {Mixed} the data passed to the callback function
-     */
-   ,trigger: function (name, data) {
-        name = name.toLowerCase();
-        this._eventProvider.trigger(name, data);
-        return this;
-    }
-});
-
-// internal supported events names
-QQWB.extend("events", {
-    USER_LOGGEDIN_EVENT: "UserLoggedIn"
-   ,USER_LOGIN_FAILED_EVENT: "UserLoginFailed"
-   ,USER_LOGOUT_EVENT: "UserLoggedOut"
-   ,TOKEN_READY_EVENT: "tokenReady"
-   ,DOCUMENT_READY_EVENT: "documentReady"
-   ,EVERYTHING_READY_EVENT: "everythingReady"
-});
 /**
  * Tencent weibo javascript library
  *
@@ -5241,507 +5747,3 @@ if (QQWB.browser.feature.localstorage || QQWB.browser.feature.userdata) {
     QQWB._alias.call(QQWB.localStorage,"save",QQWB.localStorage.set);
     QQWB._alias.call(QQWB.localStorage,"remove",QQWB.localStorage.del);
 }
-/**
- * Tencent weibo javascript library
- *
- * Authenticate user
- *
- * @author michalliu
- * @version 1.0
- * @package auth
- * @module auth
- * @requires base
- *           token
- *           event.event
- *           core.queryString
- *           core.log
- */
-QQWB.extend("",{
-    /**
-     * Login in user
-     *
-     * @access public
-     * @param optSuccessHandler {Function} handlers when login is success
-     * @param optFailHandler {Function} handlers when login is fail
-     * @return {Object|undefined}
-     */
-    login: function (optSuccessHandler, optFailHandler) {
-
-        if (!this._inited) {
-            this.log.critical("Library not initialized, call T.init() to initialize");
-        }
-
-        var loginStatus = this.loginStatus(); 
-
-        // user already logged in
-        if (loginStatus) {
-
-            optSuccessHandler && optSuccessHandler.call(this,loginStatus);
-
-        } else { // open authorization window
-
-            optSuccessHandler && this.bind(this.events.USER_LOGGEDIN_EVENT, optSuccessHandler);
-            optFailHandler && this.bind(this.events.USER_LOGIN_FAILED_EVENT, optFailHandler);
-
-            var 
-                currWindow = {
-                    x: window.screenX || window.screenLeft
-                   ,y: window.screenY || window.screenTop
-                   ,width: window.outerWidth || document.documentElement.clientWidth
-                   ,height: window.outerHeight || document.documentElement.clientHeight
-                },
-
-                authWindow = {
-                    width: 500
-                   ,height: 300
-                   ,authQuery: function () {
-                      return QQWB.queryString.encode({
-                               response_type: "token"
-                              ,client_id: QQWB._appkey
-                              ,redirect_uri: QQWB._domain.clientproxy
-                              ,referer: document.location.href // IE will lost http referer when new window opened
-                              ,scope: "all"
-                           });
-                    }
-                   ,x: function () {
-                       return parseInt(currWindow.x + (currWindow.width - this.width) / 2, 10);
-                    }
-                   ,y: function () {
-                       return parseInt(currWindow.y + (currWindow.height - this.height) / 2, 10);
-                    }
-                   ,popup: function () {
-                       this.contentWindow = window.open(QQWB._domain.auth + "?" + this.authQuery(), "", ["height="
-                                                                                                   ,this.height
-                                                                                                   ,", width="
-                                                                                                   ,this.width
-                                                                                                   ,", top="
-                                                                                                   ,this.y()
-                                                                                                   ,", left="
-                                                                                                   ,this.x()
-                                                                                                   ,", toobar="
-                                                                                                   ,"no"
-                                                                                                   ,", menubar="
-                                                                                                   ,"no"
-                                                                                                   ,", scrollbars="
-                                                                                                   ,"no"
-                                                                                                   ,", resizable="
-                                                                                                   ,"yes"
-                                                                                                   ,", location="
-                                                                                                   ,"yes"
-                                                                                                   ,", status="
-                                                                                                   ,"no"
-                           ].join(""));
-                       return this;
-                    }
-                   ,focus: function () {
-                       this.contentWindow && this.contentWindow.focus && this.contentWindow.focus();
-                       return this;
-                    }
-                };
-
-            authWindow.popup().focus();
-
-            if (this.browser.msie) {// a timer is running to check autheciation and window status
-                (function () {
-
-                    var responseText;
-
-                    if (authWindow.contentWindow.closed) {
-                        responseText = "error=access_denied";
-                        QQWB._token.resolveResponse(responseText);
-                        return;
-                    }
-
-                    try {
-                        responseText = authWindow.contentWindow.location.hash.split("#").pop();
-                        QQWB._token.resolveResponse(responseText);
-                        authWindow.contentWindow.close();
-                    } catch (ex) {
-                        setTimeout(arguments.callee,0);
-                    }
-
-                }());
-            } else {
-
-                QQWB._startTrackingAuthWindowStatus();
-
-                (function () {
-
-                    var responseText;
-
-                    if (!QQWB._isTrackingAuthWindowStatus()) {
-                        return;
-                    }
-
-                    if (authWindow.contentWindow.closed) {
-                        responseText = "error=access_denied";
-                        QQWB._token.resolveResponse(responseText);
-                        return;
-                    } else {
-                        setTimeout(arguments.callee, 0);
-                    }
-
-                }());
-            }
-        } // end if loginStatus
-
-        return this;
-    }
-
-    /**
-     * Logout user
-     *
-     * @return {Object} QQWB object
-     */
-   ,logout: function (optHandler) {
-       if (!this.loginStatus()) {
-           this.log.info("user not logged in");
-       } else {
-           this._token.clearAccessToken();
-           this._token.clearRefreshToken();
-       }
-       optHandler && optHandler.call(this);
-       this.trigger(this.events.USER_LOGOUT_EVENT);
-       return this;
-    }
-
-   /**
-    * Get login status object
-    *
-    * @access public
-    * @param optCallback {Function} callback handler
-    * @return {Object|undefined}
-    */
-   ,loginStatus: function (optCallback) {
-       var 
-           status,
-           accessToken = this._token.getAccessToken(),
-           user = this._token.getTokenUser();
-
-       if (accessToken) {
-           status = {
-               access_token: accessToken
-              ,name: user.name
-              ,nick: user.nick
-           };
-       }
-
-       optCallback && optCallback.call(this, status);
-
-       return status;
-    }
-    /**
-     * Are we tracking autheciate window status?
-     * This is usefull in non-IE browser
-     *
-     * In IE,when autheciate window opened,there is a timer in the opener
-     * keep tracking the opended window's location to parse and save token
-     * then the autheciate window is closed by force.
-     *
-     * In non-IE browser,the way is different. Once the browser's token come back
-     * the autheciate window will push that token to opener then close itself. but
-     * there is aslo a timer is running in the opener to keep tracking if user manaually
-     * closed the autheciate window. If user close that window (window.closed equal to
-     * true),we will simulate a error response.The problem is when the user finished the
-     * authoriztion task normally the autheciate window will closed aslo.the timer inside
-     * the opener will detect that and set response incorrectly. to correct this, If the
-     * user finished the authorization task normally, we should stop the timer immediatly.
-     * that is before the autheciate window close itself, it told the opener, "don't track 
-     * my status anymore,i will close my self normally",If the timer see that, the timer will
-     * not running anymore, and the set error reponse will never called.
-     *
-     */
-    ,_isTrackingAuthWindowStatus: function () {
-        return !!this._trackAuthWindowStatus;
-    }
-   /**
-    * Don't track if autheciate window is closed or not
-    * 
-    * @access private
-    * @return {undefined}
-    */
-   ,_startTrackingAuthWindowStatus: function() {
-       this._trackAuthWindowStatus = true;
-    }
-   /**
-    * Don't track if autheciate window is closed or not
-    * 
-    * @access private
-    * @return {undefined}
-    */
-   ,_stopTrackingAuthWindowStatus: function() {
-       this._trackAuthWindowStatus = false;
-    }
-});
-/**
- * Tencent weibo javascript library
- *
- * API call
- *
- * Example:
-  
-    T.api(
-       "/status/home_timeline"
-      ,{
-          maxpage: 20
-       }
-      ,"json","GET")
- *  .success(function (response) {
- *  })
- *  .error(function (error) {
- *  });
- *
- *  Note:
- *
- *  T.api method supports cache, when the condition meets.
- *  The cached api will run automaticlly.
- *
- *  If there is a problem when processing to meet the condition.
- *  then the api call will failed too.
- *
- * @access public
- * @param api {String} the rest-style api interface
- * @param apiParams {Object} api params
- * @param optDataType {String} the dataType supports either "json","xml","text", case-insensitive, default is "json"
- * @param optType {String} the request method supports either "get","post", case-insensitive, default is "get"
- * @param optSolution {String} use solution by force @see QQWB.solution
- * @return {Object} promise object
- *
- * @author michalliu
- * @version 1.0
- * @package core
- * @module api
- * @requires base
- *           ext.XML
- *           ext.Array
- *           apiProvider
- *           deferred
- *           auth.token
- *           auth.auth
- */
-
-QQWB.provide("api", function (api, apiParams, optDataType, optType, optSolution) {
-
-	apiParams = apiParams || {};
-    optDataType = (optDataType || "json").toLowerCase();
-    optType = optType || "GET";
-
-	var 
-    	promise,
-		solution,
-		format = optDataType, // the format string in oauth querystring
-		supportedFormats = {json:true,xml:true/*,text:true*/},
-    	deferred = QQWB.deferred.deferred();
-	
-	if (!(format in supportedFormats)) {
-		format = "json";
-	}
-
-	apiParams["access_token"] = QQWB._token.getAccessToken();
-	apiParams["version"] = "2.0";
-	apiParams["format"] = format;
-
-
-    promise = deferred.promise();
-
-	// force to use specified solution
-	if (optSolution && QQWB.Array.inArray([QQWB._solution.HTML5_SOLUTION
-                                          ,QQWB._solution.FLASH_SOLUTION
-										  ,QQWB._solution.SILVER_LIGHT_SOLUTION]
-										  ,optSolution)) {
-		QQWB.log.warning("forced to use solution " + optSolution);
-		// solution has initialized let that solution handle the request
-		if(!QQWB._solution[optSolution]) { // solution not initiallize, initialize it
-		    QQWB.log.warning("forced to use solution " + optSolution + ", this solution is not inited, initialzing...");
-		    QQWB._solution.initSolution[optSolution];
-		}
-	    solution = QQWB._solution[optSolution];
-	} else {
-        // solutions with following priority order
-        solution =  (QQWB.browser.feature.postmessage && QQWB._solution[QQWB._solution.HTML5_SOLUTION])
-            || (QQWB.browser.feature.flash && QQWB._solution[QQWB._solution.FLASH_SOLUTION])
-            || (QQWB.browser.feature.silverlight && QQWB._solution[QQWB._solution.SILVER_LIGHT_SOLUTION]);
-
-	}
-
-	// don't handle that, let server to the job
-	// then pass a failed message to the callback
-    //
-	/*if (false && !QQWB._apiProvider.isProvide(api)) {
-		QQWB.log.error("can't call \"" + api +"\", not supported");
-		deferred.reject(-1, "api not supported"); // immediately error
-		return promise;
-	}*/
-
-	// no solution or solution not correctly initialzed
-	// its not possible to implement to QQWB.api method working
-	// very little chance
-	if (!solution || solution.readyState === 2) {
-		QQWB.log.critical("solution error");
-		deferred.reject(-1, "solution error"); // immediately error
-		return promise;
-	}
-
-    //TODO: if api call required solution is flash
-    //then cache the function do flash solution init
-	//if (!solution.support(api)) {
-		// choose other solution
-		// return  QQWB.api(api, apiParams, optDataType, optType, other solution);
-	//}
-
-	// if api called before the solution is ready, we cached it and waiting the solution ready
-	// when solution is ready, regardless success or fail, these cached function will be invoke again immediately
-	if (solution.readyState === 0) { //solution not ready
-		QQWB.log.warning("solution is not ready, your api call request has been cached, will invoke immediately when solution is ready");
-    	solution.promise.done(function () { // when solution is ready
-		    QQWB.log.info("invoking cached api call \"QQWB.api( " + [api, apiParams, optDataType, optType].join(",") + " )\"...");
-
-			// emulate the request send it to server
-			// when data backs, resolve or reject the deferred object previously saved.
-			// then pass the data in accordingly
-			QQWB.api(api, apiParams, optDataType, optType)
-			    .success(function () {
-				    deferred.resolveWith(deferred,QQWB.Array.fromArguments(arguments));
-				 })
-			    .error(function (){
-				    deferred.rejectWith(deferred,QQWB.Array.fromArguments(arguments));
-			     }); // keep the arguments
-		}).fail(function () { // we use the arguments from boot section (boot.js)
-		    QQWB.log.error("can't invoking cached api call \"QQWB.api( " + [api, apiParams, optDataType, optType].join(",") + " )\"");
-		    deferred.rejectWith(deferred,QQWB.Array.fromArguments(arguments));
-		});
-		return promise;
-	}
-
-	// must be here everything must be ready already from here
-	
-    // user not logged in, don't bother to try to get data
-	if (!QQWB.loginStatus()) {
-		deferred.reject(-1, "not login"); // immediately error
-		return promise;
-	}
-
-	// describe what we are to do now
-    QQWB.log.info("[" + (QQWB.api.id ? QQWB.api.id + 1 : "_") + "] requesting data \"" + QQWB._apiProvider.describe(api) + "\" from server...");
-
-    // html5 solution
-    if (solution === QQWB._solution[QQWB._solution.HTML5_SOLUTION]) {
-			var serverProxy = document.getElementById(solution.id);
-			if (!serverProxy) { // double check to avoid the server frame was removed from dom unexpectly
-	            QQWB.log.critical("server proxy not found");
-	            deferred.reject(-1,"server proxy not found");
-			} else {
-                // server proxy's url should be same as QQWB._domain.serverproxy, if not may be we got the wrong element
-				if (serverProxy.src !== QQWB._domain.serverproxy) { // double check to avoid the server frame src was modified unexpectly 
-	                QQWB.log.critical("server proxy is not valid, src attribute has unexpected value");
-	                deferred.reject(-1,"server proxy not valid");
-				} else {
-					// everything goes well
-                 	// lazy create an collection object to maintain the deferred object
-                 	// only html5 solution need this
-                 	if (!QQWB.api.deferrsCollection) {
-                 		QQWB.extend(QQWB.api, {
-                 			id : 0
-                 		   ,_deferredCollection: {
-                 		   }
-                 		   ,deferredAt: function (deferredId) {
-                 			   if (this._deferredCollection[deferredId]) {
-                 			       return this._deferredCollection[deferredId];
-                 			   } else {
-                 	               QQWB.log.warning("get deferred object has failed, that object does not exist at index " + deferredId);
-                 			   }
-                 		    }
-                 			// uncollect the deferred object
-                 		   ,uncollect: function (deferredId) {
-                 			   if (this._deferredCollection[deferredId]) {
-                 			       delete this._deferredCollection[deferredId];
-                 			   } else {
-                 	               QQWB.log.warning("uncollect deferred object has failed, that object does not exist at index " + deferredId);
-                 			   }
-                 		    }
-                 			// collect an deferred object to collections
-                 		   ,collect: function (deferredObj) {
-                 			   if (deferredObj.promise) { // it's an deferred object
-                 			       this._deferredCollection[++this.id] = deferredObj;
-                 			       return this.id;
-                 			   } else { // we dont accpept other than deferred object
-                 	               QQWB.log.warning("collect a non-deferred object is illegal");
-                 			   }
-                 		    }
-                 		  
-                 			// how many api call this page does?
-                 		   ,total: function () {
-                 			   return QQWB.api.id;
-                 		    }
-                 		});
-                 	}
-
-					if (!QQWB.api.messageHandler) {
-						// add listeners for the data when data comes back
-						QQWB.provide("api.messageHandler", function (e) {
-							// we only trust the data back from the API server, ingore others
-							// This is important for security reson
-							if (QQWB._domain.serverproxy.indexOf(e.origin) !== 0) {
-	                            QQWB.log.warning("unexpected message arrived from " + e.origin + " with data " + e.data);
-							} else {
-								// here is the result comes back
-
-								// data.id represent the caller's id to know which deferred object should handle the data
-								// data.data reprent the result return from API server
-								var 
-							    	data = JSON.parse(e.data),
-									id = data.id,
-									relateDeferred = QQWB.api.deferredAt(id),
-							    	response = data.data;
-
-								if (relateDeferred) {
-							        if (response[0] !== 200) {
-										relateDeferred.reject.apply(relateDeferred,response);
-									} else {
-										if (response[4] == "xmltext") {
-											response[2] = QQWB.XML.fromString(response[2])
-										}
-										relateDeferred.resolve.apply(relateDeferred,[response[2],response[3]]);
-							    	}
-									QQWB.api.uncollect(id);
-								} else {
-	                                QQWB.log.warning("related deferred object not found, it shouldn't happen");
-								}
-							}
-						}); // end provide
-
-                        if (window.addEventListener) {
-                            window.addEventListener("message", QQWB.api.messageHandler, false);
-                        } else if (window.attachEvent) {
-                            window.attachEvent("onmessage", QQWB.api.messageHandler);
-                        }
-					}
-                 
-					try {
-						// send to proxy server
-						// IE only support String type as the message
-						// @see http://msdn.microsoft.com/en-us/library/cc197015(v=vs.85).aspx
-						serverProxy.contentWindow.postMessage(JSON.stringify({ 
-							id: QQWB.api.collect(deferred)
-						   ,data: [api, apiParams, optDataType, optType]
-						}),QQWB._domain.serverproxy);
-
-					} catch (ex) {
-	                    QQWB.log.critical("post message to server proxy has failed, " + ex);
-	                    deferred.reject(-1,ex);
-					}
-				} // end server proxy src modified check
-			} // end server proxy existance check
-
-	} else if (solution === QQWB._solution[QQWB._solution.FLASH_SOLUTION]) {
-		QQWB.io._apiFlashAjax(api, apiParams, optDataType, optType).complete(function () {
-			var response = QQWB.Array.fromArguments(arguments);
-			if (response[0] !== 200) {
-				deferred.reject.apply(relateDeferred,response);
-			} else {
-				deferred.resolve.apply(deferred,[response[2],response[3]]);
-			}
-		});
-	}
-    return promise;
-});

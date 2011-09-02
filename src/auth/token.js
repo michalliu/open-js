@@ -122,14 +122,17 @@ QQWB.extend("_token",{
      * @param optSuccessCallback {Function} callback function when result returned
      */
    ,exchangeForToken: function (optSuccessCallback) {
-       QQWB.io.jsonp(QQWB._domain.exchange + "?" + QQWB.queryString.encode({
-           response_type: "token"
-          ,client_id: QQWB._appkey
-          ,scope: "all"
-          ,state: "1"
-          ,refresh_token: this.getRefreshToken()
-          ,access_token: this.getAccessToken(true)
-       })).success(function (response) {
+       QQWB.io.jsonp({
+                url: QQWB._domain.exchange
+               ,data: QQWB.queryString.encode({
+                          response_type: "token"
+                         ,client_id: QQWB._appkey
+                         ,scope: "all"
+                         ,state: "1"
+                         ,refresh_token: this.getRefreshToken()
+                         ,access_token: this.getAccessToken(true)
+                      })
+       }).success(function (response) {
 
            var _response = response;
 
@@ -176,12 +179,15 @@ QQWB.extend("_token",{
      * @param optSuccessCallback {Function} callback function when result returned
      */
    ,getNewAccessToken: function (optSuccessCallback) {
-       QQWB.io.jsonp(QQWB._domain.query + "?" + QQWB.queryString.encode({
-           response_type: "token"
-          ,client_id: QQWB._appkey
-          ,scope: "all"
-          ,state: "1"
-       })).success(function (response) {
+       QQWB.io.jsonp({
+               url: QQWB._domain.query
+              ,data: QQWB.queryString.encode({
+                   response_type: "token"
+                  ,client_id: QQWB._appkey
+                  ,scope: "all"
+                  ,state: "1"
+               })
+       }).success(function (response) {
 
            var _response = response;
 
