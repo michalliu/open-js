@@ -205,7 +205,7 @@ QQWB.extend("deferred", {
 		    for ( var i=0; i < length; i++) {
 				if (args[i] && QQWB.Function.isFunction(args[i].promise)) { // arg is deferred object
 				    // deferred.reject will called if any operation in when in rejected
-				    args[i].promise().then(resolveFunc[i],deferred.reject);
+				    args[i].promise().then(resolveFunc(i),deferred.reject);
 				} else { // ingore arg that not a deferred object
 					--count; // total arg -- 
 				}
@@ -222,3 +222,7 @@ QQWB.extend("deferred", {
     }
 });
 
+// expose to global namespace
+QQWB.provide("when", function () {
+    return QQWB.deferred.when.apply(this,QQWB.Array.fromArguments(arguments));
+});

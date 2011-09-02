@@ -131,7 +131,7 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optSolution)
 			    .error(function (){
 				    deferred.rejectWith(deferred,QQWB.Array.fromArguments(arguments));
 			     }); // keep the arguments
-		}).fail(function () { // we use the arguments from boot section (boot.js)
+		}).fail(function () { // solution failed, we use the arguments from boot section (boot.js)
 		    QQWB.log.error("can't invoking cached api call \"QQWB.api( " + [api, apiParams, optDataType, optType].join(",") + " )\"");
 		    deferred.rejectWith(deferred,QQWB.Array.fromArguments(arguments));
 		});

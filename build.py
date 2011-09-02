@@ -303,7 +303,7 @@ def build(modulenames, compress, targetfile, createlog=False):
         logfile = open("log.txt","w+")
         logfile.write("\n\n".join([str(source) for source in sources]))
         logfile.write("\n" * 2)
-        logfile.write("\n".join(["<script src=\"" + source.path.replace(_CWD,"http://test.svr.net/apphost/jsapi/wdk").replace("\\","/") + "\"></script>" for source in sources]))
+        logfile.write("\n".join(["<script src=\"" + source.path.replace(_CWD,"http://test.svr.net/apphost/jsapi/open-js").replace("\\","/") + "\"></script>" for source in sources]))
         logfile.close()
 ##
 ##

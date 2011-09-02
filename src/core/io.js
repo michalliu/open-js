@@ -396,6 +396,7 @@ QQWB.extend("io", {
     /**
      * JSONP request
      *
+     * TODO: modified to as documention described
      * @access public
      * @param url {String} jsonp url callback is added automaticlly
      * @return {Object} promise
@@ -434,3 +435,16 @@ QQWB.extend("io", {
     }
 });
 
+// expose to global namespace
+QQWB.provide("ajax", function (opts) {
+    return QQWB.io.ajax.call(QQWB.io, opts);
+});
+
+
+QQWB.provide("jsonp", function (url) {
+    return QQWB.io.jsonp.call(QQWB.io, url);
+})
+
+QQWB.provide("script", function (src, optCharset) {
+    return QQWB.io.script.apply(QQWB.io, [src, optCharset]);
+})

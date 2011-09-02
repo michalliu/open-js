@@ -276,6 +276,1686 @@
 /**
  * Tencent weibo javascript library
  *
+ * static variables
+ *
+ * @author michalliu
+ * @version 1.0
+ * @package core
+ * @module static
+ * @requires base
+ */
+
+QQWB.extend("_static",{
+    GET: "GET"
+   ,POST:"POST"
+   ,GET_OR_POST: "GET | POST"
+   ,CATEGORY_TIMELINE: "时间线"
+   ,EMPTY_STR:""
+   ,NO_DEFAULT_VALUE:null
+   ,NO_DESCRIPTION:"暂时关于此参数的说明"
+});
+/**
+ * Tencent weibo javascript library
+ *
+ * API descriptor
+ *
+ *
+ * @author michalliu
+ * @version 1.0
+ * @package core
+ * @module apiProvider
+ * @requires base
+ *           static
+ */
+QQWB.extend("_apiProvider", {
+    // api list
+    //
+    apis: {
+        "/statuses/home_timeline": {
+            category: "时间线",
+            description: "主页时间线",
+            supportMethod: "get",
+            supportParams: {
+                pageflag: {
+                    defalutValue: 20,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                reqnum: {
+                    defalutValue: 0,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                pagetime: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/statuses/public_timeline": {
+            category: "时间线",
+            description: "广播大厅时间线",
+            supportMethod: "get",
+            supportParams: {
+                pos: {
+                    defalutValue: 20,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                reqnum: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/statuses/user_timeline": {
+            category: "时间线",
+            description: "其他用户发表时间线",
+            supportMethod: "get",
+            supportParams: {
+                pageflag: {
+                    defalutValue: 0,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                pagetime: {
+                    defalutValue: 20,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                reqnum: {
+                    defalutValue: 0,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                lastid: {
+                    defalutValue: "t",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                name: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/statuses/mentions_timeline": {
+            category: "时间线",
+            description: "@提到我的时间线",
+            supportMethod: "get",
+            supportParams: {
+                pageflag: {
+                    defalutValue: 0,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                pagetime: {
+                    defalutValue: 20,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                reqnum: {
+                    defalutValue: 0,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                lastid: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/statuses/ht_timeline": {
+            category: "时间线",
+            description: "话题时间线",
+            supportMethod: "post",
+            supportParams: {
+                httext: {
+                    defalutValue: 0,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                pageflag: {
+                    defalutValue: "",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                pageinfo: {
+                    defalutValue: 20,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                reqnum: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/statuses/broadcast_timeline": {
+            category: "时间线",
+            description: "我发表时间线",
+            supportMethod: "get",
+            supportParams: {
+                pageflag: {
+                    defalutValue: 0,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                pagetime: {
+                    defalutValue: 20,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                reqnum: {
+                    defalutValue: 0,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                lastid: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/statuses/special_timeline": {
+            category: "时间线",
+            description: "特别收听的人发表时间线",
+            supportMethod: "get",
+            supportParams: {
+                pageflag: {
+                    defalutValue: 0,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                pagetime: {
+                    defalutValue: 20,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                reqnum: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/statuses/broadcast_timeline_ids": {
+            category: "时间线",
+            description: "我发表时间线索引",
+            supportMethod: "get",
+            supportParams: {
+                pageflag: {
+                    defalutValue: 20,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                pagetime: {
+                    defalutValue: "",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                reqnum: {
+                    defalutValue: "",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                lastid: {
+                    defalutValue: "",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                type: {
+                    defalutValue: "",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                contenttype: {
+                    defalutValue: "",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                accesslevel: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/statuses/home_timeline_ids": {
+            category: "时间线",
+            description: "首页时间线索引",
+            supportMethod: "get",
+            supportParams: {
+                pageflag: {
+                    defalutValue: 20,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                pagetime: {
+                    defalutValue: "",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                reqnum: {
+                    defalutValue: "",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                lastid: {
+                    defalutValue: "",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                type: {
+                    defalutValue: "",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                contenttype: {
+                    defalutValue: "",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                accesslevel: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/statuses/mentions_timeline_ids": {
+            category: "时间线",
+            description: "提及我的时间线索引",
+            supportMethod: "get",
+            supportParams: {
+                pageflag: {
+                    defalutValue: 20,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                pagetime: {
+                    defalutValue: "",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                reqnum: {
+                    defalutValue: "",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                lastid: {
+                    defalutValue: "",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                type: {
+                    defalutValue: "",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                contenttype: {
+                    defalutValue: "",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                accesslevel: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/statuses/user_timeline_ids": {
+            category: "时间线",
+            description: "用户发表时间线索引",
+            supportMethod: "get",
+            supportParams: {
+                pageflag: {
+                    defalutValue: 20,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                pagetime: {
+                    defalutValue: "",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                reqnum: {
+                    defalutValue: "",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                lastid: {
+                    defalutValue: "t",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                name: {
+                    defalutValue: "",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                type: {
+                    defalutValue: "",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                contenttype: {
+                    defalutValue: "",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                accesslevel: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/statuses/users_timeline": {
+            category: "时间线",
+            description: "多用户发表时间线",
+            supportMethod: "get",
+            supportParams: {
+                pageflag: {
+                    defalutValue: 20,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                pagetime: {
+                    defalutValue: "",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                reqnum: {
+                    defalutValue: "",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                lastid: {
+                    defalutValue: "t,api_weibo",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                names: {
+                    defalutValue: "",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                type: {
+                    defalutValue: "",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                contenttype: {
+                    defalutValue: "",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                accesslevel: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/statuses/users_timeline_ids": {
+            category: "时间线",
+            description: "多用户发表时间线索引",
+            supportMethod: "get",
+            supportParams: {
+                pageflag: {
+                    defalutValue: 20,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                pagetime: {
+                    defalutValue: "",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                reqnum: {
+                    defalutValue: "",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                lastid: {
+                    defalutValue: "t,api_weibo",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                names: {
+                    defalutValue: "",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                type: {
+                    defalutValue: "",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                contenttype: {
+                    defalutValue: "",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                accesslevel: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/statuses/area_timeline": {
+            category: "时间线",
+            description: "同城发表时间线",
+            supportMethod: "get",
+            supportParams: {
+                pos: {
+                    defalutValue: 20,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                reqnum: {
+                    defalutValue: "",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                country: {
+                    defalutValue: "",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                province: {
+                    defalutValue: "",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                city: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/t/show": {
+            category: "微博相关",
+            description: "获取一条微博数据",
+            supportMethod: "get",
+            supportParams: {
+                id: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/t/add": {
+            category: "微博相关",
+            description: "发表一条微博",
+            supportMethod: "post",
+            supportParams: {
+                content: {
+                    defalutValue: "127.0.0.1",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                clientip: {
+                    defalutValue: "",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                jing: {
+                    defalutValue: "",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                wei: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/t/del": {
+            category: "微博相关",
+            description: "删除一条微博",
+            supportMethod: "post",
+            supportParams: {
+                id: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/t/re_add": {
+            category: "微博相关",
+            description: "转播一条微博",
+            supportMethod: "post",
+            supportParams: {
+                content: {
+                    defalutValue: "127.0.0.1",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                clientip: {
+                    defalutValue: "",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                jing: {
+                    defalutValue: "",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                wei: {
+                    defalutValue: "",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                reid: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/t/reply": {
+            category: "微博相关",
+            description: "回复一条微博",
+            supportMethod: "post",
+            supportParams: {
+                content: {
+                    defalutValue: "127.0.0.1",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                clientip: {
+                    defalutValue: "",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                jing: {
+                    defalutValue: "",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                wei: {
+                    defalutValue: "",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                reid: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/t/add_pic": {
+            category: "微博相关",
+            description: "发表一条图片微博",
+            supportMethod: "post",
+            supportParams: {
+                content: {
+                    defalutValue: "127.0.0.1",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                clientip: {
+                    defalutValue: "",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                jing: {
+                    defalutValue: "",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                wei: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/t/re_count": {
+            category: "微博相关",
+            description: "转播数或点评数",
+            supportMethod: "post",
+            supportParams: {
+                ids: {
+                    defalutValue: 2,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                flag: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/t/re_list": {
+            category: "微博相关",
+            description: "获取单条微博的转发和点评列表",
+            supportMethod: "get",
+            supportParams: {
+                flag: {
+                    defalutValue: "",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                rootid: {
+                    defalutValue: 0,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                pageflag: {
+                    defalutValue: 0,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                pagetime: {
+                    defalutValue: 20,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                reqnum: {
+                    defalutValue: 0,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                twitterid: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/t/comment": {
+            category: "微博相关",
+            description: "点评一条微博",
+            supportMethod: "post",
+            supportParams: {
+                content: {
+                    defalutValue: "127.0.0.1",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                clientip: {
+                    defalutValue: "",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                jing: {
+                    defalutValue: "",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                wei: {
+                    defalutValue: "",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                reid: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/t/add_music": {
+            category: "微博相关",
+            description: "发表音频微博",
+            supportMethod: "post",
+            supportParams: {
+                content: {
+                    defalutValue: "127.0.0.1",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                clientip: {
+                    defalutValue: "",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                jing: {
+                    defalutValue: "",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                wei: {
+                    defalutValue: "http://a.com/b.mp3",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                url: {
+                    defalutValue: "歌名",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                title: {
+                    defalutValue: "演唱者",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                author: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/t/add_video": {
+            category: "微博相关",
+            description: "发表视频微博",
+            supportMethod: "post",
+            supportParams: {
+                content: {
+                    defalutValue: "127.0.0.1",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                clientip: {
+                    defalutValue: "",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                jing: {
+                    defalutValue: "",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                wei: {
+                    defalutValue: "http://v.youku.com/v_show/id_XMjExODczODM2.html",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                url: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/t/getvideoinfo": {
+            category: "微博相关",
+            description: "获取视频信息",
+            supportMethod: "post",
+            supportParams: {
+                url: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/t/list": {
+            category: "微博相关",
+            description: "根据微博ID批量得到微博数据",
+            supportMethod: "get",
+            supportParams: {
+                ids: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/user/info": {
+            category: "账户相关",
+            description: "获取自己的详细资料",
+            supportMethod: "get"
+        },
+        "/user/update": {
+            category: "账户相关",
+            description: "更新个人资料",
+            supportMethod: "post",
+            supportParams: {
+                nick: {
+                    defalutValue: 1,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                sex: {
+                    defalutValue: 2000,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                year: {
+                    defalutValue: 1,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                month: {
+                    defalutValue: 1,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                day: {
+                    defalutValue: 86,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                countrycode: {
+                    defalutValue: 34,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                provincecode: {
+                    defalutValue: 0755,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                citycode: {
+                    defalutValue: "i am ok.",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                introduction: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/user/update_head": {
+            category: "账户相关",
+            description: "更新个人资料头像",
+            supportMethod: "post",
+            supportParams: {
+                pic: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/user/other_info": {
+            category: "账户相关",
+            description: "获取其他人资料",
+            supportMethod: "get",
+            supportParams: {
+                name: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/user/infos": {
+            category: "账户相关",
+            description: "多用户信息",
+            supportMethod: "post",
+            supportParams: {
+                names: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/user/verify": {
+            category: "账户相关",
+            description: "验证账户是否合法（是否注册微博）",
+            supportMethod: "post",
+            supportParams: {
+                name: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/friends/fanslist": {
+            category: "关系链相关",
+            description: "我的听众列表",
+            supportMethod: "get",
+            supportParams: {
+                reqnum: {
+                    defalutValue: 0,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                startindex: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/friends/idollist": {
+            category: "关系链相关",
+            description: "我收听的人列表",
+            supportMethod: "get",
+            supportParams: {
+                reqnum: {
+                    defalutValue: 0,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                startindex: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/friends/blacklist": {
+            category: "关系链相关",
+            description: "黑名单列表",
+            supportMethod: "get",
+            supportParams: {
+                reqnum: {
+                    defalutValue: 0,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                startindex: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/friends/speciallist": {
+            category: "关系链相关",
+            description: "特别收听列表",
+            supportMethod: "get",
+            supportParams: {
+                reqnum: {
+                    defalutValue: 0,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                startindex: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/friends/add": {
+            category: "关系链相关",
+            description: "收听某个用户",
+            supportMethod: "post",
+            supportParams: {
+                name: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/friends/del": {
+            category: "关系链相关",
+            description: "取消收听某个用户",
+            supportMethod: "post",
+            supportParams: {
+                name: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/friends/addspecial": {
+            category: "关系链相关",
+            description: "特别收听某个用户",
+            supportMethod: "post",
+            supportParams: {
+                name: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/friends/delspecial": {
+            category: "关系链相关",
+            description: "取消特别收听某个用户",
+            supportMethod: "post",
+            supportParams: {
+                name: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/friends/addblacklist": {
+            category: "关系链相关",
+            description: "添加某个用户到黑名单",
+            supportMethod: "post",
+            supportParams: {
+                name: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/friends/delblacklist": {
+            category: "关系链相关",
+            description: "从黑名单中删除某个用户",
+            supportMethod: "post",
+            supportParams: {
+                name: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/friends/check": {
+            category: "关系链相关",
+            description: "检查是否我的听众或收听的人",
+            supportMethod: "get",
+            supportParams: {
+                names: {
+                    defalutValue: 2,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                flag: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/friends/user_fanslist": {
+            category: "关系链相关",
+            description: "其他账户听众列表",
+            supportMethod: "get",
+            supportParams: {
+                reqnum: {
+                    defalutValue: 0,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                startindex: {
+                    defalutValue: "t",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                name: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/friends/user_idollist": {
+            category: "关系链相关",
+            description: "其他账户收听的人列表",
+            supportMethod: "get",
+            supportParams: {
+                reqnum: {
+                    defalutValue: 0,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                startindex: {
+                    defalutValue: "t",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                name: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/friends/user_speciallist": {
+            category: "关系链相关",
+            description: "其他账户特别收听的人列表",
+            supportMethod: "get",
+            supportParams: {
+                reqnum: {
+                    defalutValue: 0,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                startindex: {
+                    defalutValue: "",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                name: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/friends/fanslist_s": {
+            category: "关系链相关",
+            description: "多听众列表",
+            supportMethod: "get",
+            supportParams: {
+                reqnum: {
+                    defalutValue: 0,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                startindex: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/friends/idollist_s": {
+            category: "关系链相关",
+            description: "多收听人列表",
+            supportMethod: "get",
+            supportParams: {
+                reqnum: {
+                    defalutValue: 0,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                startindex: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/private/add": {
+            category: "私信相关",
+            description: "发私信",
+            supportMethod: "post",
+            supportParams: {
+                content: {
+                    defalutValue: "127.0.0.1",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                clientip: {
+                    defalutValue: "",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                jing: {
+                    defalutValue: "",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                wei: {
+                    defalutValue: "t",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                name: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/private/del": {
+            category: "私信相关",
+            description: "删除一条私信",
+            supportMethod: "post",
+            supportParams: {
+                id: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/private/recv": {
+            category: "私信相关",
+            description: "收件箱",
+            supportMethod: "get",
+            supportParams: {
+                pageflag: {
+                    defalutValue: 0,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                pagetime: {
+                    defalutValue: 20,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                reqnum: {
+                    defalutValue: 0,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                lastid: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/private/send": {
+            category: "私信相关",
+            description: "发件箱",
+            supportMethod: "get",
+            supportParams: {
+                pageflag: {
+                    defalutValue: 0,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                pagetime: {
+                    defalutValue: 20,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                reqnum: {
+                    defalutValue: 0,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                lastid: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/search/user": {
+            category: "搜索相关",
+            description: "搜索用户",
+            supportMethod: "get",
+            supportParams: {
+                keyword: {
+                    defalutValue: 10,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                pagesize: {
+                    defalutValue: 1,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                page: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/search/t": {
+            category: "搜索相关",
+            description: "搜索微博",
+            supportMethod: "get",
+            supportParams: {
+                keyword: {
+                    defalutValue: 10,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                pagesize: {
+                    defalutValue: 1,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                page: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/search/userbytag": {
+            category: "搜索相关",
+            description: "通过标签搜索用户",
+            supportMethod: "get",
+            supportParams: {
+                keyword: {
+                    defalutValue: 10,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                pagesize: {
+                    defalutValue: 1,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                page: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/trends/ht": {
+            category: "热度趋势",
+            description: "话题热榜",
+            supportMethod: "get",
+            supportParams: {
+                type: {
+                    defalutValue: 20,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                reqnum: {
+                    defalutValue: 0,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                pos: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/trends/t": {
+            category: "热度趋势",
+            description: "热门转播",
+            supportMethod: "get",
+            supportParams: {
+                reqnum: {
+                    defalutValue: 0,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                pos: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/info/update": {
+            category: "查看数据",
+            description: "更新条数",
+            supportMethod: "get",
+            supportParams: {
+                op: {
+                    defalutValue: 9,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                type: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/fav/addt": {
+            category: "数据收藏",
+            description: "收藏一条微博",
+            supportMethod: "post",
+            supportParams: {
+                id: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/fav/delt": {
+            category: "数据收藏",
+            description: "取消收藏一条微博",
+            supportMethod: "post",
+            supportParams: {
+                id: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/fav/list_t": {
+            category: "数据收藏",
+            description: "收藏的微博列表",
+            supportMethod: "get",
+            supportParams: {
+                pageflag: {
+                    defalutValue: 0,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                nexttime: {
+                    defalutValue: 0,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                prevtime: {
+                    defalutValue: 20,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                reqnum: {
+                    defalutValue: 0,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                lastid: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/fav/addht": {
+            category: "数据收藏",
+            description: "订阅话题",
+            supportMethod: "post",
+            supportParams: {
+                id: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/fav/delht": {
+            category: "数据收藏",
+            description: "取消收藏话题",
+            supportMethod: "post",
+            supportParams: {
+                id: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/fav/list_ht": {
+            category: "数据收藏",
+            description: "获取已订阅话题列表",
+            supportMethod: "get",
+            supportParams: {
+                reqnum: {
+                    defalutValue: 0,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                pageflag: {
+                    defalutValue: 0,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                pagetime: {
+                    defalutValue: 0,
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                lastid: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/ht/ids": {
+            category: "话题相关",
+            description: "根据话题名称查询话题ID",
+            supportMethod: "get",
+            supportParams: {
+                httexts: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/ht/info": {
+            category: "话题相关",
+            description: "根据话题ID获取话题相关微博",
+            supportMethod: "get",
+            supportParams: {
+                ids: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/tag/add": {
+            category: "标签相关",
+            description: "添加标签",
+            supportMethod: "post",
+            supportParams: {
+                tag: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/tag/del": {
+            category: "标签相关",
+            description: "删除标签",
+            supportMethod: "post",
+            supportParams: {
+                tagid: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/other/kownperson": {
+            category: "其他",
+            description: "我可能认识的人",
+            supportMethod: "get",
+            supportParams: {
+                ip: {
+                    defalutValue: "",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                country_code: {
+                    defalutValue: "",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                province_code: {
+                    defalutValue: "",
+                    description: QQWB._static.NO_DESCRIPTION
+                },
+                city_code: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/other/kownperson": {
+            category: "其他",
+            description: "可能认识的人",
+            supportMethod: "get"
+        },
+        "/other/shorturl": {
+            category: "其他",
+            description: "短URL转长URL",
+            supportMethod: "get",
+            supportParams: {
+                url: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        },
+        "/other/get_emtions": {
+            category: "其他",
+            description: "获取表情接口",
+            supportMethod: "get",
+            supportParams: {
+                type: {
+                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    description: QQWB._static.NO_DESCRIPTION
+                }
+            }
+        }
+    }
+    /**
+     * Get an api descriptor object
+     *
+     * @access public
+     * @param interface {String} the api interface
+     * @return {Object} the descriptor object
+     */
+   ,getDescriptor: function (interface) {
+        return this.apis[interface];
+    }
+    /**
+     * Determine an api is in the api list or not
+     *
+     * @access public
+     * @param interface {String} the api interface
+     * @return {Boolean}
+     */
+   ,isProvide: function (interface) {
+        return !!this.getDescriptor(interface);
+    }
+    /**
+     * Try to describe the api interface by human read-able format
+     *
+     * @access public
+     * @param interface {String} the api interface
+     * @return {Boolean}
+     */
+   ,describe: function (interface) {
+        var descriptor = this.getDescriptor(interface);
+        if (descriptor) {
+            return descriptor.category + ">" + descriptor.description;
+        } else {
+            return "";
+        }
+    }
+});
+/**
+ * Tencent weibo javascript library
+ *
+ * Incode document
+ *
+ * Example:
+ *
+ * T.man("/Statuses/home_timeline");
+ *
+ * @author michalliu
+ * @version 1.0
+ * @package core
+ * @module man
+ * @requires base
+ *           apiProvider
+ */
+
+QQWB.provide("man", function (api) {
+    return this._apiProvider.getDescriptor(api);
+});
+
+/**
+ * Tencent weibo javascript library
+ *
+ * String extension
+ *
+ * //TODO: encoding libraries
+ *
+ * http://www.cnblogs.com/cgli/archive/2011/05/17/2048869.html
+ * http://www.blueidea.com/tech/web/2006/3622.asp
+ *
+ * @author michalliu
+ * @version 1.0
+ * @package ext
+ * @module String
+ * @requires base
+ */
+QQWB.extend("String",{
+    /**
+     * Determine whether an object is string
+     *
+     * @access public
+     * @param source {Mixed} anything
+     * @return {Boolean}
+     */
+    isString: function (source) {
+        return typeof source === "string";
+    }
+
+});
+/**
+ * Tencent weibo javascript library
+ *
+ * DOM operations
+ *
+ * @author michalliu
+ * @version 1.0
+ * @package core
+ * @module dom
+ * @requires base
+ *           ext.String
+ */
+
+QQWB.extend("dom", {
+    /**
+     * Create an element
+     * 
+     * @access public
+     * @param tagName {String} the element's tagName
+     * @param optAttrs {Object} attrs on that element
+     * @return {DOMElement} an element
+     */
+    create: function (tagName,optAttrs) {
+        var element = document.createElement(tagName + "");
+        if (optAttrs && element) {
+            for (attr in optAttrs) {
+                if (optAttrs.hasOwnProperty(attr)) {
+                    element[attr] = optAttrs[attr];
+                }
+            }
+        }
+        return element;
+     }
+    /**
+     * Create and return a hiddened element
+     *
+     * @access public
+     * @param optTagName {String} tagName
+     * @param optAttrs {Object} element's attrs
+	 * @param optFake {Boolean} use visibility:hidden insteadof display:none
+     * @return {DOMElement} a hiddened element
+     */
+   ,createHidden: function (optTagName, optAttrs, optFake) {
+        optTagName = optTagName || "div";
+        var el = this.create(optTagName,optAttrs);
+        el.width = el.height = 0;
+        el.style.width = el.style.height = 0;
+        el.style.position = "absolute";
+        el.style.top = "-9999px";
+		if (optFake) {
+			// el.style.visibility = "hidden";
+		} else {
+            el.style.display = "none";
+		}
+        return el;
+    }
+    /**
+     * Append child to parent
+     *
+     * Note:
+     * if parent is not valid then append to dom body 
+     *
+     * @access public
+     * @param child {DOMElement} childNode
+     * @param parent {DOMElement} parentNode
+	 * @return {Object} QQWB.dom
+     */
+   ,append: function (child, parent) {
+       parent = parent || document.body;
+       if (child && child.nodeType) {
+           parent.appendChild(child);
+       }
+       return this;
+    }
+    /**
+     * Set element's innerHTML
+     *
+     * @access public
+	 * @param node {Node} node
+	 * @param html {String} the html text for the node
+	 * @return {Object} QQWB.dom
+     */
+   ,html: function (node, html) {
+       node && node.nodeType && html && (node.innerHTML = html);
+       return this;
+   }
+    /**
+     * Append html to DOM and make it hidden
+     *
+     * @access public
+     * @param html {DOMElement|String}
+     * @param optAttrs {Object} element's attrs
+	 * @param optFake {Boolean} use visibility:hidden insteadof display:none
+	 * @return {Object} QQWB.dom
+     */
+   ,appendHidden: function (html, optAttrs ,optFake) {
+       var hidden = this.createHidden(null, optAttrs, optFake);
+       this.html(hidden, html);
+       return this.append(hidden);
+    }
+	/**
+	 * Remove node from DOM
+	 *
+     * @access public
+	 * @param node {Node} the DOM node
+	 * @return {Object} QQWB.dom
+	 */
+   ,remove: function (node) {
+	   node && node.nodeType /* is node */ && node.parentNode /* parentNode exists */ && node.parentNode.removeChild(node)/* remove it */;
+	   return this;
+    }
+});
+
+/**
+ * Tencent weibo javascript library
+ *
+ * Querystring encoder and decoder
+ *
+ * @author michalliu
+ * @version 1.0
+ * @package core
+ * @module queryString
+ * @requires base
+ */
+
+QQWB.extend("queryString",{
+    /**
+     * Encode parameter object to query string
+     *
+     * @access public
+     * @param params {Object} the object contains params
+     *        opt_sep {String} the seprator string, default is '&'
+     *        opt_encode {Function} the function to encode param, default is encodeURIComponent
+     * @return {String} the encoded query string
+     */
+    encode: function (params, opt_sep, opt_encode) {
+        var 
+            regexp = /%20/g,
+            sep = opt_sep || '&',
+            encode = opt_encode || encodeURIComponent,
+            pairs = [];
+
+        for (var key in params) {
+            if (params.hasOwnProperty(key)) {
+                var val = params[key];
+                if (val !== null && typeof val != 'undefined') {
+                    pairs.push(encode(key).replace(regexp,"+") + "=" + encode(val).replace(regexp,"+"));
+                }
+            }
+        }
+
+        pairs.sort();
+        return pairs.join(sep);
+    }
+    /**
+     * Decode query string to parameter object
+     *
+     * @param str {String} query string
+     *        opt_sep {String} the seprator string default is '&'
+     *        opt_decode {Function} the function to decode string default is decodeURIComponent
+     * @return {Object} the parameter object
+     */
+   ,decode: function (str, opt_sep, opt_decode) {
+       var
+           decode = opt_decode || decodeURIComponent,
+           sep = opt_sep || '&',
+           parts = str.split(sep),
+           params = {},
+           pair;
+
+       for (var i = 0,l = parts.length; i<l; i++) {
+           pair = parts[i].split('=',2);
+           if (pair && pair[0]) {
+               params[decode(pair[0])] = decode(pair[1]);
+           }
+       }
+
+       return params;
+    }
+});
+/**
+ * Tencent weibo javascript library
+ *
  * format string with python style
  *
  * @author michalliu
@@ -689,92 +2369,6 @@ QQWB.extend("log", {
 /**
  * Tencent weibo javascript library
  *
- * Cookie manipulation
- *
- * @author michalliu
- * @version 1.0
- * @package core
- * @module cookie
- * @requires base
- *           log
- */
-
-QQWB.extend("cookie", {
-    /**
-     * Set cookie
-     *
-     * @param name {String} cookie name
-     *        value {String} cookie value
-     *        maxage {Number} seconds from now. If present -1 it means a session cookie(default by browser)
-     *        path {String} cookie path. If not present then use full request path(default by browser)
-     *        domain {String} cookie domain. If not present then use full request host name(default by browser)
-     * @access public
-     * @return {Void}
-     */
-    set: function (name, value, opt_maxage, opt_path, opt_domain) {
-
-       if ( typeof opt_maxage === "undefined" || opt_maxage === null) {
-           opt_maxage = -1;
-       }
-
-       var cookieDomain = opt_domain ? "domain=" + opt_domain : "";
-       var cookiePath = opt_path ? "path=" + opt_path : "";
-       var cookieExpire = "";
-
-       if (opt_maxage === 0) {
-           // expire the cookie
-           cookieExpire = "expires=" + new Date(1970,1,1).toUTCString();
-       } else if (opt_maxage > 0) {
-           cookieExpire = "expires=" + new Date(+new Date+opt_maxage*1000).toUTCString();
-       }
-
-       document.cookie = [name + "=" + value, cookieExpire, cookiePath, cookieDomain].join("; ");
-
-       return this;
-    }
-
-    /**
-     * Return the first value for the given cookie name 
-     *
-     * @access public
-     * @param name {String} cookie name
-     * @return {String} value for cookie
-     */
-   ,get: function (name) {
-       var 
-           cookieName = name + "=";
-           cookies = (document.cookie || "").split(/\s*;\s*/);
-       for (var i=0,l=cookies.length; i<l; i++) {
-           var cookie = cookies[i];
-           if (cookie.indexOf(cookieName) === 0) {
-               return cookie.substr(cookieName.length);
-           }
-       }
-    }
-
-    /**
-     * Delete cookie
-     *
-     * @access public
-     * @param name {String} cookie name
-     *        opt_path {String} the path of cookie
-     *        opt_domain {String} the domain of cookie
-     * @return {Void}
-     */
-   ,del: function (name, opt_path, opt_domain) {
-
-       this.set(name, '', 0, opt_path, opt_domain);
-
-       if (document.cookie.indexOf(name+"=") >= 0) {
-           QQWB.log.warning("Cookie may not be deleted as you expected");
-       }
-
-       return this;
-    }
-});
-/**
- * Tencent weibo javascript library
- *
  * Function extension
  *
  * @author michalliu
@@ -794,35 +2388,6 @@ QQWB.extend("Function",{
     isFunction: function (arg) {
         return typeof arg === "function";
     }
-});
-/**
- * Tencent weibo javascript library
- *
- * String extension
- *
- * //TODO: encoding libraries
- *
- * http://www.cnblogs.com/cgli/archive/2011/05/17/2048869.html
- * http://www.blueidea.com/tech/web/2006/3622.asp
- *
- * @author michalliu
- * @version 1.0
- * @package ext
- * @module String
- * @requires base
- */
-QQWB.extend("String",{
-    /**
-     * Determine whether an object is string
-     *
-     * @access public
-     * @param source {Mixed} anything
-     * @return {Boolean}
-     */
-    isString: function (source) {
-        return typeof source === "string";
-    }
-
 });
 /**
  * Tencent weibo javascript library
@@ -1152,72 +2717,107 @@ QQWB.extend("deferred", {
 		return deferred.promise();
     }
 });
-
 /**
  * Tencent weibo javascript library
  *
- * Querystring encoder and decoder
+ * Combine time-waiting operations together
  *
  * @author michalliu
  * @version 1.0
  * @package core
- * @module queryString
+ * @module when
  * @requires base
+ *           deferred
+ *           ext.Array
  */
 
-QQWB.extend("queryString",{
+QQWB.provide("when", function () {
+    return QQWB.deferred.when.apply(this,QQWB.Array.fromArguments(arguments));
+});
+/**
+ * Tencent weibo javascript library
+ *
+ * Cookie manipulation
+ *
+ * @author michalliu
+ * @version 1.0
+ * @package core
+ * @module cookie
+ * @requires base
+ *           log
+ */
+
+QQWB.extend("cookie", {
     /**
-     * Encode parameter object to query string
+     * Set cookie
      *
+     * @param name {String} cookie name
+     *        value {String} cookie value
+     *        maxage {Number} seconds from now. If present -1 it means a session cookie(default by browser)
+     *        path {String} cookie path. If not present then use full request path(default by browser)
+     *        domain {String} cookie domain. If not present then use full request host name(default by browser)
      * @access public
-     * @param params {Object} the object contains params
-     *        opt_sep {String} the seprator string, default is '&'
-     *        opt_encode {Function} the function to encode param, default is encodeURIComponent
-     * @return {String} the encoded query string
+     * @return {Void}
      */
-    encode: function (params, opt_sep, opt_encode) {
-        var 
-            regexp = /%20/g,
-            sep = opt_sep || '&',
-            encode = opt_encode || encodeURIComponent,
-            pairs = [];
+    set: function (name, value, opt_maxage, opt_path, opt_domain) {
 
-        for (var key in params) {
-            if (params.hasOwnProperty(key)) {
-                var val = params[key];
-                if (val !== null && typeof val != 'undefined') {
-                    pairs.push(encode(key).replace(regexp,"+") + "=" + encode(val).replace(regexp,"+"));
-                }
-            }
-        }
-
-        pairs.sort();
-        return pairs.join(sep);
-    }
-    /**
-     * Decode query string to parameter object
-     *
-     * @param str {String} query string
-     *        opt_sep {String} the seprator string default is '&'
-     *        opt_decode {Function} the function to decode string default is decodeURIComponent
-     * @return {Object} the parameter object
-     */
-   ,decode: function (str, opt_sep, opt_decode) {
-       var
-           decode = opt_decode || decodeURIComponent,
-           sep = opt_sep || '&',
-           parts = str.split(sep),
-           params = {},
-           pair;
-
-       for (var i = 0,l = parts.length; i<l; i++) {
-           pair = parts[i].split('=',2);
-           if (pair && pair[0]) {
-               params[decode(pair[0])] = decode(pair[1]);
-           }
+       if ( typeof opt_maxage === "undefined" || opt_maxage === null) {
+           opt_maxage = -1;
        }
 
-       return params;
+       var cookieDomain = opt_domain ? "domain=" + opt_domain : "";
+       var cookiePath = opt_path ? "path=" + opt_path : "";
+       var cookieExpire = "";
+
+       if (opt_maxage === 0) {
+           // expire the cookie
+           cookieExpire = "expires=" + new Date(1970,1,1).toUTCString();
+       } else if (opt_maxage > 0) {
+           cookieExpire = "expires=" + new Date(+new Date+opt_maxage*1000).toUTCString();
+       }
+
+       document.cookie = [name + "=" + value, cookieExpire, cookiePath, cookieDomain].join("; ");
+
+       return this;
+    }
+
+    /**
+     * Return the first value for the given cookie name 
+     *
+     * @access public
+     * @param name {String} cookie name
+     * @return {String} value for cookie
+     */
+   ,get: function (name) {
+       var 
+           cookieName = name + "=";
+           cookies = (document.cookie || "").split(/\s*;\s*/);
+       for (var i=0,l=cookies.length; i<l; i++) {
+           var cookie = cookies[i];
+           if (cookie.indexOf(cookieName) === 0) {
+               return cookie.substr(cookieName.length);
+           }
+       }
+    }
+
+    /**
+     * Delete cookie
+     *
+     * @access public
+     * @param name {String} cookie name
+     *        opt_path {String} the path of cookie
+     *        opt_domain {String} the domain of cookie
+     * @return {Void}
+     */
+   ,del: function (name, opt_path, opt_domain) {
+
+       this.set(name, '', 0, opt_path, opt_domain);
+
+       if (document.cookie.indexOf(name+"=") >= 0) {
+           QQWB.log.warning("Cookie may not be deleted as you expected");
+       }
+
+       return this;
     }
 });
 /**
@@ -2019,935 +3619,6 @@ QQWB.extend("_token",{
        }
     }
 });
-/**
- * Tencent weibo javascript library
- *
- * A simple event system provide hooks
- *
- * @author michalliu
- * @version 1.0
- * @package event
- * @module eventProvider
- * @requires base
- *           ext.Array
- */
-QQWB.extend("_eventProvider",{
-
-    /**
-     * Get event system's internal map or create it if not exists
-     *
-     * @access private
-     * @return {Object} the internal event map
-     */
-    _getEventsMap: function () {
-        if (!this._eventsMap) {
-            this._eventsMap = {};
-        }
-        return this._eventsMap;
-    }
-
-    /**
-     * Bind an event
-     *
-     * @access public
-     * @param name {String} the event name to bind
-     * @param handler {Function} the handler for this event
-     * @return {Void}
-     */
-   ,bind: function (name, handler) {
-       var evts = this._getEventsMap();
-       if (!evts[name]) {
-           evts[name] = [handler];
-       } else {
-           if (!QQWB.Array.inArray(evts[name],handler)) {
-               evts[name].push(handler);
-           }
-       }
-    }
-
-    /**
-     * Unbind an event
-	 * 
-	 * If no handler provided, it will unbind all the handlers to this event
-     * @access public
-     * @param name {String} the event name to unbind
-     *        handler {Function} the handler's reference for this event to unbind
-     * @return {Void}
-     */
-   ,unbind: function (name, handler) {
-	   var handlers = this._getEventsMap()[name];
-	   if (handlers) {
-		   if (handler) { // unbind specific handler,do nothing if handler not registered
-			   for (var i=0,l=handlers.length; i<l; i++) {
-				   if (handler === handlers[i]) {
-					   handlers[i] = null;
-				   }
-			   }
-		   } else { // unbind all the handlers
-			   //handlers.length = 0;
-			   delete this._getEventsMap()[name];
-		   }
-	   }
-    }
-
-   /**
-	* Trigger a named event
-	*
-	* @access private
-	* @param name {String} the event name
-	*        data {Mixed} the event data
-	*/
-   ,trigger: function (name, data) {
-	   var handlers = this._getEventsMap()[name];
-	   if (handlers) {
-           for (var i=0,l=handlers.length; i<l; i++) {
-			   var handler = handlers[i];
-			   if (handler) {
-				   handler.call(QQWB,data);
-			   }
-           }
-	   }
-    }
-});
-/**
- * Tencent weibo javascript library
- *
- * Event API
- *
- * @author michalliu
- * @version 1.0
- * @package event
- * @module event
- * @requires base
- *           eventProvider
- */
-
-// event methods
-//
-QQWB.extend("",{
-    /**
-     * Bind an event
-     *
-     * Example:
-     * 
-     * T.bind("UserLoggedIn", function () {
-     *     T.log.info("user logged in");
-     * });
-     *
-     * @param name {String} event name to bind
-     * @param handler {Function} the handler for this event
-     */
-    bind: function (name, handler) {
-        name = name.toLowerCase();
-        this._eventProvider.bind(name, handler);
-    	return this;
-    }
-
-    /**
-     * Unbind an event
-     *
-     * Example:
-     *
-     * // handler for when user logged in
-     * // keep a reference to this handler
-     * var userlogin = function () {
-     *     T.log.info("user logged in");
-     * }
-     *
-     * // bind handler
-     * T.bind("UserLoggedIn", userlogin);
-     *
-     * // unbind this handler 
-     * T.unbind("UserLoggedIn", userlogin);
-     *
-     * // unbind all the handlers
-     * T.unbind("UserLoggedIn")
-     *
-     * @param name {String} event name to unbind
-     *        handler {Function} the handler's reference for this event to unbind
-     */
-   ,unbind: function (name, handler) {
-        name = name.toLowerCase();
-        this._eventProvider.unbind(name, handler);
-	    return this;
-    }
-
-    /**
-     * Trigger an event manually
-     *
-     * Example:
-     *
-     * T.trigger("UserLoggedIn");
-     *
-     * @param eventName {String} the event's name to bind
-     * @param data {Mixed} the data passed to the callback function
-     */
-   ,trigger: function (name, data) {
-        name = name.toLowerCase();
-        this._eventProvider.trigger(name, data);
-        return this;
-    }
-});
-
-// internal supported events names
-QQWB.extend("events", {
-    USER_LOGGEDIN_EVENT: "UserLoggedIn"
-   ,USER_LOGIN_FAILED_EVENT: "UserLoginFailed"
-   ,USER_LOGOUT_EVENT: "UserLoggedOut"
-   ,TOKEN_READY_EVENT: "tokenReady"
-   ,DOCUMENT_READY_EVENT: "documentReady"
-   ,EVERYTHING_READY_EVENT: "everythingReady"
-});
-/**
- * Tencent weibo javascript library
- *
- * Authenticate user
- *
- * @author michalliu
- * @version 1.0
- * @package auth
- * @module auth
- * @requires base
- *           token
- *           event.event
- *           core.queryString
- *           core.log
- */
-QQWB.extend("",{
-    /**
-     * Login in user
-     *
-     * @access public
-     * @param optSuccessHandler {Function} handlers when login is success
-     * @param optFailHandler {Function} handlers when login is fail
-     * @return {Object|undefined}
-     */
-    login: function (optSuccessHandler, optFailHandler) {
-
-        if (!this._inited) {
-            this.log.critical("Library not initialized, call T.init() to initialize");
-        }
-
-        var loginStatus = this.loginStatus(); 
-
-        // user already logged in
-        if (loginStatus) {
-
-            optSuccessHandler && optSuccessHandler.call(this,loginStatus);
-
-        } else { // open authorization window
-
-            optSuccessHandler && this.bind(this.events.USER_LOGGEDIN_EVENT, optSuccessHandler);
-            optFailHandler && this.bind(this.events.USER_LOGIN_FAILED_EVENT, optFailHandler);
-
-            var 
-                currWindow = {
-                    x: window.screenX || window.screenLeft
-                   ,y: window.screenY || window.screenTop
-                   ,width: window.outerWidth || document.documentElement.clientWidth
-                   ,height: window.outerHeight || document.documentElement.clientHeight
-                },
-
-                authWindow = {
-                    width: 500
-                   ,height: 300
-                   ,authQuery: function () {
-                      return QQWB.queryString.encode({
-                               response_type: "token"
-                              ,client_id: QQWB._appkey
-                              ,redirect_uri: QQWB._domain.clientproxy
-                              ,referer: document.location.href // IE will lost http referer when new window opened
-                              ,scope: "all"
-                           });
-                    }
-                   ,x: function () {
-                       return parseInt(currWindow.x + (currWindow.width - this.width) / 2, 10);
-                    }
-                   ,y: function () {
-                       return parseInt(currWindow.y + (currWindow.height - this.height) / 2, 10);
-                    }
-                   ,popup: function () {
-                       this.contentWindow = window.open(QQWB._domain.auth + "?" + this.authQuery(), "", ["height="
-                                                                                                   ,this.height
-                                                                                                   ,", width="
-                                                                                                   ,this.width
-                                                                                                   ,", top="
-                                                                                                   ,this.y()
-                                                                                                   ,", left="
-                                                                                                   ,this.x()
-                                                                                                   ,", toobar="
-                                                                                                   ,"no"
-                                                                                                   ,", menubar="
-                                                                                                   ,"no"
-                                                                                                   ,", scrollbars="
-                                                                                                   ,"no"
-                                                                                                   ,", resizable="
-                                                                                                   ,"yes"
-                                                                                                   ,", location="
-                                                                                                   ,"yes"
-                                                                                                   ,", status="
-                                                                                                   ,"no"
-                           ].join(""));
-                       return this;
-                    }
-                   ,focus: function () {
-                       this.contentWindow && this.contentWindow.focus && this.contentWindow.focus();
-                       return this;
-                    }
-                };
-
-            authWindow.popup().focus();
-
-            if (this.browser.msie) {// a timer is running to check autheciation and window status
-                (function () {
-
-                    var responseText;
-
-                    if (authWindow.contentWindow.closed) {
-                        responseText = "error=access_denied";
-                        QQWB._token.resolveResponse(responseText);
-                        return;
-                    }
-
-                    try {
-                        responseText = authWindow.contentWindow.location.hash.split("#").pop();
-                        QQWB._token.resolveResponse(responseText);
-                        authWindow.contentWindow.close();
-                    } catch (ex) {
-                        setTimeout(arguments.callee,0);
-                    }
-
-                }());
-            } else {
-
-                QQWB._startTrackingAuthWindowStatus();
-
-                (function () {
-
-                    var responseText;
-
-                    if (!QQWB._isTrackingAuthWindowStatus()) {
-                        return;
-                    }
-
-                    if (authWindow.contentWindow.closed) {
-                        responseText = "error=access_denied";
-                        QQWB._token.resolveResponse(responseText);
-                        return;
-                    } else {
-                        setTimeout(arguments.callee, 0);
-                    }
-
-                }());
-            }
-        } // end if loginStatus
-
-        return this;
-    }
-
-    /**
-     * Logout user
-     *
-     * @return {Object} QQWB object
-     */
-   ,logout: function (optHandler) {
-       if (!this.loginStatus()) {
-           this.log.info("user not logged in");
-       } else {
-           this._token.clearAccessToken();
-           this._token.clearRefreshToken();
-       }
-       optHandler && optHandler.call(this);
-       this.trigger(this.events.USER_LOGOUT_EVENT);
-       return this;
-    }
-
-   /**
-    * Get login status object
-    *
-    * @access public
-    * @param optCallback {Function} callback handler
-    * @return {Object|undefined}
-    */
-   ,loginStatus: function (optCallback) {
-       var 
-           status,
-           accessToken = this._token.getAccessToken(),
-           user = this._token.getTokenUser();
-
-       if (accessToken) {
-           status = {
-               access_token: accessToken
-              ,name: user.name
-              ,nick: user.nick
-           };
-       }
-
-       optCallback && optCallback.call(this, status);
-
-       return status;
-    }
-    /**
-     * Are we tracking autheciate window status?
-     * This is usefull in non-IE browser
-     *
-     * In IE,when autheciate window opened,there is a timer in the opener
-     * keep tracking the opended window's location to parse and save token
-     * then the autheciate window is closed by force.
-     *
-     * In non-IE browser,the way is different. Once the browser's token come back
-     * the autheciate window will push that token to opener then close itself. but
-     * there is aslo a timer is running in the opener to keep tracking if user manaually
-     * closed the autheciate window. If user close that window (window.closed equal to
-     * true),we will simulate a error response.The problem is when the user finished the
-     * authoriztion task normally the autheciate window will closed aslo.the timer inside
-     * the opener will detect that and set response incorrectly. to correct this, If the
-     * user finished the authorization task normally, we should stop the timer immediatly.
-     * that is before the autheciate window close itself, it told the opener, "don't track 
-     * my status anymore,i will close my self normally",If the timer see that, the timer will
-     * not running anymore, and the set error reponse will never called.
-     *
-     */
-    ,_isTrackingAuthWindowStatus: function () {
-        return !!this._trackAuthWindowStatus;
-    }
-   /**
-    * Don't track if autheciate window is closed or not
-    * 
-    * @access private
-    * @return {undefined}
-    */
-   ,_startTrackingAuthWindowStatus: function() {
-       this._trackAuthWindowStatus = true;
-    }
-   /**
-    * Don't track if autheciate window is closed or not
-    * 
-    * @access private
-    * @return {undefined}
-    */
-   ,_stopTrackingAuthWindowStatus: function() {
-       this._trackAuthWindowStatus = false;
-    }
-});
-/**
- * Tencent weibo javascript library
- *
- * static variables
- *
- * @author michalliu
- * @version 1.0
- * @package core
- * @module static
- * @requires base
- */
-
-QQWB.extend("_static",{
-    GET: "GET"
-   ,POST:"POST"
-   ,GET_OR_POST: "GET | POST"
-   ,CATEGORY_TIMELINE: "时间线"
-   ,EMPTY_STR:""
-});
-/**
- * Tencent weibo javascript library
- *
- * API descriptor
- *
- *
- * @author michalliu
- * @version 1.0
- * @package core
- * @module apiProvider
- * @requires base
- *           static
- */
-//TODO: more api should be supported
-QQWB.extend("_apiProvider", {
-	// api list
-    apis: {
-         "/statuses/home_timeline": {
-             category: QQWB._static.CATEGORY_TIMELINE
-            ,description: "主页时间线"
-            ,supportMethod: QQWB._static.GET
-            ,supportParams: {
-                 pageflag: {
-                     defaultValue:0
-                    ,description:QQWB._static.EMPTY_STR
-                 }
-                ,reqnum: {
-                    defaultValue:20
-                   ,description:QQWB._static.EMPTY_STR
-                 }
-                ,pagetime: {
-                    defaultValue:0
-                   ,description:QQWB._static.EMPTY_STR
-                 }
-             }
-         }
-        ,"/statuses/public_timeline": {
-             category: QQWB._static.CATEGORY_TIMELINE
-            ,description: "广播大厅时间线"
-            ,supportMethod: QQWB._static.GET
-            ,supportParams: {
-                 pos: {
-                     defaultValue:0
-                    ,description:QQWB._static.EMPTY_STR
-                 }
-                ,reqnum: {
-                    defaultValue:20
-                   ,description:QQWB._static.EMPTY_STR
-                 }
-                ,pagetime: {
-                    defaultValue:0
-                   ,description:QQWB._static.EMPTY_STR
-                 }
-             }
-         }
-    }
-	/**
-	 * Get an api descriptor object
-	 *
-	 * @access public
-	 * @param interface {String} the api interface
-	 * @return {Object} the descriptor object
-	 */
-   ,getDescriptor: function (interface) {
-       return this.apis[interface];
-    }
-	/**
-	 * Determine an api is in the api list or not
-	 *
-	 * @access public
-	 * @param interface {String} the api interface
-	 * @return {Boolean}
-	 */
-   ,isProvide: function (interface) {
-       return !!this.getDescriptor(interface);
-    }
-	/**
-	 * Try to describe the api interface by human read-able format
-	 *
-	 * @access public
-	 * @param interface {String} the api interface
-	 * @return {Boolean}
-	 */
-    ,describe: function (interface) {
-		var descriptor = this.getDescriptor(interface);
-		if (descriptor) {
-			return descriptor.category + ">" + descriptor.description;
-		} else {
-			return "";
-		}
-	 }
-});
-
-/**
- * Tencent weibo javascript library
- *
- * API call
- *
- * Example:
-  
-    T.api(
-       "/status/home_timeline"
-      ,{
-          maxpage: 20
-       }
-      ,"json","GET")
- *  .success(function (response) {
- *  })
- *  .error(function (error) {
- *  });
- *
- *  Note:
- *
- *  T.api method supports cache, when the condition meets.
- *  The cached api will run automaticlly.
- *
- *  If there is a problem when processing to meet the condition.
- *  then the api call will failed too.
- *
- * @access public
- * @param api {String} the rest-style api interface
- * @param apiParams {Object} api params
- * @param optDataType {String} the dataType supports either "json","xml","text", case-insensitive, default is "json"
- * @param optType {String} the request method supports either "get","post", case-insensitive, default is "get"
- * @param optSolution {String} use solution by force @see QQWB.solution
- * @return {Object} promise object
- *
- * @author michalliu
- * @version 1.0
- * @package core
- * @module api
- * @requires base
- *           ext.XML
- *           ext.Array
- *           apiProvider
- *           deferred
- *           auth.token
- *           auth.auth
- */
-
-QQWB.provide("api", function (api, apiParams, optDataType, optType, optSolution) {
-
-	apiParams = apiParams || {};
-    optDataType = (optDataType || "json").toLowerCase();
-    optType = optType || "GET";
-
-	var 
-    	promise,
-		solution,
-		format = optDataType, // the format string in oauth querystring
-		supportedFormats = {json:true,xml:true/*,text:true*/},
-    	deferred = QQWB.deferred.deferred();
-	
-	if (!(format in supportedFormats)) {
-		format = "json";
-	}
-
-	apiParams["access_token"] = QQWB._token.getAccessToken();
-	apiParams["version"] = "2.0";
-	apiParams["format"] = format;
-
-
-    promise = deferred.promise();
-
-	// force to use specified solution
-	if (optSolution && QQWB.Array.inArray([QQWB._solution.HTML5_SOLUTION
-                                          ,QQWB._solution.FLASH_SOLUTION
-										  ,QQWB._solution.SILVER_LIGHT_SOLUTION]
-										  ,optSolution)) {
-		QQWB.log.warning("forced to use solution " + optSolution);
-		// solution has initialized let that solution handle the request
-		if(!QQWB._solution[optSolution]) { // solution not initiallize, initialize it
-		    QQWB.log.warning("forced to use solution " + optSolution + ", this solution is not inited, initialzing...");
-		    QQWB._solution.initSolution[optSolution];
-		}
-	    solution = QQWB._solution[optSolution];
-	} else {
-        // solutions with following priority order
-        solution =  (QQWB.browser.feature.postmessage && QQWB._solution[QQWB._solution.HTML5_SOLUTION])
-            || (QQWB.browser.feature.flash && QQWB._solution[QQWB._solution.FLASH_SOLUTION])
-            || (QQWB.browser.feature.silverlight && QQWB._solution[QQWB._solution.SILVER_LIGHT_SOLUTION]);
-
-	}
-
-	// don't handle that, let server to the job
-	// then pass a failed message to the callback
-    //
-	/*if (false && !QQWB._apiProvider.isProvide(api)) {
-		QQWB.log.error("can't call \"" + api +"\", not supported");
-		deferred.reject(-1, "api not supported"); // immediately error
-		return promise;
-	}*/
-
-	// no solution or solution not correctly initialzed
-	// its not possible to implement to QQWB.api method working
-	// very little chance
-	if (!solution || solution.readyState === 2) {
-		QQWB.log.critical("solution error");
-		deferred.reject(-1, "solution error"); // immediately error
-		return promise;
-	}
-
-    //TODO: if api call required solution is flash
-    //then cache the function do flash solution init
-	//if (!solution.support(api)) {
-		// choose other solution
-		// return  QQWB.api(api, apiParams, optDataType, optType, other solution);
-	//}
-
-	// if api called before the solution is ready, we cached it and waiting the solution ready
-	// when solution is ready, regardless success or fail, these cached function will be invoke again immediately
-	if (solution.readyState === 0) { //solution not ready
-		QQWB.log.warning("solution is not ready, your api call request has been cached, will invoke immediately when solution is ready");
-    	solution.promise.done(function () { // when solution is ready
-		    QQWB.log.info("invoking cached api call \"QQWB.api( " + [api, apiParams, optDataType, optType].join(",") + " )\"...");
-
-			// emulate the request send it to server
-			// when data backs, resolve or reject the deferred object previously saved.
-			// then pass the data in accordingly
-			QQWB.api(api, apiParams, optDataType, optType)
-			    .success(function () {
-				    deferred.resolveWith(deferred,QQWB.Array.fromArguments(arguments));
-				 })
-			    .error(function (){
-				    deferred.rejectWith(deferred,QQWB.Array.fromArguments(arguments));
-			     }); // keep the arguments
-		}).fail(function () { // we use the arguments from boot section (boot.js)
-		    QQWB.log.error("can't invoking cached api call \"QQWB.api( " + [api, apiParams, optDataType, optType].join(",") + " )\"");
-		    deferred.rejectWith(deferred,QQWB.Array.fromArguments(arguments));
-		});
-		return promise;
-	}
-
-	// must be here everything must be ready already from here
-	
-    // user not logged in, don't bother to try to get data
-	if (!QQWB.loginStatus()) {
-		deferred.reject(-1, "not login"); // immediately error
-		return promise;
-	}
-
-	// describe what we are to do now
-    QQWB.log.info("[" + (QQWB.api.id ? QQWB.api.id + 1 : "_") + "] requesting data \"" + QQWB._apiProvider.describe(api) + "\" from server...");
-
-    // html5 solution
-    if (solution === QQWB._solution[QQWB._solution.HTML5_SOLUTION]) {
-			var serverProxy = document.getElementById(solution.id);
-			if (!serverProxy) { // double check to avoid the server frame was removed from dom unexpectly
-	            QQWB.log.critical("server proxy not found");
-	            deferred.reject(-1,"server proxy not found");
-			} else {
-                // server proxy's url should be same as QQWB._domain.serverproxy, if not may be we got the wrong element
-				if (serverProxy.src !== QQWB._domain.serverproxy) { // double check to avoid the server frame src was modified unexpectly 
-	                QQWB.log.critical("server proxy is not valid, src attribute has unexpected value");
-	                deferred.reject(-1,"server proxy not valid");
-				} else {
-					// everything goes well
-                 	// lazy create an collection object to maintain the deferred object
-                 	// only html5 solution need this
-                 	if (!QQWB.api.deferrsCollection) {
-                 		QQWB.extend(QQWB.api, {
-                 			id : 0
-                 		   ,_deferredCollection: {
-                 		   }
-                 		   ,deferredAt: function (deferredId) {
-                 			   if (this._deferredCollection[deferredId]) {
-                 			       return this._deferredCollection[deferredId];
-                 			   } else {
-                 	               QQWB.log.warning("get deferred object has failed, that object does not exist at index " + deferredId);
-                 			   }
-                 		    }
-                 			// uncollect the deferred object
-                 		   ,uncollect: function (deferredId) {
-                 			   if (this._deferredCollection[deferredId]) {
-                 			       delete this._deferredCollection[deferredId];
-                 			   } else {
-                 	               QQWB.log.warning("uncollect deferred object has failed, that object does not exist at index " + deferredId);
-                 			   }
-                 		    }
-                 			// collect an deferred object to collections
-                 		   ,collect: function (deferredObj) {
-                 			   if (deferredObj.promise) { // it's an deferred object
-                 			       this._deferredCollection[++this.id] = deferredObj;
-                 			       return this.id;
-                 			   } else { // we dont accpept other than deferred object
-                 	               QQWB.log.warning("collect a non-deferred object is illegal");
-                 			   }
-                 		    }
-                 		  
-                 			// how many api call this page does?
-                 		   ,total: function () {
-                 			   return QQWB.api.id;
-                 		    }
-                 		});
-                 	}
-
-					if (!QQWB.api.messageHandler) {
-						// add listeners for the data when data comes back
-						QQWB.provide("api.messageHandler", function (e) {
-							// we only trust the data back from the API server, ingore others
-							// This is important for security reson
-							if (QQWB._domain.serverproxy.indexOf(e.origin) !== 0) {
-	                            QQWB.log.warning("unexpected message arrived from " + e.origin + " with data " + e.data);
-							} else {
-								// here is the result comes back
-
-								// data.id represent the caller's id to know which deferred object should handle the data
-								// data.data reprent the result return from API server
-								var 
-							    	data = JSON.parse(e.data),
-									id = data.id,
-									relateDeferred = QQWB.api.deferredAt(id),
-							    	response = data.data;
-
-								if (relateDeferred) {
-							        if (response[0] !== 200) {
-										relateDeferred.reject.apply(relateDeferred,response);
-									} else {
-										if (response[4] == "xmltext") {
-											response[2] = QQWB.XML.fromString(response[2])
-										}
-										relateDeferred.resolve.apply(relateDeferred,[response[2],response[3]]);
-							    	}
-									QQWB.api.uncollect(id);
-								} else {
-	                                QQWB.log.warning("related deferred object not found, it shouldn't happen");
-								}
-							}
-						}); // end provide
-
-                        if (window.addEventListener) {
-                            window.addEventListener("message", QQWB.api.messageHandler, false);
-                        } else if (window.attachEvent) {
-                            window.attachEvent("onmessage", QQWB.api.messageHandler);
-                        }
-					}
-                 
-					try {
-						// send to proxy server
-						// IE only support String type as the message
-						// @see http://msdn.microsoft.com/en-us/library/cc197015(v=vs.85).aspx
-						serverProxy.contentWindow.postMessage(JSON.stringify({ 
-							id: QQWB.api.collect(deferred)
-						   ,data: [api, apiParams, optDataType, optType]
-						}),QQWB._domain.serverproxy);
-
-					} catch (ex) {
-	                    QQWB.log.critical("post message to server proxy has failed, " + ex);
-	                    deferred.reject(-1,ex);
-					}
-				} // end server proxy src modified check
-			} // end server proxy existance check
-
-	} else if (solution === QQWB._solution[QQWB._solution.FLASH_SOLUTION]) {
-		QQWB.io._apiFlashAjax(api, apiParams, optDataType, optType).complete(function () {
-			var response = QQWB.Array.fromArguments(arguments);
-			if (response[0] !== 200) {
-				deferred.reject.apply(relateDeferred,response);
-			} else {
-				deferred.resolve.apply(deferred,[response[2],response[3]]);
-			}
-		});
-	}
-    return promise;
-});
-/**
- * Tencent weibo javascript library
- *
- * Incode document
- *
- * Example:
- *
- * T.man("/Statuses/home_timeline");
- *
- * @author michalliu
- * @version 1.0
- * @package core
- * @module man
- * @requires base
- *           apiProvider
- */
-
-QQWB.provide("man", function (api) {
-    return this._apiProvider.getDescriptor(api);
-});
-
-/**
- * Tencent weibo javascript library
- *
- * DOM operations
- *
- * @author michalliu
- * @version 1.0
- * @package core
- * @module dom
- * @requires base
- *           ext.String
- */
-
-QQWB.extend("dom", {
-    /**
-     * Create an element
-     * 
-     * @access public
-     * @param tagName {String} the element's tagName
-     * @param optAttrs {Object} attrs on that element
-     * @return {DOMElement} an element
-     */
-    create: function (tagName,optAttrs) {
-        var element = document.createElement(tagName + "");
-        if (optAttrs && element) {
-            for (attr in optAttrs) {
-                if (optAttrs.hasOwnProperty(attr)) {
-                    element[attr] = optAttrs[attr];
-                }
-            }
-        }
-        return element;
-     }
-    /**
-     * Create and return a hiddened element
-     *
-     * @access public
-     * @param optTagName {String} tagName
-     * @param optAttrs {Object} element's attrs
-	 * @param optFake {Boolean} use visibility:hidden insteadof display:none
-     * @return {DOMElement} a hiddened element
-     */
-   ,createHidden: function (optTagName, optAttrs, optFake) {
-        optTagName = optTagName || "div";
-        var el = this.create(optTagName,optAttrs);
-        el.width = el.height = 0;
-        el.style.width = el.style.height = 0;
-        el.style.position = "absolute";
-        el.style.top = "-9999px";
-		if (optFake) {
-			// el.style.visibility = "hidden";
-		} else {
-            el.style.display = "none";
-		}
-        return el;
-    }
-    /**
-     * Append child to parent
-     *
-     * Note:
-     * if parent is not valid then append to dom body 
-     *
-     * @access public
-     * @param child {DOMElement} childNode
-     * @param parent {DOMElement} parentNode
-	 * @return {Object} QQWB.dom
-     */
-   ,append: function (child, parent) {
-       parent = parent || document.body;
-       if (child && child.nodeType) {
-           parent.appendChild(child);
-       }
-       return this;
-    }
-    /**
-     * Set element's innerHTML
-     *
-     * @access public
-	 * @param node {Node} node
-	 * @param html {String} the html text for the node
-	 * @return {Object} QQWB.dom
-     */
-   ,html: function (node, html) {
-       node && node.nodeType && html && (node.innerHTML = html);
-       return this;
-   }
-    /**
-     * Append html to DOM and make it hidden
-     *
-     * @access public
-     * @param html {DOMElement|String}
-     * @param optAttrs {Object} element's attrs
-	 * @param optFake {Boolean} use visibility:hidden insteadof display:none
-	 * @return {Object} QQWB.dom
-     */
-   ,appendHidden: function (html, optAttrs ,optFake) {
-       var hidden = this.createHidden(null, optAttrs, optFake);
-       this.html(hidden, html);
-       return this.append(hidden);
-    }
-	/**
-	 * Remove node from DOM
-	 *
-     * @access public
-	 * @param node {Node} the DOM node
-	 * @return {Object} QQWB.dom
-	 */
-   ,remove: function (node) {
-	   node && node.nodeType /* is node */ && node.parentNode /* parentNode exists */ && node.parentNode.removeChild(node)/* remove it */;
-	   return this;
-    }
-});
-
 /*
  * @author crockford
  * @url https://raw.github.com/douglascrockford/JSON-js/master/json2.js
@@ -3434,6 +4105,185 @@ if (!JSON) {
         };
     }
 }());
+/**
+ * Tencent weibo javascript library
+ *
+ * A simple event system provide hooks
+ *
+ * @author michalliu
+ * @version 1.0
+ * @package event
+ * @module eventProvider
+ * @requires base
+ *           ext.Array
+ */
+QQWB.extend("_eventProvider",{
+
+    /**
+     * Get event system's internal map or create it if not exists
+     *
+     * @access private
+     * @return {Object} the internal event map
+     */
+    _getEventsMap: function () {
+        if (!this._eventsMap) {
+            this._eventsMap = {};
+        }
+        return this._eventsMap;
+    }
+
+    /**
+     * Bind an event
+     *
+     * @access public
+     * @param name {String} the event name to bind
+     * @param handler {Function} the handler for this event
+     * @return {Void}
+     */
+   ,bind: function (name, handler) {
+       var evts = this._getEventsMap();
+       if (!evts[name]) {
+           evts[name] = [handler];
+       } else {
+           if (!QQWB.Array.inArray(evts[name],handler)) {
+               evts[name].push(handler);
+           }
+       }
+    }
+
+    /**
+     * Unbind an event
+	 * 
+	 * If no handler provided, it will unbind all the handlers to this event
+     * @access public
+     * @param name {String} the event name to unbind
+     *        handler {Function} the handler's reference for this event to unbind
+     * @return {Void}
+     */
+   ,unbind: function (name, handler) {
+	   var handlers = this._getEventsMap()[name];
+	   if (handlers) {
+		   if (handler) { // unbind specific handler,do nothing if handler not registered
+			   for (var i=0,l=handlers.length; i<l; i++) {
+				   if (handler === handlers[i]) {
+					   handlers[i] = null;
+				   }
+			   }
+		   } else { // unbind all the handlers
+			   //handlers.length = 0;
+			   delete this._getEventsMap()[name];
+		   }
+	   }
+    }
+
+   /**
+	* Trigger a named event
+	*
+	* @access private
+	* @param name {String} the event name
+	*        data {Mixed} the event data
+	*/
+   ,trigger: function (name, data) {
+	   var handlers = this._getEventsMap()[name];
+	   if (handlers) {
+           for (var i=0,l=handlers.length; i<l; i++) {
+			   var handler = handlers[i];
+			   if (handler) {
+				   handler.call(QQWB,data);
+			   }
+           }
+	   }
+    }
+});
+/**
+ * Tencent weibo javascript library
+ *
+ * Event API
+ *
+ * @author michalliu
+ * @version 1.0
+ * @package event
+ * @module event
+ * @requires base
+ *           eventProvider
+ */
+
+// event methods
+//
+QQWB.extend("",{
+    /**
+     * Bind an event
+     *
+     * Example:
+     * 
+     * T.bind("UserLoggedIn", function () {
+     *     T.log.info("user logged in");
+     * });
+     *
+     * @param name {String} event name to bind
+     * @param handler {Function} the handler for this event
+     */
+    bind: function (name, handler) {
+        name = name.toLowerCase();
+        this._eventProvider.bind(name, handler);
+    	return this;
+    }
+
+    /**
+     * Unbind an event
+     *
+     * Example:
+     *
+     * // handler for when user logged in
+     * // keep a reference to this handler
+     * var userlogin = function () {
+     *     T.log.info("user logged in");
+     * }
+     *
+     * // bind handler
+     * T.bind("UserLoggedIn", userlogin);
+     *
+     * // unbind this handler 
+     * T.unbind("UserLoggedIn", userlogin);
+     *
+     * // unbind all the handlers
+     * T.unbind("UserLoggedIn")
+     *
+     * @param name {String} event name to unbind
+     *        handler {Function} the handler's reference for this event to unbind
+     */
+   ,unbind: function (name, handler) {
+        name = name.toLowerCase();
+        this._eventProvider.unbind(name, handler);
+	    return this;
+    }
+
+    /**
+     * Trigger an event manually
+     *
+     * Example:
+     *
+     * T.trigger("UserLoggedIn");
+     *
+     * @param eventName {String} the event's name to bind
+     * @param data {Mixed} the data passed to the callback function
+     */
+   ,trigger: function (name, data) {
+        name = name.toLowerCase();
+        this._eventProvider.trigger(name, data);
+        return this;
+    }
+});
+
+// internal supported events names
+QQWB.extend("events", {
+    USER_LOGGEDIN_EVENT: "UserLoggedIn"
+   ,USER_LOGIN_FAILED_EVENT: "UserLoginFailed"
+   ,USER_LOGOUT_EVENT: "UserLoggedOut"
+   ,TOKEN_READY_EVENT: "tokenReady"
+   ,DOCUMENT_READY_EVENT: "documentReady"
+   ,EVERYTHING_READY_EVENT: "everythingReady"
+});
 /**
  * Tencent weibo javascript library
  *
@@ -4391,3 +5241,507 @@ if (QQWB.browser.feature.localstorage || QQWB.browser.feature.userdata) {
     QQWB._alias.call(QQWB.localStorage,"save",QQWB.localStorage.set);
     QQWB._alias.call(QQWB.localStorage,"remove",QQWB.localStorage.del);
 }
+/**
+ * Tencent weibo javascript library
+ *
+ * Authenticate user
+ *
+ * @author michalliu
+ * @version 1.0
+ * @package auth
+ * @module auth
+ * @requires base
+ *           token
+ *           event.event
+ *           core.queryString
+ *           core.log
+ */
+QQWB.extend("",{
+    /**
+     * Login in user
+     *
+     * @access public
+     * @param optSuccessHandler {Function} handlers when login is success
+     * @param optFailHandler {Function} handlers when login is fail
+     * @return {Object|undefined}
+     */
+    login: function (optSuccessHandler, optFailHandler) {
+
+        if (!this._inited) {
+            this.log.critical("Library not initialized, call T.init() to initialize");
+        }
+
+        var loginStatus = this.loginStatus(); 
+
+        // user already logged in
+        if (loginStatus) {
+
+            optSuccessHandler && optSuccessHandler.call(this,loginStatus);
+
+        } else { // open authorization window
+
+            optSuccessHandler && this.bind(this.events.USER_LOGGEDIN_EVENT, optSuccessHandler);
+            optFailHandler && this.bind(this.events.USER_LOGIN_FAILED_EVENT, optFailHandler);
+
+            var 
+                currWindow = {
+                    x: window.screenX || window.screenLeft
+                   ,y: window.screenY || window.screenTop
+                   ,width: window.outerWidth || document.documentElement.clientWidth
+                   ,height: window.outerHeight || document.documentElement.clientHeight
+                },
+
+                authWindow = {
+                    width: 500
+                   ,height: 300
+                   ,authQuery: function () {
+                      return QQWB.queryString.encode({
+                               response_type: "token"
+                              ,client_id: QQWB._appkey
+                              ,redirect_uri: QQWB._domain.clientproxy
+                              ,referer: document.location.href // IE will lost http referer when new window opened
+                              ,scope: "all"
+                           });
+                    }
+                   ,x: function () {
+                       return parseInt(currWindow.x + (currWindow.width - this.width) / 2, 10);
+                    }
+                   ,y: function () {
+                       return parseInt(currWindow.y + (currWindow.height - this.height) / 2, 10);
+                    }
+                   ,popup: function () {
+                       this.contentWindow = window.open(QQWB._domain.auth + "?" + this.authQuery(), "", ["height="
+                                                                                                   ,this.height
+                                                                                                   ,", width="
+                                                                                                   ,this.width
+                                                                                                   ,", top="
+                                                                                                   ,this.y()
+                                                                                                   ,", left="
+                                                                                                   ,this.x()
+                                                                                                   ,", toobar="
+                                                                                                   ,"no"
+                                                                                                   ,", menubar="
+                                                                                                   ,"no"
+                                                                                                   ,", scrollbars="
+                                                                                                   ,"no"
+                                                                                                   ,", resizable="
+                                                                                                   ,"yes"
+                                                                                                   ,", location="
+                                                                                                   ,"yes"
+                                                                                                   ,", status="
+                                                                                                   ,"no"
+                           ].join(""));
+                       return this;
+                    }
+                   ,focus: function () {
+                       this.contentWindow && this.contentWindow.focus && this.contentWindow.focus();
+                       return this;
+                    }
+                };
+
+            authWindow.popup().focus();
+
+            if (this.browser.msie) {// a timer is running to check autheciation and window status
+                (function () {
+
+                    var responseText;
+
+                    if (authWindow.contentWindow.closed) {
+                        responseText = "error=access_denied";
+                        QQWB._token.resolveResponse(responseText);
+                        return;
+                    }
+
+                    try {
+                        responseText = authWindow.contentWindow.location.hash.split("#").pop();
+                        QQWB._token.resolveResponse(responseText);
+                        authWindow.contentWindow.close();
+                    } catch (ex) {
+                        setTimeout(arguments.callee,0);
+                    }
+
+                }());
+            } else {
+
+                QQWB._startTrackingAuthWindowStatus();
+
+                (function () {
+
+                    var responseText;
+
+                    if (!QQWB._isTrackingAuthWindowStatus()) {
+                        return;
+                    }
+
+                    if (authWindow.contentWindow.closed) {
+                        responseText = "error=access_denied";
+                        QQWB._token.resolveResponse(responseText);
+                        return;
+                    } else {
+                        setTimeout(arguments.callee, 0);
+                    }
+
+                }());
+            }
+        } // end if loginStatus
+
+        return this;
+    }
+
+    /**
+     * Logout user
+     *
+     * @return {Object} QQWB object
+     */
+   ,logout: function (optHandler) {
+       if (!this.loginStatus()) {
+           this.log.info("user not logged in");
+       } else {
+           this._token.clearAccessToken();
+           this._token.clearRefreshToken();
+       }
+       optHandler && optHandler.call(this);
+       this.trigger(this.events.USER_LOGOUT_EVENT);
+       return this;
+    }
+
+   /**
+    * Get login status object
+    *
+    * @access public
+    * @param optCallback {Function} callback handler
+    * @return {Object|undefined}
+    */
+   ,loginStatus: function (optCallback) {
+       var 
+           status,
+           accessToken = this._token.getAccessToken(),
+           user = this._token.getTokenUser();
+
+       if (accessToken) {
+           status = {
+               access_token: accessToken
+              ,name: user.name
+              ,nick: user.nick
+           };
+       }
+
+       optCallback && optCallback.call(this, status);
+
+       return status;
+    }
+    /**
+     * Are we tracking autheciate window status?
+     * This is usefull in non-IE browser
+     *
+     * In IE,when autheciate window opened,there is a timer in the opener
+     * keep tracking the opended window's location to parse and save token
+     * then the autheciate window is closed by force.
+     *
+     * In non-IE browser,the way is different. Once the browser's token come back
+     * the autheciate window will push that token to opener then close itself. but
+     * there is aslo a timer is running in the opener to keep tracking if user manaually
+     * closed the autheciate window. If user close that window (window.closed equal to
+     * true),we will simulate a error response.The problem is when the user finished the
+     * authoriztion task normally the autheciate window will closed aslo.the timer inside
+     * the opener will detect that and set response incorrectly. to correct this, If the
+     * user finished the authorization task normally, we should stop the timer immediatly.
+     * that is before the autheciate window close itself, it told the opener, "don't track 
+     * my status anymore,i will close my self normally",If the timer see that, the timer will
+     * not running anymore, and the set error reponse will never called.
+     *
+     */
+    ,_isTrackingAuthWindowStatus: function () {
+        return !!this._trackAuthWindowStatus;
+    }
+   /**
+    * Don't track if autheciate window is closed or not
+    * 
+    * @access private
+    * @return {undefined}
+    */
+   ,_startTrackingAuthWindowStatus: function() {
+       this._trackAuthWindowStatus = true;
+    }
+   /**
+    * Don't track if autheciate window is closed or not
+    * 
+    * @access private
+    * @return {undefined}
+    */
+   ,_stopTrackingAuthWindowStatus: function() {
+       this._trackAuthWindowStatus = false;
+    }
+});
+/**
+ * Tencent weibo javascript library
+ *
+ * API call
+ *
+ * Example:
+  
+    T.api(
+       "/status/home_timeline"
+      ,{
+          maxpage: 20
+       }
+      ,"json","GET")
+ *  .success(function (response) {
+ *  })
+ *  .error(function (error) {
+ *  });
+ *
+ *  Note:
+ *
+ *  T.api method supports cache, when the condition meets.
+ *  The cached api will run automaticlly.
+ *
+ *  If there is a problem when processing to meet the condition.
+ *  then the api call will failed too.
+ *
+ * @access public
+ * @param api {String} the rest-style api interface
+ * @param apiParams {Object} api params
+ * @param optDataType {String} the dataType supports either "json","xml","text", case-insensitive, default is "json"
+ * @param optType {String} the request method supports either "get","post", case-insensitive, default is "get"
+ * @param optSolution {String} use solution by force @see QQWB.solution
+ * @return {Object} promise object
+ *
+ * @author michalliu
+ * @version 1.0
+ * @package core
+ * @module api
+ * @requires base
+ *           ext.XML
+ *           ext.Array
+ *           apiProvider
+ *           deferred
+ *           auth.token
+ *           auth.auth
+ */
+
+QQWB.provide("api", function (api, apiParams, optDataType, optType, optSolution) {
+
+	apiParams = apiParams || {};
+    optDataType = (optDataType || "json").toLowerCase();
+    optType = optType || "GET";
+
+	var 
+    	promise,
+		solution,
+		format = optDataType, // the format string in oauth querystring
+		supportedFormats = {json:true,xml:true/*,text:true*/},
+    	deferred = QQWB.deferred.deferred();
+	
+	if (!(format in supportedFormats)) {
+		format = "json";
+	}
+
+	apiParams["access_token"] = QQWB._token.getAccessToken();
+	apiParams["version"] = "2.0";
+	apiParams["format"] = format;
+
+
+    promise = deferred.promise();
+
+	// force to use specified solution
+	if (optSolution && QQWB.Array.inArray([QQWB._solution.HTML5_SOLUTION
+                                          ,QQWB._solution.FLASH_SOLUTION
+										  ,QQWB._solution.SILVER_LIGHT_SOLUTION]
+										  ,optSolution)) {
+		QQWB.log.warning("forced to use solution " + optSolution);
+		// solution has initialized let that solution handle the request
+		if(!QQWB._solution[optSolution]) { // solution not initiallize, initialize it
+		    QQWB.log.warning("forced to use solution " + optSolution + ", this solution is not inited, initialzing...");
+		    QQWB._solution.initSolution[optSolution];
+		}
+	    solution = QQWB._solution[optSolution];
+	} else {
+        // solutions with following priority order
+        solution =  (QQWB.browser.feature.postmessage && QQWB._solution[QQWB._solution.HTML5_SOLUTION])
+            || (QQWB.browser.feature.flash && QQWB._solution[QQWB._solution.FLASH_SOLUTION])
+            || (QQWB.browser.feature.silverlight && QQWB._solution[QQWB._solution.SILVER_LIGHT_SOLUTION]);
+
+	}
+
+	// don't handle that, let server to the job
+	// then pass a failed message to the callback
+    //
+	/*if (false && !QQWB._apiProvider.isProvide(api)) {
+		QQWB.log.error("can't call \"" + api +"\", not supported");
+		deferred.reject(-1, "api not supported"); // immediately error
+		return promise;
+	}*/
+
+	// no solution or solution not correctly initialzed
+	// its not possible to implement to QQWB.api method working
+	// very little chance
+	if (!solution || solution.readyState === 2) {
+		QQWB.log.critical("solution error");
+		deferred.reject(-1, "solution error"); // immediately error
+		return promise;
+	}
+
+    //TODO: if api call required solution is flash
+    //then cache the function do flash solution init
+	//if (!solution.support(api)) {
+		// choose other solution
+		// return  QQWB.api(api, apiParams, optDataType, optType, other solution);
+	//}
+
+	// if api called before the solution is ready, we cached it and waiting the solution ready
+	// when solution is ready, regardless success or fail, these cached function will be invoke again immediately
+	if (solution.readyState === 0) { //solution not ready
+		QQWB.log.warning("solution is not ready, your api call request has been cached, will invoke immediately when solution is ready");
+    	solution.promise.done(function () { // when solution is ready
+		    QQWB.log.info("invoking cached api call \"QQWB.api( " + [api, apiParams, optDataType, optType].join(",") + " )\"...");
+
+			// emulate the request send it to server
+			// when data backs, resolve or reject the deferred object previously saved.
+			// then pass the data in accordingly
+			QQWB.api(api, apiParams, optDataType, optType)
+			    .success(function () {
+				    deferred.resolveWith(deferred,QQWB.Array.fromArguments(arguments));
+				 })
+			    .error(function (){
+				    deferred.rejectWith(deferred,QQWB.Array.fromArguments(arguments));
+			     }); // keep the arguments
+		}).fail(function () { // we use the arguments from boot section (boot.js)
+		    QQWB.log.error("can't invoking cached api call \"QQWB.api( " + [api, apiParams, optDataType, optType].join(",") + " )\"");
+		    deferred.rejectWith(deferred,QQWB.Array.fromArguments(arguments));
+		});
+		return promise;
+	}
+
+	// must be here everything must be ready already from here
+	
+    // user not logged in, don't bother to try to get data
+	if (!QQWB.loginStatus()) {
+		deferred.reject(-1, "not login"); // immediately error
+		return promise;
+	}
+
+	// describe what we are to do now
+    QQWB.log.info("[" + (QQWB.api.id ? QQWB.api.id + 1 : "_") + "] requesting data \"" + QQWB._apiProvider.describe(api) + "\" from server...");
+
+    // html5 solution
+    if (solution === QQWB._solution[QQWB._solution.HTML5_SOLUTION]) {
+			var serverProxy = document.getElementById(solution.id);
+			if (!serverProxy) { // double check to avoid the server frame was removed from dom unexpectly
+	            QQWB.log.critical("server proxy not found");
+	            deferred.reject(-1,"server proxy not found");
+			} else {
+                // server proxy's url should be same as QQWB._domain.serverproxy, if not may be we got the wrong element
+				if (serverProxy.src !== QQWB._domain.serverproxy) { // double check to avoid the server frame src was modified unexpectly 
+	                QQWB.log.critical("server proxy is not valid, src attribute has unexpected value");
+	                deferred.reject(-1,"server proxy not valid");
+				} else {
+					// everything goes well
+                 	// lazy create an collection object to maintain the deferred object
+                 	// only html5 solution need this
+                 	if (!QQWB.api.deferrsCollection) {
+                 		QQWB.extend(QQWB.api, {
+                 			id : 0
+                 		   ,_deferredCollection: {
+                 		   }
+                 		   ,deferredAt: function (deferredId) {
+                 			   if (this._deferredCollection[deferredId]) {
+                 			       return this._deferredCollection[deferredId];
+                 			   } else {
+                 	               QQWB.log.warning("get deferred object has failed, that object does not exist at index " + deferredId);
+                 			   }
+                 		    }
+                 			// uncollect the deferred object
+                 		   ,uncollect: function (deferredId) {
+                 			   if (this._deferredCollection[deferredId]) {
+                 			       delete this._deferredCollection[deferredId];
+                 			   } else {
+                 	               QQWB.log.warning("uncollect deferred object has failed, that object does not exist at index " + deferredId);
+                 			   }
+                 		    }
+                 			// collect an deferred object to collections
+                 		   ,collect: function (deferredObj) {
+                 			   if (deferredObj.promise) { // it's an deferred object
+                 			       this._deferredCollection[++this.id] = deferredObj;
+                 			       return this.id;
+                 			   } else { // we dont accpept other than deferred object
+                 	               QQWB.log.warning("collect a non-deferred object is illegal");
+                 			   }
+                 		    }
+                 		  
+                 			// how many api call this page does?
+                 		   ,total: function () {
+                 			   return QQWB.api.id;
+                 		    }
+                 		});
+                 	}
+
+					if (!QQWB.api.messageHandler) {
+						// add listeners for the data when data comes back
+						QQWB.provide("api.messageHandler", function (e) {
+							// we only trust the data back from the API server, ingore others
+							// This is important for security reson
+							if (QQWB._domain.serverproxy.indexOf(e.origin) !== 0) {
+	                            QQWB.log.warning("unexpected message arrived from " + e.origin + " with data " + e.data);
+							} else {
+								// here is the result comes back
+
+								// data.id represent the caller's id to know which deferred object should handle the data
+								// data.data reprent the result return from API server
+								var 
+							    	data = JSON.parse(e.data),
+									id = data.id,
+									relateDeferred = QQWB.api.deferredAt(id),
+							    	response = data.data;
+
+								if (relateDeferred) {
+							        if (response[0] !== 200) {
+										relateDeferred.reject.apply(relateDeferred,response);
+									} else {
+										if (response[4] == "xmltext") {
+											response[2] = QQWB.XML.fromString(response[2])
+										}
+										relateDeferred.resolve.apply(relateDeferred,[response[2],response[3]]);
+							    	}
+									QQWB.api.uncollect(id);
+								} else {
+	                                QQWB.log.warning("related deferred object not found, it shouldn't happen");
+								}
+							}
+						}); // end provide
+
+                        if (window.addEventListener) {
+                            window.addEventListener("message", QQWB.api.messageHandler, false);
+                        } else if (window.attachEvent) {
+                            window.attachEvent("onmessage", QQWB.api.messageHandler);
+                        }
+					}
+                 
+					try {
+						// send to proxy server
+						// IE only support String type as the message
+						// @see http://msdn.microsoft.com/en-us/library/cc197015(v=vs.85).aspx
+						serverProxy.contentWindow.postMessage(JSON.stringify({ 
+							id: QQWB.api.collect(deferred)
+						   ,data: [api, apiParams, optDataType, optType]
+						}),QQWB._domain.serverproxy);
+
+					} catch (ex) {
+	                    QQWB.log.critical("post message to server proxy has failed, " + ex);
+	                    deferred.reject(-1,ex);
+					}
+				} // end server proxy src modified check
+			} // end server proxy existance check
+
+	} else if (solution === QQWB._solution[QQWB._solution.FLASH_SOLUTION]) {
+		QQWB.io._apiFlashAjax(api, apiParams, optDataType, optType).complete(function () {
+			var response = QQWB.Array.fromArguments(arguments);
+			if (response[0] !== 200) {
+				deferred.reject.apply(relateDeferred,response);
+			} else {
+				deferred.resolve.apply(deferred,[response[2],response[3]]);
+			}
+		});
+	}
+    return promise;
+});
