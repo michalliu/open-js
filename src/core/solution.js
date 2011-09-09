@@ -110,7 +110,7 @@ QQWB.extend("_solution", {
                    }
 
                    // append the server frame to page
-                   QQWB.documentReady(function () {
+                   QQWB.everythingReady(function () {
                        QQWB.log.info("init html5 solution...");
                        serverframe = QQWB.dom.createHidden("iframe", {id: solution.id,src: QQWB._domain.serverproxy});
                        QQWB.dom.append(serverframe);
@@ -144,7 +144,7 @@ QQWB.extend("_solution", {
                    // reference for choosed solution object
                    solution = this[this.FLASH_SOLUTION];
 
-	        	   QQWB.documentReady(function () {
+	        	   QQWB.everythingReady(function () {
                        QQWB.log.info("init flash solution...");
 	        		   var resolveTimer,
 	        		       resolveTimeout = 10 * 1000,
