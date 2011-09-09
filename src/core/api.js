@@ -224,7 +224,7 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optSolution)
 										relateDeferred.reject.apply(relateDeferred,response);
 									} else {
 										if (response[4] == "xmltext") {
-											response[2] = QQWB.XML.fromString(response[2])
+											response[2] = QQWB.XML.fromString(response[2]);
 										}
 										relateDeferred.resolve.apply(relateDeferred,[response[2],response[3]]);
 							    	}

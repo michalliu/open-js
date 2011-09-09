@@ -130,7 +130,7 @@ QQWB.extend("_solution", {
                                    solution.deferred.reject(-1,"server proxy frame not working");
                                }
                            }, 1 * 1000)/* check delayed */;
-                       }
+                       };
                    });
                } else { // browser don't support postmessage feature, the html5 solution failed
                    QQWB.log.error("can't init solution \"" + name) +"\",browser doesn't support postmessage";
@@ -178,6 +178,8 @@ QQWB.extend("_solution", {
 
                case this.SILVER_LIGHT_SOLUTION:
                if (QQWB.browser.feature.silverlight) {
+                   // silverlight not implemented
+                   ~1;
                } else {
                    QQWB.log.error("can't init solution \"" + name) +"\",browser doesn't support silverlight or silverlight is disabled";
                    solutionInit.reject("browser not supported");
@@ -187,6 +189,7 @@ QQWB.extend("_solution", {
                default:
                QQWB.log.error("can't init solution \"" + name) +"\",not supported";
                solutionInit.reject("solution " + name + " not supported");
+               break;
            }
 
 	       }

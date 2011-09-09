@@ -267,8 +267,9 @@ if (window.opener) {
 				        	}), targetOrigin);
 						});
 					}
-				}
-            }
+			   }
+            };
+
             if (window.addEventListener) {
                 window.addEventListener("message", messageHandler, false);
             } else if (window.attachEvent) {
@@ -336,7 +337,7 @@ if (!QQWB._isDocumentReady) { // we will try to trigger the ready event many tim
     if (QQWB.browser.webkit) {
         (function () {
             if (QQWB._isDocumentReady) {return;}
-            if (!/load|complete/.test(document.readyState)) {
+            if (!(/load|complete/.test(document.readyState))) {
                 setTimeout(arguments.callee, 0);
                 return; // don't bother to try, the document is definitly not ready
             }

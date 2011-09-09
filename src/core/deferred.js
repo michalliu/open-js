@@ -198,7 +198,7 @@ QQWB.extend("deferred", {
 				if (!(--count)) { // the last operation is resolved, resolve the when deffered
 					deferred.resolveWith(deferred, QQWB.Array.fromArguments(args));
 				}
-			}
+			};
 		}
 
 		if (length > 1) { // more than one deferred object
@@ -224,7 +224,3 @@ QQWB.extend("deferred", {
 
 // expose to global namespace
 QQWB._alias("when", QQWB.deferred.when);
-
-/*QQWB.provide("when", function () {
-    return QQWB.deferred.when.apply(this,QQWB.Array.fromArguments(arguments));
-});*/

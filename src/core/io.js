@@ -412,7 +412,7 @@ QQWB.extend("io", {
         QQWB.extend(default_opts, opts, true);
 
         if (default_opts.data) {
-            default_opts.url += ("?" + default_opts.data +  "&" + callbackQueryName + "=" + callbackName)
+            default_opts.url += ("?" + default_opts.data +  "&" + callbackQueryName + "=" + callbackName);
         } 
 
         window[callbackName] = function (data) {

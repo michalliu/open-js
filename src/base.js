@@ -45,13 +45,13 @@
          *
          * @access private
          */
-        _name: "Tencent weibo SDK",
+        _name: "Tencent weibo SDK"
         /**
          * Client appkey
          *
          * @access private
          */
-        _appkey: "{APPKEY}"
+       ,_appkey: "{APPKEY}"
 
         /**
          * Indicate appkey is valid or not

@@ -60,7 +60,7 @@ QQWB.extend("door", {
            ,isOpen: function () {
                return locks === 0;
             }
-        }
+        };
     }
 	/**
 	 * Retrieve the number of lockers

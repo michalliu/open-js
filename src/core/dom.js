@@ -48,7 +48,13 @@ QQWB.extend("dom", {
         el.style.position = "absolute";
         el.style.top = "-9999px";
 		if (optFake) {
+            // we can't use the flash object in IE if flash container's style of visibility 
+            // is hidden or display is none;
+            // we can't use the flash object in chrome if flash container's style of display
+            // is none, and visibility is hidden no problem
+            // for convience we hidden the flash by giving it a large offset of top
 			// el.style.visibility = "hidden";
+            "";
 		} else {
             el.style.display = "none";
 		}

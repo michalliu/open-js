@@ -727,7 +727,7 @@ QQWB.extend("_apiProvider", {
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 provincecode: {
-                    defalutValue: 0755,
+                    defalutValue: "0755",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 citycode: {
@@ -1395,31 +1395,31 @@ QQWB.extend("_apiProvider", {
      * Get an api descriptor object
      *
      * @access public
-     * @param interface {String} the api interface
+     * @param apiInterface {String} the api interface
      * @return {Object} the descriptor object
      */
-   ,getDescriptor: function (interface) {
-        return this.apis[interface];
+   ,getDescriptor: function (apiInterface) {
+        return this.apis[apiInterface];
     }
     /**
      * Determine an api is in the api list or not
      *
      * @access public
-     * @param interface {String} the api interface
+     * @param apiInterface {String} the api interface
      * @return {Boolean}
      */
-   ,isProvide: function (interface) {
-        return !!this.getDescriptor(interface);
+   ,isProvide: function (apiInterface) {
+        return !!this.getDescriptor(apiInterface);
     }
     /**
      * Try to describe the api interface by human read-able format
      *
      * @access public
-     * @param interface {String} the api interface
+     * @param apiInterface {String} the api interface
      * @return {Boolean}
      */
-   ,describe: function (interface) {
-        var descriptor = this.getDescriptor(interface);
+   ,describe: function (apiInterface) {
+        var descriptor = this.getDescriptor(apiInterface);
         if (descriptor) {
             return descriptor.category + ">" + descriptor.description;
         } else {
