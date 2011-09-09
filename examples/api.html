@@ -4,7 +4,9 @@
 		<title>API调用演示</title>
 		<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
         <style>
-            div{font-size:12px;font-family:menlo,monaco,consolas}
+            div,textarea{font-size:12px;font-family:menlo,monaco,consolas}
+            textarea{width:600px;height:500px;}
+            .code{display:none;}
         </style>
         <script src="../build/all.js"></script>
         <script>
@@ -21,6 +23,7 @@
             function apiError(code, message) {
                 document.all.result.innerHTML = code + "," + message;
             }
+
             // 动作绑定
             T.documentReady(function () {
                 document.getElementById("exec").onclick = function () {
@@ -82,6 +85,42 @@
     <div class="result" id="result"></div>
     </p>
 
+    <p><a href="javascript:document.all.code.style.display='block';">显示代码</a></p>
+    <p class="code" id="code">
+    <textarea>
+
+            // 初始化库
+            T.init({appkey: "key001"});
+
+            // 取数据失败
+            function apiSuccess(response) {
+                document.all.result.innerHTML = response;
+            }
+
+            // 取数据成功
+            function apiError(code, message) {
+                document.all.result.innerHTML = code + "," + message;
+            }
+
+            // 动作绑定
+            T.documentReady(function () {
+                document.getElementById("exec").onclick = function () {
+                    var command = document.all.command.value,
+                        params = document.all.parameters.value,
+                        format = document.all._format.value,
+                        method = document.all._method.value;
+
+                    params = T.queryString.decode(params,",");
+
+                    document.all.result.innerHTML = "处理中...";
+
+                    T.api(command,params,format,method)
+                     .success(apiSuccess)
+                     .error(apiError);
+                };
+            });
+    </textarea>
+    </p>
 	</body>
 </html>
 
