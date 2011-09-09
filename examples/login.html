@@ -1,0 +1,55 @@
+<!doctype html>
+<html>
+	<head>
+		<title>登录及登出</title>
+		<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+        <script src="../build/all.js"></script>
+        <script>
+
+            // 初始化库
+            T.init({appkey: "key001"});
+
+            // 绑定登录成功后的处理
+            T.bind(T.events.USER_LOGGEDIN_EVENT, function (loginStatus) {
+                var username = loginStatus.name,
+                    usernick = loginStatus.nick;
+                document.getElementById("result").innerHTML = username + "(" + usernick + ") 登录成功";
+            });
+
+            // 绑定登录失败后的处理
+            T.bind(T.events.USER_LOGIN_FAILED_EVENT, function (error) {
+                document.getElementById("result").innerHTML = "登录失败" + error.message;
+            });
+
+            // 绑定登录失败后的处理
+            T.bind(T.events.USER_LOGGEDOUT_EVENT, function (error) {
+                document.getElementById("result").innerHTML = "登出成功";
+            });
+
+            // 登录与登出动作触发
+            T.documentReady(function () {
+
+                document.getElementById("loginBtn").onclick = function () {
+                    T.login();
+                };
+
+                document.getElementById("logoutBtn").onclick = function () {
+                    T.logout();
+                };
+            });
+        </script>
+	</head>
+    <!--[if lt IE 7 ]><body class="ie_6"><![endif]-->
+    <!--[if IE 7 ]><body class="ie_7"><![endif]-->
+    <!--[if IE 8 ]><body class="ie_8"><![endif]-->
+    <!--[if IE 9 ]><body class="ie_9"><![endif]-->
+    <!--[if (gt IE 9)|!(IE)]><!-->
+    <body>
+    <!--<![endif]-->
+    <h1>登录与登出示例</h1>
+    <button id="loginBtn">登录</button>
+    <button id="logoutBtn">登出</button>
+    <div class="result" id="result"></div>
+	</body>
+</html>
+
