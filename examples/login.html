@@ -3,6 +3,9 @@
 	<head>
 		<title>登录及登出</title>
 		<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+        <style>
+            div{font-size:12px;font-family:menlo,monaco,consolas}
+        </style>
         <script src="../build/all.js"></script>
         <script>
 
@@ -13,27 +16,28 @@
             T.bind(T.events.USER_LOGGEDIN_EVENT, function (loginStatus) {
                 var username = loginStatus.name,
                     usernick = loginStatus.nick;
-                document.getElementById("result").innerHTML = username + "(" + usernick + ") 登录成功";
+                document.all.result.innerHTML = username + "(" + usernick + ") 登录成功";
             });
 
             // 绑定登录失败后的处理
             T.bind(T.events.USER_LOGIN_FAILED_EVENT, function (error) {
-                document.getElementById("result").innerHTML = "登录失败" + error.message;
+                document.all.result.innerHTML = "登录失败" + error.message;
             });
 
             // 绑定登录失败后的处理
             T.bind(T.events.USER_LOGGEDOUT_EVENT, function (error) {
-                document.getElementById("result").innerHTML = "登出成功";
+                document.all.result.innerHTML = "登出成功";
             });
 
-            // 登录与登出动作触发
+            // 登录与登出动作绑定
             T.documentReady(function () {
 
-                document.getElementById("loginBtn").onclick = function () {
+                document.all.loginBtn.onclick = function () {
+                    document.all.result.innerHTML = "登录中";
                     T.login();
                 };
 
-                document.getElementById("logoutBtn").onclick = function () {
+                document.all.logoutBtn.onclick = function () {
                     T.logout();
                 };
             });
@@ -46,10 +50,16 @@
     <!--[if (gt IE 9)|!(IE)]><!-->
     <body>
     <!--<![endif]-->
+    <p>
     <h1>登录与登出示例</h1>
+    </p>
+    <p>
     <button id="loginBtn">登录</button>
     <button id="logoutBtn">登出</button>
+    </p>
+    <p>
     <div class="result" id="result"></div>
+    </p>
 	</body>
 </html>
 

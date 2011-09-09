@@ -15,6 +15,8 @@
  * @requires base
  */
 QQWB.extend("String",{
+    _trimLeft: /^\s+/
+   ,_trimRight: /\s+$/
     /**
      * Determine whether an object is string
      *
@@ -22,8 +24,42 @@ QQWB.extend("String",{
      * @param source {Mixed} anything
      * @return {Boolean}
      */
-    isString: function (source) {
+   ,isString: function (source) {
         return typeof source === "string";
     }
 
+    /**
+     * Strip left blank
+     *
+     * @access public
+     * @param source {Mixed} anything
+     * @return {String}
+     */
+   ,ltrim: function (source) {
+       return source == null ? "" : source.toString().replace(this._trimLeft,"");
+    }
+
+    /**
+     * Strip right blank
+     *
+     * @access public
+     * @param source {Mixed} anything
+     * @return {String}
+     */
+   ,rtrim: function (source) {
+       return source == null ? "" : source.toString().replace(this._trimRight,"");
+    }
+
+    /**
+     * Strip blank at left and right
+     *
+     * @access public
+     * @param source {Mixed} anything
+     * @return {String}
+     */
+    ,trim: String.prototype.trim ? function (source) {
+            return source == null ? "" : String.prototype.trim.call(source);
+        } : function (source) {
+            return source == null ? "" : source.toString().replace(this._trimLeft,"").replace(this._trimRight,"");
+        } 
 });
