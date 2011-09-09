@@ -82,7 +82,7 @@ QQWB.extend("",{
 QQWB.extend("events", {
     USER_LOGGEDIN_EVENT: "UserLoggedIn"
    ,USER_LOGIN_FAILED_EVENT: "UserLoginFailed"
-   ,USER_LOGOUT_EVENT: "UserLoggedOut"
+   ,USER_LOGGEDOUT_EVENT: "UserLoggedOut"
    ,TOKEN_READY_EVENT: "tokenReady"
    ,DOCUMENT_READY_EVENT: "documentReady"
    ,EVERYTHING_READY_EVENT: "everythingReady"

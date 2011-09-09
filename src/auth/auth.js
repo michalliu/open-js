@@ -30,15 +30,16 @@ QQWB.extend("",{
 
         var loginStatus = this.loginStatus(); 
 
+        optSuccessHandler && this.bind(this.events.USER_LOGGEDIN_EVENT, optSuccessHandler);
+        optFailHandler && this.bind(this.events.USER_LOGIN_FAILED_EVENT, optFailHandler);
+
         // user already logged in
         if (loginStatus) {
 
             optSuccessHandler && optSuccessHandler.call(this,loginStatus);
+            this.trigger(this.events.USER_LOGGEDIN_EVENT,loginStatus);
 
         } else { // open authorization window
-
-            optSuccessHandler && this.bind(this.events.USER_LOGGEDIN_EVENT, optSuccessHandler);
-            optFailHandler && this.bind(this.events.USER_LOGIN_FAILED_EVENT, optFailHandler);
 
             var 
                 currWindow = {
@@ -158,7 +159,7 @@ QQWB.extend("",{
            this._token.clearRefreshToken();
        }
        optHandler && optHandler.call(this);
-       this.trigger(this.events.USER_LOGOUT_EVENT);
+       this.trigger(this.events.USER_LOGGEDOUT_EVENT);
        return this;
     }
 
