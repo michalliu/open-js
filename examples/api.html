@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 	<head>
-		<title>基本数据输入及输出</title>
+		<title>API调用演示</title>
 		<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
         <style>
             div{font-size:12px;font-family:menlo,monaco,consolas}
@@ -29,9 +29,7 @@
                         format = document.all._format.value,
                         method = document.all._method.value;
 
-                    console.log(params);
                     params = T.queryString.decode(params,",");
-                    console.log(params);
 
                     document.all.result.innerHTML = "处理中...";
 
