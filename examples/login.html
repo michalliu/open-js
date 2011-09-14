@@ -31,6 +31,18 @@
                 document.all.result.innerHTML = "登出成功";
             });
 
+            // 获取目前的登录态并显示相应的信息
+            T.tokenReady(function () {
+                var loginStatus = T.loginStatus(); 
+                T.documentReady(function () {
+                    if (loginStatus) {
+                        document.all.result.innerHTML = "欢迎," + loginStatus.name;
+                    } else {
+                        document.all.result.innerHTML = "请登录";
+                    }
+                });
+            });
+
             // 登录与登出动作绑定
             T.documentReady(function () {
 
@@ -87,6 +99,18 @@
             // 绑定登录失败后的处理
             T.bind(T.events.USER_LOGGEDOUT_EVENT, function (error) {
                 document.all.result.innerHTML = "登出成功";
+            });
+
+            // 获取目前的登录态并显示相应的信息
+            T.tokenReady(function () {
+                var loginStatus = T.loginStatus(); 
+                T.documentReady(function () {
+                    if (loginStatus) {
+                        document.all.result.innerHTML = "欢迎," + loginStatus.name;
+                    } else {
+                        document.all.result.innerHTML = "请登录";
+                    }
+                });
             });
 
             // 登录与登出动作绑定

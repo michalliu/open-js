@@ -39,6 +39,7 @@
  * @requires base
  *           ext.XML
  *           ext.Array
+ *           ext.JSON
  *           apiProvider
  *           deferred
  *           auth.token
@@ -214,7 +215,7 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optSolution)
 								// data.id represent the caller's id to know which deferred object should handle the data
 								// data.data reprent the result return from API server
 								var 
-							    	data = JSON.parse(e.data),
+							    	data = QQWB.JSON.fromString(e.data),
 									id = data.id,
 									relateDeferred = QQWB.api.deferredAt(id),
 							    	response = data.data;
@@ -247,7 +248,7 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optSolution)
 						// send to proxy server
 						// IE only support String type as the message
 						// @see http://msdn.microsoft.com/en-us/library/cc197015(v=vs.85).aspx
-						serverProxy.contentWindow.postMessage(JSON.stringify({ 
+						serverProxy.contentWindow.postMessage(QQWB.JSON.stringify({ 
 							id: QQWB.api.collect(deferred)
 						   ,data: [api, apiParams, optDataType, optType]
 						}),QQWB._domain.serverproxy);

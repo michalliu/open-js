@@ -13,10 +13,10 @@
  *           apiProvider
  *           deferred
  *           ext.Array
+ *           ext.JSON
  *           auth.token
  *           event.event
  *           solution
- *           JSON2
  */
 
 QQWB.extend("",{
@@ -189,7 +189,7 @@ QQWB.extend("",{
         // to detect that, auth.login will dealing with this
         // situtation
         inPopup = !!openerProp, // popup window
-        //inFrame = self != parentProp, // iframe
+        inFrame = self != parentProp, // iframe
         asServer = QQWB._domain.serverproxy === self.location.href; // as server proxy
 
     // auto adopt a solution to client(browser)
@@ -222,7 +222,7 @@ QQWB.extend("",{
         return;
     } 
 
-    if (asServer && QQWB.browser.feature.postmessage) {
+    if (inFrame && asServer && QQWB.browser.feature.postmessage) {
         var 
 			targetOrigin = "*", // we don't care who will handle the data
             appWindow = parentProp; // the third-party application window
@@ -236,7 +236,7 @@ QQWB.extend("",{
 			// we do strict api check here to protect from XSS/CSRF attack
 			//
 			var 
-			    data = JSON.parse(e.data),
+			    data = QQWB.JSON.fromString(e.data),
 				id = data.id, // message id related to the deferred object
 				args = data.data, //
 				apiInterface = args[0]; //  the api interface should be the first argument
@@ -252,7 +252,7 @@ QQWB.extend("",{
 			}
 
 			if (!apiInterface) { // interface can not be empty
-				appWindow.postMessage(JSON.stringify({
+				appWindow.postMessage(QQWB.JSON.toString({
 					id: id
 				   ,data: [-1, "interface can not be empty"]
 				}), targetOrigin);
@@ -260,7 +260,7 @@ QQWB.extend("",{
 			} else {
 				// This is extremely important to protect from XSS/CSRF attack
 				if (!QQWB._apiProvider.isProvide(apiInterface)) {
-			    	appWindow.postMessage(JSON.stringify({
+			    	appWindow.postMessage(QQWB.JSON.toString({
 			    		id: id
 			    	   ,data: [-1, "interface \"" + apiInterface +"\" is not supported"]
 			    	}), targetOrigin);
@@ -270,7 +270,7 @@ QQWB.extend("",{
 					// we directly pass the data to the reciever regardless its success or not
 					//
 					QQWB.io._apiAjax.apply(this,args).complete(function () {
-			        	appWindow.postMessage(JSON.stringify({
+			        	appWindow.postMessage(QQWB.JSON.toString({
 			        		id: id
 			        	   ,data: QQWB.Array.fromArguments(arguments)
 			        	}), targetOrigin);
@@ -284,9 +284,11 @@ QQWB.extend("",{
         } else if (window.attachEvent) {
             self.attachEvent("onmessage", messageHandler);
         }
-    } else {
-        initSolution();
+
+        return;
     }
+    
+    initSolution();
 
 }());
 
