@@ -12,9 +12,16 @@
  *           static
  */
 QQWB.extend("_apiProvider", {
+	// api error
+	apiError: {
+		httpHeaderFlag: /X-APIErrorCode:\s+(\d+)/
+	   ,"1": "参数错误"
+	   ,"2": "频率受限"
+	   ,"3": "鉴权失败"
+	   ,"4": "内部错误"
+	}
     // api list
-    //
-    apis: {
+   ,apis: {
         "/statuses/home_timeline": {
             category: "时间线",
             description: "主页时间线",

@@ -62,4 +62,30 @@ QQWB.extend("String",{
         } : function (source) {
             return source == null ? "" : source.toString().replace(this._trimLeft,"").replace(this._trimRight,"");
         } 
+
+	/**
+	 * Determine whether needle at the front of str
+	 *
+	 * @access public
+	 * @param source {Mixed} anything
+	 * @return {Boolean}
+	 */
+	,startsWith: String.prototype.startsWith ? function (source, needle) {
+			return source == null ? false : String.prototype.startsWith.call(source, needle);
+		} : function (source, needle) {
+			return source == null ? false : source.toString().indexOf(needle) == 0;
+		} 
+
+	/**
+	 * Determine whether needle at the end of str
+	 *
+	 * @access public
+	 * @param source {Mixed} anything
+	 * @return {Boolean}
+	 */
+	,endsWith: String.prototype.endsWith ? function (source, needle) {
+			return source == null ? false : String.prototype.endsWith.call(source, needle);
+		} : function (source, needle) {
+			return source == null ? false : source.toString().lastIndexOf(needle) >= 0 && source.toString().lastIndexOf(needle) + needle.length == source.length;
+		} 
 });

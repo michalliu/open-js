@@ -98,7 +98,7 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optSolution)
 		return promise;
 	}*/
 
-	// no solution or solution not correctly initialzed
+	// no solution or selected solution failed initialze
 	// its not possible to implement to QQWB.api method working
 	// very little chance
 	if (!solution || solution.readyState === 2) {
@@ -226,7 +226,8 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optSolution)
 										if (response[4] == "xmltext") {
 											response[2] = QQWB.XML.fromString(response[2]);
 										}
-										relateDeferred.resolve.apply(relateDeferred,[response[2],response[3]]);
+										//relateDeferred.resolve.apply(relateDeferred,[response[2],response[3]]);
+                                        relateDeferred.resolve(response[2]);
 							    	}
 									QQWB.api.uncollect(id);
 								} else {
@@ -262,11 +263,18 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optSolution)
 		QQWB.io._apiFlashAjax(api, apiParams, optDataType, optType).complete(function () {
 			var response = QQWB.Array.fromArguments(arguments);
 			if (response[0] !== 200) {
-				deferred.reject.apply(relateDeferred,response);
+				deferred.reject.apply(deferred,response);
 			} else {
-				deferred.resolve.apply(deferred,[response[2],response[3]]);
+				//deferred.resolve.apply(deferred,[response[2],response[3]]);
+                deferred.resolve(response[2]);
 			}
 		});
 	}
+
+	// describe that we have done the request
+	promise.complete(function () {
+        QQWB.log.info("*[" + (QQWB.api.id ? QQWB.api.id : "_") + "] requesting data \"" + QQWB._apiProvider.describe(api) + "\" has finished");
+	});
+
     return promise;
 });

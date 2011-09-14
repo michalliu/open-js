@@ -9,6 +9,7 @@
  * @module JSON
  * @requires base
  *           String
+ *           JSON2
  */
 QQWB.extend("JSON",{
     /**
@@ -44,4 +45,15 @@ QQWB.extend("JSON",{
             return source;
         } // end if
     } // end fromString
-});
+
+    /**
+     * Convert JSON Object to string
+     *
+     * @access public
+     * @param source {Object} the source object
+     * @return {String} the stringified version of an object
+     */
+   ,toString: function (source) {
+       return source == null ? "" : window.JSON.stringify(source);
+    }
+}, true/*overwrite toString method inherit from Object.prototype*/);
