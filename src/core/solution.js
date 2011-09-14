@@ -158,11 +158,11 @@ QQWB.extend("_solution", {
                            });
 	        		   
                        // if solution didn't marked as resolved(success) after 30 seconds 
-	        		   // mark the solution has failed and do clean up
+	        		   // mark the solution to failed and do clean up
 	        		   resolveTimer = setTimeout(function () {
 	        	    		   if (!solution.deferred.isResolved()) {
 	        	    		       solution.readyState = 2;
-	        	    		       solution.deferred.reject(-1, "encounter error while loading proxy swf");
+	        	    		       solution.deferred.reject(-1, "encounter error while loading proxy swf, need newer flash player");
 	        	    		       // remove the box cotains the flash
 	        	    		       QQWB.dom.remove(movieBox);
 	        	    		   }
