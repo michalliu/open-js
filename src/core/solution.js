@@ -151,7 +151,7 @@ QQWB.extend("_solution", {
 	        		       movieBox = QQWB.flash.load(QQWB._domain.flashproxy, function (moviename) {
 							  QQWB.log.info("flash solution initlized successfully");
 	        	              solution.readyState = 1;
-	        				  window["QQWBFlashTransport"] = QQWB.flash.getSWFObjectByName(moviename);
+							  window["QQWBFlashTransport"] = QQWB.flash.getSWFObjectByName(moviename);
 	        				  // clear the timer
 	        				  resolveTimer && clearTimeout(resolveTimer);
 	        	              solution.deferred.resolve();
@@ -180,6 +180,7 @@ QQWB.extend("_solution", {
                if (QQWB.browser.feature.silverlight) {
                    // silverlight not implemented
                    ~1;
+                   QQWB.log.error("sorry, silverlight solution is not implemented");
                } else {
                    QQWB.log.error("can't init solution \"" + name) +"\",browser doesn't support silverlight or silverlight is disabled";
                    solutionInit.reject("browser not supported");

@@ -213,6 +213,7 @@ QQWB.extend("",{
 
     if (inPopup) { // expected working for non-IE browser
         // same origin policy test
+        QQWB.log.info("library booting at popup mode");
         openerProp.location.href ? 
             QQWB._token.resolveResponse(window.location.hash.split("#").pop(), openerProp) :
             QQWB.log.critical("crossdomain login is not supported currently");
@@ -223,6 +224,7 @@ QQWB.extend("",{
     } 
 
     if (inFrame && asServer && QQWB.browser.feature.postmessage) {
+        QQWB.log.info("library booting at server proxy mode");
         var 
 			targetOrigin = "*", // we don't care who will handle the data
             appWindow = parentProp; // the third-party application window
@@ -288,6 +290,7 @@ QQWB.extend("",{
         return;
     }
     
+    QQWB.log.info("library booting at normal mode");
     initSolution();
 
 }());

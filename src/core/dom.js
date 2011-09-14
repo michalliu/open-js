@@ -54,7 +54,7 @@ QQWB.extend("dom", {
             // is none, and visibility is hidden no problem
             // for convience we hidden the flash by giving it a large offset of top
 			// el.style.visibility = "hidden";
-            "";
+            ~0;
 		} else {
             el.style.display = "none";
 		}

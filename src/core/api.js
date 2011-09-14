@@ -147,8 +147,21 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optSolution)
 		return promise;
 	}
 
+	// record the serial
+	if (!QQWB.api.id) {
+		QQWB.extend(QQWB.api, {
+			id: 0
+            // how many api call this page does?
+		   ,total: function () {
+			   return QQWB.api.id;
+		    }
+		});
+	}
+
+    QQWB.api.id ++;
+
 	// describe what we are to do now
-    QQWB.log.info("[" + (QQWB.api.id ? QQWB.api.id + 1 : "_") + "] requesting data \"" + QQWB._apiProvider.describe(api) + "\" from server...");
+    QQWB.log.info("[" + QQWB.api.id + "] requesting data \"" + QQWB._apiProvider.describe(api) + "\" from server...");
 
     // html5 solution
     if (solution === QQWB._solution[QQWB._solution.HTML5_SOLUTION]) {
@@ -165,11 +178,10 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optSolution)
 					// everything goes well
                  	// lazy create an collection object to maintain the deferred object
                  	// only html5 solution need this
-                 	if (!QQWB.api.deferrsCollection) {
+                 	if (!QQWB.api._deferredCollection) {
                  		QQWB.extend(QQWB.api, {
-                 			id : 0
-                 		   ,_deferredCollection: {
-                 		   }
+                 		    _deferredCollection: {
+                 		    }
                  		   ,deferredAt: function (deferredId) {
                  			   if (this._deferredCollection[deferredId]) {
                  			       return this._deferredCollection[deferredId];
@@ -188,16 +200,11 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optSolution)
                  			// collect an deferred object to collections
                  		   ,collect: function (deferredObj) {
                  			   if (deferredObj.promise) { // it's an deferred object
-                 			       this._deferredCollection[++this.id] = deferredObj;
+                 			       this._deferredCollection[this.id] = deferredObj;
                  			       return this.id;
                  			   } else { // we dont accpept other than deferred object
                  	               QQWB.log.warning("collect a non-deferred object is illegal");
                  			   }
-                 		    }
-                 		  
-                 			// how many api call this page does?
-                 		   ,total: function () {
-                 			   return QQWB.api.id;
                  		    }
                  		});
                  	}
@@ -245,13 +252,22 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optSolution)
 					}
                  
 					try {
-						// send to proxy server
-						// IE only support String type as the message
-						// @see http://msdn.microsoft.com/en-us/library/cc197015(v=vs.85).aspx
-						serverProxy.contentWindow.postMessage(QQWB.JSON.stringify({ 
-							id: QQWB.api.collect(deferred)
-						   ,data: [api, apiParams, optDataType, optType]
-						}),QQWB._domain.serverproxy);
+						// IE8 has problems if not wrapped by setTimeout
+						// @see http://ejohn.org/blog/how-javascript-timers-work/
+						var collectionID = QQWB.api.collect(deferred);
+
+						// we send async request at the same time
+						// and through id we know the result belong
+						// to which request
+						setTimeout(function () {
+                            // send to proxy server
+                            // IE only support String type as the message
+                            // @see http://msdn.microsoft.com/en-us/library/cc197015(v=vs.85).aspx
+                            serverProxy.contentWindow.postMessage(QQWB.JSON.stringify({ 
+                            	id: collectionID
+                               ,data: [api, apiParams, optDataType, optType]
+                            }),QQWB._domain.serverproxy);
+						}, 0 );
 
 					} catch (ex) {
 	                    QQWB.log.critical("post message to server proxy has failed, " + ex);
@@ -261,6 +277,7 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optSolution)
 			} // end server proxy existance check
 
 	} else if (solution === QQWB._solution[QQWB._solution.FLASH_SOLUTION]) {
+		// @see io.js onFlashRequestComplete_8df046 for api call sequence management
 		QQWB.io._apiFlashAjax(api, apiParams, optDataType, optType).complete(function () {
 			var response = QQWB.Array.fromArguments(arguments);
 			if (response[0] !== 200) {
@@ -276,7 +293,7 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optSolution)
     (function () {
         var serial = QQWB.api.id;
      	promise.complete(function () {
-             QQWB.log.info("*[" + (serial ? serial : "_") + "] done");
+             QQWB.log.info("*[" + serial + "] done");
              serial = null; // defect memory leak in IE
      	});
     }());

@@ -265,10 +265,14 @@ QQWB.extend("io", {
 
 			   // push to queue
                window.onFlashRequestComplete_8df046.callbacks.push(callback);
-
-	           QQWBFlashTransport.httpRequest(cfg.url,cfg.data,cfg.type);
-
+			   
+			   if (QQWBFlashTransport && QQWBFlashTransport.httpRequest) {
+			       QQWBFlashTransport.httpRequest(cfg.url,cfg.data,cfg.type);
+			   } else {
+			       QQWB.log.critical("flash transportation object error" + QQWBFlashTransportName);
+			   }
 		   }
+
 		  ,abort: function () {
 			  if (callback) {
 			      callback(0,1);
@@ -479,9 +483,9 @@ QQWB.extend("io", {
 
             window[callbackName] = _oldcallback; // restore back to original value
             
-            if (typeof window[callbackName] == "undefined") { // original value is undefined
-                delete window[callbackName]; // delete it
-            }
+            //if (typeof window[callbackName] == "undefined") { // original value is undefined
+                //delete window[callbackName]; // delete it
+            //}
         };
 
         QQWB.io._IOScript(default_opts).send(function (status, statusText) {
