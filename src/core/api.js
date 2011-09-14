@@ -272,9 +272,13 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optSolution)
 	}
 
 	// describe that we have done the request
-	promise.complete(function () {
-        QQWB.log.info("*[" + (QQWB.api.id ? QQWB.api.id : "_") + "] requesting data \"" + QQWB._apiProvider.describe(api) + "\" has finished");
-	});
+    (function () {
+        var serial = QQWB.api.id;
+     	promise.complete(function () {
+             QQWB.log.info("*[" + (serial ? serial : "_") + "] done");
+             serial = null; // defect memory leak in IE
+     	});
+    }());
 
     return promise;
 });
