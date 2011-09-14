@@ -17,5 +17,5 @@ QQWB.extend("_static",{
    ,CATEGORY_TIMELINE: "时间线"
    ,EMPTY_STR:""
    ,NO_DEFAULT_VALUE:null
-   ,NO_DESCRIPTION:"暂时关于此参数的说明"
+   ,NO_DESCRIPTION:"暂时没有关于此参数的说明"
 });
