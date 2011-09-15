@@ -152,11 +152,14 @@ QQWB.extend("",{
      * @return {Object} QQWB object
      */
    ,logout: function (optHandler) {
-       if (!this.loginStatus()) {
-           this.log.info("user not logged in");
+	   var loginStatus = this.loginStatus();
+       QQWB.log.info("logging out user...");
+       if (!loginStatus) {
+           this.log.warning("oops, user not logged in");
        } else {
            this._token.clearAccessToken();
            this._token.clearRefreshToken();
+           this.log.info(loginStatus.name + " has logged out successfully");
        }
        optHandler && optHandler.call(this);
        this.trigger(this.events.USER_LOGGEDOUT_EVENT);
