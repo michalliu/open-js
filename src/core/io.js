@@ -445,7 +445,6 @@ QQWB.extend("io", {
     /**
      * JSONP request
      *
-     * TODO: modified to as documention described
      * @access public
      * @param opts {Object} jsonp config
      * @return {Object} promise

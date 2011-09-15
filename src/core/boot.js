@@ -36,8 +36,7 @@ QQWB.extend("",{
                rawAccessToken = this._token.getAccessToken(true), 
                refreshToken = this._token.getRefreshToken(),
                needExchangeToken = refreshToken && !accessToken && rawAccessToken,
-               // FIXME: debug don't make auto_token request
-               needRequestNewToken = false && !refreshToken && !accessToken,
+               needRequestNewToken = !refreshToken && !accessToken,
                clientProxy = opts.proxy || document.location.href; // redirect flag is userfull to solve IE's opener problem
 
            if (opts.appkey) {
@@ -56,7 +55,7 @@ QQWB.extend("",{
                this.log.info("exchanging refresh token to access token...");
                QQWB._token.exchangeForToken(function (response) {
 
-                   //TODO: does it really neccessary?
+                   // does it really neccessary?
                    if (response.error) {// exchangeToken encountered error, try to get a new access_token automaticly
                        QQWB.log.warning("exchange token has failed, trying to retrieve a new access_token...");
                        this._tokenReadyDoor.lock();// lock for async refresh token

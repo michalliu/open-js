@@ -15,8 +15,6 @@
  *
  * throw QQWBError("message")
  *
- * //TODO: should we only export one variable in global namespace
- *
  * @access public
  *
  * function QQWBError(message) {
@@ -271,13 +269,6 @@
     // expose variable
     twb._alias.call(window,["QQWB","T"],twb); // we probably should only export one global variable
 
-    //twb.assign("_domain","API_URI","http://test.svr.net/apphost/oauth/api.php"); // no trailer slash   
-    //twb.assign("_domain","AUTH_URI","http://test.svr.net/apphost/oauth/authorize.php");   
-    //twb.assign("_domain","EXCHANGE_TOKEN_URI","http://test.svr.net/apphost/oauth/exchangeToken.php");   
-    //twb.assign("_domain","QUERY_TOKEN_URI","http://test.svr.net/apphost/oauth/queryToken.php");   
-    //twb.assign("_domain","SERVERPROXY_URI","http://test.svr.net/apphost/proxy/proxy.html");   
-    //twb.assign("_domain","FLASHPROXY_URI","http://test.svr.net/apphost/proxy/proxy.swf");   
-    
     twb.assign("_domain","API_URI","/api"); // no trailer slash   
     twb.assign("_domain","AUTH_URI","/oauth_html/loginV2mini.php");   
     twb.assign("_domain","EXCHANGE_TOKEN_URI","/cgi-bin/exchange_token");   

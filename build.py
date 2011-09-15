@@ -293,12 +293,14 @@ def build(modulenames, compress, targetfile, createlog=False):
 
     finalSource = "".join(finalSource)
 
-    if compress:
-        packer = JavaScriptPacker()
+    packer = JavaScriptPacker()
 
-    open(targetfile,"w+").write(packer.pack(finalSource))
+    normalProcess = compress and (lambda s: packer.pack(s)) or (lambda s: s)
+    obfuscatProcess = lambda s: packer.pack(s, encoding=62)
+
+    open(targetfile,"w+").write(normalProcess(finalSource))
     targetfileMinfied,extension = os.path.splitext(targetfile)
-    open("".join([targetfileMinfied,".min",extension]),"w+").write(packer.pack(finalSource, encoding=62))
+    open("".join([targetfileMinfied,".obfuscated",extension]),"w+").write(obfuscatProcess(finalSource))
 
     if createlog:
         logfile = open("log.txt","w+")
