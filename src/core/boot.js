@@ -36,7 +36,8 @@ QQWB.extend("",{
                rawAccessToken = this._token.getAccessToken(true), 
                refreshToken = this._token.getRefreshToken(),
                needExchangeToken = refreshToken && !accessToken && rawAccessToken,
-               needRequestNewToken = !refreshToken && !accessToken,
+               // FIXME: debug don't make auto_token request
+               needRequestNewToken = false && !refreshToken && !accessToken,
                clientProxy = opts.proxy || document.location.href; // redirect flag is userfull to solve IE's opener problem
 
            if (opts.appkey) {
@@ -155,7 +156,7 @@ QQWB.extend("",{
 
             this._everythingReadyDoor.isOpen()
             && this.log.info("everything is ready")
-            && this.log.info("current user is " + this.loginStatus().name)
+            //&& this.log.info("current user is " + this.loginStatus().name)
             && this.trigger(this.events.EVERYTHING_READY_EVENT);
         })
    /**
