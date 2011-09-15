@@ -15,7 +15,6 @@ def usage():
         +"python build.py [options] [module,[module,...]] filename\n\n"\
         +"options:\n"\
         +"-h --help     print this message\n"\
-        +"-c --compress compress code to reduce file size\n"\
         +"-q --quiet    dont print out log\n"\
         +"-y --yes      dont ask for confirmation\n"\
         +"-l --log      generate log file\n"\
@@ -265,7 +264,7 @@ class Source(object):
                 if line:
                     self.requires.add(line.groups()[0])
 
-def build(modulenames, compress, targetfile, createlog=False):
+def build(modulenames, targetfile, createlog=False):
 
     """start build library"""
 
@@ -295,11 +294,12 @@ def build(modulenames, compress, targetfile, createlog=False):
 
     packer = JavaScriptPacker()
 
-    normalProcess = compress and (lambda s: packer.pack(s)) or (lambda s: s)
+    minifyProcess = lambda s: packer.pack(s)
     obfuscatProcess = lambda s: packer.pack(s, encoding=62)
 
-    open(targetfile,"w+").write(normalProcess(finalSource))
+    open(targetfile,"w+").write(finalSource)
     targetfileMinfied,extension = os.path.splitext(targetfile)
+    open("".join([targetfileMinfied,".min",extension]),"w+").write(minifyProcess(finalSource))
     open("".join([targetfileMinfied,".obfuscated",extension]),"w+").write(obfuscatProcess(finalSource))
 
     if createlog:
@@ -825,7 +825,6 @@ def main(argv):
 
     initLogger()
     modules=set() #需要打包的模块
-    compress=False #是否压缩Js文件
     quietMode=False # 安静模式
     executeDirectly=False # 直接执行不再询问
     fileList=False # 创建文件列表清单文件
@@ -833,7 +832,7 @@ def main(argv):
     savedFileName="all.js" #默认目标文件名
 
     try:
-        opts,args = getopt.getopt(argv, "hcqylm:",["help","compress","quiet","yes","log","module="])
+        opts,args = getopt.getopt(argv, "hqylm:",["help","quiet","yes","log","module="])
     except getopt.GetoptError,err:
         log.error(str(err))
         usage()
@@ -842,8 +841,6 @@ def main(argv):
         if opt in ("-h", "--help"):
             usage()
             sys.exit()
-        elif opt in ("-c","--compress"):
-            compress = True
         elif opt in ("-q","--quiet"):
             quietMode = True
         elif opt in ("-y","--yes"):
@@ -864,7 +861,7 @@ def main(argv):
         log.setLevel(logging.FATAL)
 
     if executeDirectly:
-        build(modules,compress,savedFilePath,fileList)
+        build(modules,savedFilePath,fileList)
         return
 
     #询问是否继续
@@ -873,10 +870,6 @@ def main(argv):
         log.info("use modules %s" % ",".join(modules))
     else:
         log.info("use all the module available")
-    if compress:
-        log.info("compress the code")
-    else:
-        log.info("don't compress the code")
     if fileList:
         log.info("generate log file")
     else:
@@ -888,7 +881,7 @@ def main(argv):
     while True:
         confirm = raw_input(">>>")
         if confirm.lower() == "yes":
-            build(modules,compress,savedFilePath,fileList)
+            build(modules,savedFilePath,fileList)
             break
         elif confirm.lower() == "no":
             sys.exit(0)
