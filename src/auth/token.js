@@ -141,10 +141,10 @@ QQWB.extend("_token",{
            if(response.access_token){
 
                !response.expires_in && QQWB.log.error("token expires_in not retrieved");
-               !response.wbname && QQWB.log.warning("weibo username not retrieved, will not update username");
-               !response.wbnick && QQWB.log.warning("weibo usernick not retrieved, will not update usernick");
+               !response.wb_name && QQWB.log.warning("weibo username not retrieved, will not update username");
+               !response.wb_nick && QQWB.log.warning("weibo usernick not retrieved, will not update usernick");
 
-               QQWB._token.setAccessToken(response.access_token, parseInt(response.expires_in,10), response.wbname, response.wbnick);
+               QQWB._token.setAccessToken(response.access_token, parseInt(response.expires_in,10), response.wb_name, response.wb_nick);
 
                if (response.refresh_token) { // which should exists if accesstoken exists
                     QQWB._token.setRefreshToken(response.refresh_token);
@@ -196,10 +196,10 @@ QQWB.extend("_token",{
            if(response.access_token){
 
                !response.expires_in && QQWB.log.error("token expires_in not retrieved");
-               !response.wbname && QQWB.log.warning("weibo username not retrieved");
-               !response.wbnick && QQWB.log.warning("weibo usernick not retrieved");
+               !response.wb_name && QQWB.log.warning("weibo username not retrieved");
+               !response.wb_nick && QQWB.log.warning("weibo usernick not retrieved");
 
-               QQWB._token.setAccessToken(response.access_token, parseInt(response.expires_in,10), response.wbname, response.wbnick);
+               QQWB._token.setAccessToken(response.access_token, parseInt(response.expires_in,10), response.wb_name, response.wb_nick);
 
                if (response.refresh_token) { // which should exists if accesstoken exists
                     QQWB._token.setRefreshToken(response.refresh_token);
@@ -241,7 +241,7 @@ QQWB.extend("_token",{
 
        if (response.access_token) {
 
-           global._token.setAccessToken(response.access_token, parseInt(response.expires_in,10), response.wbname, response.wbnick);
+           global._token.setAccessToken(response.access_token, parseInt(response.expires_in,10), response.wb_name, response.wb_nick);
 
            if (response.refresh_token) { // which should exists if accesstoken exists
                global._token.setRefreshToken(response.refresh_token);
@@ -257,7 +257,8 @@ QQWB.extend("_token",{
            response.message = response.error; // alternative error name
            global.trigger(global.events.USER_LOGIN_FAILED_EVENT,response);
        } else {
-           global.log.error("unexpected result returned from server " + _response);
+           global.log.error("unexpected result returned from server " + responseText);
+           response.message = response.error = "server error";
            global.trigger(global.events.USER_LOGIN_FAILED_EVENT,response);
        }
     }

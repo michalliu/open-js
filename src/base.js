@@ -35,6 +35,11 @@
         twb, // the internal namespace object
         originalT = window.T; // get a reference of window's T
 
+    var 
+        protocol = "http";          // server protocol
+          scheme = protocol + "://", // server scheme
+            host = "open.t.qq.com",  // server host
+
     // Core base object
     twb = {
 
@@ -78,14 +83,14 @@
          * @access private
          */
        ,_domain: {
-           api: "{API_URI}"
-          ,cdn: "{CDN_URI}"
-          ,auth: "{AUTH_URI}"
-          ,exchange: "{EXCHANGE_TOKEN_URI}"
-          ,query: "{QUERY_TOKEN_URI}"
-          ,clientproxy: "{CLIENTPROXY_URI}" // auth redirect_url
-          ,serverproxy: "{SERVERPROXY_URI}" // server html proxy
-          ,flashproxy: "{FLASHPROXY_URI}" // flash proxy
+                   api : scheme + host + "{API_URI}"
+          ,       auth : scheme + host + "{AUTH_URI}"
+          ,      query : scheme + host +  "{QUERY_TOKEN_URI}"
+          ,   exchange : scheme + host +  "{EXCHANGE_TOKEN_URI}"
+          , flashproxy : scheme + host +  "{FLASHPROXY_URI}"     // server flash proxy
+          ,serverproxy : scheme + host +  "{SERVERPROXY_URI}"    // server html proxy
+          ,clientproxy : "{CLIENTPROXY_URI}" // autheciation redirect uri
+          //,cdn: "{CDN_URI}"
         }
         /**
          * Cookie configration
@@ -266,11 +271,18 @@
     // expose variable
     twb._alias.call(window,["QQWB","T"],twb); // we probably should only export one global variable
 
-    twb.assign("_domain","API_URI","http://test.svr.net/apphost/oauth/api.php"); // no trailer slash   
-    twb.assign("_domain","AUTH_URI","http://test.svr.net/apphost/oauth/authorize.php");   
-    twb.assign("_domain","EXCHANGE_TOKEN_URI","http://test.svr.net/apphost/oauth/exchangeToken.php");   
-    twb.assign("_domain","QUERY_TOKEN_URI","http://test.svr.net/apphost/oauth/queryToken.php");   
-    twb.assign("_domain","SERVERPROXY_URI","http://test.svr.net/apphost/proxy/proxy.html");   
-    twb.assign("_domain","FLASHPROXY_URI","http://test.svr.net/apphost/proxy/proxy.swf");   
+    //twb.assign("_domain","API_URI","http://test.svr.net/apphost/oauth/api.php"); // no trailer slash   
+    //twb.assign("_domain","AUTH_URI","http://test.svr.net/apphost/oauth/authorize.php");   
+    //twb.assign("_domain","EXCHANGE_TOKEN_URI","http://test.svr.net/apphost/oauth/exchangeToken.php");   
+    //twb.assign("_domain","QUERY_TOKEN_URI","http://test.svr.net/apphost/oauth/queryToken.php");   
+    //twb.assign("_domain","SERVERPROXY_URI","http://test.svr.net/apphost/proxy/proxy.html");   
+    //twb.assign("_domain","FLASHPROXY_URI","http://test.svr.net/apphost/proxy/proxy.swf");   
+    
+    twb.assign("_domain","API_URI","/api"); // no trailer slash   
+    twb.assign("_domain","AUTH_URI","/oauth_html/loginV2mini.php");   
+    twb.assign("_domain","EXCHANGE_TOKEN_URI","/cgi-bin/exchange_token");   
+    twb.assign("_domain","QUERY_TOKEN_URI","/cgi-bin/auto_token");   
+    twb.assign("_domain","SERVERPROXY_URI","/media/proxy.html");   
+    twb.assign("_domain","FLASHPROXY_URI","/media/proxy.swf");   
 
 }());
