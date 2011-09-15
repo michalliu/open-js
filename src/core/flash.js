@@ -13,15 +13,17 @@
  *           dom
  */
 QQWB.extend("flash",{
+    NO_CACHE: 1
     /**
      * Load swf to the current page by swf file path
      *
      * @access public
      * @param swfPath {String} the swf file path
      * @param optCallback {Function} the optCallback when swf is ready
+     * @param optCache {Number} indicate whether cache the swf file
      * @return Flash {Object}
      */
-   load: function (swfPath, optCallback) { 
+   ,load: function (swfPath, optCallback, optCache) { 
 
        // lazy create the loaded swfs
        if (!this.loadedSwfs) {
@@ -35,7 +37,9 @@ QQWB.extend("flash",{
        }
 
 	   // defect cache
-	   swfPath += "?" + QQWB.uid();
+       if (optNoCache === this.NO_CACHE) {
+	       swfPath += "?" + QQWB.uid();
+       }
 
        // this is the function name will be called inside flash
        // to indicate that the flash itself is ready now

@@ -155,7 +155,7 @@ QQWB.extend("_solution", {
 	        				  // clear the timer
 	        				  resolveTimer && clearTimeout(resolveTimer);
 	        	              solution.deferred.resolve();
-                           });
+                           }, QQWB.flash.NO_CACHE/* ie has problems if cache allowed,please advice if you know a better solution*/);
 	        		   
                        // if solution didn't marked as resolved(success) after 30 seconds 
 	        		   // mark the solution to failed and do clean up
