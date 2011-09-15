@@ -223,4 +223,4 @@ QQWB.extend("deferred", {
 });
 
 // expose to global namespace
-QQWB._alias("when", QQWB.deferred.when);
+QQWB._alias(["task","when"], QQWB.deferred.when);

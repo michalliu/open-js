@@ -1,0 +1,135 @@
+<!doctype html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+		<title>登录登出演示</title>
+        <style>
+            div,textarea{font-size:12px;font-family:menlo,monaco,consolas}
+            textarea{width:600px;height:500px;}
+            .code{display:none;}
+        </style>
+        <!--[if lt IE 9 ]>
+        <script src="../tool/firebug-lite/content/firebug-lite-dev.js"></script>
+        <![endif]-->
+        <script src="../build/all.js"></script>
+        <script>
+
+            // 初始化库
+            T.init({appkey: "key001"});
+
+            // 绑定登录成功后的处理
+            T.bind(T.events.USER_LOGGEDIN_EVENT, function (loginStatus) {
+                var username = loginStatus.name,
+                    usernick = loginStatus.nick;
+                document.all.result.innerHTML = username + "(" + usernick + ") 登录成功";
+            });
+
+            // 绑定登录失败后的处理
+            T.bind(T.events.USER_LOGIN_FAILED_EVENT, function (error) {
+                document.all.result.innerHTML = "登录失败" + error.message;
+            });
+
+            // 绑定登录失败后的处理
+            T.bind(T.events.USER_LOGGEDOUT_EVENT, function (error) {
+                document.all.result.innerHTML = "登出成功";
+            });
+
+            // 获取目前的登录态并显示相应的信息
+            T.tokenReady(function () {
+                var loginStatus = T.loginStatus(); 
+                T.documentReady(function () {
+                    if (loginStatus) {
+                        document.all.result.innerHTML = "欢迎," + loginStatus.name;
+                    } else {
+                        document.all.result.innerHTML = "请登录";
+                    }
+                });
+            });
+
+            // 登录与登出动作绑定
+            T.documentReady(function () {
+
+                document.all.loginBtn.onclick = function () {
+                    document.all.result.innerHTML = "登录中";
+                    T.login();
+                };
+
+                document.all.logoutBtn.onclick = function () {
+                    T.logout();
+                };
+            });
+        </script>
+	</head>
+    <!--[if lt IE 7 ]><body class="ie_6"><![endif]-->
+    <!--[if IE 7 ]><body class="ie_7"><![endif]-->
+    <!--[if IE 8 ]><body class="ie_8"><![endif]-->
+    <!--[if IE 9 ]><body class="ie_9"><![endif]-->
+    <!--[if (gt IE 9)|!(IE)]><!-->
+    <body>
+    <!--<![endif]-->
+    <p>
+    <h1>登录与登出示例</h1>
+    </p>
+
+    <p>
+    <button id="loginBtn">登录</button>
+    <button id="logoutBtn">登出</button>
+    </p>
+
+    <p>
+    <div class="result" id="result"></div>
+    </p>
+
+    <p><a href="#" onclick="document.all.code.style.display='block';">显示代码</a></p>
+    <p class="code" id="code">
+    <textarea>
+
+            // 初始化库
+            T.init({appkey: "key001"});
+
+            // 绑定登录成功后的处理
+            T.bind(T.events.USER_LOGGEDIN_EVENT, function (loginStatus) {
+                var username = loginStatus.name,
+                    usernick = loginStatus.nick;
+                document.all.result.innerHTML = username + "(" + usernick + ") 登录成功";
+            });
+
+            // 绑定登录失败后的处理
+            T.bind(T.events.USER_LOGIN_FAILED_EVENT, function (error) {
+                document.all.result.innerHTML = "登录失败" + error.message;
+            });
+
+            // 绑定登录失败后的处理
+            T.bind(T.events.USER_LOGGEDOUT_EVENT, function (error) {
+                document.all.result.innerHTML = "登出成功";
+            });
+
+            // 获取目前的登录态并显示相应的信息
+            T.tokenReady(function () {
+                var loginStatus = T.loginStatus(); 
+                T.documentReady(function () {
+                    if (loginStatus) {
+                        document.all.result.innerHTML = "欢迎," + loginStatus.name;
+                    } else {
+                        document.all.result.innerHTML = "请登录";
+                    }
+                });
+            });
+
+            // 登录与登出动作绑定
+            T.documentReady(function () {
+
+                document.all.loginBtn.onclick = function () {
+                    document.all.result.innerHTML = "登录中";
+                    T.login();
+                };
+
+                document.all.logoutBtn.onclick = function () {
+                    T.logout();
+                };
+            });
+    </textarea>
+    </p>
+	</body>
+</html>
+

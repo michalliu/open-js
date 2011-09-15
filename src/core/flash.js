@@ -34,6 +34,9 @@ QQWB.extend("flash",{
            return;
        }
 
+	   // defect cache
+	   swfPath += "?" + QQWB.uid();
+
        // this is the function name will be called inside flash
        // to indicate that the flash itself is ready now
        var movieContainerId= "movieContainer_" + QQWB.uid(),
@@ -48,9 +51,9 @@ QQWB.extend("flash",{
            window[flashReadyCallbackName] = _flashReady;
            // if the original value is undefined
            // then delete it
-           if (typeof _flashReady === "undefined") {
-               delete window[flashReadyCallbackName];
-           }
+           //if (typeof _flashReady === "undefined") {
+               //delete window[flashReadyCallbackName];
+           //}
            // clean up variables in closure to avoid memory leak in IE
            _flashReady = null;
            optCallback && (optCallback = null);

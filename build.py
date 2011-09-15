@@ -295,9 +295,10 @@ def build(modulenames, compress, targetfile, createlog=False):
 
     if compress:
         packer = JavaScriptPacker()
-        finalSource = packer.pack(finalSource)
 
-    open(targetfile,"w+").write(finalSource)
+    open(targetfile,"w+").write(packer.pack(finalSource))
+    targetfileMinfied,extension = os.path.splitext(targetfile)
+    open("".join([targetfileMinfied,".min",extension]),"w+").write(packer.pack(finalSource, encoding=62))
 
     if createlog:
         logfile = open("log.txt","w+")

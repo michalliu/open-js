@@ -13,10 +13,10 @@
  *           apiProvider
  *           deferred
  *           ext.Array
+ *           ext.JSON
  *           auth.token
  *           event.event
  *           solution
- *           JSON2
  */
 
 QQWB.extend("",{
@@ -175,130 +175,125 @@ QQWB.extend("",{
     }
 });
 
-QQWB._tokenReadyDoor.lock(); // lock for library application must call init first
-QQWB._everythingReadyDoor.lock(); // lock for library must ready
-QQWB._everythingReadyDoor.lock(); // lock for document must ready
-
-QQWB.bind(QQWB.events.TOKEN_READY_EVENT, function () {
-    QQWB._everythingReadyDoor.unlock(); // unlock for token ready
-});
-
-if (window.opener) {
-    //in authorize window
+// boot library
+(function () {
     var 
-        opener = window.opener,
-        responseText = window.location.hash.split("#").pop();
+        self = window,
+        openerProp = self.opener,
+        parentProp = self.parent,
 
-    // if allow to read location means the origin is same
-    if (opener.location.href) { 
-        QQWB._token.resolveResponse(responseText, opener); // save token
-    } else {
-        QQWB.log.critical("crossdomain login is not supported currently");
-    }                                                       
+        // Note:
+        // not all the browser agree this.
+        // in MSIE even openerProp is false
+        // library still could be in a popup, there is no way 
+        // to detect that, auth.login will dealing with this
+        // situtation
+        inPopup = !!openerProp, // popup window
+        inFrame = self != parentProp, // iframe
+        asServer = QQWB._domain.serverproxy === self.location.href; // as server proxy
 
-    // opener will use timer to detect is user closed the authwindow and send a error message
-    // since auth window is closed by us normally,in this case,opener shouldn't track it anymore
-    opener.QQWB._stopTrackingAuthWindowStatus();
-
-    window.close();
-
-    QQWB.log.info("library is booting at server authorization mode"); 
-
-} else if (window != window.parent) { // in frame
-
-    var serverProxyMode = QQWB._domain.serverproxy === window.location.href;// is this library working at proxy mode?(located on the api host?)
-
-    if (serverProxyMode) {
-
-        QQWB.log.info("library is booting at server proxy mode"); 
-
-        if (QQWB.browser.feature.postmessage) { // server proxy solution only runs html5 postmessage solution
-            
-            var 
-				targetOrigin = "*", // we don't care who will handle the data
-                external = window.parent; // the third-party application window
-
-            // post a message to the parent window indicate that server frame(itself) was successfully loaded
-            external.postMessage("success", targetOrigin); 
-
-            // recieve message from external as data transfer proxy
-		    var messageHandler = function (e) {
-				// accept any origin
-				// we do strict api check here to protect from XSS/CSRF attack
-				//
-				var 
-				    data = JSON.parse(e.data),
-					id = data.id, // message id related to the deferred object
-					args = data.data, //
-					apiInterface = args[0]; //  the api interface should be the first argument
-
-				if (args[2].toLowerCase() == "xml") {
-					// if dataType is xml, the ajax will return a xml object, which can't call
-					// postMessage directly (will raise an exception) , instead we request to tranfer
-					// XML as String, then parse it back to XML object.
-					// io.js will fall to response.text
-					// api.js will detect that convert it back to xml
-					// @see io.js,api.js
-					args[2] = "xmltext";
-				}
-
-				if (!apiInterface) { // interface can not be empty
-					external.postMessage(JSON.stringify({
-						id: id
-					   ,data: [-1, "interface can not be empty"]
-					}), targetOrigin);
-					QQWB.log.error("interface is empty");
-				} else {
-					// This is extremely important to protect from XSS/CSRF attack
-					if (!QQWB._apiProvider.isProvide(apiInterface)) {
-				    	external.postMessage(JSON.stringify({
-				    		id: id
-				    	   ,data: [-1, "interface \"" + apiInterface +"\" is not supported"]
-				    	}), targetOrigin);
-					    QQWB.log.error("interface \"" + apiInterface +"\" is not allowed to be called");
-					} else {
-						// everything goes well
-						// we directly pass the data to the reciever regardless its success or not
-						//
-						QQWB.io._apiAjax.apply(this,args).complete(function () {
-				        	external.postMessage(JSON.stringify({
-				        		id: id
-				        	   ,data: QQWB.Array.fromArguments(arguments)
-				        	}), targetOrigin);
-						});
-					}
-			   }
-            };
-
-            if (window.addEventListener) {
-                window.addEventListener("message", messageHandler, false);
-            } else if (window.attachEvent) {
-                window.attachEvent("onmessage", messageHandler);
-            }
-            QQWB.log.info("server message listener installed, waiting messages from client..."); 
-        }
-    } else {
-        QQWB.log.info("library is booting at client proxy mode"); 
-    }
-} else {
-
-    // IE will falls to here incorrectly since it lost the opener property after browser redirect in auth window
-    // May be firefox and opera has the same problem? i didn't test it.
-    // if (/redirectflag/.test(window.location.hash)) { // its in auth window, solve the opener problem (typically in IE)
-    //} else {
-        if (QQWB._domain.serverproxy !== window.location.href) { // scripts runs at client not server
-            QQWB.log.info("library is booting at plain client mode, waiting init signal..."); 
-            // adapt a solution
-            if (QQWB.browser.feature.postmessage) {
-                QQWB._solution.initSolution(QQWB._solution.HTML5_SOLUTION);
-            } else if (QQWB.browser.feature.flash) {
-                QQWB._solution.initSolution(QQWB._solution.FLASH_SOLUTION);
-            }
+    // auto adopt a solution to client(browser)
+    function initSolution() {
+        if (QQWB.browser.feature.postmessage) {
+            QQWB._solution.initSolution(QQWB._solution.HTML5_SOLUTION);
+        } else if (QQWB.browser.feature.flash) {
+            QQWB._solution.initSolution(QQWB._solution.FLASH_SOLUTION);
         } else {
-            QQWB.log.info("library is booting at plain server mode"); 
+            QQWB.log.error("init solution is called, but no solution for the browser");
         }
-    //}
-}
+    }
+
+    QQWB._tokenReadyDoor.lock(); // init must be called
+    QQWB._everythingReadyDoor.lock(); // token must be ready
+    QQWB._everythingReadyDoor.lock(); // document(DOM) must be ready
+    
+    QQWB.bind(QQWB.events.TOKEN_READY_EVENT, function () {
+        QQWB._everythingReadyDoor.unlock(); // unlock for token ready
+    });
+
+    if (inPopup) { // expected working for non-IE browser
+        // same origin policy test
+        QQWB.log.info("library booting at popup mode");
+        openerProp.location.href ? 
+            QQWB._token.resolveResponse(window.location.hash.split("#").pop(), openerProp) :
+            QQWB.log.critical("crossdomain login is not supported currently");
+
+        openerProp.QQWB._stopTrackingAuthWindowStatus(); // stop manaually close window timer
+        window.close();
+        return;
+    } 
+
+    if (inFrame && asServer && QQWB.browser.feature.postmessage) {
+        QQWB.log.info("library booting at server proxy mode");
+        var 
+			targetOrigin = "*", // we don't care who will handle the data
+            appWindow = parentProp; // the third-party application window
+
+        // post a message to the parent window indicate that server frame(itself) was successfully loaded
+        appWindow.postMessage("success", targetOrigin); 
+
+        // recieve message from appWindow as data transfer proxy
+		var messageHandler = function (e) {
+			// accept any origin
+			// we do strict api check here to protect from XSS/CSRF attack
+			//
+			var 
+			    data = QQWB.JSON.fromString(e.data),
+				id = data.id, // message id related to the deferred object
+				args = data.data, //
+				apiInterface = args[0]; //  the api interface should be the first argument
+
+			if (args[2].toLowerCase() == "xml") {
+				// if dataType is xml, the ajax will return a xml object, which can't call
+				// postMessage directly (will raise an exception) , instead we request to tranfer
+				// XML as String, then parse it back to XML object.
+				// io.js will fall to response.text
+				// api.js will detect that convert it back to xml
+				// @see io.js,api.js
+				args[2] = "xmltext";
+			}
+
+			if (!apiInterface) { // interface can not be empty
+				appWindow.postMessage(QQWB.JSON.toString({
+					id: id
+				   ,data: [-1, "interface can not be empty"]
+				}), targetOrigin);
+				QQWB.log.error("interface is empty");
+			} else {
+				// This is extremely important to protect from XSS/CSRF attack
+				if (!QQWB._apiProvider.isProvide(apiInterface)) {
+			    	appWindow.postMessage(QQWB.JSON.toString({
+			    		id: id
+			    	   ,data: [-1, "interface \"" + apiInterface +"\" is not supported"]
+			    	}), targetOrigin);
+				    QQWB.log.error("interface \"" + apiInterface +"\" is not allowed to be called");
+				} else {
+					// everything goes well
+					// we directly pass the data to the reciever regardless its success or not
+					//
+					QQWB.io._apiAjax.apply(this,args).complete(function () {
+			        	appWindow.postMessage(QQWB.JSON.toString({
+			        		id: id
+			        	   ,data: QQWB.Array.fromArguments(arguments)
+			        	}), targetOrigin);
+					});
+				}
+		   }
+        };
+
+        if (self.addEventListener) {
+            self.addEventListener("message", messageHandler, false);
+        } else if (window.attachEvent) {
+            self.attachEvent("onmessage", messageHandler);
+        }
+
+        return;
+    }
+    
+    QQWB.log.info("library booting at normal mode");
+    initSolution();
+
+}());
 
 // process document ready event
 if (!QQWB._isDocumentReady) { // we will try to trigger the ready event many times when it has a change to be ready

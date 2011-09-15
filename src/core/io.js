@@ -9,6 +9,7 @@
  * @module io
  * @requires base
  *           queryString
+ *           apiProvider
  *           deferred
  *           ext.XML
  *           ext.JSON
@@ -264,10 +265,14 @@ QQWB.extend("io", {
 
 			   // push to queue
                window.onFlashRequestComplete_8df046.callbacks.push(callback);
-
-	           QQWBFlashTransport.httpRequest(cfg.url,cfg.data,cfg.type);
-
+			   
+			   if (QQWBFlashTransport && QQWBFlashTransport.httpRequest) {
+			       QQWBFlashTransport.httpRequest(cfg.url,cfg.data,cfg.type);
+			   } else {
+			       QQWB.log.critical("flash transportation object error" + QQWBFlashTransportName);
+			   }
 		   }
+
 		  ,abort: function () {
 			  if (callback) {
 			      callback(0,1);
@@ -318,18 +323,27 @@ QQWB.extend("io", {
 	* @return {Object} promise object
 	*/
   ,flashAjax: function (opts) {
-       var deferred = QQWB.deferred.deferred();
+       var 
+           deferred = QQWB.deferred.deferred(),
+           default_opts = {
+               type: "get"
+              ,dataType: "json"
+           };
 
-	   if (!opts.type) {
-		   opts.type = "get";
-	   }
+       QQWB.extend(default_opts, opts, true);
 
-       QQWB.io._IOFlash(opts).send(function (status, statusText, responses, responseHeaders) {
-       	if (status !== 200) {
-       		deferred.reject(status, statusText);
-       	} else {
-       		deferred.resolve(status, statusText, responses, responseHeaders);
-       	}
+       QQWB.io._IOFlash(default_opts).send(function (status, statusText, responses, responseHeaders) {
+		   if (status !== 200) {
+       	       deferred.reject(status, statusText);
+       	   } else {
+			   // extract API error code from http header
+			   if (responseHeaders && QQWB._apiProvider.apiError.httpHeaderFlag.test(responseHeaders)) {
+				   var apiErrorCode = responseHeaders.match(QQWB._apiProvider.apiError.httpHeaderFlag)[1];
+				   deferred.reject(parseInt(apiErrorCode,10), QQWB._apiProvider.apiError[apiErrorCode]);
+               } else {
+                   deferred.resolve(status, statusText, responses, responseHeaders);
+               }
+       	   }
        });
 
 	   return deferred.promise();
@@ -356,7 +370,47 @@ QQWB.extend("io", {
 			if (status !== 200) {
 				deferred.reject(status, statusText);
 			} else {
-				deferred.resolve(status, statusText, responses, responseHeaders, dataType);
+			    // extract API error code from http header
+			    if (responseHeaders && QQWB._apiProvider.apiError.httpHeaderFlag.test(responseHeaders)) {
+			        var apiErrorCode = responseHeaders.match(QQWB._apiProvider.apiError.httpHeaderFlag)[1];
+				    deferred.reject(parseInt(apiErrorCode,10), QQWB._apiProvider.apiError[apiErrorCode]);
+                } else {
+				    deferred.resolve(status, statusText, responses, responseHeaders, dataType);
+                }
+			}
+		});
+
+		return deferred.promise();
+    }
+	/**
+	 * Ajax request sender
+	 *
+	 * Note:
+	 * 
+	 * same as ajax, the only difference is when ajax success, 
+	 * it only pass one response object as argument, this is the
+	 * function to expose to our root namespace
+	 * 
+	 * @access public
+	 * @param opts {Object} ajax settings
+	 * @return {Object} deferred object
+	 */
+   ,ajax2: function (opts) {
+
+       var 
+           deferred = QQWB.deferred.deferred(),
+           default_opts = {
+               type: "get"
+              ,dataType: "json"
+           };
+
+        QQWB.extend(default_opts, opts, true);
+
+		QQWB.io._IOAjax(default_opts).send(function (status, statusText, responses, responseHeaders, dataType) {
+			if (status !== 200) {
+				deferred.reject(status, statusText);
+			} else {
+				deferred.resolve(/*status, statusText, */responses/*, responseHeaders, dataType*/);
 			}
 		});
 
@@ -429,9 +483,9 @@ QQWB.extend("io", {
 
             window[callbackName] = _oldcallback; // restore back to original value
             
-            if (typeof window[callbackName] == "undefined") { // original value is undefined
-                delete window[callbackName]; // delete it
-            }
+            //if (typeof window[callbackName] == "undefined") { // original value is undefined
+                //delete window[callbackName]; // delete it
+            //}
         };
 
         QQWB.io._IOScript(default_opts).send(function (status, statusText) {
@@ -446,6 +500,6 @@ QQWB.extend("io", {
 });
 
 // expose to global namespace
-QQWB._alias("ajax",QQWB.io.ajax);
+QQWB._alias("ajax",QQWB.io.ajax2);
 QQWB._alias("jsonp",QQWB.io.jsonp);
 QQWB._alias("script",QQWB.io.script);

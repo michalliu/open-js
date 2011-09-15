@@ -110,7 +110,7 @@ QQWB.extend("_solution", {
                    }
 
                    // append the server frame to page
-                   QQWB.documentReady(function () {
+                   QQWB.everythingReady(function () {
                        QQWB.log.info("init html5 solution...");
                        serverframe = QQWB.dom.createHidden("iframe", {id: solution.id,src: QQWB._domain.serverproxy});
                        QQWB.dom.append(serverframe);
@@ -144,25 +144,25 @@ QQWB.extend("_solution", {
                    // reference for choosed solution object
                    solution = this[this.FLASH_SOLUTION];
 
-	        	   QQWB.documentReady(function () {
+	        	   QQWB.everythingReady(function () {
                        QQWB.log.info("init flash solution...");
 	        		   var resolveTimer,
 	        		       resolveTimeout = 10 * 1000,
 	        		       movieBox = QQWB.flash.load(QQWB._domain.flashproxy, function (moviename) {
 							  QQWB.log.info("flash solution initlized successfully");
 	        	              solution.readyState = 1;
-	        				  window["QQWBFlashTransport"] = QQWB.flash.getSWFObjectByName(moviename);
+							  window["QQWBFlashTransport"] = QQWB.flash.getSWFObjectByName(moviename);
 	        				  // clear the timer
 	        				  resolveTimer && clearTimeout(resolveTimer);
 	        	              solution.deferred.resolve();
                            });
 	        		   
                        // if solution didn't marked as resolved(success) after 30 seconds 
-	        		   // mark the solution has failed and do clean up
+	        		   // mark the solution to failed and do clean up
 	        		   resolveTimer = setTimeout(function () {
 	        	    		   if (!solution.deferred.isResolved()) {
 	        	    		       solution.readyState = 2;
-	        	    		       solution.deferred.reject(-1, "encounter error while loading proxy swf");
+	        	    		       solution.deferred.reject(-1, "encounter error while loading proxy swf, need newer flash player");
 	        	    		       // remove the box cotains the flash
 	        	    		       QQWB.dom.remove(movieBox);
 	        	    		   }
@@ -180,6 +180,7 @@ QQWB.extend("_solution", {
                if (QQWB.browser.feature.silverlight) {
                    // silverlight not implemented
                    ~1;
+                   QQWB.log.error("sorry, silverlight solution is not implemented");
                } else {
                    QQWB.log.error("can't init solution \"" + name) +"\",browser doesn't support silverlight or silverlight is disabled";
                    solutionInit.reject("browser not supported");

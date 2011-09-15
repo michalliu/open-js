@@ -55,4 +55,4 @@ QQWB.extend("XML",{
        }
        return xml;
     }
-});
+}, true/*overwrite toString method inherit from Object.prototype*/);

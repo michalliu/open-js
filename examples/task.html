@@ -1,0 +1,88 @@
+<!doctype html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+		<title>task</title>
+        <style>
+            div,textarea{font-size:12px;font-family:menlo,monaco,consolas}
+            textarea{width:600px;height:500px;}
+            .code{display:none;}
+        </style>
+        <!--[if lt IE 9 ]>
+        <script src="../tool/firebug-lite/content/firebug-lite-dev.js"></script>
+        <![endif]-->
+        <script src="../build/all.js"></script>
+        <script>
+            // 初始化库
+            T.init({appkey: "key001"});
+
+            // 执行任务
+            T.task(
+                   // 任务一: 取登录用户的信息
+                   T.api("/user/info")
+                   // 任务二: 取登录用户的主页时间线
+                  ,T.api("/statuses/home_timeline")
+                   // 其它任务 T.ajax, T.jsonp, T,script 等调用
+                  )
+             .success(function (userinfo, timeline) {
+                 T.documentReady(function () {
+                     document.all.result.innerHTML = "<p>userinfo:"
+                                                   + userinfo 
+                                                   + "</p><p>timeline:"
+                                                   + timeline
+                                                   + "</p>";
+                 })
+             })
+             .error(function (code, message) {
+                 T.documentReady(function () {
+                     document.all.result.innerHTML = "对不起，有错误发生"
+                                                   + code
+                                                   + ","
+                                                   + message;
+                 })
+             });
+        </script>
+	</head>
+    <!--[if lt IE 7 ]><body class="ie_6"><![endif]-->
+    <!--[if IE 7 ]><body class="ie_7"><![endif]-->
+    <!--[if IE 8 ]><body class="ie_8"><![endif]-->
+    <!--[if IE 9 ]><body class="ie_9"><![endif]-->
+    <!--[if (gt IE 9)|!(IE)]><!-->
+    <body>
+    <!--<![endif]-->
+
+    <p>
+    <div class="result" id="result"></div>
+    </p>
+
+    <p><a href="#" onclick="document.all.code.style.display='block';">显示代码</a></p>
+    <p class="code" id="code">
+    <textarea>
+            T.init({appkey: "key001"});
+
+            T.task(
+                   T.api("/user/info")
+                  ,T.api("/statuses/home_timeline")
+                  )
+             .success(function (userinfo, timeline) {
+                 T.documentReady(function () {
+                     document.all.result.innerHTML = "<p>userinfo:"
+                                                   + userinfo 
+                                                   + "</p><p>timeline:"
+                                                   + timeline
+                                                   + "</p>";
+                 })
+             })
+             .error(function (code, message) {
+                 T.documentReady(function () {
+                     document.all.result.innerHTML = "对不起，有错误发生"
+                                                   + code
+                                                   + ","
+                                                   + message;
+                 })
+             });
+    </textarea>
+    </p>
+	</body>
+</html>
+
