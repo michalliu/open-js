@@ -292,15 +292,7 @@ def build(modulenames, targetfile, createlog=False):
 
     finalSource = "".join(finalSource)
 
-    packer = JavaScriptPacker()
-
-    compressProcess = lambda s: packer.pack(s)
-    obfuscatProcess = lambda s: packer.pack(s, encoding=62)
-
     open(targetfile,"w+").write(finalSource)
-    basefile,extension = os.path.splitext(targetfile)
-    open("".join([basefile,".compress",extension]),"w+").write(compressProcess(finalSource))
-    open("".join([basefile,".obfuscated",extension]),"w+").write(obfuscatProcess(finalSource))
 
     if createlog:
         logfile = open("log.txt","w+")
@@ -308,6 +300,24 @@ def build(modulenames, targetfile, createlog=False):
         logfile.write("\n" * 2)
         logfile.write("\n".join(["<script src=\"" + source.path.replace(_CWD,"..").replace("\\","/") + "\"></script>" for source in sources]))
         logfile.close()
+
+    # packing javascript
+    basefile,extension = os.path.splitext(targetfile)
+    minifiedfile = "".join([basefile,".min",extension])
+
+    # pack javascript through uglifyjs
+    nodejs = os.path.join(_CWD, "tools", "node.exe")
+    uglifyjs = os.path.join(_CWD, "tools", "UglifyJS", "uglifyjs")
+    uglifyOptions = "-o %s" % minifiedfile
+
+    uglified = os.system("%s %s %s %s" % (nodejs, uglifyjs, uglifyOptions,targetfile))
+
+    #uglified success
+    if uglified != 0:
+        # pack javascript through python
+        packer = JavaScriptPacker()
+        open(minifiedfile,"w+").write(packer.pack(finalSource))
+
 ##
 ##
 ##

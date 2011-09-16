@@ -5,3 +5,13 @@ xmldata2JSON/
 # code packer - php version #
 #############################
 packer.php-1.1/
+
+# nodejs (required by uglifyjs) #
+#################################
+UglifyJS/
+
+# uglifyjs #
+############
+UglifyJS/
+
+
