@@ -2,16 +2,22 @@
 ##############################
 xmldata2JSON/
 
-# code packer - php version #
-#############################
+# code packer - php version                        #
+# http://joliclic.free.fr/php/javascript-packer/en/#
+####################################################
 packer.php-1.1/
 
 # nodejs (required by uglifyjs) #
+# http://nodejs.org/dist/       #
 #################################
-UglifyJS/
+node.exe
 
-# uglifyjs #
-############
+# uglifyjs                             #
+# https://github.com/mishoo/UglifyJS   #
+#                                      #
+# silightly modified version           #
+# https://github.com/michalliu/UglifyJS#
+########################################
 UglifyJS/
 
 
