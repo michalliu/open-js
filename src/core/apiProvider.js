@@ -10,6 +10,7 @@
  * @module apiProvider
  * @requires base
  *           static
+ *           common.String
  */
 QQWB.extend("_apiProvider", {
 	// api error
@@ -1432,5 +1433,16 @@ QQWB.extend("_apiProvider", {
         } else {
             return "";
         }
+    }
+    /**
+     * Enhance the compatbility of input value
+     *
+     * @access public
+     * @param apiInterface {String} the api interface
+     * @return {String} the api interface
+     */
+   ,compat: function (apiInterface) {
+    	!QQWB.String.startsWith(apiInterface,"/") && (apiInterface = "/" + apiInterface);
+        return apiInterface.toLowerCase();
     }
 });

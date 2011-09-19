@@ -11,7 +11,7 @@
  *           core.time
  *           core.cookie
  *           core.io
- *           ext.String
+ *           common.String
  */
 QQWB.extend("_token",{
     /**

@@ -742,97 +742,6 @@ QQWB.extend("log", {
 /**
  * Tencent weibo javascript library
  *
- * String extension
- *
- * //TODO: encoding libraries
- *
- * http://www.cnblogs.com/cgli/archive/2011/05/17/2048869.html
- * http://www.blueidea.com/tech/web/2006/3622.asp
- *
- * @author michalliu
- * @version 1.0
- * @package ext
- * @module String
- * @requires base
- */
-QQWB.extend("String",{
-    _trimLeft: /^\s+/
-   ,_trimRight: /\s+$/
-    /**
-     * Determine whether an object is string
-     *
-     * @access public
-     * @param source {Mixed} anything
-     * @return {Boolean}
-     */
-   ,isString: function (source) {
-        return typeof source === "string";
-    }
-
-    /**
-     * Strip left blank
-     *
-     * @access public
-     * @param source {Mixed} anything
-     * @return {String}
-     */
-   ,ltrim: function (source) {
-       return source == null ? "" : source.toString().replace(this._trimLeft,"");
-    }
-
-    /**
-     * Strip right blank
-     *
-     * @access public
-     * @param source {Mixed} anything
-     * @return {String}
-     */
-   ,rtrim: function (source) {
-       return source == null ? "" : source.toString().replace(this._trimRight,"");
-    }
-
-    /**
-     * Strip blank at left and right
-     *
-     * @access public
-     * @param source {Mixed} anything
-     * @return {String}
-     */
-    ,trim: String.prototype.trim ? function (source) {
-            return source == null ? "" : String.prototype.trim.call(source);
-        } : function (source) {
-            return source == null ? "" : source.toString().replace(this._trimLeft,"").replace(this._trimRight,"");
-        } 
-
-	/**
-	 * Determine whether needle at the front of str
-	 *
-	 * @access public
-	 * @param source {Mixed} anything
-	 * @return {Boolean}
-	 */
-	,startsWith: String.prototype.startsWith ? function (source, needle) {
-			return source == null ? false : String.prototype.startsWith.call(source, needle);
-		} : function (source, needle) {
-			return source == null ? false : source.toString().indexOf(needle) == 0;
-		} 
-
-	/**
-	 * Determine whether needle at the end of str
-	 *
-	 * @access public
-	 * @param source {Mixed} anything
-	 * @return {Boolean}
-	 */
-	,endsWith: String.prototype.endsWith ? function (source, needle) {
-			return source == null ? false : String.prototype.endsWith.call(source, needle);
-		} : function (source, needle) {
-			return source == null ? false : source.toString().lastIndexOf(needle) >= 0 && source.toString().lastIndexOf(needle) + needle.length == source.length;
-		} 
-});
-/**
- * Tencent weibo javascript library
- *
  * Cookie manipulation
  *
  * @author michalliu
@@ -919,6 +828,155 @@ QQWB.extend("cookie", {
 /**
  * Tencent weibo javascript library
  *
+ * String extension
+ *
+ * //TODO: encoding libraries
+ *
+ * http://www.cnblogs.com/cgli/archive/2011/05/17/2048869.html
+ * http://www.blueidea.com/tech/web/2006/3622.asp
+ *
+ * @author michalliu
+ * @version 1.0
+ * @package common
+ * @module String
+ * @requires base
+ */
+QQWB.extend("String",{
+    _trimLeft: /^\s+/
+   ,_trimRight: /\s+$/
+    /**
+     * Determine whether an object is string
+     *
+     * @access public
+     * @param source {Mixed} anything
+     * @return {Boolean}
+     */
+   ,isString: function (source) {
+        return typeof source === "string";
+    }
+
+    /**
+     * Strip left blank
+     *
+     * @access public
+     * @param source {Mixed} anything
+     * @return {String}
+     */
+   ,ltrim: function (source) {
+       return source == null ? "" : source.toString().replace(this._trimLeft,"");
+    }
+
+    /**
+     * Strip right blank
+     *
+     * @access public
+     * @param source {Mixed} anything
+     * @return {String}
+     */
+   ,rtrim: function (source) {
+       return source == null ? "" : source.toString().replace(this._trimRight,"");
+    }
+
+    /**
+     * Strip blank at left and right
+     *
+     * @access public
+     * @param source {Mixed} anything
+     * @return {String}
+     */
+    ,trim: String.prototype.trim ? function (source) {
+            return source == null ? "" : String.prototype.trim.call(source);
+        } : function (source) {
+            return source == null ? "" : source.toString().replace(this._trimLeft,"").replace(this._trimRight,"");
+        } 
+
+	/**
+	 * Determine whether needle at the front of str
+	 *
+	 * @access public
+	 * @param source {Mixed} anything
+	 * @return {Boolean}
+	 */
+	,startsWith: String.prototype.startsWith ? function (source, needle) {
+			return source == null ? false : String.prototype.startsWith.call(source, needle);
+		} : function (source, needle) {
+			return source == null ? false : source.toString().indexOf(needle) == 0;
+		} 
+
+	/**
+	 * Determine whether needle at the end of str
+	 *
+	 * @access public
+	 * @param source {Mixed} anything
+	 * @return {Boolean}
+	 */
+	,endsWith: String.prototype.endsWith ? function (source, needle) {
+			return source == null ? false : String.prototype.endsWith.call(source, needle);
+		} : function (source, needle) {
+			return source == null ? false : source.toString().lastIndexOf(needle) >= 0 && source.toString().lastIndexOf(needle) + needle.length == source.length;
+		} 
+});
+/**
+ * Tencent weibo javascript library
+ *
+ * String extension
+ *
+ * @author michalliu
+ * @version 1.0
+ * @package common
+ * @module XML
+ * @requires base
+ */
+QQWB.extend("XML",{
+    /**
+     * Determine is XML object or not
+     *
+     * @access public
+     * @param xml {Object} xml object
+     * @return {Boolean}
+     */
+    isXML: function (xml) {
+       //TODO: not implement yet
+    }
+    /**
+     * xml object to string
+     *
+     * @access public
+     * @param xml {Object} xml object
+     * @return {String}
+     */
+   ,toString: function (xml) {
+        var str;
+        if (window.ActiveXObject) {
+            str = xml.xml;
+        } else {
+            str = (new XMLSerializer()).serializeToString(xml);
+        }
+        return str;
+    }
+    /**
+     * create xml object from string
+     *
+     * @access public
+     * @param str {String} xml string
+     * @return {Object} xml object
+     */
+   ,fromString: function (str) {
+       var xml;
+       if (window.ActiveXObject) {
+           xml = new ActiveXObject("Microsoft.XMLDOM");
+           xml.async = "false";
+           xml.loadXML(str);
+       } else {
+           var parser = new DOMParser();
+           xml = parser.parseFromString(str, "text/xml");
+       }
+       return xml;
+    }
+}, true/*overwrite toString method inherit from Object.prototype*/);
+/**
+ * Tencent weibo javascript library
+ *
  * static variables
  *
  * @author michalliu
@@ -949,6 +1007,7 @@ QQWB.extend("_static",{
  * @module apiProvider
  * @requires base
  *           static
+ *           common.String
  */
 QQWB.extend("_apiProvider", {
 	// api error
@@ -2372,65 +2431,439 @@ QQWB.extend("_apiProvider", {
             return "";
         }
     }
+    /**
+     * Enhance the compatbility of input value
+     *
+     * @access public
+     * @param apiInterface {String} the api interface
+     * @return {String} the api interface
+     */
+   ,compat: function (apiInterface) {
+    	!QQWB.String.startsWith(apiInterface,"/") && (apiInterface = "/" + apiInterface);
+        return apiInterface.toLowerCase();
+    }
 });
 /**
  * Tencent weibo javascript library
  *
- * String extension
+ * Querystring encoder and decoder
  *
  * @author michalliu
  * @version 1.0
- * @package ext
- * @module XML
+ * @package core
+ * @module queryString
  * @requires base
  */
-QQWB.extend("XML",{
+
+QQWB.extend("queryString",{
     /**
-     * Determine is XML object or not
+     * Encode parameter object to query string
      *
      * @access public
-     * @param xml {Object} xml object
+     * @param params {Object} the object contains params
+     *        opt_sep {String} the seprator string, default is '&'
+     *        opt_encode {Function} the function to encode param, default is encodeURIComponent
+     * @return {String} the encoded query string
+     */
+    encode: function (params, opt_sep, opt_encode) {
+        var 
+            regexp = /%20/g,
+            sep = opt_sep || '&',
+            encode = opt_encode || encodeURIComponent,
+            pairs = [];
+
+        for (var key in params) {
+            if (params.hasOwnProperty(key)) {
+                var val = params[key];
+                if (val !== null && typeof val != 'undefined') {
+                    pairs.push(encode(key).replace(regexp,"+") + "=" + encode(val).replace(regexp,"+"));
+                }
+            }
+        }
+
+        pairs.sort();
+        return pairs.join(sep);
+    }
+    /**
+     * Decode query string to parameter object
+     *
+     * @param str {String} query string
+     *        opt_sep {String} the seprator string default is '&'
+     *        opt_decode {Function} the function to decode string default is decodeURIComponent
+     * @return {Object} the parameter object
+     */
+   ,decode: function (str, opt_sep, opt_decode) {
+       var
+           decode = opt_decode || decodeURIComponent,
+           sep = opt_sep || '&',
+           parts = str.split(sep),
+           params = {},
+           pair;
+
+       for (var i = 0,l = parts.length; i<l; i++) {
+           pair = parts[i].split('=',2);
+           if (pair && pair[0]) {
+               params[decode(pair[0])] = decode(pair[1]);
+           }
+       }
+
+       return params;
+    }
+});
+/**
+ * Tencent weibo javascript library
+ *
+ * Function extension
+ *
+ * @author michalliu
+ * @version 1.0
+ * @package common
+ * @module Function
+ * @requires base
+ */
+QQWB.extend("Function",{
+    /**
+     * Determine whether an object is Function
+     *
+     * @access public
+     * @param arg {Mixed} anything
      * @return {Boolean}
      */
-    isXML: function (xml) {
-       //TODO: not implement yet
+    isFunction: function (arg) {
+        return typeof arg === "function";
     }
+});
+/**
+ * Tencent weibo javascript library
+ *
+ * Array extension
+ *
+ * @author michalliu
+ * @version 1.0
+ * @package common
+ * @module Array
+ * @requires base
+ *           String
+ */
+QQWB.extend("Array",{
     /**
-     * xml object to string
+     * Get whether an object is array
      *
      * @access public
-     * @param xml {Object} xml object
-     * @return {String}
+     * @param arg {Mixed} anything
+     * @return {Boolean}
      */
-   ,toString: function (xml) {
-        var str;
-        if (window.ActiveXObject) {
-            str = xml.xml;
-        } else {
-            str = (new XMLSerializer()).serializeToString(xml);
-        }
-        return str;
+    isArray: function (arg) {
+        return Object.prototype.toString.call(arg) === "[object Array]";
     }
     /**
-     * create xml object from string
+     * Get whether an object in the array
      *
      * @access public
-     * @param str {String} xml string
-     * @return {Object} xml object
+     * @param arr {Array} the array object
+     *        arg {Mixed} anything
+     * @return {Boolean}
      */
-   ,fromString: function (str) {
-       var xml;
-       if (window.ActiveXObject) {
-           xml = new ActiveXObject("Microsoft.XMLDOM");
-           xml.async = "false";
-           xml.loadXML(str);
-       } else {
-           var parser = new DOMParser();
-           xml = parser.parseFromString(str, "text/xml");
+   ,inArray: function (arr, arg) {
+       for (var i=0,l=arr.length; i<l; i++) {
+           if (arg === arr[i]) {
+               return true;
+           }
        }
-       return xml;
+       return false;
     }
-}, true/*overwrite toString method inherit from Object.prototype*/);
+    /**
+     * Build array from String
+     *
+     * @access public
+     * @param source {String} the source string
+     * @param optSep {Regexp|String} the seprator passed into String.split method
+     * @param optMax {Number} the maxCount of the newly builded array
+     * @return {Array}
+     */
+   ,fromString: function (source, optSep, optMax) {
+       if (!QQWB.String.isString(source)) {
+           return [];
+       } 
+       optSep = optSep || "";
+       return optMax ? source.split(optSep, optMax) : source.split(optSep);
+    }
+    /**
+     * Build array from an array-like object
+     *
+     * @access public
+     * @param source {Object} the source object
+     * @param optMax {Number} the maxCount of the newly builded array
+     * @return {Array}
+     */
+   ,fromArguments: function (source, optMax) {
+       if (typeof source !== "object") {
+           return [];
+       } 
+       return optMax ? Array.prototype.slice.call(source, optMax) : Array.prototype.slice.call(source);
+    }
+    /**
+     * Argument object to array
+     * 
+     * @deprecated use fromString,fromArguments instead
+     * @access public
+     * @param arg {Mixed} source
+     * @return {Array}
+     */
+   ,toArray: function (arg) {
+       if (typeof arg == "string") {
+           return arg.split("");
+       } else if (typeof arg == "object") {
+           return Array.prototype.slice.call(arg,0);
+       } else {
+           return this.toArray(arg.toString());
+       }
+    }
+    /**
+     * Enumerate the array
+     *
+     * Note:
+     * If handler executed and returned false,
+     * The enumeration will stop immediately
+     *
+     * @access public
+     * @param arr {Array} the array object
+     *        handler {Function} the callback function
+     */
+   ,each: function (arr, handler) {
+       for (var i=0,l=arr.length; i<l; i++) {
+           if (false === handler(i,arr[i])) {
+               break;
+           }
+       }
+    }
+});
+/**
+ * Tencent weibo javascript library
+ *
+ * Deferred object
+ *
+ * Note:
+ *
+ * Code is ported from jquery
+ * A good explaination at 
+ * http://stackoverflow.com/questions/4866721/what-are-deferred-objects/4867928#comment-8591160
+ *
+ * @author michalliu
+ * @version 1.0
+ * @package core
+ * @module deferred
+ * @requires base
+ *           common.Array
+ *           common.Function
+ */
+
+QQWB.extend("deferred", {
+	 /**
+	  * Deferered object read-only methods
+	  */
+	_promiseMethods: "done fail isResolved isRejected promise then always success error complete whatever".split(" ")
+	/**
+	 * Create a simple deferred object (one callback list)
+	 *
+	 * @access private
+	 * @return a deferred object
+	 */
+   ,_deferred: function () {
+		var 
+		    callbacks = [], // callback list
+			fired, // stored [ context, args], use to fire again
+			firing, // to avoid firing when already doing so
+			cancelled, // flag to know if the deferred has been cancelled
+			deferred = { // the deferred itself
+				done: function () {
+					if (!cancelled) {
+						var 
+						    args = arguments
+						   ,elem
+						   ,_fired;
+
+						   // we should consider about fired status here
+						   // this is neccesary to handle how done deals
+						   // with arrays recursively
+						   if (fired) {
+							   _fired = fired;
+							   fired = 0;
+						   }
+
+						   // add callbacks smartly
+						   for (var i=0,l=args.length; i<l; i++) { 
+							    elem = args[i];
+							    if (QQWB.Array.isArray(elem)) {
+								   deferred.done.apply(deferred, elem);
+							   } else if (QQWB.Function.isFunction(elem)) {
+								   callbacks.push(elem);
+						    	}
+						   }
+
+						   // consider fired here
+						   // if it's already been resolved then call resolveWith
+						   // using the cached context and arguments to call the 
+						   // callbacks immediatly
+						   if (_fired) {
+							   deferred.resolveWith(_fired[0], _fired[1]);
+						   }
+					}
+					return this;
+				}
+
+				// resolve with given context and args
+			   ,resolveWith: function (context, args) {
+				   // if its been cancelled then we can't resolve
+				   // if it has fired then we can't fire again
+				   // if it's currently firing then we can't fire
+				   if (!cancelled && !fired && !firing) {
+					   args = args || [];
+					   firing = 1;
+					   // using try {} finally {} block because you are
+					   // calling external callbacks, maybe these callbacks
+					   // made by the user which are not bugfree.
+
+					   // the finally block will always run no matter how bad
+					   // the internal code is
+					   try { 
+					       while (callbacks[0]) {
+							   callbacks.shift().apply(context, args);// first in first out
+						   }
+					   }
+					   finally {
+						   fired = [context, args]; // cache the the context and args
+						   firing = 0;
+					   }
+				   }
+				   return this;
+			    }
+
+				// Resolve with this as context and given arguments
+			   ,resolve: function () {
+				   deferred.resolveWith(this, arguments);
+				   return this;
+			    }
+
+				// Has this deferred been resolved?
+			   ,isResolved: function () {
+				   return !!(firing || fired);
+			    }
+				// Cancel
+			   ,cancel: function () {
+				   cancelled = 1;
+				   callbacks = [];
+				   return this;
+			    }
+	    };
+		return deferred;
+	}
+	/**
+	 * Full fledged deferred (two callback list success and fail)
+	 */
+   ,deferred: function (func) {
+	   var
+	       promise,
+	       deferred = QQWB.deferred._deferred(),
+	       failDeferred = QQWB.deferred._deferred();
+
+	   // Add errorDeferred methods, then and promise
+	   QQWB.extend(deferred, {
+		   // send to failed deferred object
+		   fail: failDeferred.done
+		   // send to sucess callback and failcallbacks at a time
+		  ,then: function (doneCallbacks, failCallbacks) {
+			  deferred.done(doneCallbacks).fail(failCallbacks);
+			  return this;
+		   }
+		   // send to success callback and to fail callback aslo
+		  ,always: function () {
+			  return deferred.done.apply(deferred, arguments).fail.apply(this, arguments);
+		   }
+		   // invoke callbacks in failed deferred with context and arguments
+		  ,rejectWith: failDeferred.resolveWith
+		   // invoke callbacks in failed deferred
+		  ,reject: failDeferred.resolve
+		   // is callbacks in failed deferred invoked
+		  ,isRejected: failDeferred.isResolved
+		  // promise to return a read-only copy(cant call resolve resolveWith
+		  // reject and rejectWith) of deferred
+		  ,promise: function (obj) {
+			  if (obj == null) {
+				  if (promise) {
+				      return promise;
+				  }
+				  promise = obj = {};
+			  }
+			  var i = QQWB.deferred._promiseMethods.length;
+			  while (i--) {
+				  obj[QQWB.deferred._promiseMethods[i]] = deferred[QQWB.deferred._promiseMethods[i]];
+			  }
+			  return obj;
+		   }
+	   });
+
+	   // lovely alternative function names
+	   deferred.success = deferred.done;
+       deferred.error = deferred.fail;
+       deferred.complete = deferred.whatever = deferred.always;
+
+	   // funciton either success or fail
+	   // if success fail deferer will cancel,vice versa
+	   deferred.done(failDeferred.cancel).fail(deferred.cancel);
+
+	   // unexpose cancel
+	   delete deferred.cancel;
+
+	   // a chance allow outer function to get a pointer to deferred object
+	   func &&  func.call(deferred, deferred);
+
+	   return deferred;
+    }
+	/**
+	 * Deferred helper
+	 */
+   ,when: function (firstParam) {
+	   var 
+	       args = arguments,
+		   length = args.length,
+		   count = length,
+		   deferred = length <= 1 && firstParam && QQWB.Function.isFunction(firstParam.promise) ?
+		              firstParam :
+					  QQWB.deferred.deferred(); // generate a deferred object or use the exists one
+
+	    function resolveFunc (i) {
+			return function (value) {
+				args[i] = arguments.length > 1 ? QQWB.Array.fromArguments(arguments) : value;
+				if (!(--count)) { // the last operation is resolved, resolve the when deffered
+					deferred.resolveWith(deferred, QQWB.Array.fromArguments(args));
+				}
+			};
+		}
+
+		if (length > 1) { // more than one deferred object
+		    for ( var i=0; i < length; i++) {
+				if (args[i] && QQWB.Function.isFunction(args[i].promise)) { // arg is deferred object
+				    // deferred.reject will called if any operation in when in rejected
+				    args[i].promise().then(resolveFunc(i),deferred.reject);
+				} else { // ingore arg that not a deferred object
+					--count; // total arg -- 
+				}
+
+				if (!count) { // nothing is deferred
+				    deferred.resolveWith (deferred, args);// let new deferred object handle it
+				}
+			}
+		} else if ( deferred !== firstParam) {
+			deferred.resolveWith(deferred, length ? [firstParam] : []);
+		}
+
+		return deferred.promise();
+    }
+});
+
+// expose to global namespace
+QQWB._alias(["task","when"], QQWB.deferred.when);
 /*
  * @author crockford
  * @url https://raw.github.com/douglascrockford/JSON-js/master/json2.js
@@ -2924,7 +3357,7 @@ if (!JSON) {
  *
  * @author michalliu
  * @version 1.0
- * @package ext
+ * @package common
  * @module JSON
  * @requires base
  *           String
@@ -3003,427 +3436,6 @@ QQWB.extend("JSON",{
 /**
  * Tencent weibo javascript library
  *
- * Querystring encoder and decoder
- *
- * @author michalliu
- * @version 1.0
- * @package core
- * @module queryString
- * @requires base
- */
-
-QQWB.extend("queryString",{
-    /**
-     * Encode parameter object to query string
-     *
-     * @access public
-     * @param params {Object} the object contains params
-     *        opt_sep {String} the seprator string, default is '&'
-     *        opt_encode {Function} the function to encode param, default is encodeURIComponent
-     * @return {String} the encoded query string
-     */
-    encode: function (params, opt_sep, opt_encode) {
-        var 
-            regexp = /%20/g,
-            sep = opt_sep || '&',
-            encode = opt_encode || encodeURIComponent,
-            pairs = [];
-
-        for (var key in params) {
-            if (params.hasOwnProperty(key)) {
-                var val = params[key];
-                if (val !== null && typeof val != 'undefined') {
-                    pairs.push(encode(key).replace(regexp,"+") + "=" + encode(val).replace(regexp,"+"));
-                }
-            }
-        }
-
-        pairs.sort();
-        return pairs.join(sep);
-    }
-    /**
-     * Decode query string to parameter object
-     *
-     * @param str {String} query string
-     *        opt_sep {String} the seprator string default is '&'
-     *        opt_decode {Function} the function to decode string default is decodeURIComponent
-     * @return {Object} the parameter object
-     */
-   ,decode: function (str, opt_sep, opt_decode) {
-       var
-           decode = opt_decode || decodeURIComponent,
-           sep = opt_sep || '&',
-           parts = str.split(sep),
-           params = {},
-           pair;
-
-       for (var i = 0,l = parts.length; i<l; i++) {
-           pair = parts[i].split('=',2);
-           if (pair && pair[0]) {
-               params[decode(pair[0])] = decode(pair[1]);
-           }
-       }
-
-       return params;
-    }
-});
-/**
- * Tencent weibo javascript library
- *
- * Function extension
- *
- * @author michalliu
- * @version 1.0
- * @package ext
- * @module Function
- * @requires base
- */
-QQWB.extend("Function",{
-    /**
-     * Determine whether an object is Function
-     *
-     * @access public
-     * @param arg {Mixed} anything
-     * @return {Boolean}
-     */
-    isFunction: function (arg) {
-        return typeof arg === "function";
-    }
-});
-/**
- * Tencent weibo javascript library
- *
- * Array extension
- *
- * @author michalliu
- * @version 1.0
- * @package ext
- * @module Array
- * @requires base
- *           String
- */
-QQWB.extend("Array",{
-    /**
-     * Get whether an object is array
-     *
-     * @access public
-     * @param arg {Mixed} anything
-     * @return {Boolean}
-     */
-    isArray: function (arg) {
-        return Object.prototype.toString.call(arg) === "[object Array]";
-    }
-    /**
-     * Get whether an object in the array
-     *
-     * @access public
-     * @param arr {Array} the array object
-     *        arg {Mixed} anything
-     * @return {Boolean}
-     */
-   ,inArray: function (arr, arg) {
-       for (var i=0,l=arr.length; i<l; i++) {
-           if (arg === arr[i]) {
-               return true;
-           }
-       }
-       return false;
-    }
-    /**
-     * Build array from String
-     *
-     * @access public
-     * @param source {String} the source string
-     * @param optSep {Regexp|String} the seprator passed into String.split method
-     * @param optMax {Number} the maxCount of the newly builded array
-     * @return {Array}
-     */
-   ,fromString: function (source, optSep, optMax) {
-       if (!QQWB.String.isString(source)) {
-           return [];
-       } 
-       optSep = optSep || "";
-       return optMax ? source.split(optSep, optMax) : source.split(optSep);
-    }
-    /**
-     * Build array from an array-like object
-     *
-     * @access public
-     * @param source {Object} the source object
-     * @param optMax {Number} the maxCount of the newly builded array
-     * @return {Array}
-     */
-   ,fromArguments: function (source, optMax) {
-       if (typeof source !== "object") {
-           return [];
-       } 
-       return optMax ? Array.prototype.slice.call(source, optMax) : Array.prototype.slice.call(source);
-    }
-    /**
-     * Argument object to array
-     * 
-     * @deprecated use fromString,fromArguments instead
-     * @access public
-     * @param arg {Mixed} source
-     * @return {Array}
-     */
-   ,toArray: function (arg) {
-       if (typeof arg == "string") {
-           return arg.split("");
-       } else if (typeof arg == "object") {
-           return Array.prototype.slice.call(arg,0);
-       } else {
-           return this.toArray(arg.toString());
-       }
-    }
-    /**
-     * Enumerate the array
-     *
-     * Note:
-     * If handler executed and returned false,
-     * The enumeration will stop immediately
-     *
-     * @access public
-     * @param arr {Array} the array object
-     *        handler {Function} the callback function
-     */
-   ,each: function (arr, handler) {
-       for (var i=0,l=arr.length; i<l; i++) {
-           if (false === handler(i,arr[i])) {
-               break;
-           }
-       }
-    }
-});
-/**
- * Tencent weibo javascript library
- *
- * Deferred object
- *
- * Note:
- *
- * Code is ported from jquery
- * A good explaination at 
- * http://stackoverflow.com/questions/4866721/what-are-deferred-objects/4867928#comment-8591160
- *
- * @author michalliu
- * @version 1.0
- * @package core
- * @module deferred
- * @requires base
- *           ext.Array
- *           ext.Function
- */
-
-QQWB.extend("deferred", {
-	 /**
-	  * Deferered object read-only methods
-	  */
-	_promiseMethods: "done fail isResolved isRejected promise then always success error complete whatever".split(" ")
-	/**
-	 * Create a simple deferred object (one callback list)
-	 *
-	 * @access private
-	 * @return a deferred object
-	 */
-   ,_deferred: function () {
-		var 
-		    callbacks = [], // callback list
-			fired, // stored [ context, args], use to fire again
-			firing, // to avoid firing when already doing so
-			cancelled, // flag to know if the deferred has been cancelled
-			deferred = { // the deferred itself
-				done: function () {
-					if (!cancelled) {
-						var 
-						    args = arguments
-						   ,elem
-						   ,_fired;
-
-						   // we should consider about fired status here
-						   // this is neccesary to handle how done deals
-						   // with arrays recursively
-						   if (fired) {
-							   _fired = fired;
-							   fired = 0;
-						   }
-
-						   // add callbacks smartly
-						   for (var i=0,l=args.length; i<l; i++) { 
-							    elem = args[i];
-							    if (QQWB.Array.isArray(elem)) {
-								   deferred.done.apply(deferred, elem);
-							   } else if (QQWB.Function.isFunction(elem)) {
-								   callbacks.push(elem);
-						    	}
-						   }
-
-						   // consider fired here
-						   // if it's already been resolved then call resolveWith
-						   // using the cached context and arguments to call the 
-						   // callbacks immediatly
-						   if (_fired) {
-							   deferred.resolveWith(_fired[0], _fired[1]);
-						   }
-					}
-					return this;
-				}
-
-				// resolve with given context and args
-			   ,resolveWith: function (context, args) {
-				   // if its been cancelled then we can't resolve
-				   // if it has fired then we can't fire again
-				   // if it's currently firing then we can't fire
-				   if (!cancelled && !fired && !firing) {
-					   args = args || [];
-					   firing = 1;
-					   // using try {} finally {} block because you are
-					   // calling external callbacks, maybe these callbacks
-					   // made by the user which are not bugfree.
-
-					   // the finally block will always run no matter how bad
-					   // the internal code is
-					   try { 
-					       while (callbacks[0]) {
-							   callbacks.shift().apply(context, args);// first in first out
-						   }
-					   }
-					   finally {
-						   fired = [context, args]; // cache the the context and args
-						   firing = 0;
-					   }
-				   }
-				   return this;
-			    }
-
-				// Resolve with this as context and given arguments
-			   ,resolve: function () {
-				   deferred.resolveWith(this, arguments);
-				   return this;
-			    }
-
-				// Has this deferred been resolved?
-			   ,isResolved: function () {
-				   return !!(firing || fired);
-			    }
-				// Cancel
-			   ,cancel: function () {
-				   cancelled = 1;
-				   callbacks = [];
-				   return this;
-			    }
-	    };
-		return deferred;
-	}
-	/**
-	 * Full fledged deferred (two callback list success and fail)
-	 */
-   ,deferred: function (func) {
-	   var
-	       promise,
-	       deferred = QQWB.deferred._deferred(),
-	       failDeferred = QQWB.deferred._deferred();
-
-	   // Add errorDeferred methods, then and promise
-	   QQWB.extend(deferred, {
-		   // send to failed deferred object
-		   fail: failDeferred.done
-		   // send to sucess callback and failcallbacks at a time
-		  ,then: function (doneCallbacks, failCallbacks) {
-			  deferred.done(doneCallbacks).fail(failCallbacks);
-			  return this;
-		   }
-		   // send to success callback and to fail callback aslo
-		  ,always: function () {
-			  return deferred.done.apply(deferred, arguments).fail.apply(this, arguments);
-		   }
-		   // invoke callbacks in failed deferred with context and arguments
-		  ,rejectWith: failDeferred.resolveWith
-		   // invoke callbacks in failed deferred
-		  ,reject: failDeferred.resolve
-		   // is callbacks in failed deferred invoked
-		  ,isRejected: failDeferred.isResolved
-		  // promise to return a read-only copy(cant call resolve resolveWith
-		  // reject and rejectWith) of deferred
-		  ,promise: function (obj) {
-			  if (obj == null) {
-				  if (promise) {
-				      return promise;
-				  }
-				  promise = obj = {};
-			  }
-			  var i = QQWB.deferred._promiseMethods.length;
-			  while (i--) {
-				  obj[QQWB.deferred._promiseMethods[i]] = deferred[QQWB.deferred._promiseMethods[i]];
-			  }
-			  return obj;
-		   }
-	   });
-
-	   // lovely alternative function names
-	   deferred.success = deferred.done;
-       deferred.error = deferred.fail;
-       deferred.complete = deferred.whatever = deferred.always;
-
-	   // funciton either success or fail
-	   // if success fail deferer will cancel,vice versa
-	   deferred.done(failDeferred.cancel).fail(deferred.cancel);
-
-	   // unexpose cancel
-	   delete deferred.cancel;
-
-	   // a chance allow outer function to get a pointer to deferred object
-	   func &&  func.call(deferred, deferred);
-
-	   return deferred;
-    }
-	/**
-	 * Deferred helper
-	 */
-   ,when: function (firstParam) {
-	   var 
-	       args = arguments,
-		   length = args.length,
-		   count = length,
-		   deferred = length <= 1 && firstParam && QQWB.Function.isFunction(firstParam.promise) ?
-		              firstParam :
-					  QQWB.deferred.deferred(); // generate a deferred object or use the exists one
-
-	    function resolveFunc (i) {
-			return function (value) {
-				args[i] = arguments.length > 1 ? QQWB.Array.fromArguments(arguments) : value;
-				if (!(--count)) { // the last operation is resolved, resolve the when deffered
-					deferred.resolveWith(deferred, QQWB.Array.fromArguments(args));
-				}
-			};
-		}
-
-		if (length > 1) { // more than one deferred object
-		    for ( var i=0; i < length; i++) {
-				if (args[i] && QQWB.Function.isFunction(args[i].promise)) { // arg is deferred object
-				    // deferred.reject will called if any operation in when in rejected
-				    args[i].promise().then(resolveFunc(i),deferred.reject);
-				} else { // ingore arg that not a deferred object
-					--count; // total arg -- 
-				}
-
-				if (!count) { // nothing is deferred
-				    deferred.resolveWith (deferred, args);// let new deferred object handle it
-				}
-			}
-		} else if ( deferred !== firstParam) {
-			deferred.resolveWith(deferred, length ? [firstParam] : []);
-		}
-
-		return deferred.promise();
-    }
-});
-
-// expose to global namespace
-QQWB._alias(["task","when"], QQWB.deferred.when);
-/**
- * Tencent weibo javascript library
- *
  * Input and output,AJAX,JSONP
  *
  * @author michalliu
@@ -3434,8 +3446,8 @@ QQWB._alias(["task","when"], QQWB.deferred.when);
  *           queryString
  *           apiProvider
  *           deferred
- *           ext.XML
- *           ext.JSON
+ *           common.XML
+ *           common.JSON
  */
 
 QQWB.extend("io", {
@@ -3938,7 +3950,7 @@ QQWB._alias("script",QQWB.io.script);
  *           core.time
  *           core.cookie
  *           core.io
- *           ext.String
+ *           common.String
  */
 QQWB.extend("_token",{
     /**
@@ -4201,7 +4213,7 @@ QQWB.extend("_token",{
  * @package event
  * @module eventProvider
  * @requires base
- *           ext.Array
+ *           common.Array
  */
 QQWB.extend("_eventProvider",{
 
@@ -4645,9 +4657,9 @@ QQWB.extend("",{
  * @package core
  * @module api
  * @requires base
- *           ext.XML
- *           ext.Array
- *           ext.JSON
+ *           common.XML
+ *           common.Array
+ *           common.JSON
  *           apiProvider
  *           deferred
  *           auth.token
@@ -4656,6 +4668,7 @@ QQWB.extend("",{
 
 QQWB.provide("api", function (api, apiParams, optDataType, optType, optSolution) {
 
+	api = this._apiProvider.compat(api);
 	apiParams = apiParams || {};
     optDataType = (optDataType || "json").toLowerCase();
     optType = optType || "GET";
@@ -4924,10 +4937,11 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optSolution)
  * @module man
  * @requires base
  *           apiProvider
- *           ext.JSON
+ *           common.JSON
  */
 
 QQWB.provide("man", function (api) {
+	api = this._apiProvider.compat(api);
     return this._apiProvider.getDescriptor(api) ? QQWB.JSON.toString(this._apiProvider.getDescriptor(api)) : "no such api";
 });
 
@@ -4941,7 +4955,7 @@ QQWB.provide("man", function (api) {
  * @package core
  * @module dom
  * @requires base
- *           ext.String
+ *           common.String
  */
 
 QQWB.extend("dom", {
@@ -5050,80 +5064,6 @@ QQWB.extend("dom", {
     }
 });
 
-/**
- * Tencent weibo javascript library
- *
- * Locker mechanism
- *
- * @author michalliu
- * @version 1.0
- * @package core
- * @module door
- * @requires base
- */
-QQWB.extend("door", {
-
-	// count of doors
-    doors:0
-
-	/**
-	 * Retrieve a new door object, the door can be locked or unlocked
-	 *
-	 * @access public
-	 * @param optLockDo {Function} actions do when lock acts
-	 * @param optUnlockDo {Function} action do when unlock acts
-	 * @return {Object} locker object
-	 */
-   ,door: function (optLockDo, optUnlockDo) {
-
-	    // the locks number on this door
-        var locks = 0;
-
-		// record the total number of door instance
-        this.doors ++;
-
-        return {
-			/**
-			 * Lock the door
-			 *
-			 * @access public
-			 */
-            lock: function () {
-                locks ++;
-				optLockDo && optLockDo.call(QQWB);
-				return this;
-            }
-			/**
-			 * unLock the door
-			 *
-			 * @access public
-			 */
-           ,unlock: function () {
-               locks --;
-			   locks = Math.max(0,locks);
-			   optUnlockDo && optUnlockDo.call(QQWB);
-			   return this;
-            }
-			/**
-			 * Check whether the door instance is open
-			 *
-			 * @access public
-			 */
-           ,isOpen: function () {
-               return locks === 0;
-            }
-        };
-    }
-	/**
-	 * Retrieve the number of lockers
-	 *
-	 * @access public
-	 * @return {Number} count of lockers
-	 */
-   ,count: function () {
-       return this.doors;
-    }
-});
 /**
  * Tencent weibo javascript library
  *
@@ -5283,7 +5223,7 @@ QQWB.extend("door", {
  * @package core
  * @module flash
  * @requires base
- *           ext.Array
+ *           common.Array
  *           browser
  *           dom
  */
@@ -5382,7 +5322,7 @@ QQWB.extend("flash",{
  * @module solution
  * @requires base
  *           deferred
- *           ext.Array
+ *           common.Array
  *           dom
  *           flash
  */
@@ -5574,6 +5514,80 @@ QQWB.extend("_solution", {
 /**
  * Tencent weibo javascript library
  *
+ * Locker mechanism
+ *
+ * @author michalliu
+ * @version 1.0
+ * @package core
+ * @module door
+ * @requires base
+ */
+QQWB.extend("door", {
+
+	// count of doors
+    doors:0
+
+	/**
+	 * Retrieve a new door object, the door can be locked or unlocked
+	 *
+	 * @access public
+	 * @param optLockDo {Function} actions do when lock acts
+	 * @param optUnlockDo {Function} action do when unlock acts
+	 * @return {Object} locker object
+	 */
+   ,door: function (optLockDo, optUnlockDo) {
+
+	    // the locks number on this door
+        var locks = 0;
+
+		// record the total number of door instance
+        this.doors ++;
+
+        return {
+			/**
+			 * Lock the door
+			 *
+			 * @access public
+			 */
+            lock: function () {
+                locks ++;
+				optLockDo && optLockDo.call(QQWB);
+				return this;
+            }
+			/**
+			 * unLock the door
+			 *
+			 * @access public
+			 */
+           ,unlock: function () {
+               locks --;
+			   locks = Math.max(0,locks);
+			   optUnlockDo && optUnlockDo.call(QQWB);
+			   return this;
+            }
+			/**
+			 * Check whether the door instance is open
+			 *
+			 * @access public
+			 */
+           ,isOpen: function () {
+               return locks === 0;
+            }
+        };
+    }
+	/**
+	 * Retrieve the number of lockers
+	 *
+	 * @access public
+	 * @return {Number} count of lockers
+	 */
+   ,count: function () {
+       return this.doors;
+    }
+});
+/**
+ * Tencent weibo javascript library
+ *
  * Library booter
  *
  * @author michalliu
@@ -5585,8 +5599,8 @@ QQWB.extend("_solution", {
  *           browser
  *           apiProvider
  *           deferred
- *           ext.Array
- *           ext.JSON
+ *           common.Array
+ *           common.JSON
  *           auth.token
  *           event.event
  *           solution

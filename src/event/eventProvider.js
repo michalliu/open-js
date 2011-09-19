@@ -8,7 +8,7 @@
  * @package event
  * @module eventProvider
  * @requires base
- *           ext.Array
+ *           common.Array
  */
 QQWB.extend("_eventProvider",{
 

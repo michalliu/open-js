@@ -11,8 +11,8 @@
  *           queryString
  *           apiProvider
  *           deferred
- *           ext.XML
- *           ext.JSON
+ *           common.XML
+ *           common.JSON
  */
 
 QQWB.extend("io", {

@@ -9,7 +9,7 @@
  * @module solution
  * @requires base
  *           deferred
- *           ext.Array
+ *           common.Array
  *           dom
  *           flash
  */

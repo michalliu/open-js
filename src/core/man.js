@@ -13,10 +13,11 @@
  * @module man
  * @requires base
  *           apiProvider
- *           ext.JSON
+ *           common.JSON
  */
 
 QQWB.provide("man", function (api) {
+	api = this._apiProvider.compat(api);
     return this._apiProvider.getDescriptor(api) ? QQWB.JSON.toString(this._apiProvider.getDescriptor(api)) : "no such api";
 });
 
