@@ -29,7 +29,7 @@
                 document.all.result.innerHTML = "登录失败" + error.message;
             });
 
-            // 绑定登录失败后的处理
+            // 绑定登出处理
             T.bind(T.events.USER_LOGGEDOUT_EVENT, function (error) {
                 document.all.result.innerHTML = "登出成功";
             });

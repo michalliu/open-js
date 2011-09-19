@@ -11,6 +11,7 @@
  *           core.time
  *           core.cookie
  *           core.io
+ *           ext.String
  */
 QQWB.extend("_token",{
     /**
@@ -119,9 +120,9 @@ QQWB.extend("_token",{
      * Use refresh token to obtain an access token
      *
      * @access public
-     * @param optSuccessCallback {Function} callback function when result returned
+     * @param optCallback {Function} callback function when result returned
      */
-   ,exchangeForToken: function (optSuccessCallback) {
+   ,exchangeForToken: function (optCallback) {
        QQWB.io.jsonp({
                 url: QQWB._domain.exchange
                ,data: QQWB.queryString.encode({
@@ -136,7 +137,7 @@ QQWB.extend("_token",{
 
            var _response = response;
 
-           response = QQWB.queryString.decode(response);
+           QQWB.String.isString(response) && (response = QQWB.queryString.decode(response));
 
            if(response.access_token){
 
@@ -160,14 +161,14 @@ QQWB.extend("_token",{
                QQWB.log.error("unexpected result returned from server " + _response + " while exchanging for new access token");
            }
 
-           optSuccessCallback && optSuccessCallback.call(QQWB,response);
-
        }).error(function (status, statusText) {
            if (status === 404) {
                QQWB.log.error("exchange token has failed, script not found");
            } else {
                QQWB.log.error("exchange token has failed, " + statusText);
            }
+       }).complete(function (arg1, arg2, arg3) {
+           optCallback && optCallback.apply(QQWB,[arg1, arg2, arg3]);
        });
 
        return QQWB;
@@ -176,9 +177,9 @@ QQWB.extend("_token",{
      * Obtain an access token
      *
      * @access public
-     * @param optSuccessCallback {Function} callback function when result returned
+     * @param optCallback {Function} callback function when result returned
      */
-   ,getNewAccessToken: function (optSuccessCallback) {
+   ,getNewAccessToken: function (optCallback) {
        QQWB.io.jsonp({
                url: QQWB._domain.query
               ,data: QQWB.queryString.encode({
@@ -191,7 +192,7 @@ QQWB.extend("_token",{
 
            var _response = response;
 
-           response = QQWB.queryString.decode(response);
+           QQWB.String.isString(response) && (response = QQWB.queryString.decode(response));
 
            if(response.access_token){
 
@@ -215,14 +216,14 @@ QQWB.extend("_token",{
                QQWB.log.error("unexpected result returned from server " + _response + " while retrieving new access token");
            }
 
-           optSuccessCallback && optSuccessCallback.call(QQWB,response);
-
        }).error(function (status, statusText) {
            if (status === 404) {
                QQWB.log.error("get token has failed, script not found");
            } else {
                QQWB.log.error("get token failed, " + statusText);
            }
+       }).complete(function (arg1, arg2, arg3) {
+           optCallback && optCallback.apply(QQWB,[arg1, arg2, arg3]);
        });
 
        return QQWB;

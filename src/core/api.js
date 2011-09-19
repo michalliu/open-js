@@ -143,6 +143,7 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optSolution)
 	
     // user not logged in, don't bother to try to get data
 	if (!QQWB.loginStatus()) {
+        QQWB.log.error("failed to make api call, not logged in");
 		deferred.reject(-1, "not login"); // immediately error
 		return promise;
 	}

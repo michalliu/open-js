@@ -685,11 +685,151 @@ QQWB.extend("log", {
            ,frame: window != window.parent ? "*":""
         });
 
+        // capture message
+        if (this._capture && typeof this._captureLevel == "number" && this[level] > this._captureLevel && this._capturedMessages) {
+            if (this._capturedMessages.length >= this._captureMaxSize) {
+                this._capturedMessages.shift();
+            }
+            this._capturedMessages.push(output);
+        }
+
         // no frame messages
         QQWB._debug && window.console && window.console.log(output);
      }
+
+	/**
+	 * Start capture log
+	 *
+	 * @access public
+	 * @param optLevel {String} message level
+	 * @param optMaxSize {Number} the max size of captured message
+	 * @return {Object} log object
+	 */
+    ,startCapture: function (optLevel, optMaxSize) {
+         this._captureLevel = optLevel || this.NOTSET; // set level of messages to capture
+         this._captureMaxSize = optMaxSize || 50; // max keeping 50 messages
+         this._capturedMessages = []; // store captured messages
+         this._capture = true; // flag know capturing messages or not
+         return this;
+     }
+
+	/**
+	 * Stop capture log
+	 *
+	 * @access public
+	 * @return {Object} log object
+	 */
+    ,stopCapture: function () {
+        if (this._capture) {
+            this._capture = false;
+        }
+        return this;
+     }
+
+	/**
+	 * Retrieve the last captured messages
+	 *
+	 * @access public
+     * @param {sep} the seprator
+	 * @return {Object} log object
+	 */
+    ,lastCaptured: function (sep) {
+        sep = sep || "\n";
+        return this._capturedMessages ? this._capturedMessages.join(sep) : "";
+     }
 });
 
+/**
+ * Tencent weibo javascript library
+ *
+ * String extension
+ *
+ * //TODO: encoding libraries
+ *
+ * http://www.cnblogs.com/cgli/archive/2011/05/17/2048869.html
+ * http://www.blueidea.com/tech/web/2006/3622.asp
+ *
+ * @author michalliu
+ * @version 1.0
+ * @package ext
+ * @module String
+ * @requires base
+ */
+QQWB.extend("String",{
+    _trimLeft: /^\s+/
+   ,_trimRight: /\s+$/
+    /**
+     * Determine whether an object is string
+     *
+     * @access public
+     * @param source {Mixed} anything
+     * @return {Boolean}
+     */
+   ,isString: function (source) {
+        return typeof source === "string";
+    }
+
+    /**
+     * Strip left blank
+     *
+     * @access public
+     * @param source {Mixed} anything
+     * @return {String}
+     */
+   ,ltrim: function (source) {
+       return source == null ? "" : source.toString().replace(this._trimLeft,"");
+    }
+
+    /**
+     * Strip right blank
+     *
+     * @access public
+     * @param source {Mixed} anything
+     * @return {String}
+     */
+   ,rtrim: function (source) {
+       return source == null ? "" : source.toString().replace(this._trimRight,"");
+    }
+
+    /**
+     * Strip blank at left and right
+     *
+     * @access public
+     * @param source {Mixed} anything
+     * @return {String}
+     */
+    ,trim: String.prototype.trim ? function (source) {
+            return source == null ? "" : String.prototype.trim.call(source);
+        } : function (source) {
+            return source == null ? "" : source.toString().replace(this._trimLeft,"").replace(this._trimRight,"");
+        } 
+
+	/**
+	 * Determine whether needle at the front of str
+	 *
+	 * @access public
+	 * @param source {Mixed} anything
+	 * @return {Boolean}
+	 */
+	,startsWith: String.prototype.startsWith ? function (source, needle) {
+			return source == null ? false : String.prototype.startsWith.call(source, needle);
+		} : function (source, needle) {
+			return source == null ? false : source.toString().indexOf(needle) == 0;
+		} 
+
+	/**
+	 * Determine whether needle at the end of str
+	 *
+	 * @access public
+	 * @param source {Mixed} anything
+	 * @return {Boolean}
+	 */
+	,endsWith: String.prototype.endsWith ? function (source, needle) {
+			return source == null ? false : String.prototype.endsWith.call(source, needle);
+		} : function (source, needle) {
+			return source == null ? false : source.toString().lastIndexOf(needle) >= 0 && source.toString().lastIndexOf(needle) + needle.length == source.length;
+		} 
+});
 /**
  * Tencent weibo javascript library
  *
@@ -2291,97 +2431,6 @@ QQWB.extend("XML",{
        return xml;
     }
 }, true/*overwrite toString method inherit from Object.prototype*/);
-/**
- * Tencent weibo javascript library
- *
- * String extension
- *
- * //TODO: encoding libraries
- *
- * http://www.cnblogs.com/cgli/archive/2011/05/17/2048869.html
- * http://www.blueidea.com/tech/web/2006/3622.asp
- *
- * @author michalliu
- * @version 1.0
- * @package ext
- * @module String
- * @requires base
- */
-QQWB.extend("String",{
-    _trimLeft: /^\s+/
-   ,_trimRight: /\s+$/
-    /**
-     * Determine whether an object is string
-     *
-     * @access public
-     * @param source {Mixed} anything
-     * @return {Boolean}
-     */
-   ,isString: function (source) {
-        return typeof source === "string";
-    }
-
-    /**
-     * Strip left blank
-     *
-     * @access public
-     * @param source {Mixed} anything
-     * @return {String}
-     */
-   ,ltrim: function (source) {
-       return source == null ? "" : source.toString().replace(this._trimLeft,"");
-    }
-
-    /**
-     * Strip right blank
-     *
-     * @access public
-     * @param source {Mixed} anything
-     * @return {String}
-     */
-   ,rtrim: function (source) {
-       return source == null ? "" : source.toString().replace(this._trimRight,"");
-    }
-
-    /**
-     * Strip blank at left and right
-     *
-     * @access public
-     * @param source {Mixed} anything
-     * @return {String}
-     */
-    ,trim: String.prototype.trim ? function (source) {
-            return source == null ? "" : String.prototype.trim.call(source);
-        } : function (source) {
-            return source == null ? "" : source.toString().replace(this._trimLeft,"").replace(this._trimRight,"");
-        } 
-
-	/**
-	 * Determine whether needle at the front of str
-	 *
-	 * @access public
-	 * @param source {Mixed} anything
-	 * @return {Boolean}
-	 */
-	,startsWith: String.prototype.startsWith ? function (source, needle) {
-			return source == null ? false : String.prototype.startsWith.call(source, needle);
-		} : function (source, needle) {
-			return source == null ? false : source.toString().indexOf(needle) == 0;
-		} 
-
-	/**
-	 * Determine whether needle at the end of str
-	 *
-	 * @access public
-	 * @param source {Mixed} anything
-	 * @return {Boolean}
-	 */
-	,endsWith: String.prototype.endsWith ? function (source, needle) {
-			return source == null ? false : String.prototype.endsWith.call(source, needle);
-		} : function (source, needle) {
-			return source == null ? false : source.toString().lastIndexOf(needle) >= 0 && source.toString().lastIndexOf(needle) + needle.length == source.length;
-		} 
-});
 /*
  * @author crockford
  * @url https://raw.github.com/douglascrockford/JSON-js/master/json2.js
@@ -3889,6 +3938,7 @@ QQWB._alias("script",QQWB.io.script);
  *           core.time
  *           core.cookie
  *           core.io
+ *           ext.String
  */
 QQWB.extend("_token",{
     /**
@@ -3997,9 +4047,9 @@ QQWB.extend("_token",{
      * Use refresh token to obtain an access token
      *
      * @access public
-     * @param optSuccessCallback {Function} callback function when result returned
+     * @param optCallback {Function} callback function when result returned
      */
-   ,exchangeForToken: function (optSuccessCallback) {
+   ,exchangeForToken: function (optCallback) {
        QQWB.io.jsonp({
                 url: QQWB._domain.exchange
                ,data: QQWB.queryString.encode({
@@ -4014,7 +4064,7 @@ QQWB.extend("_token",{
 
            var _response = response;
 
-           response = QQWB.queryString.decode(response);
+           QQWB.String.isString(response) && (response = QQWB.queryString.decode(response));
 
            if(response.access_token){
 
@@ -4038,14 +4088,14 @@ QQWB.extend("_token",{
                QQWB.log.error("unexpected result returned from server " + _response + " while exchanging for new access token");
            }
 
-           optSuccessCallback && optSuccessCallback.call(QQWB,response);
-
        }).error(function (status, statusText) {
            if (status === 404) {
                QQWB.log.error("exchange token has failed, script not found");
            } else {
                QQWB.log.error("exchange token has failed, " + statusText);
            }
+       }).complete(function (arg1, arg2, arg3) {
+           optCallback && optCallback.apply(QQWB,[arg1, arg2, arg3]);
        });
 
        return QQWB;
@@ -4054,9 +4104,9 @@ QQWB.extend("_token",{
      * Obtain an access token
      *
      * @access public
-     * @param optSuccessCallback {Function} callback function when result returned
+     * @param optCallback {Function} callback function when result returned
      */
-   ,getNewAccessToken: function (optSuccessCallback) {
+   ,getNewAccessToken: function (optCallback) {
        QQWB.io.jsonp({
                url: QQWB._domain.query
               ,data: QQWB.queryString.encode({
@@ -4069,7 +4119,7 @@ QQWB.extend("_token",{
 
            var _response = response;
 
-           response = QQWB.queryString.decode(response);
+           QQWB.String.isString(response) && (response = QQWB.queryString.decode(response));
 
            if(response.access_token){
 
@@ -4093,14 +4143,14 @@ QQWB.extend("_token",{
                QQWB.log.error("unexpected result returned from server " + _response + " while retrieving new access token");
            }
 
-           optSuccessCallback && optSuccessCallback.call(QQWB,response);
-
        }).error(function (status, statusText) {
            if (status === 404) {
                QQWB.log.error("get token has failed, script not found");
            } else {
                QQWB.log.error("get token failed, " + statusText);
            }
+       }).complete(function (arg1, arg2, arg3) {
+           optCallback && optCallback.apply(QQWB,[arg1, arg2, arg3]);
        });
 
        return QQWB;
@@ -4701,6 +4751,7 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optSolution)
 	
     // user not logged in, don't bother to try to get data
 	if (!QQWB.loginStatus()) {
+        QQWB.log.error("failed to make api call, not logged in");
 		deferred.reject(-1, "not login"); // immediately error
 		return promise;
 	}

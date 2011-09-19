@@ -153,8 +153,57 @@ QQWB.extend("log", {
            ,frame: window != window.parent ? "*":""
         });
 
+        // capture message
+        if (this._capture && typeof this._captureLevel == "number" && this[level] > this._captureLevel && this._capturedMessages) {
+            if (this._capturedMessages.length >= this._captureMaxSize) {
+                this._capturedMessages.shift();
+            }
+            this._capturedMessages.push(output);
+        }
+
         // no frame messages
         QQWB._debug && window.console && window.console.log(output);
+     }
+
+	/**
+	 * Start capture log
+	 *
+	 * @access public
+	 * @param optLevel {String} message level
+	 * @param optMaxSize {Number} the max size of captured message
+	 * @return {Object} log object
+	 */
+    ,startCapture: function (optLevel, optMaxSize) {
+         this._captureLevel = optLevel || this.NOTSET; // set level of messages to capture
+         this._captureMaxSize = optMaxSize || 50; // max keeping 50 messages
+         this._capturedMessages = []; // store captured messages
+         this._capture = true; // flag know capturing messages or not
+         return this;
+     }
+
+	/**
+	 * Stop capture log
+	 *
+	 * @access public
+	 * @return {Object} log object
+	 */
+    ,stopCapture: function () {
+        if (this._capture) {
+            this._capture = false;
+        }
+        return this;
+     }
+
+	/**
+	 * Retrieve the last captured messages
+	 *
+	 * @access public
+     * @param {sep} the seprator
+	 * @return {Object} log object
+	 */
+    ,lastCaptured: function (sep) {
+        sep = sep || "\n";
+        return this._capturedMessages ? this._capturedMessages.join(sep) : "";
      }
 });
 
