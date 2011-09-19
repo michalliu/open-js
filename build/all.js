@@ -5609,8 +5609,7 @@ QQWB.extend("",{
                rawAccessToken = this._token.getAccessToken(true), 
                refreshToken = this._token.getRefreshToken(),
                needExchangeToken = refreshToken && !accessToken && rawAccessToken,
-               //FIXME: debug
-               needRequestNewToken = false && !refreshToken && !accessToken,
+               needRequestNewToken = !refreshToken && !accessToken,
                clientProxy = opts.proxy || document.location.href; // redirect flag is userfull to solve IE's opener problem
 
            if (opts.appkey) {
