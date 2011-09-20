@@ -5252,7 +5252,7 @@ QQWB.extend("flash",{
        }
 
 	   // defect cache
-       if (optNoCache === this.NO_CACHE) {
+       if (optCache === this.NO_CACHE) {
 	       swfPath += "?" + QQWB.uid();
        }
 
