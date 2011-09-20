@@ -14,8 +14,8 @@
  * @package core
  * @module deferred
  * @requires base
- *           ext.Array
- *           ext.Function
+ *           common.Array
+ *           common.Function
  */
 
 QQWB.extend("deferred", {

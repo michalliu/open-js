@@ -8,7 +8,7 @@
  * @package core
  * @module flash
  * @requires base
- *           ext.Array
+ *           common.Array
  *           browser
  *           dom
  */

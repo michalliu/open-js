@@ -10,7 +10,7 @@
  *
  * @author michalliu
  * @version 1.0
- * @package ext
+ * @package common
  * @module String
  * @requires base
  */

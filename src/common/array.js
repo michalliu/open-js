@@ -5,7 +5,7 @@
  *
  * @author michalliu
  * @version 1.0
- * @package ext
+ * @package common
  * @module Array
  * @requires base
  *           String

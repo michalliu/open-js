@@ -37,9 +37,9 @@
  * @package core
  * @module api
  * @requires base
- *           ext.XML
- *           ext.Array
- *           ext.JSON
+ *           common.XML
+ *           common.Array
+ *           common.JSON
  *           apiProvider
  *           deferred
  *           auth.token
@@ -48,6 +48,7 @@
 
 QQWB.provide("api", function (api, apiParams, optDataType, optType, optSolution) {
 
+	api = this._apiProvider.compat(api);
 	apiParams = apiParams || {};
     optDataType = (optDataType || "json").toLowerCase();
     optType = optType || "GET";

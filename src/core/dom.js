@@ -8,7 +8,7 @@
  * @package core
  * @module dom
  * @requires base
- *           ext.String
+ *           common.String
  */
 
 QQWB.extend("dom", {

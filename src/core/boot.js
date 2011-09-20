@@ -12,8 +12,8 @@
  *           browser
  *           apiProvider
  *           deferred
- *           ext.Array
- *           ext.JSON
+ *           common.Array
+ *           common.JSON
  *           auth.token
  *           event.event
  *           solution
