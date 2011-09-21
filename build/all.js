@@ -270,11 +270,11 @@
     twb._alias.call(window,["QQWB","T"],twb); // we probably should only export one global variable
 
     twb.assign("_domain","API_URI","/api"); // no trailer slash   
-    twb.assign("_domain","AUTH_URI","/oauth_html/loginV2mini.php");   
+    twb.assign("_domain","AUTH_URI","/oauth_html/login2.php");   
     twb.assign("_domain","EXCHANGE_TOKEN_URI","/cgi-bin/exchange_token");   
     twb.assign("_domain","QUERY_TOKEN_URI","/cgi-bin/auto_token");   
-    twb.assign("_domain","SERVERPROXY_URI","/media/proxy.html");   
-    twb.assign("_domain","FLASHPROXY_URI","/media/proxy.swf");   
+    twb.assign("_domain","SERVERPROXY_URI","/oauth_html/2/proxy.html");   
+    twb.assign("_domain","FLASHPROXY_URI","/oauth_html/2/proxy.swf");   
 
 }());
 /**
@@ -4684,7 +4684,8 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optSolution)
 		format = "json";
 	}
 
-	apiParams["access_token"] = QQWB._token.getAccessToken();
+	apiParams["oauth_consumer_key"] = QQWB._appkey;
+	apiParams["oauth_token"] = QQWB._token.getAccessToken();
 	apiParams["version"] = "2.0";
 	apiParams["format"] = format;
 

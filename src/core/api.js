@@ -64,7 +64,8 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optSolution)
 		format = "json";
 	}
 
-	apiParams["access_token"] = QQWB._token.getAccessToken();
+	apiParams["oauth_consumer_key"] = QQWB._appkey;
+	apiParams["oauth_token"] = QQWB._token.getAccessToken();
 	apiParams["version"] = "2.0";
 	apiParams["format"] = format;
 
