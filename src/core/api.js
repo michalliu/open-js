@@ -66,7 +66,7 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optSolution)
 
 	apiParams["oauth_consumer_key"] = QQWB._appkey;
 	apiParams["oauth_token"] = QQWB._token.getAccessToken();
-	apiParams["version"] = "2.0";
+	apiParams["oauth_version"] = "2.0";
 	apiParams["format"] = format;
 
 
