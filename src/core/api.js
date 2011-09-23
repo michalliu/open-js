@@ -106,7 +106,7 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optSolution)
 	// very little chance
 	if (!solution || solution.readyState === 2) {
 		QQWB.log.critical("solution error");
-		deferred.reject(-1, "solution error"); // immediately error
+		deferred.reject(-1, "solution error",0/*time cost*/); // immediately error
 		return promise;
 	}
 
@@ -146,7 +146,7 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optSolution)
     // user not logged in, don't bother to try to get data
 	if (!QQWB.loginStatus()) {
         QQWB.log.error("failed to make api call, not logged in");
-		deferred.reject(-1, "not login"); // immediately error
+		deferred.reject(-1, "not login", 0); // immediately error
 		return promise;
 	}
 
@@ -171,12 +171,12 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optSolution)
 			var serverProxy = document.getElementById(solution.id);
 			if (!serverProxy) { // double check to avoid the server frame was removed from dom unexpectly
 	            QQWB.log.critical("server proxy not found");
-	            deferred.reject(-1,"server proxy not found");
+	            deferred.reject(-1,"server proxy not found", 0);
 			} else {
                 // server proxy's url should be same as QQWB._domain.serverproxy, if not may be we got the wrong element
 				if (serverProxy.src !== QQWB._domain.serverproxy) { // double check to avoid the server frame src was modified unexpectly 
 	                QQWB.log.critical("server proxy is not valid, src attribute has unexpected value");
-	                deferred.reject(-1,"server proxy not valid");
+	                deferred.reject(-1,"server proxy not valid", 0);
 				} else {
 					// everything goes well
                  	// lazy create an collection object to maintain the deferred object
@@ -234,11 +234,11 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optSolution)
 							        if (response[0] !== 200) {
 										relateDeferred.reject.apply(relateDeferred,response);
 									} else {
-										if (response[4] == "xmltext") {
-											response[2] = QQWB.XML.fromString(response[2]);
+										if (response[5] == "xmltext") {
+											response[3] = QQWB.XML.fromString(response[3]);
 										}
 										//relateDeferred.resolve.apply(relateDeferred,[response[2],response[3]]);
-                                        relateDeferred.resolve(response[2]);
+                                        relateDeferred.resolve(response[3], response[2]);
 							    	}
 									QQWB.api.uncollect(id);
 								} else {
@@ -274,7 +274,7 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optSolution)
 
 					} catch (ex) {
 	                    QQWB.log.critical("post message to server proxy has failed, " + ex);
-	                    deferred.reject(-1,ex);
+	                    deferred.reject(-1,ex,0);
 					}
 				} // end server proxy src modified check
 			} // end server proxy existance check
@@ -287,7 +287,7 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optSolution)
 				deferred.reject.apply(deferred,response);
 			} else {
 				//deferred.resolve.apply(deferred,[response[2],response[3]]);
-                deferred.resolve(response[2]);
+                deferred.resolve(response[3], response[2]);
 			}
 		});
 	}

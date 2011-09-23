@@ -3448,6 +3448,7 @@ QQWB.extend("JSON",{
  *           deferred
  *           common.XML
  *           common.JSON
+ *           time
  */
 
 QQWB.extend("io", {
@@ -3464,6 +3465,7 @@ QQWB.extend("io", {
             head = document.head || document.getElementsByTagName("head")[0] || document.documentElement;
         return {
             send: function (complete) {
+				var started = QQWB.time.now();
                 script = document.createElement("script");
                 script.async = "async";
 
@@ -3485,13 +3487,13 @@ QQWB.extend("io", {
 
                         script = null;
 
-                        !isAbort && complete && complete.apply(QQWB,[200,"success"]);
-                        isAbort && complete && complete.apply(QQWB,[-1,"aborted"]);
+                        !isAbort && complete && complete.apply(QQWB,[200,"success",QQWB.time.now() - started]);
+                        isAbort && complete && complete.apply(QQWB,[-1,"aborted",QQWB.time.now() - started]);
                     }
                 };
 
                 script.onerror = function (e) { // ie 6/7/8/opera not supported(not tested)
-                    complete && complete.apply(QQWB,[404,e]);
+                    complete && complete.apply(QQWB,[404,e,QQWB.time.now() - started]);
                 };
 
                 head.insertBefore(script, head.firstChild);
@@ -3526,6 +3528,7 @@ QQWB.extend("io", {
 
 	   return {
 		   send: function (complete) {
+			   var started = QQWB.time.now();
 
 			   if (cfg.username) {
 				   xhr.open(cfg.type, cfg.url, cfg.async, cfg.username, cfg.password);
@@ -3597,12 +3600,12 @@ QQWB.extend("io", {
 					   }
 			       } catch (firefoxException) {
 					   if (!isAbort) {
-					       complete(-1, firefoxException);
+					       complete(-1, firefoxException, QQWB.time.now() - started);
 					   }
 			       }
 
 				   if (response) {
-					   complete(status, statusText, response, responseHeaders, cfg.dataType); // take cfg.dataType back
+					   complete(status, statusText, QQWB.time.now() - started, response, responseHeaders, cfg.dataType); // take cfg.dataType back
 				   }
 			   };
 
@@ -3635,7 +3638,7 @@ QQWB.extend("io", {
 	   
 	   return {
 		   send: function (complete) {
-
+			   var started = QQWB.time.now();
 			   readyState = 1;
                // the call is allowed call once
 			   callback = function (_, isAbort) {
@@ -3654,7 +3657,7 @@ QQWB.extend("io", {
 				           callback = null;
 
 				           if (isAbort) {
-				        	   complete(-1, "request has aborted");
+				        	   complete(-1, "request has aborted", QQWB.time.now() - started);
 				           } else {
 				        	   var success = /complete/i.test(_.type);
 				        	   status = success ? 200 : 204;
@@ -3674,12 +3677,12 @@ QQWB.extend("io", {
 
 				           // has response
 				           if (response) {
-				        	   complete(status, statusText, response, responseHeaders);
+				        	   complete(status, statusText, QQWB.time.now() - started, response, responseHeaders);
 				           }
 					   }
 					} catch (ex) {
 						if (!isAbort) {
-							complete(-1, ex + "");
+							complete(-1, ex + "", QQWB.time.now() - started);
 						}
 					}
 			   };
@@ -3767,16 +3770,16 @@ QQWB.extend("io", {
 
        QQWB.extend(default_opts, opts, true);
 
-       QQWB.io._IOFlash(default_opts).send(function (status, statusText, responses, responseHeaders) {
+       QQWB.io._IOFlash(default_opts).send(function (status, statusText, elapsedtime, responses, responseHeaders) {
 		   if (status !== 200) {
-       	       deferred.reject(status, statusText);
+       	       deferred.reject(status, statusText, elapsedtime);
        	   } else {
 			   // extract API error code from http header
 			   if (responseHeaders && QQWB._apiProvider.apiError.httpHeaderFlag.test(responseHeaders)) {
 				   var apiErrorCode = responseHeaders.match(QQWB._apiProvider.apiError.httpHeaderFlag)[1];
-				   deferred.reject(parseInt(apiErrorCode,10), QQWB._apiProvider.apiError[apiErrorCode]);
+				   deferred.reject(parseInt(apiErrorCode,10), QQWB._apiProvider.apiError[apiErrorCode], elapsedtime);
                } else {
-                   deferred.resolve(status, statusText, responses, responseHeaders);
+                   deferred.resolve(status, statusText, elapsedtime, responses, responseHeaders);
                }
        	   }
        });
@@ -3801,16 +3804,16 @@ QQWB.extend("io", {
 
         QQWB.extend(default_opts, opts, true);
 
-		QQWB.io._IOAjax(default_opts).send(function (status, statusText, responses, responseHeaders, dataType) {
+		QQWB.io._IOAjax(default_opts).send(function (status, statusText, elapsedtime, responses, responseHeaders, dataType) {
 			if (status !== 200) {
-				deferred.reject(status, statusText);
+				deferred.reject(status, statusText, elapsedtime);
 			} else {
 			    // extract API error code from http header
 			    if (responseHeaders && QQWB._apiProvider.apiError.httpHeaderFlag.test(responseHeaders)) {
 			        var apiErrorCode = responseHeaders.match(QQWB._apiProvider.apiError.httpHeaderFlag)[1];
-				    deferred.reject(parseInt(apiErrorCode,10), QQWB._apiProvider.apiError[apiErrorCode]);
+				    deferred.reject(parseInt(apiErrorCode,10), QQWB._apiProvider.apiError[apiErrorCode], elapsedtime);
                 } else {
-				    deferred.resolve(status, statusText, responses, responseHeaders, dataType);
+				    deferred.resolve(status, statusText, elapsedtime, responses, responseHeaders, dataType);
                 }
 			}
 		});
@@ -3841,11 +3844,11 @@ QQWB.extend("io", {
 
         QQWB.extend(default_opts, opts, true);
 
-		QQWB.io._IOAjax(default_opts).send(function (status, statusText, responses, responseHeaders, dataType) {
+		QQWB.io._IOAjax(default_opts).send(function (status, statusText, elapsedtime, responses, responseHeaders, dataType) {
 			if (status !== 200) {
-				deferred.reject(status, statusText);
+				deferred.reject(status, statusText, elapsedtime);
 			} else {
-				deferred.resolve(/*status, statusText, */responses/*, responseHeaders, dataType*/);
+				deferred.resolve(/*status, statusText, elapsedtime, */responses, elapsedtime/*, responseHeaders, dataType*/);
 			}
 		});
 
@@ -3867,11 +3870,11 @@ QQWB.extend("io", {
        QQWB.io._IOScript({
            charset: optCharset
           ,url: src
-       }).send(function (status, statusText) {
+       }).send(function (status, statusText, elapsedtime) {
            if (status !== 200) {
-               deferred.reject(status, statusText);
+               deferred.reject(status, statusText, elapsedtime);
            } else {
-               deferred.resolve(status, statusText);
+               deferred.resolve(status, statusText, elapsedtime);
            }
        });
 
@@ -3891,6 +3894,7 @@ QQWB.extend("io", {
             callbackNamePrefix = "jsonp_", // jsonp callback function name prefix
             callbackName = callbackNamePrefix + QQWB.uid(), //random jsonp callback name
             _oldcallback = window.callbackName, // keep a reference to the variable we will overwrite(very little chance)
+			timeCost,
             default_opts = {
                 dataType: "text"
                ,charset: "utf-8"
@@ -3913,7 +3917,7 @@ QQWB.extend("io", {
                 response = QQWB.XML.fromString(data);
             }
             // jsonp successed
-            deferred.resolve(response);
+            deferred.resolve(response, timeCost);
 
             window[callbackName] = _oldcallback; // restore back to original value
             
@@ -3922,10 +3926,11 @@ QQWB.extend("io", {
             //}
         };
 
-        QQWB.io._IOScript(default_opts).send(function (status, statusText) {
+        QQWB.io._IOScript(default_opts).send(function (status, statusText, elapsedtime) {
             if (status !== 200) {
-                deferred.reject(status, statusText);
+                deferred.reject(status, statusText, elapsedtime);
             }
+			timeCost = elapsedtime;
         });
 
 
@@ -4726,7 +4731,7 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optSolution)
 	// very little chance
 	if (!solution || solution.readyState === 2) {
 		QQWB.log.critical("solution error");
-		deferred.reject(-1, "solution error"); // immediately error
+		deferred.reject(-1, "solution error",0/*time cost*/); // immediately error
 		return promise;
 	}
 
@@ -4766,7 +4771,7 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optSolution)
     // user not logged in, don't bother to try to get data
 	if (!QQWB.loginStatus()) {
         QQWB.log.error("failed to make api call, not logged in");
-		deferred.reject(-1, "not login"); // immediately error
+		deferred.reject(-1, "not login", 0); // immediately error
 		return promise;
 	}
 
@@ -4791,12 +4796,12 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optSolution)
 			var serverProxy = document.getElementById(solution.id);
 			if (!serverProxy) { // double check to avoid the server frame was removed from dom unexpectly
 	            QQWB.log.critical("server proxy not found");
-	            deferred.reject(-1,"server proxy not found");
+	            deferred.reject(-1,"server proxy not found", 0);
 			} else {
                 // server proxy's url should be same as QQWB._domain.serverproxy, if not may be we got the wrong element
 				if (serverProxy.src !== QQWB._domain.serverproxy) { // double check to avoid the server frame src was modified unexpectly 
 	                QQWB.log.critical("server proxy is not valid, src attribute has unexpected value");
-	                deferred.reject(-1,"server proxy not valid");
+	                deferred.reject(-1,"server proxy not valid", 0);
 				} else {
 					// everything goes well
                  	// lazy create an collection object to maintain the deferred object
@@ -4854,11 +4859,11 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optSolution)
 							        if (response[0] !== 200) {
 										relateDeferred.reject.apply(relateDeferred,response);
 									} else {
-										if (response[4] == "xmltext") {
-											response[2] = QQWB.XML.fromString(response[2]);
+										if (response[5] == "xmltext") {
+											response[3] = QQWB.XML.fromString(response[3]);
 										}
 										//relateDeferred.resolve.apply(relateDeferred,[response[2],response[3]]);
-                                        relateDeferred.resolve(response[2]);
+                                        relateDeferred.resolve(response[3], response[2]);
 							    	}
 									QQWB.api.uncollect(id);
 								} else {
@@ -4894,7 +4899,7 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optSolution)
 
 					} catch (ex) {
 	                    QQWB.log.critical("post message to server proxy has failed, " + ex);
-	                    deferred.reject(-1,ex);
+	                    deferred.reject(-1,ex,0);
 					}
 				} // end server proxy src modified check
 			} // end server proxy existance check
@@ -4907,7 +4912,7 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optSolution)
 				deferred.reject.apply(deferred,response);
 			} else {
 				//deferred.resolve.apply(deferred,[response[2],response[3]]);
-                deferred.resolve(response[2]);
+                deferred.resolve(response[3], response[2]);
 			}
 		});
 	}
@@ -4957,6 +4962,7 @@ QQWB.provide("man", function (api) {
  * @module dom
  * @requires base
  *           common.String
+ *           common.Array
  */
 
 QQWB.extend("dom", {
@@ -4991,10 +4997,6 @@ QQWB.extend("dom", {
    ,createHidden: function (optTagName, optAttrs, optFake) {
         optTagName = optTagName || "div";
         var el = this.create(optTagName,optAttrs);
-        el.width = el.height = 0;
-        el.style.width = el.style.height = 0;
-        el.style.position = "absolute";
-        el.style.top = "-9999px";
 		if (optFake) {
             // we can't use the flash object in IE if flash container's style of visibility 
             // is hidden or display is none;
@@ -5002,7 +5004,10 @@ QQWB.extend("dom", {
             // is none, and visibility is hidden no problem
             // for convience we hidden the flash by giving it a large offset of top
 			// el.style.visibility = "hidden";
-            ~0;
+            el.width = el.height = 0;
+            el.style.width = el.style.height = 0;
+            el.style.position = "absolute";
+            el.style.top = "-9999px";
 		} else {
             el.style.display = "none";
 		}
@@ -5061,6 +5066,61 @@ QQWB.extend("dom", {
 	 */
    ,remove: function (node) {
 	   node && node.nodeType /* is node */ && node.parentNode /* parentNode exists */ && node.parentNode.removeChild(node)/* remove it */;
+	   return this;
+    }
+	/**
+	 * Determine whether node has the class name
+	 *
+     * @access public
+	 * @param node {Node} the DOM node
+	 * @param classname {Node} classname
+	 * @return {Boolean}
+	 */
+   ,hasClass: function (node, classname) {
+	   return (" " + node.className + " ").indexOf(" " + classname + " ") >= 0;
+    }
+	/**
+	 * Add classname to node
+	 *
+     * @access public
+	 * @param nodes {Node|Array} the DOM node(s)
+	 * @param classname {Node} classname
+	 * @return {Object} QQWB.dom
+	 */
+   ,addClass: function (nodes, classname) {
+	   classname = QQWB.String.trim(classname);
+	   if (QQWB.Array.isArray(nodes)) {
+		   QQWB.Array.each(nodes, function (i, node) {
+			   QQWB.dom.addClass(node, classname);
+		   });
+		   return this;
+	   }
+	   if (!QQWB.dom.hasClass(nodes,classname)) {
+		  nodes.className = nodes.className + " " + classname;
+	   }
+	   return this;
+    }
+
+	/**
+	 * remove classname of node
+	 *
+     * @access public
+	 * @param nodes {Node|Array} the DOM node(s)
+	 * @param classname {Node} classname
+	 * @return {Object} QQWB.dom
+	 */
+   ,removeClass: function (nodes, classname) {
+	   classname = QQWB.String.trim(classname);
+	   if (QQWB.Array.isArray(nodes)) {
+		   QQWB.Array.each(nodes, function (i, node) {
+			   QQWB.dom.removeClass(node, classname);
+		   });
+		   return this;
+	   }
+	   if (QQWB.dom.hasClass(nodes, classname)) {
+		   nodes.className = nodes.className.replace(classname, "");
+		   QQWB.dom.removeClass(nodes, classname);
+	   }
 	   return this;
     }
 });

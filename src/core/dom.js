@@ -9,6 +9,7 @@
  * @module dom
  * @requires base
  *           common.String
+ *           common.Array
  */
 
 QQWB.extend("dom", {
@@ -43,10 +44,6 @@ QQWB.extend("dom", {
    ,createHidden: function (optTagName, optAttrs, optFake) {
         optTagName = optTagName || "div";
         var el = this.create(optTagName,optAttrs);
-        el.width = el.height = 0;
-        el.style.width = el.style.height = 0;
-        el.style.position = "absolute";
-        el.style.top = "-9999px";
 		if (optFake) {
             // we can't use the flash object in IE if flash container's style of visibility 
             // is hidden or display is none;
@@ -54,7 +51,10 @@ QQWB.extend("dom", {
             // is none, and visibility is hidden no problem
             // for convience we hidden the flash by giving it a large offset of top
 			// el.style.visibility = "hidden";
-            ~0;
+            el.width = el.height = 0;
+            el.style.width = el.style.height = 0;
+            el.style.position = "absolute";
+            el.style.top = "-9999px";
 		} else {
             el.style.display = "none";
 		}
@@ -113,6 +113,61 @@ QQWB.extend("dom", {
 	 */
    ,remove: function (node) {
 	   node && node.nodeType /* is node */ && node.parentNode /* parentNode exists */ && node.parentNode.removeChild(node)/* remove it */;
+	   return this;
+    }
+	/**
+	 * Determine whether node has the class name
+	 *
+     * @access public
+	 * @param node {Node} the DOM node
+	 * @param classname {Node} classname
+	 * @return {Boolean}
+	 */
+   ,hasClass: function (node, classname) {
+	   return (" " + node.className + " ").indexOf(" " + classname + " ") >= 0;
+    }
+	/**
+	 * Add classname to node
+	 *
+     * @access public
+	 * @param nodes {Node|Array} the DOM node(s)
+	 * @param classname {Node} classname
+	 * @return {Object} QQWB.dom
+	 */
+   ,addClass: function (nodes, classname) {
+	   classname = QQWB.String.trim(classname);
+	   if (QQWB.Array.isArray(nodes)) {
+		   QQWB.Array.each(nodes, function (i, node) {
+			   QQWB.dom.addClass(node, classname);
+		   });
+		   return this;
+	   }
+	   if (!QQWB.dom.hasClass(nodes,classname)) {
+		  nodes.className = nodes.className + " " + classname;
+	   }
+	   return this;
+    }
+
+	/**
+	 * remove classname of node
+	 *
+     * @access public
+	 * @param nodes {Node|Array} the DOM node(s)
+	 * @param classname {Node} classname
+	 * @return {Object} QQWB.dom
+	 */
+   ,removeClass: function (nodes, classname) {
+	   classname = QQWB.String.trim(classname);
+	   if (QQWB.Array.isArray(nodes)) {
+		   QQWB.Array.each(nodes, function (i, node) {
+			   QQWB.dom.removeClass(node, classname);
+		   });
+		   return this;
+	   }
+	   if (QQWB.dom.hasClass(nodes, classname)) {
+		   nodes.className = nodes.className.replace(classname, "");
+		   QQWB.dom.removeClass(nodes, classname);
+	   }
 	   return this;
     }
 });

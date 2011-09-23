@@ -13,6 +13,7 @@
  *           deferred
  *           common.XML
  *           common.JSON
+ *           time
  */
 
 QQWB.extend("io", {
@@ -29,6 +30,7 @@ QQWB.extend("io", {
             head = document.head || document.getElementsByTagName("head")[0] || document.documentElement;
         return {
             send: function (complete) {
+				var started = QQWB.time.now();
                 script = document.createElement("script");
                 script.async = "async";
 
@@ -50,13 +52,13 @@ QQWB.extend("io", {
 
                         script = null;
 
-                        !isAbort && complete && complete.apply(QQWB,[200,"success"]);
-                        isAbort && complete && complete.apply(QQWB,[-1,"aborted"]);
+                        !isAbort && complete && complete.apply(QQWB,[200,"success",QQWB.time.now() - started]);
+                        isAbort && complete && complete.apply(QQWB,[-1,"aborted",QQWB.time.now() - started]);
                     }
                 };
 
                 script.onerror = function (e) { // ie 6/7/8/opera not supported(not tested)
-                    complete && complete.apply(QQWB,[404,e]);
+                    complete && complete.apply(QQWB,[404,e,QQWB.time.now() - started]);
                 };
 
                 head.insertBefore(script, head.firstChild);
@@ -91,6 +93,7 @@ QQWB.extend("io", {
 
 	   return {
 		   send: function (complete) {
+			   var started = QQWB.time.now();
 
 			   if (cfg.username) {
 				   xhr.open(cfg.type, cfg.url, cfg.async, cfg.username, cfg.password);
@@ -162,12 +165,12 @@ QQWB.extend("io", {
 					   }
 			       } catch (firefoxException) {
 					   if (!isAbort) {
-					       complete(-1, firefoxException);
+					       complete(-1, firefoxException, QQWB.time.now() - started);
 					   }
 			       }
 
 				   if (response) {
-					   complete(status, statusText, response, responseHeaders, cfg.dataType); // take cfg.dataType back
+					   complete(status, statusText, QQWB.time.now() - started, response, responseHeaders, cfg.dataType); // take cfg.dataType back
 				   }
 			   };
 
@@ -200,7 +203,7 @@ QQWB.extend("io", {
 	   
 	   return {
 		   send: function (complete) {
-
+			   var started = QQWB.time.now();
 			   readyState = 1;
                // the call is allowed call once
 			   callback = function (_, isAbort) {
@@ -219,7 +222,7 @@ QQWB.extend("io", {
 				           callback = null;
 
 				           if (isAbort) {
-				        	   complete(-1, "request has aborted");
+				        	   complete(-1, "request has aborted", QQWB.time.now() - started);
 				           } else {
 				        	   var success = /complete/i.test(_.type);
 				        	   status = success ? 200 : 204;
@@ -239,12 +242,12 @@ QQWB.extend("io", {
 
 				           // has response
 				           if (response) {
-				        	   complete(status, statusText, response, responseHeaders);
+				        	   complete(status, statusText, QQWB.time.now() - started, response, responseHeaders);
 				           }
 					   }
 					} catch (ex) {
 						if (!isAbort) {
-							complete(-1, ex + "");
+							complete(-1, ex + "", QQWB.time.now() - started);
 						}
 					}
 			   };
@@ -332,16 +335,16 @@ QQWB.extend("io", {
 
        QQWB.extend(default_opts, opts, true);
 
-       QQWB.io._IOFlash(default_opts).send(function (status, statusText, responses, responseHeaders) {
+       QQWB.io._IOFlash(default_opts).send(function (status, statusText, elapsedtime, responses, responseHeaders) {
 		   if (status !== 200) {
-       	       deferred.reject(status, statusText);
+       	       deferred.reject(status, statusText, elapsedtime);
        	   } else {
 			   // extract API error code from http header
 			   if (responseHeaders && QQWB._apiProvider.apiError.httpHeaderFlag.test(responseHeaders)) {
 				   var apiErrorCode = responseHeaders.match(QQWB._apiProvider.apiError.httpHeaderFlag)[1];
-				   deferred.reject(parseInt(apiErrorCode,10), QQWB._apiProvider.apiError[apiErrorCode]);
+				   deferred.reject(parseInt(apiErrorCode,10), QQWB._apiProvider.apiError[apiErrorCode], elapsedtime);
                } else {
-                   deferred.resolve(status, statusText, responses, responseHeaders);
+                   deferred.resolve(status, statusText, elapsedtime, responses, responseHeaders);
                }
        	   }
        });
@@ -366,16 +369,16 @@ QQWB.extend("io", {
 
         QQWB.extend(default_opts, opts, true);
 
-		QQWB.io._IOAjax(default_opts).send(function (status, statusText, responses, responseHeaders, dataType) {
+		QQWB.io._IOAjax(default_opts).send(function (status, statusText, elapsedtime, responses, responseHeaders, dataType) {
 			if (status !== 200) {
-				deferred.reject(status, statusText);
+				deferred.reject(status, statusText, elapsedtime);
 			} else {
 			    // extract API error code from http header
 			    if (responseHeaders && QQWB._apiProvider.apiError.httpHeaderFlag.test(responseHeaders)) {
 			        var apiErrorCode = responseHeaders.match(QQWB._apiProvider.apiError.httpHeaderFlag)[1];
-				    deferred.reject(parseInt(apiErrorCode,10), QQWB._apiProvider.apiError[apiErrorCode]);
+				    deferred.reject(parseInt(apiErrorCode,10), QQWB._apiProvider.apiError[apiErrorCode], elapsedtime);
                 } else {
-				    deferred.resolve(status, statusText, responses, responseHeaders, dataType);
+				    deferred.resolve(status, statusText, elapsedtime, responses, responseHeaders, dataType);
                 }
 			}
 		});
@@ -406,11 +409,11 @@ QQWB.extend("io", {
 
         QQWB.extend(default_opts, opts, true);
 
-		QQWB.io._IOAjax(default_opts).send(function (status, statusText, responses, responseHeaders, dataType) {
+		QQWB.io._IOAjax(default_opts).send(function (status, statusText, elapsedtime, responses, responseHeaders, dataType) {
 			if (status !== 200) {
-				deferred.reject(status, statusText);
+				deferred.reject(status, statusText, elapsedtime);
 			} else {
-				deferred.resolve(/*status, statusText, */responses/*, responseHeaders, dataType*/);
+				deferred.resolve(/*status, statusText, elapsedtime, */responses, elapsedtime/*, responseHeaders, dataType*/);
 			}
 		});
 
@@ -432,11 +435,11 @@ QQWB.extend("io", {
        QQWB.io._IOScript({
            charset: optCharset
           ,url: src
-       }).send(function (status, statusText) {
+       }).send(function (status, statusText, elapsedtime) {
            if (status !== 200) {
-               deferred.reject(status, statusText);
+               deferred.reject(status, statusText, elapsedtime);
            } else {
-               deferred.resolve(status, statusText);
+               deferred.resolve(status, statusText, elapsedtime);
            }
        });
 
@@ -456,6 +459,7 @@ QQWB.extend("io", {
             callbackNamePrefix = "jsonp_", // jsonp callback function name prefix
             callbackName = callbackNamePrefix + QQWB.uid(), //random jsonp callback name
             _oldcallback = window.callbackName, // keep a reference to the variable we will overwrite(very little chance)
+			timeCost,
             default_opts = {
                 dataType: "text"
                ,charset: "utf-8"
@@ -478,7 +482,7 @@ QQWB.extend("io", {
                 response = QQWB.XML.fromString(data);
             }
             // jsonp successed
-            deferred.resolve(response);
+            deferred.resolve(response, timeCost);
 
             window[callbackName] = _oldcallback; // restore back to original value
             
@@ -487,10 +491,11 @@ QQWB.extend("io", {
             //}
         };
 
-        QQWB.io._IOScript(default_opts).send(function (status, statusText) {
+        QQWB.io._IOScript(default_opts).send(function (status, statusText, elapsedtime) {
             if (status !== 200) {
-                deferred.reject(status, statusText);
+                deferred.reject(status, statusText, elapsedtime);
             }
+			timeCost = elapsedtime;
         });
 
 
