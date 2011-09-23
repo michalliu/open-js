@@ -1,0 +1,294 @@
+<!doctype html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+		<title>全功能测试</title>
+		<style>
+            body{font-size:12px;font-family:menlo,monaco,consolas,"Microsoft YaHei";padding:0;margin:0;}
+			ul,li,label{display:block;padding:0;margin:0;}
+			input{font-size:14px;padding:10px 5px;}
+			ul{list-style-type:none;}
+
+			.caption{font-size:18px;}
+			.section{padding:15px;margin:15px;background:whiteSmoke;border:1px solid #e5e5e5;}
+
+			.bold{font-weight:bold;}
+			.no-border{border:none;}
+
+			.appkey-haskey{font-weight:bold;color:green;background:whiteSmoke;}
+			.appkey-nokey{font-weight:normal;color:#ccc;background:white;}
+
+			.status-idle{background:#ccc;}
+			.status-success{background:green;}
+			.status-warning{background:yellow;}
+			.status-fail{background:red;}
+
+			.result-success{color:green;}
+			.result-warning{color:#DD4B39;}
+			.result-fail{color:red;}
+
+	    	.apiitem{margin:5px 0px;height:20px;}
+			.apiitem .apiseq{float:left;width:2%;height:20px;line-height:20px;}
+	    	.apiitem .apiname{background:#ccc;float:left;width:59%;height:20px;line-height:20px;position:relative;}
+	    	.apiitem .apiname .apiprogresstext{position:absolute;top:0px;left:0px;width:100%;height:100%;z-index:2;}
+	    	.apiitem .apiname .apiprogress{background:skyblue;position:absolute;top:0px;left:0px;width:0%;height:100%;z-index:1;}
+	    	.apiitem .apitestdetail{float:left;width:39%;height:100%;overflow:hidden;}
+	    	.apiitem .apitestdetail .apitestflag{float:left;width:20px;height:20px;margin:0px 10px;}
+	    	.apiitem .apitestdetail .apitestresult{float:left;line-height:20px;}
+        </style>
+        <script src="../build/all.js"></script>
+		<script>
+
+		// appkey配置
+    	(function () { 
+            var
+         		    appkey = T.cookie.get("appkey"),
+         	   placeholder = "请输入appkey";
+    
+         	appkey &&
+    	    	T.init({
+    				"appkey": appkey
+    	    	});
+    
+        	(appkey ? function () {
+                	T.documentReady(function () {
+    					var appkeyholder = document.all.appkey;
+    					appkeyholder.value = appkey;
+    					T.dom.addClass(appkeyholder,"appkey-haskey");
+                	});
+        	    } :
+                function () {
+                    T.documentReady(function () {
+    					var appkeyholder = document.all.appkey;
+    					appkeyholder.value = placeholder;
+    					T.dom.addClass(appkeyholder,"appkey-nokey");
+                        appkeyholder.focus();
+                    });
+                })();
+    
+        	T.documentReady(function () {
+    	    	var appkeyholder = document.all.appkey;			
+        		appkeyholder.onfocus = function () {
+        			if (this.value == placeholder) {
+        				this.value = '';
+        			}
+    			    T.dom.removeClass(appkeyholder,"appkey-nokey").addClass(appkeyholder,"appkey-haskey");
+        		};
+        		appkeyholder.onblur = function () {
+        			if (T.String.trim(this.value).length <= 0) {
+        		        this.value = placeholder;
+        				T.cookie.del("appkey");
+    					T.dom.removeClass(appkeyholder,"appkey-haskey").addClass(appkeyholder,"appkey-nokey");
+    				} else {
+    					T.dom.removeClass(appkeyholder,"appkey-nokey").addClass(appkeyholder,"appkey-haskey");
+    					T._inited ? T._appkey = this.value :
+                                    T.init({"appkey": this.value});
+    				}
+        		};
+        		appkeyholder.onchange = function () {
+        			T.cookie.set("appkey",this.value, 3600 * 24 * 365);
+        		};
+        	});
+    
+    	}());
+
+		//登录登出
+    	T.everythingReady(function () {
+			var 
+			       loginbar = document.all.loginbar,
+				   loginStatus = T.loginStatus();
+
+			var
+		      	messages = {
+					hasLoggedIn: '欢迎,%s,<a id="logout" href="javascript:void(0);">登出</a>'
+				   ,notLoggedIn: '<a id="login" href="javascript:void(0);">登录</a>'
+				   ,loginSuccess: '您已登录,%s,<a id="logout" href="javascript:void(0);">登出</a>'
+				   ,loginFail: '登录失败,%s,请重新<a id="login" href="javascript:void(0);">登录</a>'
+		       	}
+
+			var loginSuccessHandler = function (loginstatus) {
+				    loginbar.innerHTML = T.format.sprintf(messages.loginSuccess, loginstatus.nick);
+			    },
+		    	loginFailHandler = function (message) {
+				    loginbar.innerHTML = T.format.sprintf(messages.loginFail, message.error);
+		    	};
+
+	    	if (loginStatus) {
+				loginbar.innerHTML = T.format.sprintf(messages.hasLoggedIn, loginStatus.nick);; 
+			} else {
+				loginbar.innerHTML = messages.notLoggedIn;
+			}
+
+	    	document.body.onclick = function (e) {
+				e = e || window.event;
+				var el = e.srcElement;
+		    	switch (el.id) {
+					case "logout":
+						T.logout();
+						loginbar.innerHTML = "您已登出," + '<a id="login" href="javascript:void(0);">登录</a>';
+						break;
+					case "login":
+						T.login(loginSuccessHandler,loginFailHandler);
+						break;
+		    	}
+	    	}
+    	});
+
+		//接口测试
+    	(function () {
+			var 
+			apiitem = '<li class="apiitem" data-name="%s"><div class="apiseq">%s.</div><div class="apiname"><div class="apiprogresstext">%s</div><div class="apiprogress"></div></div><div class="apitestdetail"><div class="apitestflag status-idle"></div><div class="apitestresult">idle</div></div></li>';
+					i = 0,
+			    apitesthtml = [];
+
+        	for (var api in T._apiProvider.apis) {
+	        	if (T._apiProvider.apis.hasOwnProperty(api)) {
+					apitesthtml.push(T.format.sprintf(apiitem, api, ++i, api));
+	        	}
+        	}
+
+	    	T.documentReady(function () {
+			    document.all.apitest.innerHTML = apitesthtml.join("");
+	    	});
+
+			// 开始测试按钮
+	    	T.documentReady(function () {
+			    document.all.triggertest.onclick = function () {
+					var 
+					    block = !document.all.testoptionnonblock.checked, // 非阻塞模式开启
+						testItems = document.all.apitest.getElementsByClassName("apiitem"),
+						total = testItems.length,
+						warningTime = 50, // 请求成功的情况下如时间超出50毫秒则报警
+						startTime,
+						endTime,
+						trigger = this,
+						completed = 0,
+						i = 0;
+
+					if (trigger.getAttribute("data-restart") == "yes") { // 刷新
+						document.all.apitest.innerHTML = apitesthtml.join("");
+						document.all.totaltimecost.innerHTML = "";
+					}
+
+					trigger.disabled = "disabled";
+
+			    	function makeTest(index) {
+						var 
+						    el = testItems[index],
+							api = el.getAttribute("data-name"),
+							progress=0,
+							progressMax = 99,
+							progressElement = el.getElementsByClassName("apiprogress")[0],
+							resultElement = el.getElementsByClassName("apitestresult")[0],
+							statusElement = el.getElementsByClassName("apitestflag")[0],
+							progressTimer;
+
+				    	return {
+					    	run: function (callback) {
+								resultElement.innerHTML = "processing...";
+						    	progressTimer = setInterval(function () {
+									progress++;
+							    	if (progress > progressMax) {
+										clearInterval(progressTimer);
+										progressTimer = null;
+										return;
+							    	}
+									progressElement.style.width = progress + "%"; 
+						    	}, 100);
+
+							    T.api(api,{},"text")
+								 .success(function (response, timecost) {
+								     if( timecost < warningTime) {
+								          resultElement.innerHTML = "ok [" + timecost + "ms]";
+								          T.dom.addClass(statusElement,"status-success");
+								          T.dom.addClass(resultElement,"result-success");
+									 } else {
+								          resultElement.innerHTML = "ok [" + timecost + "ms]";
+								          T.dom.addClass(statusElement,"status-success");
+								          T.dom.addClass(resultElement,"result-warning");
+									 }
+								 })
+							     .error(function (code, message, timecost) {
+									 resultElement.innerHTML = "fail [" + timecost + "ms]";
+								     T.dom.addClass(statusElement,"status-fail");
+									 T.dom.addClass(resultElement,"result-fail");
+							     })
+								 .complete(function () {
+									 clearInterval(progressTimer);
+									 progressElement.style.width = "100%"; 
+									 progressTimer = null;
+									 callback && callback();
+								 });
+					    	}
+					       ,abort: function () {
+							   // not implemented
+					    	}
+				    	}
+			    	}
+
+			    	function onCompleting(finished) {
+						trigger.innerHTML = T.format.sprintf("测试中...%.2f%%",(finished/total) * 100);
+						return true;
+			    	}
+
+			    	function onCompleted() {
+						trigger.disabled=null;
+						endTime = T.time.now();
+						trigger.innerHTML = "重新开始测试";
+						trigger.setAttribute("data-restart","yes");
+						document.all.totaltimecost.innerHTML = "共耗时" + (endTime - startTime) + "ms";
+			    	}
+
+			    	function runTest() {
+				    	if (i >= total) {
+							return;
+				    	}
+				    	makeTest(i).run(function () {
+                            runTest(i++);
+							completed++ && onCompleting(completed) && completed >= total - 1 && onCompleted();
+				    	});
+			    	}
+
+					startTime = T.time.now();
+
+					(block ? runTest :
+					        function () {
+				            	for(;i<total;i++) {
+					            	makeTest(i).run(function () {
+					        		    completed++ && onCompleting(completed) && completed >= total - 1 && onCompleted();
+					            	});
+				            	}
+							}
+					)();
+			    }// end onclick
+	    	});
+
+    	}());
+		</script>
+	</head>
+    <!--[if lt IE 7 ]><body class="ie_6"><![endif]-->
+    <!--[if IE 7 ]><body class="ie_7"><![endif]-->
+    <!--[if IE 8 ]><body class="ie_8"><![endif]-->
+    <!--[if IE 9 ]><body class="ie_9"><![endif]-->
+    <!--[if (gt IE 9)|!(IE)]><!-->
+    <body>
+    <!--<![endif]-->
+
+	<!-- Appkey配置 -->
+	<label class="caption section">
+		AppKey:<input type="text" value="" class="no-border" id="appkey" size="32"></input>
+	</label>
+
+	<!-- 登录与登出 -->
+	<div class="caption section" id="loginbar">登录中,请稍候...</div>
+
+	<!-- 接口测试 -->
+	<div class="apitestwrapper section" id="apitestwrapper">
+		<div class="caption">API接口测试&nbsp;&nbsp;<button id="triggertest" class="caption">开始测试</button>&nbsp;&nbsp;<input id="testoptionnonblock" type="checkbox">非阻塞模式</input>&nbsp;&nbsp;<span id="totaltimecost"></span></div>
+		<ul class="apitest" id="apitest">
+		</ul>
+	</div>
+
+	</body>
+</html>
+
