@@ -53,7 +53,7 @@
 		}
 		
 		private function urlRequestError(e:ErrorEvent):void {
-			ExternalInterface.call("onFlashProxyMessage_8df046",e);
+			ExternalInterface.call("onFlashRequestComplete_8df046",e);
 		}
 		
 	}
