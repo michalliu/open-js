@@ -1,0 +1,139 @@
+<!doctype html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+		<title>登录与登出信息条</title>
+		<style>
+            body{font-size:12px;font-family:menlo,monaco,consolas,"Microsoft YaHei";padding:0;margin:0;}
+			ul,ol,li,label,textarea{display:block;padding:0;margin:0;}
+			input{font-size:14px;outline:none;}
+			ul{list-style-type:none;}
+			a{text-decoration:none;}
+
+			.caption{font-size:18px;}
+			.section{padding:15px;margin:15px;background:whiteSmoke;border:1px solid #e5e5e5;border-radius:15px;}
+
+			.bold{font-weight:bold;}
+			.no-border{border:none;}
+
+			.appkey-haskey{font-weight:bold;color:green;background:whiteSmoke;}
+			.appkey-nokey{font-weight:normal;color:#ccc;background:white;}
+
+        </style>
+        <script src="../build/all.js"></script>
+		<script>
+
+		// appkey配置
+    	(function () { 
+            var
+         		    appkey = T.cookie.get("appkey"),
+         	   placeholder = "请输入appkey";
+    
+         	appkey &&
+    	    	T.init({
+    				"appkey": appkey
+    	    	});
+    
+        	(appkey ? function () {
+                	T.documentReady(function () {
+    					var appkeyholder = document.all.appkey;
+    					appkeyholder.value = appkey;
+    					T.dom.addClass(appkeyholder,"appkey-haskey");
+                	});
+        	    } :
+                function () {
+                    T.documentReady(function () {
+    					var appkeyholder = document.all.appkey;
+    					appkeyholder.value = placeholder;
+    					T.dom.addClass(appkeyholder,"appkey-nokey");
+                        appkeyholder.focus();
+                    });
+                })();
+    
+        	T.documentReady(function () {
+    	    	var appkeyholder = document.all.appkey;			
+        		appkeyholder.onfocus = function () {
+        			if (this.value == placeholder) {
+        				this.value = '';
+        			}
+    			    T.dom.removeClass(appkeyholder,"appkey-nokey").addClass(appkeyholder,"appkey-haskey");
+        		};
+        		appkeyholder.onblur = function () {
+        			if (T.String.trim(this.value).length <= 0) {
+        		        this.value = placeholder;
+        				T.cookie.del("appkey");
+    					T.dom.removeClass(appkeyholder,"appkey-haskey").addClass(appkeyholder,"appkey-nokey");
+    				} else {
+    					T.dom.removeClass(appkeyholder,"appkey-nokey").addClass(appkeyholder,"appkey-haskey");
+    					T._inited ? T._appkey = this.value :
+                                    T.init({"appkey": this.value});
+    				}
+        		};
+        		appkeyholder.onchange = function () {
+        			T.cookie.set("appkey",this.value, 3600 * 24 * 365);
+        		};
+        	});
+    
+    	}());
+
+		//登录登出
+    	T.everythingReady(function () {
+			var 
+			       loginbar = document.all.loginbar,
+				   loginStatus = T.loginStatus();
+
+			var
+		      	messages = {
+					hasLoggedIn: '欢迎,%s,<a id="logout" href="javascript:void(0);">登出</a>'
+				   ,notLoggedIn: '<a id="login" href="javascript:void(0);">登录</a>'
+				   ,loginSuccess: '您已登录,%s,<a id="logout" href="javascript:void(0);">登出</a>'
+				   ,loginFail: '登录失败,%s,请重新<a id="login" href="javascript:void(0);">登录</a>'
+		       	}
+
+			var loginSuccessHandler = function (loginstatus) {
+				    loginbar.innerHTML = T.format.sprintf(messages.loginSuccess, loginstatus.nick);
+			    },
+		    	loginFailHandler = function (message) {
+				    loginbar.innerHTML = T.format.sprintf(messages.loginFail, message.error);
+		    	};
+
+	    	if (loginStatus) {
+				loginbar.innerHTML = T.format.sprintf(messages.hasLoggedIn, loginStatus.nick);; 
+			} else {
+				loginbar.innerHTML = messages.notLoggedIn;
+			}
+
+	    	document.body.onclick = function (e) {
+				e = e || window.event;
+				var el = e.srcElement;
+		    	switch (el.id) {
+					case "logout":
+						T.logout();
+						loginbar.innerHTML = "您已登出," + '<a id="login" href="javascript:void(0);">登录</a>';
+						break;
+					case "login":
+						T.login(loginSuccessHandler,loginFailHandler);
+						break;
+		    	}
+	    	}
+    	});
+		</script>
+	</head>
+    <!--[if lt IE 7 ]><body class="ie_6"><![endif]-->
+    <!--[if IE 7 ]><body class="ie_7"><![endif]-->
+    <!--[if IE 8 ]><body class="ie_8"><![endif]-->
+    <!--[if IE 9 ]><body class="ie_9"><![endif]-->
+    <!--[if (gt IE 9)|!(IE)]><!-->
+    <body>
+    <!--<![endif]-->
+
+	<!-- Appkey配置 -->
+	<label class="caption section">
+		AppKey:<input type="text" value="" class="no-border" id="appkey" size="32"></input>
+	</label>
+
+	<!-- 登录与登出 -->
+	<div class="caption section" id="loginbar">登录中,请稍候...</div>
+	</body>
+</html>
+

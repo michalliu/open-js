@@ -1,0 +1,362 @@
+<!doctype html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+		<title>接口调用测试</title>
+		<style>
+            body{font-size:12px;font-family:menlo,monaco,consolas,"Microsoft YaHei";padding:0;margin:0;}
+			ul,ol,li,label,textarea{display:block;padding:0;margin:0;}
+			select{font-size:14px;}
+			input{font-size:14px;outline:none;}
+			ul{list-style-type:none;}
+			a{text-decoration:none;}
+			input,textarea{font-family:menlo,monaco,consolas,"Microsoft YaHei";}
+
+			.caption{font-size:18px;}
+			.section{padding:15px;margin:15px;background:whiteSmoke;border:1px solid #e5e5e5;border-radius:15px;}
+
+			.bold{font-weight:bold;}
+			.no-border{border:none;}
+
+			.appkey-haskey{font-weight:bold;color:green;background:whiteSmoke;}
+			.appkey-nokey{font-weight:normal;color:#ccc;background:white;}
+
+			ol.configure {margin:0px 20px;}
+			.configure li{margin-top:15px;}
+			.configure li .subtitle{width:170px;float:left;}
+
+			.status-progress{background:#ccc;}
+			.status-success{background:green;}
+			.status-warning{background:gold;}
+			.status-fail{background:red;}
+
+			#status{width:140px;text-align:center;font-size:12px;height:20px;line-height:20px;padding:0px 10px;margin:0 auto;overflow:hidden;visibility:hidden;}
+			#status #performance{float:left;width:100px;padding:0px 10px;border-radius:10px;}
+			#status #diagnost{display:block;float:right;line-height:20px;font-weight:bold;font-size:16px;color:#DD4B39;}
+
+			#requestparams input{font-size:12px;padding:0px 5px;}
+			textarea#result{width:100%;height:300px;outline:none;}
+			
+        </style>
+        <script src="../build/all.js"></script>
+		<script>
+
+		// appkey配置
+    	(function () { 
+            var
+         		    appkey = T.cookie.get("appkey"),
+         	   placeholder = "请输入appkey";
+    
+         	appkey &&
+    	    	T.init({
+    				"appkey": appkey
+    	    	});
+    
+        	(appkey ? function () {
+                	T.documentReady(function () {
+    					var appkeyholder = document.all.appkey;
+    					appkeyholder.value = appkey;
+    					T.dom.addClass(appkeyholder,"appkey-haskey");
+                	});
+        	    } :
+                function () {
+                    T.documentReady(function () {
+    					var appkeyholder = document.all.appkey;
+    					appkeyholder.value = placeholder;
+    					T.dom.addClass(appkeyholder,"appkey-nokey");
+                        appkeyholder.focus();
+                    });
+                })();
+    
+        	T.documentReady(function () {
+    	    	var appkeyholder = document.all.appkey;			
+        		appkeyholder.onfocus = function () {
+        			if (this.value == placeholder) {
+        				this.value = '';
+        			}
+    			    T.dom.removeClass(appkeyholder,"appkey-nokey").addClass(appkeyholder,"appkey-haskey");
+        		};
+        		appkeyholder.onblur = function () {
+        			if (T.String.trim(this.value).length <= 0) {
+        		        this.value = placeholder;
+        				T.cookie.del("appkey");
+    					T.dom.removeClass(appkeyholder,"appkey-haskey").addClass(appkeyholder,"appkey-nokey");
+    				} else {
+    					T.dom.removeClass(appkeyholder,"appkey-nokey").addClass(appkeyholder,"appkey-haskey");
+    					T._inited ? T._appkey = this.value :
+                                    T.init({"appkey": this.value});
+    				}
+        		};
+        		appkeyholder.onchange = function () {
+        			T.cookie.set("appkey",this.value, 3600 * 24 * 365);
+        		};
+        	});
+    
+    	}());
+
+		//登录登出
+    	T.everythingReady(function () {
+			var 
+			       loginbar = document.all.loginbar,
+				   loginStatus = T.loginStatus();
+
+			var
+		      	messages = {
+					hasLoggedIn: '欢迎,%s,<a id="logout" href="javascript:void(0);">登出</a>'
+				   ,notLoggedIn: '<a id="login" href="javascript:void(0);">登录</a>'
+				   ,loginSuccess: '您已登录,%s,<a id="logout" href="javascript:void(0);">登出</a>'
+				   ,loginFail: '登录失败,%s,请重新<a id="login" href="javascript:void(0);">登录</a>'
+		       	}
+
+			var loginSuccessHandler = function (loginstatus) {
+				    loginbar.innerHTML = T.format.sprintf(messages.loginSuccess, loginstatus.nick);
+			    },
+		    	loginFailHandler = function (message) {
+				    loginbar.innerHTML = T.format.sprintf(messages.loginFail, message.error);
+		    	};
+
+	    	if (loginStatus) {
+				loginbar.innerHTML = T.format.sprintf(messages.hasLoggedIn, loginStatus.nick);; 
+			} else {
+				loginbar.innerHTML = messages.notLoggedIn;
+			}
+
+	    	document.body.onclick = function (e) {
+				e = e || window.event;
+				var el = e.srcElement;
+		    	switch (el.id) {
+					case "logout":
+						T.logout();
+						loginbar.innerHTML = "您已登出," + '<a id="login" href="javascript:void(0);">登录</a>';
+						break;
+					case "login":
+						T.login(loginSuccessHandler,loginFailHandler);
+						break;
+		    	}
+	    	}
+    	});
+
+		//创建接口列表
+    	(function () {
+			var api,
+			    category,
+			    categories = {};
+
+			for (api in T._apiProvider.apis) {
+	        	if (T._apiProvider.apis.hasOwnProperty(api)) {
+					category = T._apiProvider.apis[api].category;
+			    	if (!categories.hasOwnProperty(category)) {
+                        categories[category] = [];
+					}
+					categories[category].push([api,T._apiProvider.apis[api]]);
+	        	}
+        	}
+
+			// 创建接口列表
+	    	T.documentReady(function () {
+
+				var category,
+				    optgrp,
+				    apilist = document.all.requestapiname;
+	        	for (category in categories) {
+		        	if (categories.hasOwnProperty(category)) {
+						// 类别目录
+                        optgrp = T.dom.create("optgroup",{
+		    				       label: T.format.sprintf("-- %s",category)
+		    	    	    }); 
+		    	    	T.dom.append(optgrp,apilist);
+
+						// 该类别下的api名称
+				    	T.Array.each(categories[category], function (i,v) {
+					    	T.dom.append(T.dom.create("option",{
+								value: v[0]
+							   ,"data-methods":v[1].supportMethod
+							   ,"data-params":T.JSON.stringify(v[1].supportParams)
+							   ,innerText: T.format.sprintf("%s %s",v[0],v[1].description)
+					    	}) ,optgrp);
+				    	});
+		        	}
+	        	} // end for
+
+		    	//事件
+	        	apilist.onchange = function () {
+					var 
+					    api = apilist.options[apilist.selectedIndex],
+						methodSelector = document.all.requestmethod,
+						paramHtml = [],
+					    listMethods = api.getAttribute("data-methods").split("|"),
+						listParams = T.JSON.parse(api.getAttribute("data-params"));
+
+					methodSelector.innerHTML = "";
+
+					T.Array.each(listMethods, function (i,v) {
+						v = T.String.trim(v);
+				    	if (v) {
+					    	T.dom.append(T.dom.create("option", {
+								value: v
+							   ,innerText: v.toUpperCase()
+					    	}), methodSelector);
+				    	}
+					});
+
+					// 创建参数列表
+			    	for (var paramName in listParams) {
+				    	if(listParams.hasOwnProperty(paramName)) {
+							paramHtml.push(T.format.sprintf('%s=<input size="5" title="%s" value="%s"></input>',paramName,listParams[paramName].description,listParams[paramName].defaultValue));
+							document.all.requestparams.innerHTML = paramHtml.join("&");
+				    	}
+			    	}
+	        	};
+
+                apilist.onchange();
+
+	    	}); // end documentReady
+
+    	}());
+
+    	T.documentReady(function () {
+			var diagnost,//调试信息
+			    diagnostFormat="%s: %s";
+			// 执行请求
+		    document.all.execute.onclick = function () {
+				var
+				    apiname = document.all.requestapiname.value,
+					apiparamnames=document.all.requestparams.innerText.split("&"),
+					apiformat = document.all.requestdatatype.value,
+					apimethod=document.all.requestmethod.value,
+					apiparamvalues=[],
+					apiparamstr="",
+					trigger=this,
+					performance = document.all.performance,
+					statusHolder = document.all.status,
+					resultHolder = document.all.result,
+					apiparam;
+
+                diagnost = [];
+
+				T.find("#requestparams > input").each(function (paramInput) {
+					apiparamvalues.push(paramInput.value);
+				});
+
+				T.Array.each(apiparamvalues,function (i,v){ 
+			    	if (v) {
+						apiparamstr += apiparamnames[i] + v;
+			    	}
+				});
+
+				apiparam = T.queryString.decode(apiparamstr);
+
+				trigger.disabled = true;
+				statusHolder.style.visibility="visible";
+                performance.className="status-progress"
+				performance.innerHTML = "请稍候...";
+
+				// 调试信息
+				diagnost.push(T.format.sprintf(diagnostFormat, "接口名称", apiname));
+				diagnost.push(T.format.sprintf(diagnostFormat, "参数列表", T.queryString.encode(apiparam)));
+		    	diagnost.push(T.format.sprintf(diagnostFormat, "其它参数", T.queryString.encode({
+                   	 "oauth_consumer_key" : QQWB._appkey
+                   	,"oauth_token" : QQWB._token.getAccessToken()
+                   	,"oauth_version" : "2.0"
+		    	})));
+				diagnost.push(T.format.sprintf(diagnostFormat, "数据格式", apiformat));
+				diagnost.push(T.format.sprintf(diagnostFormat, "请求方法", apimethod));
+				diagnost.push(T.format.sprintf(diagnostFormat, "请求时间", T.time.now()));
+
+		    	function stringify(r) {
+			    	switch (apiformat) {
+						case "xml":
+						return T.XML.stringify(r);
+					    case "json":
+						return T.JSON.stringify(r);
+			    	}
+					return r;
+		    	}
+
+				T.api(apiname,apiparam,apiformat,apimethod)
+			     .complete(function () {
+					 trigger.disabled = false;
+				     diagnost.push(T.format.sprintf(diagnostFormat, "响应时间", T.time.now()));
+			     })
+				 .success(function (response, costtime, headers) {
+					 costtime > 600 ?
+					     performance.className="status-warning" :
+                         performance.className="status-success";
+					 performance.innerHTML = T.format.sprintf("处理时间%dms", costtime);
+				     diagnost.push(T.format.sprintf(diagnostFormat, "处理时间", costtime));
+				     diagnost.push(T.format.sprintf(diagnostFormat, "结    果", "成功"));
+				     diagnost.push(T.format.sprintf(diagnostFormat, "响 应 头", headers));
+				     diagnost.push(T.format.sprintf(diagnostFormat, "纯 文 本", stringify(response)));
+					 result.value = response;
+				 })
+			     .error(function (code, message, costtime){
+                     performance.className="status-fail"
+					 performance.innerHTML = T.format.sprintf("处理时间%dms", costtime);
+				     diagnost.push(T.format.sprintf(diagnostFormat, "处理时间", costtime));
+				     diagnost.push(T.format.sprintf(diagnostFormat, "结    果", "失败"));
+					 result.value = T.format.sprintf("请求失败，错误码:%d,错误信息:%s",code,message);
+			     })
+		    };
+
+			//调试信息
+		    document.all.diagnost.onclick = function () {
+				alert(diagnost.join("\n"));
+		    }
+    	}); // end documentReady
+		</script>
+	</head>
+    <!--[if lt IE 7 ]><body class="ie_6"><![endif]-->
+    <!--[if IE 7 ]><body class="ie_7"><![endif]-->
+    <!--[if IE 8 ]><body class="ie_8"><![endif]-->
+    <!--[if IE 9 ]><body class="ie_9"><![endif]-->
+    <!--[if (gt IE 9)|!(IE)]><!-->
+    <body>
+    <!--<![endif]-->
+
+	<!-- Appkey配置 -->
+	<label class="caption section">
+		AppKey:<input type="text" value="" class="no-border" id="appkey" size="32"></input>
+	</label>
+
+	<!-- 登录与登出 -->
+	<div class="caption section" id="loginbar">登录中,请稍候...</div>
+
+	<!-- 接口测试 -->
+	<div class="apitestwrapper section" id="apitestwrapper">
+		<div class="caption">接口调用测试</div>
+		<ol class="configure">
+	    	<li><div class="caption subtitle">一、接口</div>
+	        	<select id="requestapiname">
+					<optgroup label="接口列表"></optgroup>
+	            </select>
+	    	</li>
+	    	<li><div class="caption subtitle">二、参数</div>
+	        	<div id="requestparams">
+	            </div>
+	    	</li>
+	    	<li><div class="caption subtitle">三、数据格式</div>
+	        	<select id="requestdatatype">
+	        		<option value="json">JSON</option>
+	        		<option value="xml">XML</option>
+	        		<option value="text" selected>TEXT</option>
+	            </select>
+	    	</li>
+			<li><div class="caption subtitle">四、请求方式</div>
+	        	<select id="requestmethod">
+	            </select>
+            </li>
+			<li>
+		    	<button id="execute" class="caption">执行</button>
+			</li>
+	    </ol>
+	    <div id="status"><div id="performance" class="status-progress"></div><a id="diagnost" title="诊断信息" href="javascript:;">+</a></div>
+	</div>
+
+	
+	<div class="caption section" id="resultHolder">
+		<textarea id="result"></textarea>
+	</div>
+
+	</body>
+</html>
+
