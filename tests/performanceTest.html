@@ -42,7 +42,7 @@
 
 			.apitestwrapper .testdesc {padding:15px;overflow:hidden;}
 			.apitestwrapper .testdesc .status-flag,.apitestwrapper .testdesc .status-text{float:left;}
-			#performance{font-size:12px;height:20px;line-height:20px;padding:0px 10px;background:gold;margin-left:15px;border-radius:10px;display:none;}
+			#performance{font-size:12px;height:20px;line-height:20px;padding:0px 10px;background:gold;margin:0 auto; width:260px;text-align:center;border-radius:10px;visibility:hidden;}
         </style>
         <script src="../build/all.js"></script>
 		<script>
@@ -151,13 +151,12 @@
 
         	for (api in T._apiProvider.apis) {
 	        	if (T._apiProvider.apis.hasOwnProperty(api)) {
-					apitesthtml.push(T.format.sprintf('<li class="apiitem" data-name="%s"><div class="apiseq">%s.</div><div class="apiname"><div class="apiprogresstext">%s</div><div class="apiprogress"></div></div><div class="apitestdetail"><div class="apitestflag status-flag status-idle"></div><div class="apitestresult">idle</div><a class="apidiagnost" title="诊断信息" href="javascript:void(0);">+</a></div></li>', api, ++apiCounter, api));
+					apitesthtml.push(T.format.sprintf('<li class="apiitem" data-name="%s"><div class="apiseq">%s.</div><div class="apiname"><div class="apiprogresstext">%s</div><div class="apiprogress"></div></div><div class="apitestdetail"><div class="apitestflag status-flag status-idle"></div><div class="apitestresult">空闲</div><a class="apidiagnost" title="诊断信息" href="javascript:void(0);">+</a></div></li>', api, ++apiCounter, api));
 	        	}
         	}
 
 	    	T.documentReady(function () {
 			    document.all.apitest.innerHTML = apitesthtml.join("");
-                document.all.performance.style.display="none";
 	    	});
 
 			// 开始测试按钮
@@ -183,7 +182,7 @@
 					testItems = T.find("#apitest > .apiitem");
 					total = testItems.length;
 
-                    document.all.performance.style.display="block";
+                    document.all.performance.style.visibility="visible";
                     document.all.performance.innerHTML = "请稍候...";
 
 			    	function makeTest(index) {
@@ -200,7 +199,7 @@
 
 				    	return {
 					    	run: function (callback) {
-								resultElement.innerHTML = "processing...";
+								resultElement.innerHTML = "进行中...";
 						    	progressTimer = setInterval(function () {
 									progress++;
 							    	if (progress > progressMax) {
@@ -214,11 +213,11 @@
 							    T.api(api,{},"text")
 								 .success(function (response, timecost) {
 								     if( timecost < warningTime) {
-								          resultElement.innerHTML = "ok [" + timecost + "ms]";
+								          resultElement.innerHTML = (timecost < 300 ? "非常" : "良") + "好 [" + timecost + "ms]";
 								          T.dom.addClass(statusElement,"status-success");
 								          T.dom.addClass(resultElement,"result-success");
 									 } else {
-								          resultElement.innerHTML = "ok [" + timecost + "ms]";
+								          resultElement.innerHTML = "一般 [" + timecost + "ms]";
 								          T.dom.addClass(statusElement,"status-warning");
 								          T.dom.addClass(resultElement,"result-warning");
 									 }
@@ -227,7 +226,7 @@
 								     };
 								 })
 							     .error(function (code, message, timecost) {
-									 resultElement.innerHTML = "fail [" + timecost + "ms]";
+									 resultElement.innerHTML = "失败 [" + timecost + "ms]";
 								     T.dom.addClass(statusElement,"status-fail");
 									 T.dom.addClass(resultElement,"result-fail");
 								     diagnost.onclick = function () {
@@ -311,8 +310,9 @@
 
 	<!-- 接口测试 -->
 	<div class="apitestwrapper section" id="apitestwrapper">
-		<div class="caption">接口性能测试&nbsp;&nbsp;<button id="triggertest" class="caption">开始</button>&nbsp;&nbsp;<input id="testoptionnonblock" type="checkbox">不阻塞</input></div>
-		<div class="caption testdesc">
+		<div class="caption">接口性能测试&nbsp;&nbsp;<button id="triggertest" class="caption">开始</button>&nbsp;&nbsp;<input id="testoptionnonblock" type="checkbox">不阻塞</input> </div>
+        <div class="status-text" id="performance"></div>
+		<!--<div class="caption testdesc">
 			<div class="status-flag status-idle"></div>
 			<div class="status-text">等待</div>
 			<div class="status-flag status-success"></div>
@@ -321,8 +321,7 @@
 			<div class="status-text">一般</div>
 			<div class="status-flag status-fail"></div>
 			<div class="status-text">失败</div>
-            <div class="status-text" id="performance"></div>
-		</div>
+		</div>-->
 		<ul class="apitest" id="apitest">
 		</ul>
 	</div>
