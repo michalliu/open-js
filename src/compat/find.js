@@ -10,6 +10,7 @@
  * @module find
  * @requires base
  *           sizzle
+ *           common.Array
  *           
  */
 
@@ -19,9 +20,9 @@
 
     $.noConflict(); // rollback Sizzle to its original value
 
-    if (typeof window.Sizzle === "undefined") { // if we introduce the Sizzle variable then we don't need it anymore 
-        delete window.Sizzle; // IE doesn't support delete
-    }
+    //if (typeof window.Sizzle === "undefined") { // if we introduce the Sizzle variable then we don't need it anymore 
+        //delete window.Sizzle; //
+    //}
 
     /**
      * Continues to find nodes in results
@@ -40,7 +41,7 @@
      */
     function find (selector) {
         var tempArr;
-        if (toString.call(this) !== "[object Array]") {
+        if (!QQWB.Array.isArray(this)) { // expected an array
             return this;
         }
         tempArr = [];
@@ -86,6 +87,16 @@
         return $.matches(":not(" + selector + ")",this);
     }
 
+	/**
+	 * Get the element in result
+	 *
+	 * @access private
+	 * @return {Node}
+	 */
+	function get (index) {
+		return QQWB.Array.get(this, index);
+	}
+
     /**
      * A beautiful way to enumerate the nodes
      *
@@ -93,11 +104,11 @@
      * @return {Array} the *same* nodes
      */
     function each (func) {
-        if (!toString.call(this) === "[object Array]" || !func) {
+        if (!QQWB.Array.isArray(this) || !func) { // expected an array and handler
             return this;
         }
         for (var i=0,l=this.length; i<l; i++) {
-            if(func(this[i]) === false) {
+            if(func(this[i]) === false) { // execute func
                 break;
             }
         }
@@ -129,6 +140,11 @@
         !nodes.tear &&
         (nodes.tear = function (selector) {
             return create_chain(tear.call(nodes,selector));
+        });
+
+        !nodes.get &&
+        (nodes.get = function (index) {
+            return get.call(nodes,index);
         });
 
         !nodes.each &&

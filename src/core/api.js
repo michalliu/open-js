@@ -238,7 +238,7 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optSolution)
 											response[3] = QQWB.XML.fromString(response[3]);
 										}
 										//relateDeferred.resolve.apply(relateDeferred,[response[2],response[3]]);
-                                        relateDeferred.resolve(response[3], response[2]);
+                                        relateDeferred.resolve(response[3]/* response body */, response[2]/* elpased time */, response[4]/*response header*/);
 							    	}
 									QQWB.api.uncollect(id);
 								} else {
@@ -287,7 +287,7 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optSolution)
 				deferred.reject.apply(deferred,response);
 			} else {
 				//deferred.resolve.apply(deferred,[response[2],response[3]]);
-                deferred.resolve(response[3], response[2]);
+                deferred.resolve(response[3]/* response body */, response[2]/* elpased time */, response[4]/*response header*/);
 			}
 		});
 	}

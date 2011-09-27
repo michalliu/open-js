@@ -24,10 +24,21 @@ QQWB.extend("XML",{
      * xml object to string
      *
      * @access public
+	 * @deprecated use stringify instead
      * @param xml {Object} xml object
      * @return {String}
      */
    ,toString: function (xml) {
+	   return this.stringify(xml);
+    }
+    /**
+     * xml object to string
+     *
+     * @access public
+     * @param xml {Object} xml object
+     * @return {String}
+     */
+   ,stringify: function (xml) {
         var str;
         if (window.ActiveXObject) {
             str = xml.xml;

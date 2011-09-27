@@ -26,7 +26,11 @@ QQWB.extend("dom", {
         if (optAttrs && element) {
             for (attr in optAttrs) {
                 if (optAttrs.hasOwnProperty(attr)) {
-                    element[attr] = optAttrs[attr];
+					if(!QQWB.String.startsWith(attr,"data-")) {
+                        element[attr] = optAttrs[attr];
+					} else {
+						element.setAttribute(attr,optAttrs[attr]);
+					}
                 }
             }
         }

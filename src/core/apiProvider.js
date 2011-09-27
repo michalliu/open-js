@@ -29,15 +29,15 @@ QQWB.extend("_apiProvider", {
             supportMethod: "get",
             supportParams: {
                 pageflag: {
-                    defalutValue: 20,
+                    defaultValue: 20,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 reqnum: {
-                    defalutValue: 0,
+                    defaultValue: 0,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 pagetime: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -48,11 +48,11 @@ QQWB.extend("_apiProvider", {
             supportMethod: "get",
             supportParams: {
                 pos: {
-                    defalutValue: 20,
+                    defaultValue: 20,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 reqnum: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -63,23 +63,23 @@ QQWB.extend("_apiProvider", {
             supportMethod: "get",
             supportParams: {
                 pageflag: {
-                    defalutValue: 0,
+                    defaultValue: 0,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 pagetime: {
-                    defalutValue: 20,
+                    defaultValue: 20,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 reqnum: {
-                    defalutValue: 0,
+                    defaultValue: 0,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 lastid: {
-                    defalutValue: "t",
+                    defaultValue: "t",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 name: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -90,19 +90,19 @@ QQWB.extend("_apiProvider", {
             supportMethod: "get",
             supportParams: {
                 pageflag: {
-                    defalutValue: 0,
+                    defaultValue: 0,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 pagetime: {
-                    defalutValue: 20,
+                    defaultValue: 20,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 reqnum: {
-                    defalutValue: 0,
+                    defaultValue: 0,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 lastid: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -113,19 +113,19 @@ QQWB.extend("_apiProvider", {
             supportMethod: "post",
             supportParams: {
                 httext: {
-                    defalutValue: 0,
+                    defaultValue: 0,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 pageflag: {
-                    defalutValue: "",
+                    defaultValue: "",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 pageinfo: {
-                    defalutValue: 20,
+                    defaultValue: 20,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 reqnum: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -136,19 +136,19 @@ QQWB.extend("_apiProvider", {
             supportMethod: "get",
             supportParams: {
                 pageflag: {
-                    defalutValue: 0,
+                    defaultValue: 0,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 pagetime: {
-                    defalutValue: 20,
+                    defaultValue: 20,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 reqnum: {
-                    defalutValue: 0,
+                    defaultValue: 0,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 lastid: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -159,15 +159,15 @@ QQWB.extend("_apiProvider", {
             supportMethod: "get",
             supportParams: {
                 pageflag: {
-                    defalutValue: 0,
+                    defaultValue: 0,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 pagetime: {
-                    defalutValue: 20,
+                    defaultValue: 20,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 reqnum: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -178,31 +178,31 @@ QQWB.extend("_apiProvider", {
             supportMethod: "get",
             supportParams: {
                 pageflag: {
-                    defalutValue: 20,
+                    defaultValue: 20,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 pagetime: {
-                    defalutValue: "",
+                    defaultValue: "",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 reqnum: {
-                    defalutValue: "",
+                    defaultValue: "",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 lastid: {
-                    defalutValue: "",
+                    defaultValue: "",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 type: {
-                    defalutValue: "",
+                    defaultValue: "",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 contenttype: {
-                    defalutValue: "",
+                    defaultValue: "",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 accesslevel: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -213,31 +213,31 @@ QQWB.extend("_apiProvider", {
             supportMethod: "get",
             supportParams: {
                 pageflag: {
-                    defalutValue: 20,
+                    defaultValue: 20,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 pagetime: {
-                    defalutValue: "",
+                    defaultValue: "",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 reqnum: {
-                    defalutValue: "",
+                    defaultValue: "",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 lastid: {
-                    defalutValue: "",
+                    defaultValue: "",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 type: {
-                    defalutValue: "",
+                    defaultValue: "",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 contenttype: {
-                    defalutValue: "",
+                    defaultValue: "",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 accesslevel: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -248,31 +248,31 @@ QQWB.extend("_apiProvider", {
             supportMethod: "get",
             supportParams: {
                 pageflag: {
-                    defalutValue: 20,
+                    defaultValue: 20,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 pagetime: {
-                    defalutValue: "",
+                    defaultValue: "",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 reqnum: {
-                    defalutValue: "",
+                    defaultValue: "",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 lastid: {
-                    defalutValue: "",
+                    defaultValue: "",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 type: {
-                    defalutValue: "",
+                    defaultValue: "",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 contenttype: {
-                    defalutValue: "",
+                    defaultValue: "",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 accesslevel: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -283,35 +283,35 @@ QQWB.extend("_apiProvider", {
             supportMethod: "get",
             supportParams: {
                 pageflag: {
-                    defalutValue: 20,
+                    defaultValue: 20,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 pagetime: {
-                    defalutValue: "",
+                    defaultValue: "",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 reqnum: {
-                    defalutValue: "",
+                    defaultValue: "",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 lastid: {
-                    defalutValue: "t",
+                    defaultValue: "t",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 name: {
-                    defalutValue: "",
+                    defaultValue: "",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 type: {
-                    defalutValue: "",
+                    defaultValue: "",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 contenttype: {
-                    defalutValue: "",
+                    defaultValue: "",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 accesslevel: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -322,35 +322,35 @@ QQWB.extend("_apiProvider", {
             supportMethod: "get",
             supportParams: {
                 pageflag: {
-                    defalutValue: 20,
+                    defaultValue: 20,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 pagetime: {
-                    defalutValue: "",
+                    defaultValue: "",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 reqnum: {
-                    defalutValue: "",
+                    defaultValue: "",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 lastid: {
-                    defalutValue: "t,api_weibo",
+                    defaultValue: "t,api_weibo",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 names: {
-                    defalutValue: "",
+                    defaultValue: "",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 type: {
-                    defalutValue: "",
+                    defaultValue: "",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 contenttype: {
-                    defalutValue: "",
+                    defaultValue: "",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 accesslevel: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -361,35 +361,35 @@ QQWB.extend("_apiProvider", {
             supportMethod: "get",
             supportParams: {
                 pageflag: {
-                    defalutValue: 20,
+                    defaultValue: 20,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 pagetime: {
-                    defalutValue: "",
+                    defaultValue: "",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 reqnum: {
-                    defalutValue: "",
+                    defaultValue: "",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 lastid: {
-                    defalutValue: "t,api_weibo",
+                    defaultValue: "t,api_weibo",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 names: {
-                    defalutValue: "",
+                    defaultValue: "",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 type: {
-                    defalutValue: "",
+                    defaultValue: "",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 contenttype: {
-                    defalutValue: "",
+                    defaultValue: "",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 accesslevel: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -400,23 +400,23 @@ QQWB.extend("_apiProvider", {
             supportMethod: "get",
             supportParams: {
                 pos: {
-                    defalutValue: 20,
+                    defaultValue: 20,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 reqnum: {
-                    defalutValue: "",
+                    defaultValue: "",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 country: {
-                    defalutValue: "",
+                    defaultValue: "",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 province: {
-                    defalutValue: "",
+                    defaultValue: "",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 city: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -427,7 +427,7 @@ QQWB.extend("_apiProvider", {
             supportMethod: "get",
             supportParams: {
                 id: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -438,19 +438,19 @@ QQWB.extend("_apiProvider", {
             supportMethod: "post",
             supportParams: {
                 content: {
-                    defalutValue: "127.0.0.1",
+                    defaultValue: "127.0.0.1",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 clientip: {
-                    defalutValue: "",
+                    defaultValue: "",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 jing: {
-                    defalutValue: "",
+                    defaultValue: "",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 wei: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -461,7 +461,7 @@ QQWB.extend("_apiProvider", {
             supportMethod: "post",
             supportParams: {
                 id: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -472,23 +472,23 @@ QQWB.extend("_apiProvider", {
             supportMethod: "post",
             supportParams: {
                 content: {
-                    defalutValue: "127.0.0.1",
+                    defaultValue: "127.0.0.1",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 clientip: {
-                    defalutValue: "",
+                    defaultValue: "",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 jing: {
-                    defalutValue: "",
+                    defaultValue: "",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 wei: {
-                    defalutValue: "",
+                    defaultValue: "",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 reid: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -499,23 +499,23 @@ QQWB.extend("_apiProvider", {
             supportMethod: "post",
             supportParams: {
                 content: {
-                    defalutValue: "127.0.0.1",
+                    defaultValue: "127.0.0.1",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 clientip: {
-                    defalutValue: "",
+                    defaultValue: "",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 jing: {
-                    defalutValue: "",
+                    defaultValue: "",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 wei: {
-                    defalutValue: "",
+                    defaultValue: "",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 reid: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -526,19 +526,19 @@ QQWB.extend("_apiProvider", {
             supportMethod: "post",
             supportParams: {
                 content: {
-                    defalutValue: "127.0.0.1",
+                    defaultValue: "127.0.0.1",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 clientip: {
-                    defalutValue: "",
+                    defaultValue: "",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 jing: {
-                    defalutValue: "",
+                    defaultValue: "",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 wei: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -549,11 +549,11 @@ QQWB.extend("_apiProvider", {
             supportMethod: "post",
             supportParams: {
                 ids: {
-                    defalutValue: 2,
+                    defaultValue: 2,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 flag: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -564,27 +564,27 @@ QQWB.extend("_apiProvider", {
             supportMethod: "get",
             supportParams: {
                 flag: {
-                    defalutValue: "",
+                    defaultValue: "",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 rootid: {
-                    defalutValue: 0,
+                    defaultValue: 0,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 pageflag: {
-                    defalutValue: 0,
+                    defaultValue: 0,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 pagetime: {
-                    defalutValue: 20,
+                    defaultValue: 20,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 reqnum: {
-                    defalutValue: 0,
+                    defaultValue: 0,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 twitterid: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -595,23 +595,23 @@ QQWB.extend("_apiProvider", {
             supportMethod: "post",
             supportParams: {
                 content: {
-                    defalutValue: "127.0.0.1",
+                    defaultValue: "127.0.0.1",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 clientip: {
-                    defalutValue: "",
+                    defaultValue: "",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 jing: {
-                    defalutValue: "",
+                    defaultValue: "",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 wei: {
-                    defalutValue: "",
+                    defaultValue: "",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 reid: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -622,31 +622,31 @@ QQWB.extend("_apiProvider", {
             supportMethod: "post",
             supportParams: {
                 content: {
-                    defalutValue: "127.0.0.1",
+                    defaultValue: "127.0.0.1",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 clientip: {
-                    defalutValue: "",
+                    defaultValue: "",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 jing: {
-                    defalutValue: "",
+                    defaultValue: "",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 wei: {
-                    defalutValue: "http://a.com/b.mp3",
+                    defaultValue: "http://a.com/b.mp3",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 url: {
-                    defalutValue: "歌名",
+                    defaultValue: "歌名",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 title: {
-                    defalutValue: "演唱者",
+                    defaultValue: "演唱者",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 author: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -657,23 +657,23 @@ QQWB.extend("_apiProvider", {
             supportMethod: "post",
             supportParams: {
                 content: {
-                    defalutValue: "127.0.0.1",
+                    defaultValue: "127.0.0.1",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 clientip: {
-                    defalutValue: "",
+                    defaultValue: "",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 jing: {
-                    defalutValue: "",
+                    defaultValue: "",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 wei: {
-                    defalutValue: "http://v.youku.com/v_show/id_XMjExODczODM2.html",
+                    defaultValue: "http://v.youku.com/v_show/id_XMjExODczODM2.html",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 url: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -684,7 +684,7 @@ QQWB.extend("_apiProvider", {
             supportMethod: "post",
             supportParams: {
                 url: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -695,7 +695,7 @@ QQWB.extend("_apiProvider", {
             supportMethod: "get",
             supportParams: {
                 ids: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -711,39 +711,39 @@ QQWB.extend("_apiProvider", {
             supportMethod: "post",
             supportParams: {
                 nick: {
-                    defalutValue: 1,
+                    defaultValue: 1,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 sex: {
-                    defalutValue: 2000,
+                    defaultValue: 2000,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 year: {
-                    defalutValue: 1,
+                    defaultValue: 1,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 month: {
-                    defalutValue: 1,
+                    defaultValue: 1,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 day: {
-                    defalutValue: 86,
+                    defaultValue: 86,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 countrycode: {
-                    defalutValue: 34,
+                    defaultValue: 34,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 provincecode: {
-                    defalutValue: "0755",
+                    defaultValue: "0755",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 citycode: {
-                    defalutValue: "i am ok.",
+                    defaultValue: "i am ok.",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 introduction: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -754,7 +754,7 @@ QQWB.extend("_apiProvider", {
             supportMethod: "post",
             supportParams: {
                 pic: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -765,7 +765,7 @@ QQWB.extend("_apiProvider", {
             supportMethod: "get",
             supportParams: {
                 name: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -776,7 +776,7 @@ QQWB.extend("_apiProvider", {
             supportMethod: "post",
             supportParams: {
                 names: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -787,7 +787,7 @@ QQWB.extend("_apiProvider", {
             supportMethod: "post",
             supportParams: {
                 name: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -798,11 +798,11 @@ QQWB.extend("_apiProvider", {
             supportMethod: "get",
             supportParams: {
                 reqnum: {
-                    defalutValue: 0,
+                    defaultValue: 0,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 startindex: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -813,11 +813,11 @@ QQWB.extend("_apiProvider", {
             supportMethod: "get",
             supportParams: {
                 reqnum: {
-                    defalutValue: 0,
+                    defaultValue: 0,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 startindex: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -828,11 +828,11 @@ QQWB.extend("_apiProvider", {
             supportMethod: "get",
             supportParams: {
                 reqnum: {
-                    defalutValue: 0,
+                    defaultValue: 0,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 startindex: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -843,11 +843,11 @@ QQWB.extend("_apiProvider", {
             supportMethod: "get",
             supportParams: {
                 reqnum: {
-                    defalutValue: 0,
+                    defaultValue: 0,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 startindex: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -858,7 +858,7 @@ QQWB.extend("_apiProvider", {
             supportMethod: "post",
             supportParams: {
                 name: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -869,7 +869,7 @@ QQWB.extend("_apiProvider", {
             supportMethod: "post",
             supportParams: {
                 name: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -880,7 +880,7 @@ QQWB.extend("_apiProvider", {
             supportMethod: "post",
             supportParams: {
                 name: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -891,7 +891,7 @@ QQWB.extend("_apiProvider", {
             supportMethod: "post",
             supportParams: {
                 name: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -902,7 +902,7 @@ QQWB.extend("_apiProvider", {
             supportMethod: "post",
             supportParams: {
                 name: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -913,7 +913,7 @@ QQWB.extend("_apiProvider", {
             supportMethod: "post",
             supportParams: {
                 name: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -924,11 +924,11 @@ QQWB.extend("_apiProvider", {
             supportMethod: "get",
             supportParams: {
                 names: {
-                    defalutValue: 2,
+                    defaultValue: 2,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 flag: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -939,15 +939,15 @@ QQWB.extend("_apiProvider", {
             supportMethod: "get",
             supportParams: {
                 reqnum: {
-                    defalutValue: 0,
+                    defaultValue: 0,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 startindex: {
-                    defalutValue: "t",
+                    defaultValue: "t",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 name: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -958,15 +958,15 @@ QQWB.extend("_apiProvider", {
             supportMethod: "get",
             supportParams: {
                 reqnum: {
-                    defalutValue: 0,
+                    defaultValue: 0,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 startindex: {
-                    defalutValue: "t",
+                    defaultValue: "t",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 name: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -977,15 +977,15 @@ QQWB.extend("_apiProvider", {
             supportMethod: "get",
             supportParams: {
                 reqnum: {
-                    defalutValue: 0,
+                    defaultValue: 0,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 startindex: {
-                    defalutValue: "",
+                    defaultValue: "",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 name: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -996,11 +996,11 @@ QQWB.extend("_apiProvider", {
             supportMethod: "get",
             supportParams: {
                 reqnum: {
-                    defalutValue: 0,
+                    defaultValue: 0,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 startindex: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -1011,11 +1011,11 @@ QQWB.extend("_apiProvider", {
             supportMethod: "get",
             supportParams: {
                 reqnum: {
-                    defalutValue: 0,
+                    defaultValue: 0,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 startindex: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -1026,23 +1026,23 @@ QQWB.extend("_apiProvider", {
             supportMethod: "post",
             supportParams: {
                 content: {
-                    defalutValue: "127.0.0.1",
+                    defaultValue: "127.0.0.1",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 clientip: {
-                    defalutValue: "",
+                    defaultValue: "",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 jing: {
-                    defalutValue: "",
+                    defaultValue: "",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 wei: {
-                    defalutValue: "t",
+                    defaultValue: "t",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 name: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -1053,7 +1053,7 @@ QQWB.extend("_apiProvider", {
             supportMethod: "post",
             supportParams: {
                 id: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -1064,19 +1064,19 @@ QQWB.extend("_apiProvider", {
             supportMethod: "get",
             supportParams: {
                 pageflag: {
-                    defalutValue: 0,
+                    defaultValue: 0,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 pagetime: {
-                    defalutValue: 20,
+                    defaultValue: 20,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 reqnum: {
-                    defalutValue: 0,
+                    defaultValue: 0,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 lastid: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -1087,19 +1087,19 @@ QQWB.extend("_apiProvider", {
             supportMethod: "get",
             supportParams: {
                 pageflag: {
-                    defalutValue: 0,
+                    defaultValue: 0,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 pagetime: {
-                    defalutValue: 20,
+                    defaultValue: 20,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 reqnum: {
-                    defalutValue: 0,
+                    defaultValue: 0,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 lastid: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -1110,15 +1110,15 @@ QQWB.extend("_apiProvider", {
             supportMethod: "get",
             supportParams: {
                 keyword: {
-                    defalutValue: 10,
+                    defaultValue: 10,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 pagesize: {
-                    defalutValue: 1,
+                    defaultValue: 1,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 page: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -1129,15 +1129,15 @@ QQWB.extend("_apiProvider", {
             supportMethod: "get",
             supportParams: {
                 keyword: {
-                    defalutValue: 10,
+                    defaultValue: 10,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 pagesize: {
-                    defalutValue: 1,
+                    defaultValue: 1,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 page: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -1148,15 +1148,15 @@ QQWB.extend("_apiProvider", {
             supportMethod: "get",
             supportParams: {
                 keyword: {
-                    defalutValue: 10,
+                    defaultValue: 10,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 pagesize: {
-                    defalutValue: 1,
+                    defaultValue: 1,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 page: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -1167,15 +1167,15 @@ QQWB.extend("_apiProvider", {
             supportMethod: "get",
             supportParams: {
                 type: {
-                    defalutValue: 20,
+                    defaultValue: 20,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 reqnum: {
-                    defalutValue: 0,
+                    defaultValue: 0,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 pos: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -1186,11 +1186,11 @@ QQWB.extend("_apiProvider", {
             supportMethod: "get",
             supportParams: {
                 reqnum: {
-                    defalutValue: 0,
+                    defaultValue: 0,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 pos: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -1201,11 +1201,11 @@ QQWB.extend("_apiProvider", {
             supportMethod: "get",
             supportParams: {
                 op: {
-                    defalutValue: 9,
+                    defaultValue: 9,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 type: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -1216,7 +1216,7 @@ QQWB.extend("_apiProvider", {
             supportMethod: "post",
             supportParams: {
                 id: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -1227,7 +1227,7 @@ QQWB.extend("_apiProvider", {
             supportMethod: "post",
             supportParams: {
                 id: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -1238,23 +1238,23 @@ QQWB.extend("_apiProvider", {
             supportMethod: "get",
             supportParams: {
                 pageflag: {
-                    defalutValue: 0,
+                    defaultValue: 0,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 nexttime: {
-                    defalutValue: 0,
+                    defaultValue: 0,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 prevtime: {
-                    defalutValue: 20,
+                    defaultValue: 20,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 reqnum: {
-                    defalutValue: 0,
+                    defaultValue: 0,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 lastid: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -1265,7 +1265,7 @@ QQWB.extend("_apiProvider", {
             supportMethod: "post",
             supportParams: {
                 id: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -1276,7 +1276,7 @@ QQWB.extend("_apiProvider", {
             supportMethod: "post",
             supportParams: {
                 id: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -1287,19 +1287,19 @@ QQWB.extend("_apiProvider", {
             supportMethod: "get",
             supportParams: {
                 reqnum: {
-                    defalutValue: 0,
+                    defaultValue: 0,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 pageflag: {
-                    defalutValue: 0,
+                    defaultValue: 0,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 pagetime: {
-                    defalutValue: 0,
+                    defaultValue: 0,
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 lastid: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -1310,7 +1310,7 @@ QQWB.extend("_apiProvider", {
             supportMethod: "get",
             supportParams: {
                 httexts: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -1321,7 +1321,7 @@ QQWB.extend("_apiProvider", {
             supportMethod: "get",
             supportParams: {
                 ids: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -1332,7 +1332,7 @@ QQWB.extend("_apiProvider", {
             supportMethod: "post",
             supportParams: {
                 tag: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -1343,7 +1343,7 @@ QQWB.extend("_apiProvider", {
             supportMethod: "post",
             supportParams: {
                 tagid: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -1354,19 +1354,19 @@ QQWB.extend("_apiProvider", {
             supportMethod: "get",
             supportParams: {
                 ip: {
-                    defalutValue: "",
+                    defaultValue: "",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 country_code: {
-                    defalutValue: "",
+                    defaultValue: "",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 province_code: {
-                    defalutValue: "",
+                    defaultValue: "",
                     description: QQWB._static.NO_DESCRIPTION
                 },
                 city_code: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -1382,7 +1382,7 @@ QQWB.extend("_apiProvider", {
             supportMethod: "get",
             supportParams: {
                 url: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }
@@ -1393,7 +1393,7 @@ QQWB.extend("_apiProvider", {
             supportMethod: "get",
             supportParams: {
                 type: {
-                    defalutValue: QQWB._static.NO_DEFAULT_VALUE,
+                    defaultValue: QQWB._static.NO_DEFAULT_VALUE,
                     description: QQWB._static.NO_DESCRIPTION
                 }
             }

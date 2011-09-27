@@ -17,6 +17,8 @@
  */
 
 QQWB.extend("io", {
+	// global IO timeout (30 seconds)
+	_globalIOTimeout: 30 * 1000
     /**
      * The script IO mechanism
      *
@@ -24,9 +26,10 @@ QQWB.extend("io", {
      * @param cfg {Object} the configration for script io
      * @return {Object} to send/abort the request
      */
-    _IOScript: function (cfg) {
+   ,_IOScript: function (cfg) {
         var 
             script,
+			scriptLoadTimeout,
             head = document.head || document.getElementsByTagName("head")[0] || document.documentElement;
         return {
             send: function (complete) {
@@ -40,9 +43,17 @@ QQWB.extend("io", {
 
                 script.src = cfg.url;
 
+			    scriptLoadTimeout = setTimeout(function () {
+			  	    QQWB.log.warning("script loading timeout");
+				    // ITEF Standard http://en.wikipedia.org/wiki/List_of_HTTP_status_codes
+				    complete(599,"network connect timeout",  QQWB.time.now() - started);
+			    }, QQWB.io._globalIOTimeout);
+
                 script.onload = script.onreadystatechange = function (e,isAbort) {
 
                     if (isAbort || !script.readyState || /loaded|complete/.test(script.readyState)) {
+
+				        clearTimeout(scriptLoadTimeout);
 
                         script.onload = script.onreadystatechange = null;
 
@@ -58,6 +69,7 @@ QQWB.extend("io", {
                 };
 
                 script.onerror = function (e) { // ie 6/7/8/opera not supported(not tested)
+				    clearTimeout(scriptLoadTimeout);
                     complete && complete.apply(QQWB,[404,e,QQWB.time.now() - started]);
                 };
 
@@ -82,6 +94,7 @@ QQWB.extend("io", {
    ,_IOAjax: function (cfg) {
 	   
 	   var callback,
+	       ajaxTimeout,
 	       cfg = cfg || {},
 	       xhr = window.XMLHttpRequest ? 
 	             new window.XMLHttpRequest() :
@@ -110,6 +123,12 @@ QQWB.extend("io", {
 
 			   xhr.send(cfg.data || null);
 
+			   ajaxTimeout = setTimeout(function () {
+				   QQWB.log.warning("request timeout");
+				   // ITEF Standard http://en.wikipedia.org/wiki/List_of_HTTP_status_codes
+				   complete(599,"network connect timeout",  QQWB.time.now() - started);
+			   }, QQWB.io._globalIOTimeout);
+
 			   callback = function (_, isAbort) {
 				   var
 				       status,
@@ -118,6 +137,7 @@ QQWB.extend("io", {
 					   responses,
                        response,
 					   xml;
+
 
 				   try {
 					   // never called and (is aborted or complete)
@@ -165,11 +185,13 @@ QQWB.extend("io", {
 					   }
 			       } catch (firefoxException) {
 					   if (!isAbort) {
-					       complete(-1, firefoxException, QQWB.time.now() - started);
+				           clearTimeout(ajaxTimeout);
+					       complete(xhr.status, xhr.statusText, QQWB.time.now() - started);
 					   }
 			       }
 
 				   if (response) {
+				       clearTimeout(ajaxTimeout);
 					   complete(status, statusText, QQWB.time.now() - started, response, responseHeaders, cfg.dataType); // take cfg.dataType back
 				   }
 			   };
@@ -198,6 +220,7 @@ QQWB.extend("io", {
    ,_IOFlash: function (cfg) {
 
 	   var callback,
+	       flashTimeout,
 	       readyState,
 	       cfg = cfg || {};
 	   
@@ -205,6 +228,12 @@ QQWB.extend("io", {
 		   send: function (complete) {
 			   var started = QQWB.time.now();
 			   readyState = 1;
+
+			   flashTimeout = setTimeout(function () {
+				   QQWB.log.warning("request timeout");
+				   complete(599,"network connect timeout",  QQWB.time.now() - started);
+			   }, QQWB.io._globalIOTimeout);
+
                // the call is allowed call once
 			   callback = function (_, isAbort) {
 				   var
@@ -215,6 +244,8 @@ QQWB.extend("io", {
                        response,
 					   xml,
 					   readyState = 4;
+
+				   clearTimeout(flashTimeout);
 
 				   try{
 				       if (callback && (isAbort || readyState == 4)) {
@@ -227,7 +258,7 @@ QQWB.extend("io", {
 				        	   var success = /complete/i.test(_.type);
 				        	   status = success ? 200 : 204;
 				        	   statusText = success ? "ok" : _.type;
-				        	   responseHeaders = "";
+				        	   responseHeaders = ""; //FIXME: fill responseHeaders with datas
 				        	   responses = {}; // internal object
 				        	   responses.text = _.target.data;
 

@@ -53,7 +53,7 @@ QQWB.extend("JSON",{
      * @param source {Object} the source object
      * @return {String} the stringified version of an object
      */
-   ,toString: function (source) {
+   ,stringify: function (source) {
        return source == null ? "" : window.JSON.stringify(source);
     }
 
@@ -61,12 +61,12 @@ QQWB.extend("JSON",{
      * Convert JSON Object to string
      *
      * @access public
-     * @deprecated use JSON.toString instead
+     * @deprecated use JSON.stringify instead
      * @param source {Object} the source object
      * @return {String} the stringified version of an object
      */
-   ,stringify: function (source) {
-       return QQWB.JSON.toString(source);
+   ,toString: function (source) {
+       return QQWB.JSON.stringify(source);
     }
     /**
      * Convert string to JSON object

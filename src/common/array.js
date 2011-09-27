@@ -102,4 +102,25 @@ QQWB.extend("Array",{
            }
        }
     }
+	/**
+	 * Get element from array
+	 *
+	 * Examples:
+	 *
+	 * get([1,2],-1)
+	 *
+	 * output
+	 *
+	 * 2
+	 *
+	 * @access public
+	 * @param arr {Array} the array object
+	 * @param index {Number} the index at array
+	 */
+   ,get: function (arr, index) {
+	   var l = arr.length;
+	   if (Math.abs(index) < l) {
+		   return index >= 0 ? arr[index] : arr[l+index]; 
+	   }
+    }
 });
