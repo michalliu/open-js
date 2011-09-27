@@ -172,7 +172,7 @@
 					    	T.dom.append(T.dom.create("option",{
 								value: v[0]
 							   ,"data-methods":v[1].supportMethod
-							   ,"data-params":T.JSON.stringify(v[1].supportParams)
+                               ,"data-params":v[1].supportParams ? T.JSON.stringify(v[1].supportParams) : "{}"
 							   ,innerText: T.format.sprintf("%s %s",v[0],v[1].description)
 					    	}) ,optgrp);
 				    	});
