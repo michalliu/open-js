@@ -88,7 +88,7 @@
 				   ,notLoggedIn: '<a id="login" href="javascript:void(0);">登录</a>'
 				   ,loginSuccess: '您已登录,%s,<a id="logout" href="javascript:void(0);">登出</a>'
 				   ,loginFail: '登录失败,%s,请重新<a id="login" href="javascript:void(0);">登录</a>'
-		       	}
+		       	};
 
 			var loginSuccessHandler = function (loginstatus) {
 				    loginbar.innerHTML = T.format.sprintf(messages.loginSuccess, loginstatus.nick);
@@ -98,7 +98,7 @@
 		    	};
 
 	    	if (loginStatus) {
-				loginbar.innerHTML = T.format.sprintf(messages.hasLoggedIn, loginStatus.nick);; 
+				loginbar.innerHTML = T.format.sprintf(messages.hasLoggedIn, loginStatus.nick); 
 			} else {
 				loginbar.innerHTML = messages.notLoggedIn;
 			}
@@ -115,7 +115,7 @@
 						T.login(loginSuccessHandler,loginFailHandler);
 						break;
 		    	}
-	    	}
+	    	};
     	});
 		</script>
 	</head>
@@ -136,4 +136,3 @@
 	<div class="caption section" id="loginbar">登录中,请稍候...</div>
 	</body>
 </html>
-

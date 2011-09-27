@@ -182,18 +182,18 @@ QQWB.extend("io", {
                                 }
 
 					    	}
-					   }
+
+						   //if (response) { // when server returns empty body sometimes, response will never called
+				               clearTimeout(ajaxTimeout);
+					           complete(status, statusText, QQWB.time.now() - started, response, responseHeaders, cfg.dataType); // take cfg.dataType back
+						   //}
+					   } // end readyState 4
 			       } catch (firefoxException) {
 					   if (!isAbort) {
 				           clearTimeout(ajaxTimeout);
 					       complete(xhr.status, xhr.statusText, QQWB.time.now() - started);
 					   }
-			       }
-
-				   if (response) {
-				       clearTimeout(ajaxTimeout);
-					   complete(status, statusText, QQWB.time.now() - started, response, responseHeaders, cfg.dataType); // take cfg.dataType back
-				   }
+			       } // end try catch
 			   };
 
 			   if (!cfg.async || xhr.readyState === 4) {
@@ -271,10 +271,9 @@ QQWB.extend("io", {
                                }
 				           }
 
-				           // has response
-				           if (response) {
+						   //if (response) { // when server returns empty body sometimes, response will never called
 				        	   complete(status, statusText, QQWB.time.now() - started, response, responseHeaders);
-				           }
+						   //}
 					   }
 					} catch (ex) {
 						if (!isAbort) {

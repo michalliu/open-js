@@ -112,7 +112,7 @@
 				   ,notLoggedIn: '<a id="login" href="javascript:void(0);">登录</a>'
 				   ,loginSuccess: '您已登录,%s,<a id="logout" href="javascript:void(0);">登出</a>'
 				   ,loginFail: '登录失败,%s,请重新<a id="login" href="javascript:void(0);">登录</a>'
-		       	}
+		       	};
 
 			var loginSuccessHandler = function (loginstatus) {
 				    loginbar.innerHTML = T.format.sprintf(messages.loginSuccess, loginstatus.nick);
@@ -122,7 +122,7 @@
 		    	};
 
 	    	if (loginStatus) {
-				loginbar.innerHTML = T.format.sprintf(messages.hasLoggedIn, loginStatus.nick);; 
+				loginbar.innerHTML = T.format.sprintf(messages.hasLoggedIn, loginStatus.nick); 
 			} else {
 				loginbar.innerHTML = messages.notLoggedIn;
 			}
@@ -139,7 +139,7 @@
 						T.login(loginSuccessHandler,loginFailHandler);
 						break;
 		    	}
-	    	}
+	    	};
     	});
 
 		//接口测试
@@ -224,7 +224,7 @@
 									 }
 								     diagnost.onclick = function () {
 										 alert(response);
-								     }
+								     };
 								 })
 							     .error(function (code, message, timecost) {
 									 resultElement.innerHTML = "fail [" + timecost + "ms]";
@@ -232,7 +232,7 @@
 									 T.dom.addClass(resultElement,"result-fail");
 								     diagnost.onclick = function () {
 										 alert(message);
-								     }
+								     };
 							     })
 								 .complete(function () {
 									 clearInterval(progressTimer);
@@ -245,7 +245,7 @@
 					       ,abort: function () {
 							   // 未实现
 					    	}
-				    	}
+				    	};
 			    	}
 
 			    	function onCompleting(finished) {
@@ -287,7 +287,7 @@
 				            	}
 							}
 					)();
-			    }// end onclick
+			    };// end onclick
 	    	});
 
     	}());
@@ -329,4 +329,3 @@
 
 	</body>
 </html>
-

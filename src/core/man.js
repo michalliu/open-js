@@ -18,6 +18,6 @@
 
 QQWB.provide("man", function (api) {
 	api = this._apiProvider.compat(api);
-    return this._apiProvider.getDescriptor(api) ? QQWB.JSON.toString(this._apiProvider.getDescriptor(api)) : "no such api";
+    return this._apiProvider.getDescriptor(api) ? QQWB.JSON.stringify(this._apiProvider.getDescriptor(api)) : "no such api";
 });
 

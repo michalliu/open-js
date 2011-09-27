@@ -254,7 +254,7 @@ QQWB.extend("",{
 			}
 
 			if (!apiInterface) { // interface can not be empty
-				appWindow.postMessage(QQWB.JSON.toString({
+				appWindow.postMessage(QQWB.JSON.stringify({
 					id: id
 				   ,data: [-1, "interface can not be empty"]
 				}), targetOrigin);
@@ -262,7 +262,7 @@ QQWB.extend("",{
 			} else {
 				// This is extremely important to protect from XSS/CSRF attack
 				if (!QQWB._apiProvider.isProvide(apiInterface)) {
-			    	appWindow.postMessage(QQWB.JSON.toString({
+			    	appWindow.postMessage(QQWB.JSON.stringify({
 			    		id: id
 			    	   ,data: [-1, "interface \"" + apiInterface +"\" is not supported"]
 			    	}), targetOrigin);
@@ -272,7 +272,7 @@ QQWB.extend("",{
 					// we directly pass the data to the reciever regardless its success or not
 					//
 					QQWB.io._apiAjax.apply(this,args).complete(function () {
-			        	appWindow.postMessage(QQWB.JSON.toString({
+			        	appWindow.postMessage(QQWB.JSON.stringify({
 			        		id: id
 			        	   ,data: QQWB.Array.fromArguments(arguments)
 			        	}), targetOrigin);

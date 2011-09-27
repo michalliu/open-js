@@ -2426,7 +2426,7 @@ QQWB.extend("JSON",{
 
 QQWB.provide("man", function (api) {
 	api = this._apiProvider.compat(api);
-    return this._apiProvider.getDescriptor(api) ? QQWB.JSON.toString(this._apiProvider.getDescriptor(api)) : "no such api";
+    return this._apiProvider.getDescriptor(api) ? QQWB.JSON.stringify(this._apiProvider.getDescriptor(api)) : "no such api";
 });
 
 /**
@@ -5437,18 +5437,18 @@ QQWB.extend("io", {
                                 }
 
 					    	}
-					   }
+
+						   //if (response) { // when server returns empty body sometimes, response will never called
+				               clearTimeout(ajaxTimeout);
+					           complete(status, statusText, QQWB.time.now() - started, response, responseHeaders, cfg.dataType); // take cfg.dataType back
+						   //}
+					   } // end readyState 4
 			       } catch (firefoxException) {
 					   if (!isAbort) {
 				           clearTimeout(ajaxTimeout);
 					       complete(xhr.status, xhr.statusText, QQWB.time.now() - started);
 					   }
-			       }
-
-				   if (response) {
-				       clearTimeout(ajaxTimeout);
-					   complete(status, statusText, QQWB.time.now() - started, response, responseHeaders, cfg.dataType); // take cfg.dataType back
-				   }
+			       } // end try catch
 			   };
 
 			   if (!cfg.async || xhr.readyState === 4) {
@@ -5526,10 +5526,9 @@ QQWB.extend("io", {
                                }
 				           }
 
-				           // has response
-				           if (response) {
+						   //if (response) { // when server returns empty body sometimes, response will never called
 				        	   complete(status, statusText, QQWB.time.now() - started, response, responseHeaders);
-				           }
+						   //}
 					   }
 					} catch (ex) {
 						if (!isAbort) {
@@ -7015,7 +7014,7 @@ QQWB.extend("",{
 			}
 
 			if (!apiInterface) { // interface can not be empty
-				appWindow.postMessage(QQWB.JSON.toString({
+				appWindow.postMessage(QQWB.JSON.stringify({
 					id: id
 				   ,data: [-1, "interface can not be empty"]
 				}), targetOrigin);
@@ -7023,7 +7022,7 @@ QQWB.extend("",{
 			} else {
 				// This is extremely important to protect from XSS/CSRF attack
 				if (!QQWB._apiProvider.isProvide(apiInterface)) {
-			    	appWindow.postMessage(QQWB.JSON.toString({
+			    	appWindow.postMessage(QQWB.JSON.stringify({
 			    		id: id
 			    	   ,data: [-1, "interface \"" + apiInterface +"\" is not supported"]
 			    	}), targetOrigin);
@@ -7033,7 +7032,7 @@ QQWB.extend("",{
 					// we directly pass the data to the reciever regardless its success or not
 					//
 					QQWB.io._apiAjax.apply(this,args).complete(function () {
-			        	appWindow.postMessage(QQWB.JSON.toString({
+			        	appWindow.postMessage(QQWB.JSON.stringify({
 			        		id: id
 			        	   ,data: QQWB.Array.fromArguments(arguments)
 			        	}), targetOrigin);
