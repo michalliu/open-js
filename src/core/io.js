@@ -119,6 +119,7 @@ QQWB.extend("io", {
                        xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
                    }
 				   xhr.setRequestHeader("X-Requested-With","XMLHttpRequest");
+				   xhr.setRequestHeader("X-Requested-From","TencentWeiboJavascriptSDK");
 			   } catch (ex) {}
 
 			   xhr.send(cfg.data || null);

@@ -7,8 +7,10 @@
 	import flash.events.IOErrorEvent; 
 	import flash.events.SecurityErrorEvent; 
 	import flash.net.URLLoader; 
+	import flash.net.URLLoaderDataFormat; 
 	import flash.net.URLRequest; 
-	import flash.net.URLRequestMethod; 
+	import flash.net.URLRequestMethod;
+	import flash.net.URLRequestHeader;
 	import flash.net.URLVariables; 
 	import flash.system.Security;
     Security.allowDomain("*");
@@ -41,19 +43,33 @@
 		    	default:
 		    	urlRequest.method = URLRequestMethod.GET;
 		    }
+			urlRequest.contentType = "text/plain; charset=utf-8";
+			urlRequest.requestHeaders.push(new URLRequestHeader("X-Requested-From", "TencentWeiboJavascriptSDK"));
 		    urlRequest.data = param;
-		    
+		    urlLoader.dataFormat = URLLoaderDataFormat.TEXT;
 		    urlLoader.addEventListener(Event.COMPLETE, urlRequestComplete);
 		    urlLoader.addEventListener(IOErrorEvent.IO_ERROR, urlRequestError);
 		    urlLoader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, urlRequestError);
-		    urlLoader.load(urlRequest);
+			try {
+		        urlLoader.load(urlRequest);
+			} catch (error:Error) {
+			    ExternalInterface.call("QQWB.log.error","[proxy.swf] URL loader error [" + error.name + "] " + error.message);
+			}
 		}
 		
 		private function urlRequestComplete(e:Event):void {
+			/*
+			 * api response <a href=\"xxx\"> example </a> which will
+			 * cause ExternalInterface eval error. IE will raise exception of "missing }",
+			 * chrome will raise exception "Uncaught SyntaxError: Unexpected identifier".
+			 */
+			ExternalInterface.call("QQWB.log.info","[proxy.swf] URL request status " + e.type + " ,ExternalInterface may raise exception due eval with backslash");
+			e.target.data = e.target.data.split("\\").join("\\\\");
 			ExternalInterface.call("onFlashRequestComplete_8df046",e);
 		}
 		
 		private function urlRequestError(e:ErrorEvent):void {
+			ExternalInterface.call("QQWB.log.warning","[proxy.swf] URL request error " + e.type);
 			ExternalInterface.call("onFlashRequestComplete_8df046",e);
 		}
 		
