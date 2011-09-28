@@ -50,8 +50,8 @@ QQWB.extend("",{
                 },
 
                 authWindow = {
-                    width: 500
-                   ,height: 300
+                    width: 560
+                   ,height: 420
                    ,authQuery: function () {
                       return QQWB.queryString.encode({
                                response_type: "token"
@@ -59,6 +59,7 @@ QQWB.extend("",{
                               ,redirect_uri: QQWB._domain.clientproxy
                               ,referer: document.location.href // IE will lost http referer when new window opened
                               ,scope: "all"
+							  ,status: "0" // indicate currently authorizing
                            });
                     }
                    ,x: function () {
@@ -102,21 +103,29 @@ QQWB.extend("",{
             if (this.browser.msie) {// a timer is running to check autheciation and window status
                 (function () {
 
-                    var responseText;
+                    var response;
 
                     if (authWindow.contentWindow.closed) {
-                        responseText = "error=access_denied";
-                        QQWB._token.resolveResponse(responseText);
+                        response = "error=access_denied";
+                        QQWB._token.resolveResponse(response);
                         return;
                     }
 
-                    try {
-                        responseText = authWindow.contentWindow.location.hash.split("#").pop();
-                        QQWB._token.resolveResponse(responseText);
-                        authWindow.contentWindow.close();
+                    try { //
+                        response = authWindow.contentWindow.location.hash.split("#").pop();
                     } catch (ex) {
                         setTimeout(arguments.callee,0);
+						return;
                     }
+
+					response = QQWB.queryString.decode(response);
+
+					if (response.status && parseInt(response.status,10) == 200) {
+                        QQWB._token.resolveResponse(response);
+                        authWindow.contentWindow.close();
+					} else {
+                        setTimeout(arguments.callee,0);
+					}
 
                 }());
             } else {

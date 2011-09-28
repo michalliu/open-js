@@ -171,7 +171,8 @@
         * Alias names
         *
         * @access private
-        * @param alias {String|Array} single name in string format to alias or an array of String
+        * @param alias {String|Array} aliased name(s)
+        * @param origin {Object} the object to alias
         * @return {Void}
         */
        ,_alias: function (alias, origin) {
@@ -190,6 +191,8 @@
         *
         * @deprecated not recommended
         * @access public
+		* @param alias {String|Array} aliased name(s)
+		* @param origin {String} things under QQWB
         * @return {Void}
         */
        ,alias: function (alias, origin) {
@@ -270,7 +273,7 @@
     twb._alias.call(window,["QQWB","T"],twb); // we probably should only export one global variable
 
     twb.assign("_domain","API_URI","/api"); // no trailer slash   
-    twb.assign("_domain","AUTH_URI","/oauth_html/login2.php");   
+    twb.assign("_domain","AUTH_URI","/oauth2_html/login.php");   
     twb.assign("_domain","EXCHANGE_TOKEN_URI","/cgi-bin/exchange_token");   
     twb.assign("_domain","QUERY_TOKEN_URI","/cgi-bin/auto_token");   
     twb.assign("_domain","SERVERPROXY_URI","/oauth_html/2/proxy.html");   
@@ -6033,7 +6036,7 @@ QQWB.extend("_token",{
        var 
            loginStatus,
            global = (optGlobal || window)["QQWB"],
-           response = global.queryString.decode(responseText);
+           response = QQWB.String.isString(responseText) ? global.queryString.decode(responseText) : responseText;
 
        if (response.access_token) {
 
@@ -7159,7 +7162,7 @@ if (QQWB.browser.feature.localstorage) { // implement html5 localstorge
         document.body.appendChild(userData);
     });
 
-    QQWB.extend("store", {
+    QQWB.extend("localStorage", {
         set: function (key, value, expireInDays) {
             key = "k" + key;
             var 
@@ -7198,7 +7201,7 @@ if (QQWB.browser.feature.localstorage) { // implement html5 localstorge
     QQWB.log.warning("T.localStorage object isn't initialized, do check before use");
 }
 
-if (QQWB.browser.feature.localstorage || QQWB.browser.feature.userdata) {
+if (QQWB.localStorage) {
     QQWB._alias.call(QQWB.localStorage,"save",QQWB.localStorage.set);
     QQWB._alias.call(QQWB.localStorage,"remove",QQWB.localStorage.del);
 }
@@ -7254,8 +7257,8 @@ QQWB.extend("",{
                 },
 
                 authWindow = {
-                    width: 500
-                   ,height: 300
+                    width: 560
+                   ,height: 420
                    ,authQuery: function () {
                       return QQWB.queryString.encode({
                                response_type: "token"
@@ -7263,6 +7266,7 @@ QQWB.extend("",{
                               ,redirect_uri: QQWB._domain.clientproxy
                               ,referer: document.location.href // IE will lost http referer when new window opened
                               ,scope: "all"
+							  ,status: "0" // indicate currently authorizing
                            });
                     }
                    ,x: function () {
@@ -7306,21 +7310,29 @@ QQWB.extend("",{
             if (this.browser.msie) {// a timer is running to check autheciation and window status
                 (function () {
 
-                    var responseText;
+                    var response;
 
                     if (authWindow.contentWindow.closed) {
-                        responseText = "error=access_denied";
-                        QQWB._token.resolveResponse(responseText);
+                        response = "error=access_denied";
+                        QQWB._token.resolveResponse(response);
                         return;
                     }
 
-                    try {
-                        responseText = authWindow.contentWindow.location.hash.split("#").pop();
-                        QQWB._token.resolveResponse(responseText);
-                        authWindow.contentWindow.close();
+                    try { //
+                        response = authWindow.contentWindow.location.hash.split("#").pop();
                     } catch (ex) {
                         setTimeout(arguments.callee,0);
+						return;
                     }
+
+					response = QQWB.queryString.decode(response);
+
+					if (response.status && parseInt(response.status,10) == 200) {
+                        QQWB._token.resolveResponse(response);
+                        authWindow.contentWindow.close();
+					} else {
+                        setTimeout(arguments.callee,0);
+					}
 
                 }());
             } else {

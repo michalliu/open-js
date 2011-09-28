@@ -171,7 +171,8 @@
         * Alias names
         *
         * @access private
-        * @param alias {String|Array} single name in string format to alias or an array of String
+        * @param alias {String|Array} aliased name(s)
+        * @param origin {Object} the object to alias
         * @return {Void}
         */
        ,_alias: function (alias, origin) {
@@ -190,6 +191,8 @@
         *
         * @deprecated not recommended
         * @access public
+		* @param alias {String|Array} aliased name(s)
+		* @param origin {String} things under QQWB
         * @return {Void}
         */
        ,alias: function (alias, origin) {
@@ -270,7 +273,7 @@
     twb._alias.call(window,["QQWB","T"],twb); // we probably should only export one global variable
 
     twb.assign("_domain","API_URI","/api"); // no trailer slash   
-    twb.assign("_domain","AUTH_URI","/oauth_html/login2.php");   
+    twb.assign("_domain","AUTH_URI","/oauth2_html/login.php");   
     twb.assign("_domain","EXCHANGE_TOKEN_URI","/cgi-bin/exchange_token");   
     twb.assign("_domain","QUERY_TOKEN_URI","/cgi-bin/auto_token");   
     twb.assign("_domain","SERVERPROXY_URI","/oauth_html/2/proxy.html");   

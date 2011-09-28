@@ -56,7 +56,7 @@ if (QQWB.browser.feature.localstorage) { // implement html5 localstorge
         document.body.appendChild(userData);
     });
 
-    QQWB.extend("store", {
+    QQWB.extend("localStorage", {
         set: function (key, value, expireInDays) {
             key = "k" + key;
             var 
@@ -95,7 +95,7 @@ if (QQWB.browser.feature.localstorage) { // implement html5 localstorge
     QQWB.log.warning("T.localStorage object isn't initialized, do check before use");
 }
 
-if (QQWB.browser.feature.localstorage || QQWB.browser.feature.userdata) {
+if (QQWB.localStorage) {
     QQWB._alias.call(QQWB.localStorage,"save",QQWB.localStorage.set);
     QQWB._alias.call(QQWB.localStorage,"remove",QQWB.localStorage.del);
 }

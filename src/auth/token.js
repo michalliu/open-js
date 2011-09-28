@@ -238,7 +238,7 @@ QQWB.extend("_token",{
        var 
            loginStatus,
            global = (optGlobal || window)["QQWB"],
-           response = global.queryString.decode(responseText);
+           response = QQWB.String.isString(responseText) ? global.queryString.decode(responseText) : responseText;
 
        if (response.access_token) {
 
