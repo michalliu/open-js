@@ -90,6 +90,14 @@
           ,clientproxy : "{CLIENTPROXY_URI}" // autheciation redirect uri
           //,cdn: "{CDN_URI}"
         }
+		/*
+		 * global vars 
+		 */
+	   ,_const: {
+		   AUTH_WINDOW_NAME: "authClientProxy_ee5a0f93"
+		  ,AUTH_WINDOW_WIDTH: 560
+		  ,AUTH_WINDOW_HEIGHT: 420
+	    }
         /**
          * Cookie configration
          *

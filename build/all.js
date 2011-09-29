@@ -90,6 +90,14 @@
           ,clientproxy : "{CLIENTPROXY_URI}" // autheciation redirect uri
           //,cdn: "{CDN_URI}"
         }
+		/*
+		 * global vars 
+		 */
+	   ,_const: {
+		   AUTH_WINDOW_NAME: "authClientProxy_ee5a0f93"
+		  ,AUTH_WINDOW_WIDTH: 560
+		  ,AUTH_WINDOW_HEIGHT: 420
+	    }
         /**
          * Cookie configration
          *
@@ -4689,7 +4697,7 @@ QQWB.extend("log", {
     //,_format:"{{name}} : [{{levelname}}] {{time}} {{message}}"
 
 	// log message format
-    ,_format:"%(frame)s%(name)s: [%(levelname)s] %(time)s %(message)s"
+    ,_format:"%(source)s%(popup)s%(frame)s%(name)s: [%(levelname)s] %(time)s %(message)s"
 
 	/**
 	 * Set log message level
@@ -4796,6 +4804,8 @@ QQWB.extend("log", {
            ,time: QQWB.time.shortTime()
            ,message: message
            ,frame: window != window.parent ? "*":""
+		   ,source: window.name ? window.name : ""
+		   ,popup: (window.opener || window.name === QQWB._const.AUTH_WINDOW_NAME) ? "#":""
         });
 
         // capture message
@@ -6942,19 +6952,8 @@ QQWB.extend("",{
 // boot library
 (function () {
     var 
-        self = window,
-        openerProp = self.opener,
-        parentProp = self.parent,
-
-        // Note:
-        // not all the browser agree this.
-        // in MSIE even openerProp is false
-        // library still could be in a popup, there is no way 
-        // to detect that, auth.login will dealing with this
-        // situtation
-        inPopup = !!openerProp, // popup window
-        inFrame = self != parentProp, // iframe
-        asServer = QQWB._domain.serverproxy === self.location.href; // as server proxy
+        inFrame = window != window.parent, // iframe
+        asServer = QQWB._domain.serverproxy === window.location.href; // as server proxy
 
     // auto adopt a solution to client(browser)
     function initSolution() {
@@ -6975,23 +6974,11 @@ QQWB.extend("",{
         QQWB._everythingReadyDoor.unlock(); // unlock for token ready
     });
 
-    if (inPopup) { // expected working for non-IE browser
-        // same origin policy test
-        QQWB.log.info("library booting at popup mode");
-        openerProp.location.href ? 
-            QQWB._token.resolveResponse(window.location.hash.split("#").pop(), openerProp) :
-            QQWB.log.critical("crossdomain login is not supported currently");
-
-        openerProp.QQWB._stopTrackingAuthWindowStatus(); // stop manaually close window timer
-        window.close();
-        return;
-    } 
-
     if (inFrame && asServer && QQWB.browser.feature.postmessage) {
         QQWB.log.info("library booting at server proxy mode");
         var 
 			targetOrigin = "*", // we don't care who will handle the data
-            appWindow = parentProp; // the third-party application window
+            appWindow = window.parent; // the third-party application window
 
         // post a message to the parent window indicate that server frame(itself) was successfully loaded
         appWindow.postMessage("success", targetOrigin); 
@@ -7045,10 +7032,10 @@ QQWB.extend("",{
 		   }
         };
 
-        if (self.addEventListener) {
-            self.addEventListener("message", messageHandler, false);
+        if (window.addEventListener) {
+            window.addEventListener("message", messageHandler, false);
         } else if (window.attachEvent) {
-            self.attachEvent("onmessage", messageHandler);
+            window.attachEvent("onmessage", messageHandler);
         }
 
         return;
@@ -7208,6 +7195,94 @@ if (QQWB.localStorage) {
 /**
  * Tencent weibo javascript library
  *
+ * authorization window management
+ *
+ * @author michalliu
+ * @version 1.0
+ * @package auth
+ * @module authWindow
+ * @requires base
+ *           core.queryString
+ */
+QQWB.extend("auth.authWindow",{
+    // auth window width
+	_width: QQWB.AUTH_WINDOW_WIDTH 
+   // auth window height
+   ,_height: QQWB.AUTH_WINDOW_HEIGHT 
+   // auth window name
+   ,_name: QQWB.AUTH_WINDOW_NAME
+   // auth url
+   ,_url: QQWB._domain.auth
+   // auth querystrings
+   ,_query: QQWB.queryStrig.encode({
+	   response_type: "token"
+	  ,client_id: QQWB._appkey
+	  ,redirect_uri: QQWB._domain.clientproxy
+	  ,referer: document.location.href
+	  ,scope: "all"
+	  ,status: 0
+    })
+   // auth window attributes
+   ,_attribs: "toolbar=no,menubar=no,scrollbars=no,resizeable=yes,location=yes,status=no"
+   // auth window status
+   ,_closed: true
+   // reference to auth DOMWindow
+   ,_window: null
+   // show auth window, if already showed do nothing
+   ,show: function () {
+	   var x,y,props;
+	   if (this.closed) {
+		   x = window.screenX || window.screenLeft + (window.outerWidth || document.documentElement.clientWidth - QQWB.AUTH_WINDOW_WIDTH) / 2;
+		   y = window.screenY || window.screenTop + (window.outerHeight || document.documentElement.clientHeight - QQWB.AUTH_WINDOW_HEIGHT) / 2
+		   props = ["width="+this._width,"height="+this._height,"left="+x,"top="+y]
+	       this._window = window.open(this._url + "?" + this.query, this._name, props+","+this._attribs);
+		   this.closed = false;
+		   (function () {
+			   var authwindow = QQWB.auth.authWindow,
+			       response;
+               if (authwindow._window.closed) { //already closed
+                   QQWB._token.resolveResponse("error=access_denied");
+		       	   authwindow.close();
+                   return;
+		       } else {
+		           try {
+		            	response = authWindow.contentWindow.location.hash;	
+		           } catch (ex) {
+		           	    response = null;
+		           }
+		           if (response) {
+					   response = QQWB.queryString.decode(response.split("#").pop());
+					   if (parseInt(response.status,10) == 200) {
+		                   QQWB._token.resolveResponse(response);
+					   }
+		               authwindow.close();
+		               return;
+		           }
+                   setTimeout(arguments.callee, 0);
+               }
+            }());
+	   }
+	   return this;
+    }
+   ,close: function () { 
+	   this._closed = true;
+	   if (!this._window) { // has auth window
+		   return this;
+	   }
+	   if (this._window.closed) { // auth window alreay closed
+		   return this;
+	   }
+	   this._window.close(); // closed the window
+	   return this;
+    }
+   ,focus: function () {
+	   this._window && this._window.focus();
+	   return this;
+    }
+});
+/**
+ * Tencent weibo javascript library
+ *
  * Authenticate user
  *
  * @author michalliu
@@ -7216,11 +7291,12 @@ if (QQWB.localStorage) {
  * @module auth
  * @requires base
  *           token
+ *           authWindow
  *           event.event
  *           core.queryString
  *           core.log
  */
-QQWB.extend("",{
+QQWB.extend("auth",{
     /**
      * Login in user
      *
@@ -7231,135 +7307,26 @@ QQWB.extend("",{
      */
     login: function (optSuccessHandler, optFailHandler) {
 
-        if (!this._inited) {
-            this.log.critical("Library not initialized, call T.init() to initialize");
+        if (!QQWB._inited) {
+            QQWB.log.critical("Library not initialized, call T.init() to initialize");
         }
 
-        var loginStatus = this.loginStatus(); 
+        var loginStatus = QQWB.loginStatus(); 
 
-        optSuccessHandler && this.bind(this.events.USER_LOGGEDIN_EVENT, optSuccessHandler);
-        optFailHandler && this.bind(this.events.USER_LOGIN_FAILED_EVENT, optFailHandler);
+        optSuccessHandler && QQWB.bind(QQWB.events.USER_LOGGEDIN_EVENT, optSuccessHandler);
+        optFailHandler && QQWB.bind(QQWB.events.USER_LOGIN_FAILED_EVENT, optFailHandler);
 
         // user already logged in
         if (loginStatus) {
 
-            optSuccessHandler && optSuccessHandler.call(this,loginStatus);
-            this.trigger(this.events.USER_LOGGEDIN_EVENT,loginStatus);
+            optSuccessHandler && optSuccessHandler.call(QQWB,loginStatus);
+            QQWB.trigger(QQWB.events.USER_LOGGEDIN_EVENT,loginStatus);
 
         } else { // open authorization window
-
-            var 
-                currWindow = {
-                    x: window.screenX || window.screenLeft
-                   ,y: window.screenY || window.screenTop
-                   ,width: window.outerWidth || document.documentElement.clientWidth
-                   ,height: window.outerHeight || document.documentElement.clientHeight
-                },
-
-                authWindow = {
-                    width: 560
-                   ,height: 420
-                   ,authQuery: function () {
-                      return QQWB.queryString.encode({
-                               response_type: "token"
-                              ,client_id: QQWB._appkey
-                              ,redirect_uri: QQWB._domain.clientproxy
-                              ,referer: document.location.href // IE will lost http referer when new window opened
-                              ,scope: "all"
-							  ,status: "0" // indicate currently authorizing
-                           });
-                    }
-                   ,x: function () {
-                       return parseInt(currWindow.x + (currWindow.width - this.width) / 2, 10);
-                    }
-                   ,y: function () {
-                       return parseInt(currWindow.y + (currWindow.height - this.height) / 2, 10);
-                    }
-                   ,popup: function () {
-                       this.contentWindow = window.open(QQWB._domain.auth + "?" + this.authQuery(), "", ["height="
-                                                                                                   ,this.height
-                                                                                                   ,", width="
-                                                                                                   ,this.width
-                                                                                                   ,", top="
-                                                                                                   ,this.y()
-                                                                                                   ,", left="
-                                                                                                   ,this.x()
-                                                                                                   ,", toobar="
-                                                                                                   ,"no"
-                                                                                                   ,", menubar="
-                                                                                                   ,"no"
-                                                                                                   ,", scrollbars="
-                                                                                                   ,"no"
-                                                                                                   ,", resizable="
-                                                                                                   ,"yes"
-                                                                                                   ,", location="
-                                                                                                   ,"yes"
-                                                                                                   ,", status="
-                                                                                                   ,"no"
-                           ].join(""));
-                       return this;
-                    }
-                   ,focus: function () {
-                       this.contentWindow && this.contentWindow.focus && this.contentWindow.focus();
-                       return this;
-                    }
-                };
-
-            authWindow.popup().focus();
-
-            if (this.browser.msie) {// a timer is running to check autheciation and window status
-                (function () {
-
-                    var response;
-
-                    if (authWindow.contentWindow.closed) {
-                        response = "error=access_denied";
-                        QQWB._token.resolveResponse(response);
-                        return;
-                    }
-
-                    try { //
-                        response = authWindow.contentWindow.location.hash.split("#").pop();
-                    } catch (ex) {
-                        setTimeout(arguments.callee,0);
-						return;
-                    }
-
-					response = QQWB.queryString.decode(response);
-
-					if (response.status && parseInt(response.status,10) == 200) {
-                        QQWB._token.resolveResponse(response);
-                        authWindow.contentWindow.close();
-					} else {
-                        setTimeout(arguments.callee,0);
-					}
-
-                }());
-            } else {
-
-                QQWB._startTrackingAuthWindowStatus();
-
-                (function () {
-
-                    var responseText;
-
-                    if (!QQWB._isTrackingAuthWindowStatus()) {
-                        return;
-                    }
-
-                    if (authWindow.contentWindow.closed) {
-                        responseText = "error=access_denied";
-                        QQWB._token.resolveResponse(responseText);
-                        return;
-                    } else {
-                        setTimeout(arguments.callee, 0);
-                    }
-
-                }());
-            }
+		    QQWB.auth.authWindow.show().focus();
         } // end if loginStatus
 
-        return this;
+        return QQWB;
     }
 
     /**
@@ -7368,18 +7335,18 @@ QQWB.extend("",{
      * @return {Object} QQWB object
      */
    ,logout: function (optHandler) {
-	   var loginStatus = this.loginStatus();
+	   var loginStatus = QQWB.loginStatus();
        QQWB.log.info("logging out user...");
        if (!loginStatus) {
-           this.log.warning("oops, user not logged in");
+           QQWB.log.warning("oops, user not logged in");
        } else {
-           this._token.clearAccessToken();
-           this._token.clearRefreshToken();
-           this.log.info(loginStatus.name + " has logged out successfully");
+           QQWB._token.clearAccessToken();
+           QQWB._token.clearRefreshToken();
+           QQWB.log.info(loginStatus.name + " has logged out successfully");
        }
-       optHandler && optHandler.call(this);
-       this.trigger(this.events.USER_LOGGEDOUT_EVENT);
-       return this;
+       optHandler && optHandler.call(QQWB);
+       QQWB.trigger(QQWB.events.USER_LOGGEDOUT_EVENT);
+       return QQWB;
     }
 
    /**
@@ -7392,8 +7359,8 @@ QQWB.extend("",{
    ,loginStatus: function (optCallback) {
        var 
            status,
-           accessToken = this._token.getAccessToken(),
-           user = this._token.getTokenUser();
+           accessToken = QQWB._token.getAccessToken(),
+           user = QQWB._token.getTokenUser();
 
        if (accessToken) {
            status = {
@@ -7403,53 +7370,14 @@ QQWB.extend("",{
            };
        }
 
-       optCallback && optCallback.call(this, status);
+       optCallback && optCallback.call(QQWB, status);
 
        return status;
     }
-    /**
-     * Are we tracking autheciate window status?
-     * This is usefull in non-IE browser
-     *
-     * In IE,when autheciate window opened,there is a timer in the opener
-     * keep tracking the opended window's location to parse and save token
-     * then the autheciate window is closed by force.
-     *
-     * In non-IE browser,the way is different. Once the browser's token come back
-     * the autheciate window will push that token to opener then close itself. but
-     * there is aslo a timer is running in the opener to keep tracking if user manaually
-     * closed the autheciate window. If user close that window (window.closed equal to
-     * true),we will simulate a error response.The problem is when the user finished the
-     * authoriztion task normally the autheciate window will closed aslo.the timer inside
-     * the opener will detect that and set response incorrectly. to correct this, If the
-     * user finished the authorization task normally, we should stop the timer immediatly.
-     * that is before the autheciate window close itself, it told the opener, "don't track 
-     * my status anymore,i will close my self normally",If the timer see that, the timer will
-     * not running anymore, and the set error reponse will never called.
-     *
-     */
-    ,_isTrackingAuthWindowStatus: function () {
-        return !!this._trackAuthWindowStatus;
-    }
-   /**
-    * Don't track if autheciate window is closed or not
-    * 
-    * @access private
-    * @return {undefined}
-    */
-   ,_startTrackingAuthWindowStatus: function() {
-       this._trackAuthWindowStatus = true;
-    }
-   /**
-    * Don't track if autheciate window is closed or not
-    * 
-    * @access private
-    * @return {undefined}
-    */
-   ,_stopTrackingAuthWindowStatus: function() {
-       this._trackAuthWindowStatus = false;
-    }
 });
+QQWB._alias("login",QQWB.auth.login);
+QQWB._alias("logout",QQWB.auth.logout);
+QQWB._alias("loginStatus",QQWB.auth.loginStatus);
 /**
  * Tencent weibo javascript library
  *

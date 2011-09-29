@@ -44,7 +44,7 @@ QQWB.extend("log", {
     //,_format:"{{name}} : [{{levelname}}] {{time}} {{message}}"
 
 	// log message format
-    ,_format:"%(frame)s%(name)s: [%(levelname)s] %(time)s %(message)s"
+    ,_format:"%(source)s%(popup)s%(frame)s%(name)s: [%(levelname)s] %(time)s %(message)s"
 
 	/**
 	 * Set log message level
@@ -151,6 +151,8 @@ QQWB.extend("log", {
            ,time: QQWB.time.shortTime()
            ,message: message
            ,frame: window != window.parent ? "*":""
+		   ,source: window.name ? window.name : ""
+		   ,popup: (window.opener || window.name === QQWB._const.AUTH_WINDOW_NAME) ? "#":""
         });
 
         // capture message

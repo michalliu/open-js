@@ -10,8 +10,6 @@
 			ul{list-style-type:none;}
 			a{text-decoration:none;}
 
-			.main{width:95%;margin:0 auto;}
-
 			.caption{font-size:18px;}
 			.section{padding:15px;margin:15px;background:whiteSmoke;border:1px solid #e5e5e5;border-radius:15px;}
 
@@ -27,6 +25,8 @@
 			.status-warning{background:gold;}
 			.status-fail{background:red;}
 
+			.announcement{background:#F9EDBE;}
+
 			.result-success{color:green;}
 			.result-warning{color:#DD4B39;}
 			.result-fail{color:red;}
@@ -40,13 +40,17 @@
 	    	.apiitem .apitestdetail{float:left;width:39%;height:100%;overflow:hidden;}
 	    	.apiitem .apitestdetail .apitestflag{float:left;}
 	    	.apiitem .apitestdetail .apitestresult{float:left;line-height:20px;}
-	    	.apiitem .apitestdetail .apidiagnost{display:block;float:right;line-height:20px;font-size:16px;color:#DD4B39;display:none;}
+	    	.apiitem .apitestdetail .apidiagnost{display:block;float:right;line-height:20px;font-weight:bold;font-size:16px;color:#DD4B39;display:none;}
 
 			.apitestwrapper .testdesc {padding:15px;overflow:hidden;}
 			.apitestwrapper .testdesc .status-flag,.apitestwrapper .testdesc .status-text{float:left;}
 			#performance{font-size:12px;height:20px;line-height:20px;padding:0px 10px;background:gold;margin:0 auto; width:260px;text-align:center;border-radius:10px;visibility:hidden;}
         </style>
-        <script src="../build/src/all.js"></script>
+        <!--[if lte IE 6 ]>
+        <script src="../tools/firebug-lite/content/firebug-lite-dev.js"></script>
+        <![endif]-->
+        <script src="../build/all.js"></script>
+
 		<script>
 
 		// appkey配置
@@ -179,11 +183,6 @@
 						document.all.apitest.innerHTML = apitesthtml.join("");
 					}
 
-			    	if (!T._inited) {
-			    		alert("未初始化或初始化失败");
-			    		return;
-			    	}
-
 					trigger.disabled = "disabled";
 
 					testItems = T.find("#apitest > .apiitem");
@@ -233,9 +232,13 @@
 								     };
 								 })
 							     .error(function (code, message, timecost) {
-									 resultElement.innerHTML = "失败 [" + timecost + "ms]";
+									 resultElement.innerHTML = "失败 [" + timecost + "ms] " + code + "," + message;
 								     T.dom.addClass(statusElement,"status-fail");
 									 T.dom.addClass(resultElement,"result-fail");
+									 T.dom.addClass(el,"announcement");
+								     el.onclick = function () {
+										 alert(message);
+								     }
 								     diagnost.onclick = function () {
 										 alert(message);
 								     };
@@ -255,7 +258,7 @@
 			    	}
 
 			    	function onCompleting(finished) {
-						document.all.performance.innerHTML = T.format.sprintf("已完成%.2f%%"
+						document.all.performance.innerHTML = T.format.sprintf("已完成<strong>%.2f%%</strong>"
 					                                                          ,(finished/total) * 100
 					                                                         );
 						return true;
@@ -266,7 +269,7 @@
 						endTime = T.time.now();
 						trigger.innerHTML = "重新开始";
 						trigger.setAttribute("data-restart","yes");
-						document.all.performance.innerHTML = T.format.sprintf("总响应时间%dms,平均响应时间%.2fms"
+						document.all.performance.innerHTML = T.format.sprintf("总响应时间<strong>%d</strong>ms,平均响应时间<strong>%.2f</strong>ms"
 					                                                          ,endTime - startTime
 																			  ,(endTime - startTime)/total
 					                                                         );
@@ -307,33 +310,31 @@
     <body>
     <!--<![endif]-->
 
-	<div class="main">
-    	<!-- Appkey配置 -->
-    	<label class="caption section">
-    		AppKey:<input type="text" value="" class="no-border" id="appkey" size="32"></input>
-    	</label>
-    
-    	<!-- 登录与登出 -->
-    	<div class="caption section" id="loginbar">登录中,请稍候...</div>
-    
-    	<!-- 接口测试 -->
-    	<div class="apitestwrapper section" id="apitestwrapper">
-    		<div class="caption">接口性能测试&nbsp;&nbsp;<button id="triggertest" class="caption">开始</button>&nbsp;&nbsp;<input id="testoptionnonblock" type="checkbox">不阻塞</input> </div>
-            <div class="status-text" id="performance"></div>
-    		<!--<div class="caption testdesc">
-    			<div class="status-flag status-idle"></div>
-    			<div class="status-text">等待</div>
-    			<div class="status-flag status-success"></div>
-    			<div class="status-text">良好</div>
-    			<div class="status-flag status-warning"></div>
-    			<div class="status-text">一般</div>
-    			<div class="status-flag status-fail"></div>
-    			<div class="status-text">失败</div>
-    		</div>-->
-    		<ul class="apitest" id="apitest">
-    		</ul>
-    	</div>
+	<!-- Appkey配置 -->
+	<label class="caption section">
+		AppKey:<input type="text" value="" class="no-border" id="appkey" size="32"></input>
+	</label>
 
-    </div>
+	<!-- 登录与登出 -->
+	<div class="caption section" id="loginbar">登录中,请稍候...</div>
+
+	<!-- 接口测试 -->
+	<div class="apitestwrapper section" id="apitestwrapper">
+		<div class="caption">接口性能测试&nbsp;&nbsp;<button id="triggertest" class="caption">开始</button>&nbsp;&nbsp;<input id="testoptionnonblock" type="checkbox">不阻塞</input> </div>
+        <div class="status-text" id="performance"></div>
+		<!--<div class="caption testdesc">
+			<div class="status-flag status-idle"></div>
+			<div class="status-text">等待</div>
+			<div class="status-flag status-success"></div>
+			<div class="status-text">良好</div>
+			<div class="status-flag status-warning"></div>
+			<div class="status-text">一般</div>
+			<div class="status-flag status-fail"></div>
+			<div class="status-text">失败</div>
+		</div>-->
+		<ul class="apitest" id="apitest">
+		</ul>
+	</div>
+
 	</body>
 </html>

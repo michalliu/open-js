@@ -178,19 +178,8 @@ QQWB.extend("",{
 // boot library
 (function () {
     var 
-        self = window,
-        openerProp = self.opener,
-        parentProp = self.parent,
-
-        // Note:
-        // not all the browser agree this.
-        // in MSIE even openerProp is false
-        // library still could be in a popup, there is no way 
-        // to detect that, auth.login will dealing with this
-        // situtation
-        inPopup = !!openerProp, // popup window
-        inFrame = self != parentProp, // iframe
-        asServer = QQWB._domain.serverproxy === self.location.href; // as server proxy
+        inFrame = window != window.parent, // iframe
+        asServer = QQWB._domain.serverproxy === window.location.href; // as server proxy
 
     // auto adopt a solution to client(browser)
     function initSolution() {
@@ -211,23 +200,11 @@ QQWB.extend("",{
         QQWB._everythingReadyDoor.unlock(); // unlock for token ready
     });
 
-    if (inPopup) { // expected working for non-IE browser
-        // same origin policy test
-        QQWB.log.info("library booting at popup mode");
-        openerProp.location.href ? 
-            QQWB._token.resolveResponse(window.location.hash.split("#").pop(), openerProp) :
-            QQWB.log.critical("crossdomain login is not supported currently");
-
-        openerProp.QQWB._stopTrackingAuthWindowStatus(); // stop manaually close window timer
-        window.close();
-        return;
-    } 
-
     if (inFrame && asServer && QQWB.browser.feature.postmessage) {
         QQWB.log.info("library booting at server proxy mode");
         var 
 			targetOrigin = "*", // we don't care who will handle the data
-            appWindow = parentProp; // the third-party application window
+            appWindow = window.parent; // the third-party application window
 
         // post a message to the parent window indicate that server frame(itself) was successfully loaded
         appWindow.postMessage("success", targetOrigin); 
@@ -281,10 +258,10 @@ QQWB.extend("",{
 		   }
         };
 
-        if (self.addEventListener) {
-            self.addEventListener("message", messageHandler, false);
+        if (window.addEventListener) {
+            window.addEventListener("message", messageHandler, false);
         } else if (window.attachEvent) {
-            self.attachEvent("onmessage", messageHandler);
+            window.attachEvent("onmessage", messageHandler);
         }
 
         return;
