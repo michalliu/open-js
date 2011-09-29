@@ -39,14 +39,14 @@
     
         	(appkey ? function () {
                 	T.documentReady(function () {
-    					var appkeyholder = document.all.appkey;
+    					var appkeyholder = document.getElementById("appkey");
     					appkeyholder.value = appkey;
     					T.dom.addClass(appkeyholder,"appkey-haskey");
                 	});
         	    } :
                 function () {
                     T.documentReady(function () {
-    					var appkeyholder = document.all.appkey;
+    					var appkeyholder = document.getElementById("appkey");
     					appkeyholder.value = placeholder;
     					T.dom.addClass(appkeyholder,"appkey-nokey");
                         appkeyholder.focus();
@@ -54,7 +54,7 @@
                 })();
     
         	T.documentReady(function () {
-    	    	var appkeyholder = document.all.appkey;			
+    	    	var appkeyholder = document.getElementById("appkey");			
         		appkeyholder.onfocus = function () {
         			if (this.value == placeholder) {
         				this.value = '';
@@ -82,7 +82,7 @@
 		//登录登出
     	T.everythingReady(function () {
 			var 
-			       loginbar = document.all.loginbar,
+			       loginbar = document.getElementById("loginbar"),
 				   loginStatus = T.loginStatus();
 
 			var
@@ -108,16 +108,18 @@
 
 	    	document.body.onclick = function (e) {
 				e = e || window.event;
-				var el = e.srcElement;
-		    	switch (el.id) {
-					case "logout":
-						T.logout();
-						loginbar.innerHTML = "您已登出," + '<a id="login" href="javascript:void(0);">登录</a>';
-						break;
-					case "login":
-						T.login(loginSuccessHandler,loginFailHandler);
-						break;
-		    	}
+				var el = e.srcElement || e.originalTarget;
+				if (el) {
+		        	switch (el.id) {
+			    		case "logout":
+			    			T.logout();
+			    			loginbar.innerHTML = "您已登出," + '<a id="login" href="javascript:void(0);">登录</a>';
+			    			break;
+			    		case "login":
+			    			T.login(loginSuccessHandler,loginFailHandler);
+			    			break;
+		        	}
+			    }
 	    	};
     	});
 		</script>

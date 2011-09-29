@@ -23,8 +23,9 @@ QQWB.extend("cookie", {
      * @access public
      * @return {Void}
      */
-    set: function (name, value, opt_maxage, opt_path, opt_domain) {
+    set: function (name, value, opt_maxage, opt_path, opt_domain, enc) {
 
+	   enc = enc || escape;
        if ( typeof opt_maxage === "undefined" || opt_maxage === null) {
            opt_maxage = -1;
        }
@@ -40,7 +41,7 @@ QQWB.extend("cookie", {
            cookieExpire = "expires=" + new Date(+new Date+opt_maxage*1000).toUTCString();
        }
 
-       document.cookie = [name + "=" + value, cookieExpire, cookiePath, cookieDomain].join("; ");
+       document.cookie = [name + "=" + enc(value), cookieExpire, cookiePath, cookieDomain].join("; ");
 
        return this;
     }
@@ -52,14 +53,15 @@ QQWB.extend("cookie", {
      * @param name {String} cookie name
      * @return {String} value for cookie
      */
-   ,get: function (name) {
+   ,get: function (name, dec) {
+	   dec = dec || unescape;
        var 
            cookieName = name + "=";
            cookies = (document.cookie || "").split(/\s*;\s*/);
        for (var i=0,l=cookies.length; i<l; i++) {
            var cookie = cookies[i];
            if (cookie.indexOf(cookieName) === 0) {
-               return cookie.substr(cookieName.length);
+               return dec(cookie.substr(cookieName.length));
            }
        }
     }

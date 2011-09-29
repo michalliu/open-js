@@ -53,6 +53,56 @@
         <script src="../tools/firebug-lite/content/firebug-lite-dev.js"></script>
         <![endif]-->
         <script src="../build/all.js"></script>
+<script type="text/javascript">
+<!--
+//
+// patch of innerText for firefox
+//
+(function (bool) {
+    function setInnerText(o, s) {
+        while (o.childNodes.length != 0) {
+            o.removeChild(o.childNodes[0]);
+        }
+
+        o.appendChild(document.createTextNode(s));
+    }
+
+    function getInnerText(o) {
+        var sRet = "";
+
+        for (var i = 0; i < o.childNodes.length; i ++) {
+            if (o.childNodes[i].childNodes.length != 0) {
+                sRet += getInnerText(o.childNodes[i]);
+            }
+
+            if (o.childNodes[i].nodeValue) {
+                if (o.currentStyle.display == "block") {
+                    sRet += o.childNodes[i].nodeValue + "\n";
+                } else {
+                    sRet += o.childNodes[i].nodeValue;
+                }
+            }
+        }
+
+        return sRet;
+    }
+
+    if (bool) {
+        HTMLElement.prototype.__defineGetter__("currentStyle", function () {
+            return this.ownerDocument.defaultView.getComputedStyle(this, null);
+        });
+
+        HTMLElement.prototype.__defineGetter__("innerText", function () {
+            return getInnerText(this);
+        })
+
+        HTMLElement.prototype.__defineSetter__("innerText", function(s) {
+            setInnerText(this, s);
+        })
+    }
+})(/Firefox/.test(window.navigator.userAgent));
+//-->
+</script>
 		<script>
 
 		// appkey配置
@@ -68,14 +118,14 @@
     
         	(appkey ? function () {
                 	T.documentReady(function () {
-    					var appkeyholder = document.all.appkey;
+    					var appkeyholder = document.getElementById("appkey");
     					appkeyholder.value = appkey;
     					T.dom.addClass(appkeyholder,"appkey-haskey");
                 	});
         	    } :
                 function () {
                     T.documentReady(function () {
-    					var appkeyholder = document.all.appkey;
+    					var appkeyholder = document.getElementById("appkey");
     					appkeyholder.value = placeholder;
     					T.dom.addClass(appkeyholder,"appkey-nokey");
                         appkeyholder.focus();
@@ -83,7 +133,7 @@
                 })();
     
         	T.documentReady(function () {
-    	    	var appkeyholder = document.all.appkey;			
+    	    	var appkeyholder = document.getElementById("appkey");			
         		appkeyholder.onfocus = function () {
         			if (this.value == placeholder) {
         				this.value = '';
@@ -111,7 +161,7 @@
 		//登录登出
     	T.everythingReady(function () {
 			var 
-			       loginbar = document.all.loginbar,
+			       loginbar = document.getElementById("loginbar"),
 				   loginStatus = T.loginStatus();
 
 			var
@@ -137,15 +187,17 @@
 
 	    	document.body.onclick = function (e) {
 				e = e || window.event;
-				var el = e.srcElement;
-		    	switch (el.id) {
-					case "logout":
-						T.logout();
-						loginbar.innerHTML = "您已登出," + '<a id="login" href="javascript:void(0);">登录</a>';
-						break;
-					case "login":
-						T.login(loginSuccessHandler,loginFailHandler);
-						break;
+				var el = e.srcElement || e.originalTarget;
+				if (el) {
+		        	switch (el.id) {
+			    		case "logout":
+			    			T.logout();
+			    			loginbar.innerHTML = "您已登出," + '<a id="login" href="javascript:void(0);">登录</a>';
+			    			break;
+			    		case "login":
+			    			T.login(loginSuccessHandler,loginFailHandler);
+			    			break;
+		        	}
 		    	}
 	    	};
     	});
@@ -164,14 +216,14 @@
         	}
 
 	    	T.documentReady(function () {
-			    document.all.apitest.innerHTML = apitesthtml.join("");
+			    document.getElementById("apitest").innerHTML = apitesthtml.join("");
 	    	});
 
 			// 开始测试按钮
 	    	T.documentReady(function () {
-			    document.all.triggertest.onclick = function () {
+			    document.getElementById("triggertest").onclick = function () {
 					var 
-					    block = !document.all.testoptionnonblock.checked, // 非阻塞模式开启
+					    block = !document.getElementById("testoptionnonblock").checked, // 非阻塞模式开启
 						testItems,
 						total,
 						warningTime = 600, // 600毫秒以内显示为绿色
@@ -182,7 +234,7 @@
 						i = 0;
 
 					if (trigger.getAttribute("data-restart") == "yes") { // 刷新
-						document.all.apitest.innerHTML = apitesthtml.join("");
+						document.getElementById("apitest").innerHTML = apitesthtml.join("");
 					}
 
 					trigger.disabled = "disabled";
@@ -190,8 +242,8 @@
 					testItems = T.find("#apitest > .apiitem");
 					total = testItems.length;
 
-                    document.all.performance.style.visibility="visible";
-                    document.all.performance.innerHTML = "请稍候...";
+                    document.getElementById("performance").style.visibility="visible";
+                    document.getElementById("performance").innerHTML = "请稍候...";
 
 			    	function makeTest(index) {
 						var 
@@ -262,7 +314,7 @@
 			    	}
 
 			    	function onCompleting(finished) {
-						document.all.performance.innerHTML = T.format.sprintf("已完成%.2f%%"
+						document.getElementById("performance").innerHTML = T.format.sprintf("已完成%.2f%%"
 					                                                          ,(finished/total) * 100
 					                                                         );
 						return true;
@@ -273,7 +325,7 @@
 						endTime = T.time.now();
 						trigger.innerHTML = "重新开始";
 						trigger.setAttribute("data-restart","yes");
-						document.all.performance.innerHTML = T.format.sprintf("总响应时间%dms,平均响应时间%.2fms"
+						document.getElementById("performance").innerHTML = T.format.sprintf("总响应时间%dms,平均响应时间%.2fms"
 					                                                          ,endTime - startTime
 																			  ,(endTime - startTime)/total
 					                                                         );

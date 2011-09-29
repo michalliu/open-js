@@ -16,15 +16,15 @@
 
             T.api("/statuses/home_timeline")
              .success(function (response) {
-                 document.all.result.innerHTML = response;
+                 document.getElementById("result").innerHTML = response;
               })
              .error(function (code, message) {
-                 document.all.result.innerHTML = code + "," + message;
+                 document.getElementById("result").innerHTML = code + "," + message;
               });
 
 
             T.documentReady(function () {
-                document.all.initBtn.onclick = function () {
+                document.getElementById("initBtn").onclick = function () {
                     // 初始化库
                     T.init({appkey: "key001"});
                 }
@@ -47,21 +47,21 @@
     <div class="result" id="result">请求已发出,等待初始化...</div>
     </p>
 
-    <p><a href="#" onclick="document.all.code.style.display='block';">显示代码</a></p>
+    <p><a href="#" onclick="document.getElementById("code").style.display='block';">显示代码</a></p>
     <p class="code" id="code">
     <textarea>
 
             T.api("/statuses/home_timeline")
              .success(function (response) {
-                 document.all.result.innerHTML = response;
+                 document.getElementById("result").innerHTML = response;
               })
              .error(function (code, message) {
-                 document.all.result.innerHTML = code + "," + message;
+                 document.getElementById("result").innerHTML = code + "," + message;
               });
 
 
             T.documentReady(function () {
-                document.all.initBtn.onclick = function () {
+                document.getElementById("initBtn").onclick = function () {
                     // 延迟初始化库
                     T.init({appkey: "key001"});
                 }

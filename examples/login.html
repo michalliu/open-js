@@ -21,17 +21,17 @@
             T.bind(T.events.USER_LOGGEDIN_EVENT, function (loginStatus) {
                 var username = loginStatus.name,
                     usernick = loginStatus.nick;
-                document.all.result.innerHTML = username + "(" + usernick + ") 登录成功";
+                document.getElementById("result").innerHTML = username + "(" + usernick + ") 登录成功";
             });
 
             // 绑定登录失败后的处理
             T.bind(T.events.USER_LOGIN_FAILED_EVENT, function (error) {
-                document.all.result.innerHTML = "登录失败" + error.message;
+                document.getElementById("result").innerHTML = "登录失败" + error.message;
             });
 
             // 绑定登出处理
             T.bind(T.events.USER_LOGGEDOUT_EVENT, function (error) {
-                document.all.result.innerHTML = "登出成功";
+                document.getElementById("result").innerHTML = "登出成功";
             });
 
             // 获取目前的登录态并显示相应的信息
@@ -39,9 +39,9 @@
                 var loginStatus = T.loginStatus(); 
                 T.documentReady(function () {
                     if (loginStatus) {
-                        document.all.result.innerHTML = "欢迎," + loginStatus.name;
+                        document.getElementById("result").innerHTML = "欢迎," + loginStatus.name;
                     } else {
-                        document.all.result.innerHTML = "请登录";
+                        document.getElementById("result").innerHTML = "请登录";
                     }
                 });
             });
@@ -49,12 +49,12 @@
             // 登录与登出动作绑定
             T.documentReady(function () {
 
-                document.all.loginBtn.onclick = function () {
-                    document.all.result.innerHTML = "登录中";
+                document.getElementById("loginBtn").onclick = function () {
+                    document.getElementById("result").innerHTML = "登录中";
                     T.login();
                 };
 
-                document.all.logoutBtn.onclick = function () {
+                document.getElementById("logoutBtn").onclick = function () {
                     T.logout();
                 };
             });
@@ -80,7 +80,7 @@
     <div class="result" id="result"></div>
     </p>
 
-    <p><a href="#" onclick="document.all.code.style.display='block';">显示代码</a></p>
+    <p><a href="#" onclick="document.getElementById("code").style.display='block';">显示代码</a></p>
     <p class="code" id="code">
     <textarea>
 
@@ -91,17 +91,17 @@
             T.bind(T.events.USER_LOGGEDIN_EVENT, function (loginStatus) {
                 var username = loginStatus.name,
                     usernick = loginStatus.nick;
-                document.all.result.innerHTML = username + "(" + usernick + ") 登录成功";
+                document.getElementById("result").innerHTML = username + "(" + usernick + ") 登录成功";
             });
 
             // 绑定登录失败后的处理
             T.bind(T.events.USER_LOGIN_FAILED_EVENT, function (error) {
-                document.all.result.innerHTML = "登录失败" + error.message;
+                document.getElementById("result").innerHTML = "登录失败" + error.message;
             });
 
             // 绑定登录失败后的处理
             T.bind(T.events.USER_LOGGEDOUT_EVENT, function (error) {
-                document.all.result.innerHTML = "登出成功";
+                document.getElementById("result").innerHTML = "登出成功";
             });
 
             // 获取目前的登录态并显示相应的信息
@@ -109,9 +109,9 @@
                 var loginStatus = T.loginStatus(); 
                 T.documentReady(function () {
                     if (loginStatus) {
-                        document.all.result.innerHTML = "欢迎," + loginStatus.name;
+                        document.getElementById("result").innerHTML = "欢迎," + loginStatus.name;
                     } else {
-                        document.all.result.innerHTML = "请登录";
+                        document.getElementById("result").innerHTML = "请登录";
                     }
                 });
             });
@@ -119,12 +119,12 @@
             // 登录与登出动作绑定
             T.documentReady(function () {
 
-                document.all.loginBtn.onclick = function () {
-                    document.all.result.innerHTML = "登录中";
+                document.getElementById("loginBtn").onclick = function () {
+                    document.getElementById("result").innerHTML = "登录中";
                     T.login();
                 };
 
-                document.all.logoutBtn.onclick = function () {
+                document.getElementById("logoutBtn").onclick = function () {
                     T.logout();
                 };
             });

@@ -20,7 +20,7 @@ QQWB.extend("auth.authWindow",{
    // auth url
    ,_url: QQWB._domain.auth
    // auth window attributes
-   ,_attribs: "toolbar=no,menubar=no,scrollbars=no,resizeable=yes,location=yes,status=no"
+   ,_attribs: "toolbar=no,menubar=no,scrollbars=yes,resizable=yes,location=yes,status=no"
    // auth window status
    ,_authorizing: false
    // reference to auth DOMWindow
