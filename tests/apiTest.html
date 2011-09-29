@@ -4,12 +4,15 @@
 		<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
 		<title>接口调用测试</title>
 		<style>
-            body{font-size:12px;font-family:menlo,monaco,consolas,"Microsoft YaHei";padding:0;margin:0;}
+            body{font-size:12px;font-family:consolas,"Microsoft YaHei";padding:0;margin:0;}
 			ul,ol,li,label,textarea{display:block;padding:0;margin:0;}
+			input,textarea{font-family:menlo,monaco,consolas,"Microsoft YaHei"}
 			select{font-size:14px;}
 			input{font-size:14px;outline:none;}
 			ul{list-style-type:none;}
 			a{text-decoration:none;}
+
+			.main{width:95%;margin:0 auto;}
 
 			.caption{font-size:18px;}
 			.section{padding:15px;margin:15px;background:whiteSmoke;border:1px solid #e5e5e5;border-radius:15px;}
@@ -316,48 +319,50 @@
     <body>
     <!--<![endif]-->
 
+	<div class="main">
 	<!-- Appkey配置 -->
-	<label class="caption section">
-		AppKey:<input type="text" value="" class="no-border" id="appkey" size="32"></input>
-	</label>
-
-	<!-- 登录与登出 -->
-	<div class="caption section" id="loginbar">登录中,请稍候...</div>
-
-	<!-- 接口测试 -->
-	<div class="apitestwrapper section" id="apitestwrapper">
-		<div class="caption">接口调用测试</div>
-		<ol class="configure">
-	    	<li><div class="caption subtitle">一、接口</div>
-	        	<select id="requestapiname">
-					<optgroup label="接口列表"></optgroup>
-	            </select>
-	    	</li>
-	    	<li><div class="caption subtitle">二、参数</div>
-	        	<div id="requestparams">
-	            </div>
-	    	</li>
-	    	<li><div class="caption subtitle">三、数据格式</div>
-	        	<select id="requestdatatype">
-	        		<option value="json">JSON</option>
-	        		<option value="xml">XML</option>
-	        		<option value="text" selected>TEXT</option>
-	            </select>
-	    	</li>
-			<li><div class="caption subtitle">四、请求方式</div>
-	        	<select id="requestmethod">
-	            </select>
-            </li>
-			<li>
-		    	<button id="execute" class="caption">执行</button>
-			</li>
-	    </ol>
-	    <div id="status"><div id="performance" class="status-progress"></div><a id="diagnost" title="诊断信息" href="javascript:;">+</a></div>
-	</div>
-
-	
-	<div class="caption section" id="resultHolder">
-		<textarea id="result"></textarea>
+    	<label class="caption section">
+    		AppKey:<input type="text" value="" class="no-border" id="appkey" size="32"></input>
+    	</label>
+    
+    	<!-- 登录与登出 -->
+    	<div class="caption section" id="loginbar">登录中,请稍候...</div>
+    
+    	<!-- 接口测试 -->
+    	<div class="apitestwrapper section" id="apitestwrapper">
+    		<div class="caption">接口调用测试</div>
+    		<ol class="configure">
+    	    	<li><div class="caption subtitle">一、接口</div>
+    	        	<select id="requestapiname">
+    					<optgroup label="接口列表"></optgroup>
+    	            </select>
+    	    	</li>
+    	    	<li><div class="caption subtitle">二、参数</div>
+    	        	<div id="requestparams">
+    	            </div>
+    	    	</li>
+    	    	<li><div class="caption subtitle">三、数据格式</div>
+    	        	<select id="requestdatatype">
+    	        		<option value="json">JSON</option>
+    	        		<option value="xml">XML</option>
+    	        		<option value="text" selected>TEXT</option>
+    	            </select>
+    	    	</li>
+    			<li><div class="caption subtitle">四、请求方式</div>
+    	        	<select id="requestmethod">
+    	            </select>
+                </li>
+    			<li>
+    		    	<button id="execute" class="caption">执行</button>
+    			</li>
+    	    </ol>
+    	    <div id="status"><div id="performance" class="status-progress"></div><a id="diagnost" title="诊断信息" href="javascript:;">+</a></div>
+    	</div>
+    
+    	
+    	<div class="caption section" id="resultHolder">
+    		<textarea id="result"></textarea>
+    	</div>
 	</div>
 
 	</body>

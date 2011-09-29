@@ -282,11 +282,10 @@
 
     twb.assign("_domain","API_URI","/api"); // no trailer slash   
     twb.assign("_domain","AUTH_URI","/oauth2_html/login.php");   
+    twb.assign("_domain","SERVERPROXY_URI","/oauth2_html/proxy.html");   
+    twb.assign("_domain","FLASHPROXY_URI","/oauth2_html/proxy.swf");   
     twb.assign("_domain","EXCHANGE_TOKEN_URI","/cgi-bin/exchange_token");   
     twb.assign("_domain","QUERY_TOKEN_URI","/cgi-bin/auto_token");   
-    twb.assign("_domain","SERVERPROXY_URI","/oauth_html/2/proxy.html");   
-    twb.assign("_domain","FLASHPROXY_URI","/oauth_html/2/proxy.swf");   
-
 }());
 /**
  * Tencent weibo javascript library
@@ -7206,37 +7205,37 @@ if (QQWB.localStorage) {
  */
 QQWB.extend("auth.authWindow",{
     // auth window width
-	_width: QQWB.AUTH_WINDOW_WIDTH 
+	_width: QQWB._const.AUTH_WINDOW_WIDTH 
    // auth window height
-   ,_height: QQWB.AUTH_WINDOW_HEIGHT 
+   ,_height: QQWB._const.AUTH_WINDOW_HEIGHT 
    // auth window name
-   ,_name: QQWB.AUTH_WINDOW_NAME
+   ,_name: QQWB._const.AUTH_WINDOW_NAME
    // auth url
    ,_url: QQWB._domain.auth
-   // auth querystrings
-   ,_query: QQWB.queryStrig.encode({
-	   response_type: "token"
-	  ,client_id: QQWB._appkey
-	  ,redirect_uri: QQWB._domain.clientproxy
-	  ,referer: document.location.href
-	  ,scope: "all"
-	  ,status: 0
-    })
    // auth window attributes
    ,_attribs: "toolbar=no,menubar=no,scrollbars=no,resizeable=yes,location=yes,status=no"
    // auth window status
-   ,_closed: true
+   ,_authorizing: false
    // reference to auth DOMWindow
    ,_window: null
    // show auth window, if already showed do nothing
    ,show: function () {
-	   var x,y,props;
-	   if (this.closed) {
-		   x = window.screenX || window.screenLeft + (window.outerWidth || document.documentElement.clientWidth - QQWB.AUTH_WINDOW_WIDTH) / 2;
-		   y = window.screenY || window.screenTop + (window.outerHeight || document.documentElement.clientHeight - QQWB.AUTH_WINDOW_HEIGHT) / 2
+	   var x,y,query,props;
+	   if (!this._authorizing) {
+		   x = (window.screenX || window.screenLeft) + ((window.outerWidth || document.documentElement.clientWidth) - this._width) / 2;
+		   y = (window.screenY || window.screenTop) + ((window.outerHeight || document.documentElement.clientHeight) - this._height) / 2;
+		   query =  QQWB.queryString.encode({
+                response_type: "token"
+               ,client_id: QQWB._appkey
+               ,redirect_uri: QQWB._domain.clientproxy
+               ,referer: document.location.href
+               ,scope: "all"
+               ,status: 0
+           });
 		   props = ["width="+this._width,"height="+this._height,"left="+x,"top="+y]
-	       this._window = window.open(this._url + "?" + this.query, this._name, props+","+this._attribs);
-		   this.closed = false;
+	       this._window = window.open(this._url + "?" + query, this._name, props+","+this._attribs);
+		   this._authorizing = true;
+
 		   (function () {
 			   var authwindow = QQWB.auth.authWindow,
 			       response;
@@ -7246,7 +7245,7 @@ QQWB.extend("auth.authWindow",{
                    return;
 		       } else {
 		           try {
-		            	response = authWindow.contentWindow.location.hash;	
+		            	response = authwindow._window.location.hash;	
 		           } catch (ex) {
 		           	    response = null;
 		           }
@@ -7261,11 +7260,13 @@ QQWB.extend("auth.authWindow",{
                    setTimeout(arguments.callee, 0);
                }
             }());
-	   }
+    	} else {
+			this.focus();
+    	}
 	   return this;
     }
    ,close: function () { 
-	   this._closed = true;
+	   this._authorizing = false;
 	   if (!this._window) { // has auth window
 		   return this;
 	   }
@@ -7318,10 +7319,8 @@ QQWB.extend("auth",{
 
         // user already logged in
         if (loginStatus) {
-
             optSuccessHandler && optSuccessHandler.call(QQWB,loginStatus);
             QQWB.trigger(QQWB.events.USER_LOGGEDIN_EVENT,loginStatus);
-
         } else { // open authorization window
 		    QQWB.auth.authWindow.show().focus();
         } // end if loginStatus

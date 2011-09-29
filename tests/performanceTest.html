@@ -4,11 +4,14 @@
 		<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
 		<title>全功能测试</title>
 		<style>
-            body{font-size:12px;font-family:menlo,monaco,consolas,"Microsoft YaHei";padding:0;margin:0;}
+            body{font-size:12px;font-family:consolas,"Microsoft YaHei";padding:0;margin:0;}
 			ul,ol,li,label,textarea{display:block;padding:0;margin:0;}
+			input,textarea{font-family:menlo,monaco,consolas,"Microsoft YaHei"}
 			input{font-size:14px;outline:none;}
 			ul{list-style-type:none;}
 			a{text-decoration:none;}
+
+			.main{width:95%;margin:0 auto;}
 
 			.caption{font-size:18px;}
 			.section{padding:15px;margin:15px;background:whiteSmoke;border:1px solid #e5e5e5;border-radius:15px;}
@@ -40,7 +43,7 @@
 	    	.apiitem .apitestdetail{float:left;width:39%;height:100%;overflow:hidden;}
 	    	.apiitem .apitestdetail .apitestflag{float:left;}
 	    	.apiitem .apitestdetail .apitestresult{float:left;line-height:20px;}
-	    	.apiitem .apitestdetail .apidiagnost{display:block;float:right;line-height:20px;font-weight:bold;font-size:16px;color:#DD4B39;display:none;}
+	    	.apiitem .apitestdetail .apidiagnost{display:block;float:right;line-height:20px;font-size:16px;color:#DD4B39;display:none;}
 
 			.apitestwrapper .testdesc {padding:15px;overflow:hidden;}
 			.apitestwrapper .testdesc .status-flag,.apitestwrapper .testdesc .status-text{float:left;}
@@ -50,7 +53,6 @@
         <script src="../tools/firebug-lite/content/firebug-lite-dev.js"></script>
         <![endif]-->
         <script src="../build/all.js"></script>
-
 		<script>
 
 		// appkey配置
@@ -239,7 +241,9 @@
 								     el.onclick = function () {
 										 alert(message);
 								     }
-								     diagnost.onclick = function () {
+								     diagnost.onclick = function (e) {
+										 e = e || window.event;
+										 e.stopPropagation();
 										 alert(message);
 								     };
 							     })
@@ -258,7 +262,7 @@
 			    	}
 
 			    	function onCompleting(finished) {
-						document.all.performance.innerHTML = T.format.sprintf("已完成<strong>%.2f%%</strong>"
+						document.all.performance.innerHTML = T.format.sprintf("已完成%.2f%%"
 					                                                          ,(finished/total) * 100
 					                                                         );
 						return true;
@@ -269,7 +273,7 @@
 						endTime = T.time.now();
 						trigger.innerHTML = "重新开始";
 						trigger.setAttribute("data-restart","yes");
-						document.all.performance.innerHTML = T.format.sprintf("总响应时间<strong>%d</strong>ms,平均响应时间<strong>%.2f</strong>ms"
+						document.all.performance.innerHTML = T.format.sprintf("总响应时间%dms,平均响应时间%.2fms"
 					                                                          ,endTime - startTime
 																			  ,(endTime - startTime)/total
 					                                                         );
@@ -311,29 +315,31 @@
     <!--<![endif]-->
 
 	<!-- Appkey配置 -->
-	<label class="caption section">
-		AppKey:<input type="text" value="" class="no-border" id="appkey" size="32"></input>
-	</label>
-
-	<!-- 登录与登出 -->
-	<div class="caption section" id="loginbar">登录中,请稍候...</div>
-
-	<!-- 接口测试 -->
-	<div class="apitestwrapper section" id="apitestwrapper">
-		<div class="caption">接口性能测试&nbsp;&nbsp;<button id="triggertest" class="caption">开始</button>&nbsp;&nbsp;<input id="testoptionnonblock" type="checkbox">不阻塞</input> </div>
-        <div class="status-text" id="performance"></div>
-		<!--<div class="caption testdesc">
-			<div class="status-flag status-idle"></div>
-			<div class="status-text">等待</div>
-			<div class="status-flag status-success"></div>
-			<div class="status-text">良好</div>
-			<div class="status-flag status-warning"></div>
-			<div class="status-text">一般</div>
-			<div class="status-flag status-fail"></div>
-			<div class="status-text">失败</div>
-		</div>-->
-		<ul class="apitest" id="apitest">
-		</ul>
+	<div class="main">
+    	<label class="caption section">
+    		AppKey:<input type="text" value="" class="no-border" id="appkey" size="32"></input>
+    	</label>
+    
+    	<!-- 登录与登出 -->
+    	<div class="caption section" id="loginbar">登录中,请稍候...</div>
+    
+    	<!-- 接口测试 -->
+    	<div class="apitestwrapper section" id="apitestwrapper">
+    		<div class="caption">接口性能测试&nbsp;&nbsp;<button id="triggertest" class="caption">开始</button>&nbsp;&nbsp;<input id="testoptionnonblock" type="checkbox">不阻塞</input> </div>
+            <div class="status-text" id="performance"></div>
+    		<!--<div class="caption testdesc">
+    			<div class="status-flag status-idle"></div>
+    			<div class="status-text">等待</div>
+    			<div class="status-flag status-success"></div>
+    			<div class="status-text">良好</div>
+    			<div class="status-flag status-warning"></div>
+    			<div class="status-text">一般</div>
+    			<div class="status-flag status-fail"></div>
+    			<div class="status-text">失败</div>
+    		</div>-->
+    		<ul class="apitest" id="apitest">
+    		</ul>
+    	</div>
 	</div>
 
 	</body>
