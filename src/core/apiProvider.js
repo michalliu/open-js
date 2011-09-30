@@ -14,13 +14,58 @@
  */
 QQWB.extend("_apiProvider", {
 	// api error
-	apiError: {
-		httpHeaderFlag: /X-APIErrorCode:\s+(\d+)/
-	   ,"1": "参数错误"
+    _apiRetError: {
+	    "1": "参数错误"
 	   ,"2": "频率受限"
 	   ,"3": "鉴权失败"
 	   ,"4": "内部错误"
-	}
+	   }
+   ,_apiErrorCode: {
+       "4": "过多脏话"
+      ,"5": "禁止访问"
+      ,"6": "记录不存在"
+      ,"8": "内容过长"
+      ,"9": "内容包含垃圾信息"
+      ,"10": "发表太快，频率限制"
+      ,"11": "源消息不存在"
+      ,"12": "未知错误"
+      ,"13": "重复发表"
+    }
+   /**
+     * Parse ret code from server response
+     *
+     * @param text {String} server response contains retcode
+     * @return retcode {Number} ret code
+     */
+   ,_apiParseRetCode: function (text) {
+       var match = text.match(/\"ret\":(\d+)\}/) || text.match(/<ret>(\d+)<\/ret>/); 
+       return match ? parseInt(match[1],10) : match;
+    }
+    /**
+     * Parse error code from server response
+     *
+     * @param text {String} server response contains retcode
+     * @return errorcode {Number} ret code
+     */
+   ,_apiParseErrorCode: function (text) {
+       var match = text.match(/\"errcode\":(\d+)\}/) || text.match(/<errcode>(\d+)<\/errcode>/); 
+       return match ? parseInt(match[1],10) : match;
+    }
+	/**
+	 * Convert retcode and error code to human reading messages
+	 */
+   ,_apiGetErrorMessage: function (optRetcode, optErrorcode) {
+	   var msg = [],
+	       optRetcode = optRetcode + "",
+	       optErrorcode = optErrorcode + "",
+	       retErrorMsg = QQWB._apiProvider._apiRetError[optRetcode],
+	       retCodeErrorMsg = QQWB._apiProvider._apiErrorCode[optErrorcode];
+
+	   retErrorMsg && msg.push(retErrorMsg);
+	   retCodeErrorMsg && msg.push(retCodeErrorMsg);
+
+	   return msg.length > 0 ? msg.join(",") : "";
+    }
     // api list
    ,apis: {
         "/statuses/home_timeline": {

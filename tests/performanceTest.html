@@ -6,7 +6,7 @@
 		<style>
             body{font-size:12px;font-family:consolas,"Microsoft YaHei";padding:0;margin:0;}
 			ul,ol,li,label,textarea{display:block;padding:0;margin:0;}
-			input,textarea{font-family:menlo,monaco,consolas,"Microsoft YaHei"}
+			textarea{font-family:menlo,monaco,consolas,"Microsoft YaHei"}
 			input{font-size:14px;outline:none;}
 			ul{list-style-type:none;}
 			a{text-decoration:none;}
@@ -39,7 +39,7 @@
 			.apiitem .apiseq{float:left;width:2%;height:20px;line-height:20px;}
 	    	.apiitem .apiname{background:#ccc;float:left;width:59%;height:20px;line-height:20px;position:relative;border-radius:10px;}
 	    	.apiitem .apiname .apiprogresstext{position:absolute;top:0px;left:10px;width:100%;height:100%;z-index:2;}
-	    	.apiitem .apiname .apiprogress{background:skyblue;position:absolute;top:0px;left:0px;width:0%;height:100%;z-index:1;border-radius:10px;}
+	    	.apiitem .apiname .apiprogress{background:skyblue;position:absolute;top:0px;left:0px;width:0%;height:20px;z-index:1;border-radius:10px;}
 	    	.apiitem .apitestdetail{float:left;width:39%;height:100%;overflow:hidden;}
 	    	.apiitem .apitestdetail .apitestflag{float:left;}
 	    	.apiitem .apitestdetail .apitestresult{float:left;line-height:20px;}
@@ -285,18 +285,19 @@
 										 alert(response);
 								     };
 								 })
-							     .error(function (code, message, timecost) {
+							     .error(function (code, message, timecost, responseText) {
 									 resultElement.innerHTML = "失败 [" + timecost + "ms] " + code + "," + message;
 								     T.dom.addClass(statusElement,"status-fail");
 									 T.dom.addClass(resultElement,"result-fail");
 									 T.dom.addClass(el,"announcement");
 								     el.onclick = function () {
-										 alert(message);
+										 alert(responseText);
 								     }
 								     diagnost.onclick = function (e) {
 										 e = e || window.event;
 										 e.stopPropagation();
-										 alert(message);
+										 alert(T.format.sprintf(["错误码: %s","错误信息: %s","响应时间: %sms","响应: %s"].join("\n"), 
+										                        code, message, timecost, responseText));
 								     };
 							     })
 								 .complete(function () {

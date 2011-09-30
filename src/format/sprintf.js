@@ -166,11 +166,15 @@
     	return sprintf.apply(null, argv);
     };
 
-    QQWB.extend("format", {
+	// expost to String module
+    QQWB.extend("String.format", {
 
         sprintf: sprintf
 
        ,vsprintf: vsprintf
-    })
+    });
+
+	// expost shortcut
+	QQWB._alias("format", QQWB.String.format);
 
 }());

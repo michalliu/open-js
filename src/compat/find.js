@@ -155,9 +155,11 @@
         return nodes;
     }
 
-    // expose
-    QQWB.provide('find', function (selector, context) {
+    // expose to dom module
+    QQWB.provide('dom.find', function (selector, context) {
         return create_chain($(selector, context));
     });
 
+	// alias to global
+	QQWB._alias("find", QQWB.dom.find);
 }());

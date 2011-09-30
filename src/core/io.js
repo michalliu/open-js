@@ -174,9 +174,9 @@ QQWB.extend("io", {
 								}
 
                                 // parse to JSON
-                                if (cfg.dataType.toLowerCase() == "json") {
+                                if (cfg.dataType.toLowerCase() == "json") { /// parse to json object
 									response = QQWB.JSON.fromString(responses.text);
-                                } else if (cfg.dataType.toLowerCase() == "xml") { // parse to xml
+                                } else if (cfg.dataType.toLowerCase() == "xml") { // parse to xml object
                                     response = responses.xml;
                                 } else { // as normal text
                                     response = responses.text;
@@ -186,10 +186,11 @@ QQWB.extend("io", {
 
 						   //if (response) { // when server returns empty body sometimes, response will never called
 				               clearTimeout(ajaxTimeout);
-					           complete(status, statusText, QQWB.time.now() - started, response, responseHeaders, cfg.dataType); // take cfg.dataType back
+					           complete(status, statusText, QQWB.time.now() - started, response, responses.text, responseHeaders, cfg.dataType); // take cfg.dataType back
 						   //}
 					   } // end readyState 4
 			       } catch (firefoxException) {
+					   QQWB.log.warning(firefoxException);
 					   if (!isAbort) {
 				           clearTimeout(ajaxTimeout);
 					       complete(xhr.status, xhr.statusText, QQWB.time.now() - started);
@@ -263,9 +264,9 @@ QQWB.extend("io", {
 				        	   responses = {}; // internal object
 				        	   responses.text = _.target.data;
 
-				        	   if (cfg.dataType.toLowerCase() == "json") {
+				        	   if (cfg.dataType.toLowerCase() == "json") { // parse to json object
 				        		   response = QQWB.JSON.fromString(responses.text);
-                               } else if (cfg.dataType.toLowerCase() == "xml"){
+                               } else if (cfg.dataType.toLowerCase() == "xml"){ // parse to xml object
 				        		   response = QQWB.XML.fromString(responses.text);
                                } else {
 				        		   response = responses.text;
@@ -273,7 +274,7 @@ QQWB.extend("io", {
 				           }
 
 						   //if (response) { // when server returns empty body sometimes, response will never called
-				        	   complete(status, statusText, QQWB.time.now() - started, response, responseHeaders);
+				        	   complete(status, statusText, QQWB.time.now() - started, response, responses.text, responseHeaders, cfg.dataType);
 						   //}
 					   }
 					} catch (ex) {
@@ -350,6 +351,37 @@ QQWB.extend("io", {
        return QQWB.io.flashAjax(opts);
    }
    /**
+	* SendResponse regarding api call
+	*/
+  ,_apiResponder: function (deferred) {
+	  return function (status ,statusText ,elapsedtime ,parsedResponse ,responseText ,responseHeaders ,dataType) {
+		  var retcode,errorcode;
+          if (status !== 200) { // http error
+              deferred.reject(status, statusText, elapsedtime, "");
+		  } else if ( typeof (retcode = QQWB._apiProvider._apiParseRetCode(responseText)) == "number"
+		             && 0 !== retcode
+			        ) { // api error
+		      errorcode = QQWB._apiProvider._apiParseErrorCode(responseText); 
+			  status = parseInt(1000 + "" + retcode + "" + (errorcode ? errorcode : "0"),10);
+			  deferred.reject(status,  QQWB._apiProvider._apiGetErrorMessage(retcode,errorcode), elapsedtime, responseText);
+          } else {
+			  deferred.resolve(status, statusText, elapsedtime, parsedResponse, responseHeaders, dataType);
+          }
+	  };
+   }
+   /**
+	* SendResponse regarding ajax call
+	*/
+  ,_ajaxResponder: function (deferred) {
+	  return function (status ,statusText ,elapsedtime ,parsedResponse ,responseText ,responseHeaders ,dataType) {
+          if (status !== 200) {
+              deferred.reject(status, statusText, elapsedtime, "");
+          } else {
+              deferred.resolve(parsedResponse, elapsedtime, responseText);
+          }
+	  };
+   }
+   /**
 	* Emulate AJAX request via flash
 	*
 	* @access public
@@ -365,21 +397,7 @@ QQWB.extend("io", {
            };
 
        QQWB.extend(default_opts, opts, true);
-
-       QQWB.io._IOFlash(default_opts).send(function (status, statusText, elapsedtime, responses, responseHeaders) {
-		   if (status !== 200) {
-       	       deferred.reject(status, statusText, elapsedtime);
-       	   } else {
-			   // extract API error code from http header
-			   if (responseHeaders && QQWB._apiProvider.apiError.httpHeaderFlag.test(responseHeaders)) {
-				   var apiErrorCode = responseHeaders.match(QQWB._apiProvider.apiError.httpHeaderFlag)[1];
-				   deferred.reject(parseInt(apiErrorCode,10), QQWB._apiProvider.apiError[apiErrorCode], elapsedtime);
-               } else {
-                   deferred.resolve(status, statusText, elapsedtime, responses, responseHeaders);
-               }
-       	   }
-       });
-
+       QQWB.io._IOFlash(default_opts).send(QQWB.io._apiResponder(deferred));
 	   return deferred.promise();
    }
 	/**
@@ -400,20 +418,7 @@ QQWB.extend("io", {
 
         QQWB.extend(default_opts, opts, true);
 
-		QQWB.io._IOAjax(default_opts).send(function (status, statusText, elapsedtime, responses, responseHeaders, dataType) {
-			if (status !== 200) {
-				deferred.reject(status, statusText, elapsedtime);
-			} else {
-			    // extract API error code from http header
-			    if (responseHeaders && QQWB._apiProvider.apiError.httpHeaderFlag.test(responseHeaders)) {
-			        var apiErrorCode = responseHeaders.match(QQWB._apiProvider.apiError.httpHeaderFlag)[1];
-				    deferred.reject(parseInt(apiErrorCode,10), QQWB._apiProvider.apiError[apiErrorCode], elapsedtime);
-                } else {
-				    deferred.resolve(status, statusText, elapsedtime, responses, responseHeaders, dataType);
-                }
-			}
-		});
-
+        QQWB.io._IOAjax(default_opts).send(QQWB.io._apiResponder(deferred));
 		return deferred.promise();
     }
 	/**
@@ -439,15 +444,7 @@ QQWB.extend("io", {
            };
 
         QQWB.extend(default_opts, opts, true);
-
-		QQWB.io._IOAjax(default_opts).send(function (status, statusText, elapsedtime, responses, responseHeaders, dataType) {
-			if (status !== 200) {
-				deferred.reject(status, statusText, elapsedtime);
-			} else {
-				deferred.resolve(/*status, statusText, elapsedtime, */responses, elapsedtime/*, responseHeaders, dataType*/);
-			}
-		});
-
+        QQWB.io._IOAjax(default_opts).send(QQWB._ajaxResponder(deferred));
 		return deferred.promise();
     }
     /**

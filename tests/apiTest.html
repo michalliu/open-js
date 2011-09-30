@@ -36,6 +36,7 @@
 			#status #performance{float:left;width:100px;padding:0px 10px;border-radius:10px;}
 			#status #diagnost{display:block;float:right;line-height:20px;font-size:16px;color:#DD4B39;}
 
+			select#requestapiname {width:380px;}
 			#requestparams input{font-size:12px;padding:0px 5px;}
 			textarea#result{width:100%;height:300px;outline:none;}
 			
@@ -345,15 +346,18 @@
 				     diagnost.push(T.format.sprintf(diagnostFormat, "处理时间", costtime));
 				     diagnost.push(T.format.sprintf(diagnostFormat, "结    果", "成功"));
 				     diagnost.push(T.format.sprintf(diagnostFormat, "响 应 头", headers));
-				     diagnost.push(T.format.sprintf(diagnostFormat, "纯 文 本", stringify(response)));
-					 result.value = response;
+				     diagnost.push(T.format.sprintf(diagnostFormat, "返    回", stringify(response)));
+					 result.value = stringify(response);
 				 })
-			     .error(function (code, message, costtime){
+			     .error(function (code, message, costtime, responseText){
                      performance.className="status-fail";
 					 performance.innerHTML = T.format.sprintf("处理时间%dms", costtime);
 				     diagnost.push(T.format.sprintf(diagnostFormat, "处理时间", costtime));
+				     diagnost.push(T.format.sprintf(diagnostFormat, "错 误 码", code));
+				     diagnost.push(T.format.sprintf(diagnostFormat, "错误信息", message));
 				     diagnost.push(T.format.sprintf(diagnostFormat, "结    果", "失败"));
-					 result.value = T.format.sprintf("请求失败，错误码:%d,错误信息:%s",code,message);
+				     diagnost.push(T.format.sprintf(diagnostFormat, "返    回", responseText));
+					 result.value = T.format.sprintf("失败，错误码:%d,错误信息:%s,返回:%s",code,message,responseText);
 			     });
 		    };
 
@@ -398,7 +402,6 @@
     	        	<select id="requestdatatype">
     	        		<option value="json">JSON</option>
     	        		<option value="xml">XML</option>
-    	        		<option value="text" selected>TEXT</option>
     	            </select>
     	    	</li>
     			<li><div class="caption subtitle">四、请求方式</div>

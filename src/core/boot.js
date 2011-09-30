@@ -249,6 +249,7 @@ QQWB.extend("",{
 					// we directly pass the data to the reciever regardless its success or not
 					//
 					QQWB.io._apiAjax.apply(this,args).complete(function () {
+						// can't stringify a xml object here
 			        	appWindow.postMessage(QQWB.JSON.stringify({
 			        		id: id
 			        	   ,data: QQWB.Array.fromArguments(arguments)
