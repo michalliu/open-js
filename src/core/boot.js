@@ -37,7 +37,7 @@ QQWB.extend("",{
                refreshToken = this._token.getRefreshToken(),
                needExchangeToken = refreshToken && !accessToken && rawAccessToken,
                needRequestNewToken = !refreshToken && !accessToken,
-               clientProxy = opts.proxy || document.location.href; // redirect flag is userfull to solve IE's opener problem
+               clientProxy = opts.proxy || document.location.href.replace(location.search,"").replace(location.hash,"");
 
            if (opts.appkey) {
                this.log.info("client id is " + opts.appkey);

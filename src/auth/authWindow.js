@@ -35,7 +35,6 @@ QQWB.extend("auth.authWindow",{
                 response_type: "token"
                ,client_id: QQWB._appkey
                ,redirect_uri: QQWB._domain.clientproxy
-               ,referer: document.location.href
                ,scope: "all"
                ,status: 0
            });
