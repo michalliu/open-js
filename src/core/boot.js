@@ -37,6 +37,7 @@ QQWB.extend("",{
                refreshToken = this._token.getRefreshToken(),
                needExchangeToken = refreshToken && !accessToken && rawAccessToken,
                needRequestNewToken = !refreshToken && !accessToken,
+			   pingback = opts.ping === false ? false : true, // 数据上报
                clientProxy = opts.proxy || document.location.href.replace(location.search,"").replace(location.hash,"");
 
            if (opts.appkey) {

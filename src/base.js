@@ -95,8 +95,8 @@
 		 */
 	   ,_const: {
 		   AUTH_WINDOW_NAME: "authClientProxy_ee5a0f93"
-		  ,AUTH_WINDOW_WIDTH: 560
-		  ,AUTH_WINDOW_HEIGHT: 420
+		  ,AUTH_WINDOW_WIDTH: 575
+		  ,AUTH_WINDOW_HEIGHT: 465
 	    }
         /**
          * Cookie configration
