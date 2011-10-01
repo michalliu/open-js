@@ -75,6 +75,11 @@
          */
        ,_debug: true
 
+	   /**
+		* send pingback to our server, help us to improve this SDK
+		*/
+	   ,_pingback: true
+
         /**
          * Domain configration
          *

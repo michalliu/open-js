@@ -17,6 +17,7 @@
  *           auth.token
  *           event.event
  *           solution
+ *           ping
  */
 
 QQWB.extend("",{
@@ -37,7 +38,6 @@ QQWB.extend("",{
                refreshToken = this._token.getRefreshToken(),
                needExchangeToken = refreshToken && !accessToken && rawAccessToken,
                needRequestNewToken = !refreshToken && !accessToken,
-			   pingback = opts.ping === false ? false : true, // 数据上报
                clientProxy = opts.proxy || document.location.href.replace(location.search,"").replace(location.hash,"");
 
            if (opts.appkey) {
@@ -47,6 +47,10 @@ QQWB.extend("",{
 
            this.log.info("client proxy uri is " + clientProxy);
            this.assign("_domain","CLIENTPROXY_URI",clientProxy);
+
+		   if (opts.pingback == false) {
+		       this._pingback = false;
+		   }
 
            if (/*true || force exchange token*/needExchangeToken || needRequestNewToken) {
                QQWB._tokenReadyDoor.lock(); // lock for async get or refresh token
@@ -80,6 +84,8 @@ QQWB.extend("",{
            this._inited = true;
 
            QQWB._tokenReadyDoor.unlock();
+
+		   this._pingback && this.ping && this.ping.pingAppkeyInitCalled();
 
            return this;
     }

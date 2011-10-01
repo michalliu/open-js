@@ -53,7 +53,7 @@ QQWB.extend("cookie", {
      * @param name {String} cookie name
      * @return {String} value for cookie
      */
-   ,get: function (name, dec) {
+   ,get: function (name, dec ,optDefault) {
 	   dec = dec || unescape;
        var 
            cookieName = name + "=";
@@ -64,6 +64,7 @@ QQWB.extend("cookie", {
                return dec(cookie.substr(cookieName.length));
            }
        }
+	   return optDefault;
     }
 
     /**

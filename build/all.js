@@ -75,6 +75,11 @@
          */
        ,_debug: true
 
+	   /**
+		* send pingback to our server, help us to improve this SDK
+		*/
+	   ,_pingback: true
+
         /**
          * Domain configration
          *
@@ -2941,27 +2946,44 @@ QQWB.extend("queryString",{
      *
      * @access public
      * @param params {Object} the object contains params
-     *        opt_sep {String} the seprator string, default is '&'
-     *        opt_encode {Function} the function to encode param, default is encodeURIComponent
+     * @param opt_sep {String} the seprator string, default is '&'
+     * @param opt_encode {Function} the function to encode param, default is encodeURIComponent
+	 * @param opt_filter {Array} filter the result
      * @return {String} the encoded query string
      */
-    encode: function (params, opt_sep, opt_encode) {
+    encode: function (params, opt_sep, opt_encode, opt_filter) {
         var 
             regexp = /%20/g,
             sep = opt_sep || '&',
             encode = opt_encode || encodeURIComponent,
-            pairs = [];
+            pairs = [],
+			filtered = {};
 
         for (var key in params) {
             if (params.hasOwnProperty(key)) {
                 var val = params[key];
                 if (val !== null && typeof val != 'undefined') {
-                    pairs.push(encode(key).replace(regexp,"+") + "=" + encode(val).replace(regexp,"+"));
-                }
-            }
-        }
+					if (!opt_filter) {
+                        pairs.push(encode(key).replace(regexp,"+") + "=" + encode(val).replace(regexp,"+"));
+					} else {
+						for (var i=0,l=opt_filter.length;i<l;i++) {
+							if (opt_filter[i] === encode(key).replace(regexp,"+")) {
+								pairs[i] = opt_filter[i] + "=" + encode(val).replace(regexp,"+");
+							} else {
+                                filtered[i] = true;
+							}
+						} // end opt_filter loop
+					} // end opt_filter
+                } // end val
+            } // end hasOwnProperty
+        } // end loop
 
-        pairs.sort();
+		for (var j in filtered) {
+            if (filtered.hasOwnProperty(j)) {
+			    pairs.splice(parseInt(j,10),1);
+			}
+		}
+        // pairs.sort();
         return pairs.join(sep);
     }
     /**
@@ -5102,7 +5124,7 @@ QQWB.extend("cookie", {
      * @param name {String} cookie name
      * @return {String} value for cookie
      */
-   ,get: function (name, dec) {
+   ,get: function (name, dec ,optDefault) {
 	   dec = dec || unescape;
        var 
            cookieName = name + "=";
@@ -5113,6 +5135,7 @@ QQWB.extend("cookie", {
                return dec(cookie.substr(cookieName.length));
            }
        }
+	   return optDefault;
     }
 
     /**
@@ -6438,6 +6461,78 @@ QQWB.extend("events", {
 /**
  * Tencent weibo javascript library
  *
+ * Pingback
+ *
+ * @author michalliu
+ * @version 1.0
+ * @package core
+ * @module ping
+ * @requires base
+ *           cookie
+ *           queryString
+ */
+
+QQWB.extend("ping", {
+
+	// pingback url
+	_pingbackURL: "http://btrace.qq.com/collect"
+
+	// params order
+   ,_stupidPingParamsOrder:["ftime","sIp","iQQ","sBiz","sOp","iSta","iTy","iFlow"]
+
+	// generate a basic ping params
+   ,_getBasePingParams: function () {
+	    // unique flow id
+		var     qq = QQWB.cookie.get("uin",null,"0").match(/\d+/)[0],
+		    flowid = ""; // not implemented
+        return {
+            sIp:"" // ip
+           ,iQQ: qq // QQ
+           ,sBiz:"" // biz name
+           ,sOp:"" // operation name
+           ,iSta: 0 // state
+           ,iTy:"" // system id
+           ,iFlow: flowid// unquie id
+         };
+	 } 
+	// ping with parameters
+   ,pingWith: function (params, order) {
+	   // we are intend to use global variable to avoid browser drop the ping request
+	   params = QQWB.extend(QQWB.ping._getBasePingParams(), params, true);
+	   QQWBPingTransport_18035d19 = new Image(1,1);
+	   QQWBPingTransport_18035d19.src = QQWB.ping._pingbackURL 
+	                                    + "?" 
+	                                    + QQWB.queryString.encode(params) 
+										//+ "&uid=" 
+										//+ QQWB.uid()
+										;// random id to defect browser cache
+    }
+	// ping when appkey inited, success or unsuccess
+   ,pingAppkeyInitCalled: function () {
+	   var appkeyVersion,
+	       order = QQWB.ping._stupidPingParamsOrder.concat("sAppKey","sAppPageUrl");
+	   if (/^[a-z\d][a-z\d]{30}[a-z\d]$/i.test(QQWB._appkey)) {
+           appkeyVersion = 1;
+	   } else if (/^[1-9][0-9]{7}[0-9]$/.test(QQWB._appkey)) {
+           appkeyVersion = 2;
+	   } else {
+           appkeyVersion = -1;
+	   }
+	   return QQWB.ping.pingWith({
+		    sBiz: "jssdk.appkey"
+		   ,sOp: "initCalled"
+		   ,iSta: appkeyVersion
+		   ,iTy: 1219
+		   ,sAppKey: QQWB._appkey
+		   ,sAppPageUrl: document.location.href
+		   ,sRand: QQWB.uid()
+	   });
+    }
+});
+
+/**
+ * Tencent weibo javascript library
+ *
  * Browser and browser's feature detection
  *
  * @author michalliu
@@ -6975,6 +7070,7 @@ QQWB.extend("door", {
  *           auth.token
  *           event.event
  *           solution
+ *           ping
  */
 
 QQWB.extend("",{
@@ -7004,6 +7100,10 @@ QQWB.extend("",{
 
            this.log.info("client proxy uri is " + clientProxy);
            this.assign("_domain","CLIENTPROXY_URI",clientProxy);
+
+		   if (opts.pingback == false) {
+		       this._pingback = false;
+		   }
 
            if (/*true || force exchange token*/needExchangeToken || needRequestNewToken) {
                QQWB._tokenReadyDoor.lock(); // lock for async get or refresh token
@@ -7037,6 +7137,8 @@ QQWB.extend("",{
            this._inited = true;
 
            QQWB._tokenReadyDoor.unlock();
+
+		   this._pingback && this.ping && this.ping.pingAppkeyInitCalled();
 
            return this;
     }

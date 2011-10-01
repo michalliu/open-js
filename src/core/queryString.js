@@ -16,27 +16,44 @@ QQWB.extend("queryString",{
      *
      * @access public
      * @param params {Object} the object contains params
-     *        opt_sep {String} the seprator string, default is '&'
-     *        opt_encode {Function} the function to encode param, default is encodeURIComponent
+     * @param opt_sep {String} the seprator string, default is '&'
+     * @param opt_encode {Function} the function to encode param, default is encodeURIComponent
+	 * @param opt_filter {Array} filter the result
      * @return {String} the encoded query string
      */
-    encode: function (params, opt_sep, opt_encode) {
+    encode: function (params, opt_sep, opt_encode, opt_filter) {
         var 
             regexp = /%20/g,
             sep = opt_sep || '&',
             encode = opt_encode || encodeURIComponent,
-            pairs = [];
+            pairs = [],
+			filtered = {};
 
         for (var key in params) {
             if (params.hasOwnProperty(key)) {
                 var val = params[key];
                 if (val !== null && typeof val != 'undefined') {
-                    pairs.push(encode(key).replace(regexp,"+") + "=" + encode(val).replace(regexp,"+"));
-                }
-            }
-        }
+					if (!opt_filter) {
+                        pairs.push(encode(key).replace(regexp,"+") + "=" + encode(val).replace(regexp,"+"));
+					} else {
+						for (var i=0,l=opt_filter.length;i<l;i++) {
+							if (opt_filter[i] === encode(key).replace(regexp,"+")) {
+								pairs[i] = opt_filter[i] + "=" + encode(val).replace(regexp,"+");
+							} else {
+                                filtered[i] = true;
+							}
+						} // end opt_filter loop
+					} // end opt_filter
+                } // end val
+            } // end hasOwnProperty
+        } // end loop
 
-        pairs.sort();
+		for (var j in filtered) {
+            if (filtered.hasOwnProperty(j)) {
+			    pairs.splice(parseInt(j,10),1);
+			}
+		}
+        // pairs.sort();
         return pairs.join(sep);
     }
     /**
