@@ -27,20 +27,25 @@ QQWB.extend("queryString",{
             sep = opt_sep || '&',
             encode = opt_encode || encodeURIComponent,
             pairs = [],
-			filtered = {};
+			pairsShadow = [],
+			key,val; // filtered from filters
 
-        for (var key in params) {
+        for (key in params) {
             if (params.hasOwnProperty(key)) {
-                var val = params[key];
+
+                val = params[key];
+
                 if (val !== null && typeof val != 'undefined') {
+
+					key = encode(key).replace(regexp,"+");
+					val = encode(val).replace(regexp,"+");
+
 					if (!opt_filter) {
-                        pairs.push(encode(key).replace(regexp,"+") + "=" + encode(val).replace(regexp,"+"));
+                        pairs.push(key + "=" + val);
 					} else {
-						for (var i=0,l=opt_filter.length;i<l;i++) {
-							if (opt_filter[i] === encode(key).replace(regexp,"+")) {
-								pairs[i] = opt_filter[i] + "=" + encode(val).replace(regexp,"+");
-							} else {
-                                filtered[i] = true;
+						for (var i=0,l=opt_filter.length; i<l; i++) {
+							if (opt_filter[i] === key) {
+								pairs[i] = key + "=" + val;
 							}
 						} // end opt_filter loop
 					} // end opt_filter
@@ -48,11 +53,16 @@ QQWB.extend("queryString",{
             } // end hasOwnProperty
         } // end loop
 
-		for (var j in filtered) {
-            if (filtered.hasOwnProperty(j)) {
-			    pairs.splice(parseInt(j,10),1);
+		// remove undefined value in an array
+		for (var j=0,len=pairs.length;j<len;j++) {
+			if (typeof pairs[j] != "undefined") {
+				pairsShadow.push(pairs[j]);
 			}
 		}
+		// swap value
+		pairs = pairsShadow;
+        pairsShadow = null;
+
         // pairs.sort();
         return pairs.join(sep);
     }

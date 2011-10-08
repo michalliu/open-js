@@ -46,39 +46,52 @@
          *
          * Used for debug propose
          *
-         * @access private
+         * @access public
          */
-        _name: "Tencent weibo SDK"
-        /**
-         * Client appkey
-         *
-         * @access private
-         */
-       ,_appkey: "{APPKEY}"
+        name: "Tencent weibo SDK"
 
-        /**
-         * Indicate appkey is valid or not
-         *
-         * Is the http referer matched with the url registered by this appkey?
-         * If appkey is not verified,you may not use this sdk
-         *
-         * @access private
-         */
-       ,_appkeyVerified: "{APPKEY_VERIFIED}" === "verified" // validate appid with referer url
+		/**
+		 * SDK version
+		 */
+	   ,version: "1.0"
 
+		/**
+		 * Client appkey configuration object
+		 */
+	   ,appkey: {
+		   /**
+			* Client appkey
+			*/
+		   value: "{APPKEY}"
+		   /**
+			* Appkey version
+			* -1 not determined
+			* 1 oauth 1.0
+			* 2 oauth 2.0
+			*/
+		  ,version: "{APPKEY_VERSION}"
+          /**
+           * Indicate appkey is valid or not
+           *
+           * Is the http referer matched with the url registered by this appkey?
+           * If appkey is not verified,you may not use this sdk
+		   *
+           */
+		  ,verified: "{APPKEY_VERIFIED}" === "verified"
+	    }
         /**
          * Debug mode
          *
          * Speak pointless babble
          *
-         * @access private
+         * @access public
          */
-       ,_debug: true
+       ,debug: true
 
 	   /**
 		* send pingback to our server, help us to improve this SDK
 		*/
-	   ,_pingback: true
+	   ,pingback: true
 
         /**
          * Domain configration
@@ -217,14 +230,14 @@
         *
         * Usage:
         *
-        * 1). replace T._appkey from "{APPKEY}" to "123456"
-        *     T.assign("_appkey","APPKEY","123456")
+        * 1). replace T.appkey from "{APPKEY}" to "123456"
+        *     T.assign("appkey","APPKEY","123456")
         * 
         * 2). search in namespace T replace all from "{APPKEY}" to "123456"
         *     T.assign("","APPKEY","123456")
         *
-        * 3). replace T.test._appkey from "{APPKEY}" to "123456"
-        *     T.assign("test._appkey","APPKEY","123456")
+        * 3). replace T.test.appkey from "{APPKEY}" to "123456"
+        *     T.assign("test.appkey","APPKEY","123456")
         * 
         * 4). search in namespace T.test replace all from "{APPKEY}" to "123456"
         *     T.assign("test","APPKEY","123456")

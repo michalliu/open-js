@@ -42,14 +42,14 @@ QQWB.extend("",{
 
            if (opts.appkey) {
                this.log.info("client id is " + opts.appkey);
-               this.assign("_appkey","APPKEY",opts.appkey);
+               this.assign("appkey.value","APPKEY",opts.appkey);
            }
 
            this.log.info("client proxy uri is " + clientProxy);
            this.assign("_domain","CLIENTPROXY_URI",clientProxy);
 
 		   if (opts.pingback == false) {
-		       this._pingback = false;
+		       this.pingback = false;
 		   }
 
            if (/*true || force exchange token*/needExchangeToken || needRequestNewToken) {
@@ -81,11 +81,19 @@ QQWB.extend("",{
                });
            }
 
+		   if (/^[a-z\d][a-z\d]{30}[a-z\d]$/i.test(QQWB.appkey.value)) {
+               this.assign("appkey","APPKEY_VERSION",1);
+	       } else if (/^[1-9][0-9]{7}[0-9]$/.test(QQWB.appkey.value)) {
+               this.assign("appkey","APPKEY_VERSION",2);
+	       } else {
+               this.assign("appkey","APPKEY_VERSION",3);
+	       }
+
            this._inited = true;
 
            QQWB._tokenReadyDoor.unlock();
 
-		   this._pingback && this.ping && this.ping.pingAppkeyInitCalled();
+		   this.pingback && this.ping && this.ping.pingInit();
 
            return this;
     }

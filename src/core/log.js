@@ -142,11 +142,11 @@ QQWB.extend("log", {
         var output = this._format;
         //output = output.replace("{{time}}", this._getTime())
                        //.replace("{{levelname}}", level)
-                       //.replace("{{name}}", QQWB._name)
+                       //.replace("{{name}}", QQWB.name)
                        //.replace("{{message}}", message);
         //output = output.replace(/\{\{.*?\}\}/g,output);
         output = QQWB.format.sprintf(output,{
-            name: QQWB._name
+            name: QQWB.name
            ,levelname: level
            ,time: QQWB.time.shortTime()
            ,message: message
@@ -164,7 +164,7 @@ QQWB.extend("log", {
         }
 
         // no frame messages
-        QQWB._debug && window.console && window.console.log(output);
+        QQWB.debug && window.console && window.console.log(output);
      }
 
 	/**
