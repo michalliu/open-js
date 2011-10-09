@@ -33,7 +33,7 @@ QQWB.extend("auth.authWindow",{
 		   y = (window.screenY || window.screenTop) + ((window.outerHeight || document.documentElement.clientHeight) - this._height) / 2;
 		   query =  QQWB.queryString.encode({
                 response_type: "token"
-               ,client_id: QQWB._appkey
+               ,client_id: QQWB.appkey.value
                ,redirect_uri: QQWB._domain.clientproxy
                ,scope: "all"
                ,status: 0

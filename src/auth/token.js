@@ -127,7 +127,7 @@ QQWB.extend("_token",{
                 url: QQWB._domain.exchange
                ,data: QQWB.queryString.encode({
                           response_type: "token"
-                         ,client_id: QQWB._appkey
+                         ,client_id: QQWB.appkey.value
                          ,scope: "all"
                          ,state: "1"
                          ,refresh_token: this.getRefreshToken()
@@ -184,7 +184,7 @@ QQWB.extend("_token",{
                url: QQWB._domain.query
               ,data: QQWB.queryString.encode({
                    response_type: "token"
-                  ,client_id: QQWB._appkey
+                  ,client_id: QQWB.appkey.value
                   ,scope: "all"
                   ,state: "1"
                })

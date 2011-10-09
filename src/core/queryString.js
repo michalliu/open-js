@@ -16,27 +16,54 @@ QQWB.extend("queryString",{
      *
      * @access public
      * @param params {Object} the object contains params
-     *        opt_sep {String} the seprator string, default is '&'
-     *        opt_encode {Function} the function to encode param, default is encodeURIComponent
+     * @param opt_sep {String} the seprator string, default is '&'
+     * @param opt_encode {Function} the function to encode param, default is encodeURIComponent
+	 * @param opt_filter {Array} filter the result
      * @return {String} the encoded query string
      */
-    encode: function (params, opt_sep, opt_encode) {
+    encode: function (params, opt_sep, opt_encode, opt_filter) {
         var 
             regexp = /%20/g,
             sep = opt_sep || '&',
             encode = opt_encode || encodeURIComponent,
-            pairs = [];
+            pairs = [],
+			pairsShadow = [],
+			key,val; // filtered from filters
 
-        for (var key in params) {
+        for (key in params) {
             if (params.hasOwnProperty(key)) {
-                var val = params[key];
-                if (val !== null && typeof val != 'undefined') {
-                    pairs.push(encode(key).replace(regexp,"+") + "=" + encode(val).replace(regexp,"+"));
-                }
-            }
-        }
 
-        pairs.sort();
+                val = params[key];
+
+                if (val !== null && typeof val != 'undefined') {
+
+					key = encode(key).replace(regexp,"+");
+					val = encode(val).replace(regexp,"+");
+
+					if (!opt_filter) {
+                        pairs.push(key + "=" + val);
+					} else {
+						for (var i=0,l=opt_filter.length; i<l; i++) {
+							if (opt_filter[i] === key) {
+								pairs[i] = key + "=" + val;
+							}
+						} // end opt_filter loop
+					} // end opt_filter
+                } // end val
+            } // end hasOwnProperty
+        } // end loop
+
+		// remove undefined value in an array
+		for (var j=0,len=pairs.length;j<len;j++) {
+			if (typeof pairs[j] != "undefined") {
+				pairsShadow.push(pairs[j]);
+			}
+		}
+		// swap value
+		pairs = pairsShadow;
+        pairsShadow = null;
+
+        // pairs.sort();
         return pairs.join(sep);
     }
     /**
