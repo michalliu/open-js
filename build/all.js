@@ -6741,6 +6741,8 @@ QQWB.extend("ping", {
 
 		  clientInfo += feature;
 
+		  // 1000(browertype)0(browserfeature)
+		  //
 		  return clientInfo;
 	   };
 
@@ -6765,7 +6767,10 @@ QQWB.extend("ping", {
 		   } else /*if (QQWB.browser.os.unknown)*/{
 			   appInfo += 60;
 		   }
+
 		   appInfo += parseInt(QQWB.appkey.version,10);
+
+		   // 1000(platform)(os)(appkeyversion)
 		   return appInfo;
 	   };
 
