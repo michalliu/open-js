@@ -6057,9 +6057,9 @@ QQWB.extend("_token",{
      *
      * @access public
      * @param accessToken {String} access token string
-     *        expireIn {Number} expire after seconds from now
-     *        optUsername {String} username associate with accesstoken
-     *        optNickname {String} nickname associate with accesstoken
+     * @param expireIn {Number} expire after seconds from now
+     * @param optUsername {String} username associate with accesstoken
+     * @param optNickname {String} nickname associate with accesstoken
      * @return {Object} QQWB object
      */
     setAccessToken: function (accessToken, expireIn, optUsername, optNickname) {
@@ -6741,6 +6741,8 @@ QQWB.extend("ping", {
 
 		  clientInfo += feature;
 
+		  // 1000(browertype)0(browserfeature)
+		  //
 		  return clientInfo;
 	   };
 
@@ -6765,7 +6767,10 @@ QQWB.extend("ping", {
 		   } else /*if (QQWB.browser.os.unknown)*/{
 			   appInfo += 60;
 		   }
+
 		   appInfo += parseInt(QQWB.appkey.version,10);
+
+		   // 1000(platform)(os)(appkeyversion)
 		   return appInfo;
 	   };
 
@@ -6781,6 +6786,80 @@ QQWB.extend("ping", {
     }
 });
 
+/**
+ * Tencent weibo javascript library
+ *
+ * Locker mechanism
+ *
+ * @author michalliu
+ * @version 1.0
+ * @package core
+ * @module door
+ * @requires base
+ */
+QQWB.extend("door", {
+
+	// count of doors
+    doors:0
+
+	/**
+	 * Retrieve a new door object, the door can be locked or unlocked
+	 *
+	 * @access public
+	 * @param optLockDo {Function} actions do when lock acts
+	 * @param optUnlockDo {Function} action do when unlock acts
+	 * @return {Object} locker object
+	 */
+   ,door: function (optLockDo, optUnlockDo) {
+
+	    // the locks number on this door
+        var locks = 0;
+
+		// record the total number of door instance
+        this.doors ++;
+
+        return {
+			/**
+			 * Lock the door
+			 *
+			 * @access public
+			 */
+            lock: function () {
+                locks ++;
+				optLockDo && optLockDo.call(QQWB);
+				return this;
+            }
+			/**
+			 * unLock the door
+			 *
+			 * @access public
+			 */
+           ,unlock: function () {
+               locks --;
+			   locks = Math.max(0,locks);
+			   optUnlockDo && optUnlockDo.call(QQWB);
+			   return this;
+            }
+			/**
+			 * Check whether the door instance is open
+			 *
+			 * @access public
+			 */
+           ,isOpen: function () {
+               return locks === 0;
+            }
+        };
+    }
+	/**
+	 * Retrieve the number of lockers
+	 *
+	 * @access public
+	 * @return {Number} count of lockers
+	 */
+   ,count: function () {
+       return this.doors;
+    }
+});
 /**
  * Tencent weibo javascript library
  *
@@ -7082,80 +7161,6 @@ QQWB.extend("_solution", {
 /**
  * Tencent weibo javascript library
  *
- * Locker mechanism
- *
- * @author michalliu
- * @version 1.0
- * @package core
- * @module door
- * @requires base
- */
-QQWB.extend("door", {
-
-	// count of doors
-    doors:0
-
-	/**
-	 * Retrieve a new door object, the door can be locked or unlocked
-	 *
-	 * @access public
-	 * @param optLockDo {Function} actions do when lock acts
-	 * @param optUnlockDo {Function} action do when unlock acts
-	 * @return {Object} locker object
-	 */
-   ,door: function (optLockDo, optUnlockDo) {
-
-	    // the locks number on this door
-        var locks = 0;
-
-		// record the total number of door instance
-        this.doors ++;
-
-        return {
-			/**
-			 * Lock the door
-			 *
-			 * @access public
-			 */
-            lock: function () {
-                locks ++;
-				optLockDo && optLockDo.call(QQWB);
-				return this;
-            }
-			/**
-			 * unLock the door
-			 *
-			 * @access public
-			 */
-           ,unlock: function () {
-               locks --;
-			   locks = Math.max(0,locks);
-			   optUnlockDo && optUnlockDo.call(QQWB);
-			   return this;
-            }
-			/**
-			 * Check whether the door instance is open
-			 *
-			 * @access public
-			 */
-           ,isOpen: function () {
-               return locks === 0;
-            }
-        };
-    }
-	/**
-	 * Retrieve the number of lockers
-	 *
-	 * @access public
-	 * @return {Number} count of lockers
-	 */
-   ,count: function () {
-       return this.doors;
-    }
-});
-/**
- * Tencent weibo javascript library
- *
  * Library booter
  *
  * @author michalliu
@@ -7167,12 +7172,14 @@ QQWB.extend("door", {
  *           browser
  *           apiProvider
  *           deferred
+ *           common.String
  *           common.Array
  *           common.JSON
  *           auth.token
  *           event.event
  *           solution
  *           ping
+ *           time
  */
 
 QQWB.extend("",{
@@ -7488,6 +7495,42 @@ if (!QQWB._isDocumentReady) { // we will try to trigger the ready event many tim
         }());
     }
 }
+
+// exhange token schedule
+(function () {
+
+	var maintainTokenScheduler;
+
+	function maintainTokenStatus () {
+
+        // user logged in set timer to exchange token
+		var accessToken = QQWB._token.getAccessToken(),
+		    // server accept to exchange token 30 seconds before actually expire date
+	      	waitingTime = parseInt(QQWB.cookie.get(QQWB._cookie.names.accessToken).split("|")[1],10)
+	                      - QQWB.time.now()
+	                      - 15 * 1000 /*15 seconds ahead of actual expire date*/;
+
+        maintainTokenScheduler && QQWB.log.info("cancel the **OLD** maintain token schedule");
+        maintainTokenScheduler && clearTimeout(maintainTokenScheduler);
+
+		if (accessToken) {
+			QQWB.log.info("scheduled to exchange token after " + waitingTime + "ms")
+			maintainTokenScheduler = setTimeout(function () {
+				QQWB._token.exchangeForToken(function () {
+					maintainTokenStatus();
+				});
+			}, waitingTime);
+		} else {
+			maintainTokenScheduler && QQWB.log.info("cancel the exchange token schedule");
+            maintainTokenScheduler && clearTimeout(maintainTokenScheduler);
+		}
+	}
+
+	QQWB.bind(QQWB.events.TOKEN_READY_EVENT,maintainTokenStatus);
+	QQWB.bind(QQWB.events.USER_LOGGEDIN_EVENT,maintainTokenStatus);
+	QQWB.bind(QQWB.events.USER_LOGIN_FAILED_EVENT,maintainTokenStatus);
+	QQWB.bind(QQWB.events.USER_LOGGEDOUT_EVENT,maintainTokenStatus);
+}());
 /**
  * Tencent weibo javascript library
  *

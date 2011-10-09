@@ -318,8 +318,8 @@
 				});
 
 				T.Array.each(apiparamvalues,function (i,v){ 
-			    	if (v) {
-						apiparamstr += apiparamnames[i] + v;
+			    	if (T.String.trim(v)) {
+						apiparamstr += apiparamnames[i] + v + "&";
 			    	}
 				});
 
