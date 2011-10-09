@@ -129,5 +129,75 @@ QQWB.extend("ping", {
 	   }, QQWB.ping._stupidPingParamsOrder.concat("iFrom","iPubFrom","sUrl","iUrlType"
 	                                             ,"iPos","sText","iBak1","iBak2","sBak1","sBak2"));
     }
+	// Send pingback when user authorize(loggin) success or fail
+   ,_pingAuthorize: function (success) {
+	   return QQWB.ping.pingWith({
+		    sOp: "login"
+		   ,iSta: success ? 1 : 0
+		   ,iFrom: QQWB.version.replace(/\./g,"")
+		   ,sUrl: document.location.href
+		   ,sText: QQWB.appkey.value
+	   }, QQWB.ping._stupidPingParamsOrder.concat("iFrom","iPubFrom","sUrl","iUrlType"
+	                                             ,"iPos","sText","iBak1","iBak2","sBak1","sBak2"));
+    }
+	// Send pingback when user successfull login
+   ,pingLoggedIn: function () {
+	   return QQWB.ping._pingAuthorize(true);
+    }
+	// Send pingback when user unsuccessfull login
+   ,pingLoggedInFailed: function () {
+	   return QQWB.ping._pingAuthorize(false);
+    }
+	/**
+	 * Send pingback when api is called
+	 *
+	 * @param apiname {String} apiname
+	 * @param params {String} params
+	 * @param method {String} http method
+	 * @param responseTime {Number} response time
+	 * @param status {Number} api result status
+	 * @param statusText {String} status text
+	 * @param solutionName {String} html5 or flash
+	 *
+	 * @return {Void}
+	 */
+   ,pingAPI: function (apiname, params, format, method,  status, statusText, responseTime, solutionName) {
+	   apiname = apiname || "";// represent unknown apiname
+	   params = params || "";// represent unknown params
+	   format = format || "";// represent unknown format
+	   method = method || "";// represent unknown method
+	   status = status || "-2"; // represent unknown status
+	   statusText = statusText || ""; // represent unknown status text
+	   responseTime = responseTime || "-1"; // represent unknown responsetime
+	   solutionName = solutionName || "";// represent unknown solutionName
+
+	   function parseSolutionName (sname) {
+		   sname = sname.toLowerCase();
+		   switch(sname){
+			   case "html5":
+			   case "postmessage":
+			   return 1;
+			   case "flash":
+			   return 2;
+			   case "silverlight":
+			   return 3;
+			   default:
+			   return -1;
+		   }
+	   }
+
+	   return QQWB.ping.pingWith({
+		    sOp: "api"
+		   ,iSta: status
+		   ,iFrom: QQWB.version.replace(/\./g,"")
+		   ,iPubFrom: parseSolutionName(solutionName)
+		   ,sUrl: document.location.href
+		   ,sText: QQWB.appkey.value
+		   ,iBak1: responseTime
+		   ,sBak1: [apiname, params, method].join(";")
+		   //,sBak2: statusText
+	   }, QQWB.ping._stupidPingParamsOrder.concat("iFrom","iPubFrom","sUrl","iUrlType"
+	                                             ,"iPos","sText","iBak1","iBak2","sBak1","sBak2"));
+    }
 });
 

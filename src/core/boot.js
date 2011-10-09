@@ -96,6 +96,8 @@ QQWB.extend("",{
            QQWB._tokenReadyDoor.unlock();
 
 		   this.pingback && this.ping && this.ping.pingInit();
+           this.pingback && this.ping && QQWB.bind(QQWB.events.USER_LOGGEDIN_EVENT,this.ping.pingLoggedIn);
+           this.pingback && this.ping && QQWB.bind(QQWB.events.USER_LOGIN_FAILED_EVENT,this.ping.pingLoggedInFailed);
 
            return this;
     }
@@ -343,18 +345,19 @@ if (!QQWB._isDocumentReady) { // we will try to trigger the ready event many tim
 
 	function maintainTokenStatus () {
 
-        // user logged in set timer to exchange token
-		var canMaintain = !!QQWB._token.getAccessToken(),
-		    // server accept to exchange token 30 seconds before actually expire date
-	      	waitingTime = parseInt(QQWB.cookie.get(QQWB._cookie.names.accessToken).split("|")[1],10)
-	                      - QQWB.time.now()
-	                      - 15 * 1000 /*15 seconds ahead of actual expire date*/;
+		var canMaintain = !!QQWB._token.getAccessToken(), // user logged in set timer to exchange token
+	      	waitingTime; // server accept to exchange token 30 seconds before actually expire date
 
         maintainTokenScheduler && QQWB.log.info("cancel the **OLD** maintain token schedule");
         maintainTokenScheduler && clearTimeout(maintainTokenScheduler);
 
 		if (canMaintain) {
-			QQWB.log.info("scheduled to exchange token after " + waitingTime + "ms")
+		    // server should accept to exchange token 30 seconds before actually expire date
+	      	waitingTime = parseInt(QQWB.cookie.get(QQWB._cookie.names.accessToken).split("|")[1],10)
+	                      - QQWB.time.now()
+	                      - 15 * 1000 /*15 seconds ahead of actual expire date*/;
+			QQWB.log.info("scheduled to exchange token after " + waitingTime + "ms");
+
 			maintainTokenScheduler = setTimeout(function () {
 				QQWB._token.exchangeForToken(function () {
 					maintainTokenStatus();
@@ -370,4 +373,5 @@ if (!QQWB._isDocumentReady) { // we will try to trigger the ready event many tim
 	QQWB.bind(QQWB.events.USER_LOGGEDIN_EVENT,maintainTokenStatus);
 	QQWB.bind(QQWB.events.USER_LOGIN_FAILED_EVENT,maintainTokenStatus);
 	QQWB.bind(QQWB.events.USER_LOGGEDOUT_EVENT,maintainTokenStatus);
+
 }());

@@ -41,6 +41,9 @@ QQWB.extend("_solution", {
            // a choosed solution object
            this[name] = {};
 
+		   // represent the solution's name
+		   this[name]["name"] = name;
+
            // indicate choosed solution is ready or not
            // 0 not resolved
            // 1 solution is relsolved successfully
