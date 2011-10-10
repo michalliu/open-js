@@ -190,7 +190,7 @@ QQWB.extend("io", {
 						   //}
 					   } // end readyState 4
 			       } catch (firefoxException) {
-					   QQWB.log.warning(firefoxException);
+					   QQWB.log.warning("caught exception when ajax io " + ((firefoxException && firefoxException.message) ? firefoxException.message : firefoxException));
 					   if (!isAbort) {
 				           clearTimeout(ajaxTimeout);
 					       complete(xhr.status, xhr.statusText, QQWB.time.now() - started);
@@ -362,7 +362,7 @@ QQWB.extend("io", {
 		             && 0 !== retcode
 			        ) { // api error
 		      errorcode = QQWB._apiProvider._apiParseErrorCode(responseText); 
-			  status = parseInt(1000 + "" + retcode + "" + (errorcode ? errorcode : "0"),10);
+			  status = 1000000 + retcode * 1000 + 500 + (errorcode ? errorcode : 0);
 			  deferred.reject(status,  QQWB._apiProvider._apiGetErrorMessage(retcode,errorcode), elapsedtime, responseText);
           } else {
 			  deferred.resolve(status, statusText, elapsedtime, parsedResponse, responseHeaders, dataType);

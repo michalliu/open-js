@@ -56,7 +56,7 @@
         <!--[if lte IE 6 ]>
         <script src="../tools/firebug-lite/content/firebug-lite-dev.js"></script>
         <![endif]-->
-        <script src="../build/all.js"></script>
+        <script src="../build/all.min.js"></script>
         <script type="text/javascript">
             <!--
             //
@@ -123,6 +123,7 @@
          	appkey &&
     	    	T.init({
     				"appkey": appkey
+				   ,"pingback": false
     	    	});
     
 
@@ -148,7 +149,7 @@
 				    	// 检查APPKEY是否有效
 				    	if (oauthkey.test(appkey) || oauth2key.test(appkey)) {
     				    	T._inited ? (T._appkey = this.innerText) :
-                                        T.init({"appkey": this.innerText});
+                                        T.init({"appkey": this.innerText,"pingback":false});
         			        T.cookie.set("appkey",this.innerText, 3600 * 24 * 365);
 							T.dom.removeClass(appkeyholder,"appkey-invalid")
 						         .addClass(appkeyholder,"appkey-valid");
@@ -300,7 +301,7 @@
 								    	}
 							     	}
 								}
-							    T.api(api,apiParam,"text")
+							    T.api(api,apiParam,"text","POST")
 								 .success(function (response, timecost) {
 								     if( timecost < warningTime) {
 								          resultElement.innerHTML = (timecost < 300 ? "非常" : "良") + "好 [" + timecost + "ms]";
