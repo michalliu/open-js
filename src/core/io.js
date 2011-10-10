@@ -190,10 +190,13 @@ QQWB.extend("io", {
 						   //}
 					   } // end readyState 4
 			       } catch (firefoxException) {
-					   QQWB.log.warning("caught exception when ajax io " + ((firefoxException && firefoxException.message) ? firefoxException.message : firefoxException));
+					   status = -2;
+					   statusText = (firefoxException && firefoxException.message) ? firefoxException.message : firefoxException;
+					   QQWB.log.warning("caught " + statusText + " exception QQWB.io._IOAjax");
 					   if (!isAbort) {
 				           clearTimeout(ajaxTimeout);
-					       complete(xhr.status, xhr.statusText, QQWB.time.now() - started);
+						   //complete(xhr.status, xhr.statusText, QQWB.time.now() - started);
+					       complete(status, statusText, QQWB.time.now() - started);
 					   }
 			       } // end try catch
 			   };
@@ -250,6 +253,7 @@ QQWB.extend("io", {
 				   clearTimeout(flashTimeout);
 
 				   try{
+
 				       if (callback && (isAbort || readyState == 4)) {
 
 				           callback = null;
@@ -278,9 +282,12 @@ QQWB.extend("io", {
 						   //}
 					   }
 					} catch (ex) {
-						if (!isAbort) {
-							complete(-1, ex + "", QQWB.time.now() - started);
-						}
+					   status = -2;
+					   statusText = (ex && ex.message) ? ex.message : ex;
+					   QQWB.log.warning("caught " + statusText + " exception QQWB.io._IOFlash");
+					   if (!isAbort) {
+					       complete(status, statusText, QQWB.time.now() - started);
+					   }
 					}
 			   };
 
@@ -357,11 +364,14 @@ QQWB.extend("io", {
 	  return function (status ,statusText ,elapsedtime ,parsedResponse ,responseText ,responseHeaders ,dataType) {
 		  var retcode,errorcode;
           if (status !== 200) { // http error
+		      // error code over than 2000000 represent physicall error
+			  status = 2000000 + Math.abs((status ? status : 0));
               deferred.reject(status, statusText, elapsedtime, "");
 		  } else if ( typeof (retcode = QQWB._apiProvider._apiParseRetCode(responseText)) == "number"
 		             && 0 !== retcode
 			        ) { // api error
 		      errorcode = QQWB._apiProvider._apiParseErrorCode(responseText); 
+		      // error code over than 1000000 and less than 2000000 represent logic error
 			  status = 1000000 + retcode * 1000 + 500 + (errorcode ? errorcode : 0);
 			  deferred.reject(status,  QQWB._apiProvider._apiGetErrorMessage(retcode,errorcode), elapsedtime, responseText);
           } else {
