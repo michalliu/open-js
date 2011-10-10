@@ -44,6 +44,7 @@
  *           deferred
  *           auth.token
  *           auth.auth
+ *           queryString
  */
 
 QQWB.provide("api", function (api, apiParams, optDataType, optType, optSolution) {
@@ -299,6 +300,18 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optSolution)
              QQWB.log.info("*[" + serial + "] done");
              serial = null; // defect memory leak in IE
      	});
+        //send pingback
+		if (QQWB.pingback && QQWB.ping) {
+			function sendPingback(status, statusText, responseTime) {
+                QQWB.ping.pingAPI(api,QQWB.queryString.encode(apiParams),optDataType,optType, status, statusText, responseTime, solution.name);
+			}
+			promise.success(function (response, elapsedTime) {
+                sendPingback(200,"ok",elapsedTime);
+			});
+			promise.fail(function (status, statusText, elapsedTime) {
+                sendPingback(status,statusText,elapsedTime);
+			});
+		}
     }());
 
     return promise;

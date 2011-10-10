@@ -19,9 +19,9 @@ QQWB.extend("_token",{
      *
      * @access public
      * @param accessToken {String} access token string
-     *        expireIn {Number} expire after seconds from now
-     *        optUsername {String} username associate with accesstoken
-     *        optNickname {String} nickname associate with accesstoken
+     * @param expireIn {Number} expire after seconds from now
+     * @param optUsername {String} username associate with accesstoken
+     * @param optNickname {String} nickname associate with accesstoken
      * @return {Object} QQWB object
      */
     setAccessToken: function (accessToken, expireIn, optUsername, optNickname) {

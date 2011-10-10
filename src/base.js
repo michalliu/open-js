@@ -87,7 +87,6 @@
          * @access public
          */
        ,debug: true
-
 	   /**
 		* send pingback to our server, help us to improve this SDK
 		*/
@@ -304,4 +303,5 @@
     twb.assign("_domain","FLASHPROXY_URI","/open-js/proxy.swf");   
     twb.assign("_domain","EXCHANGE_TOKEN_URI","/cgi-bin/exchange_token");   
     twb.assign("_domain","QUERY_TOKEN_URI","/cgi-bin/auto_token");   
+
 }());
