@@ -6376,8 +6376,8 @@ QQWB.extend("auth",{
 
         var loginStatus = QQWB.loginStatus(); 
 
-        optSuccessHandler && QQWB.bind(QQWB.events.USER_LOGGEDIN_EVENT, optSuccessHandler);
-        optFailHandler && QQWB.bind(QQWB.events.USER_LOGIN_FAILED_EVENT, optFailHandler);
+        optSuccessHandler && QQWB.once(QQWB.events.USER_LOGGEDIN_EVENT, optSuccessHandler);
+        optFailHandler && QQWB.once(QQWB.events.USER_LOGIN_FAILED_EVENT, optFailHandler);
 
         // user already logged in
         if (loginStatus) {
