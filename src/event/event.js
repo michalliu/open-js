@@ -8,6 +8,7 @@
  * @package event
  * @module event
  * @requires base
+ *           common.Array
  *           eventProvider
  */
 
@@ -31,6 +32,30 @@ QQWB.extend("",{
         this._eventProvider.bind(name, handler);
     	return this;
     }
+
+    /**
+     * Bind an event but only execute once
+     *
+     * Example:
+     * 
+     * T.once("UserLoggedIn", function () {
+     *     T.log.info("user logged in");
+     * });
+     *
+     * @param name {String} event name to bind
+     * @param handler {Function} the handler for this event
+     */
+   ,once: function (name, handler) {
+		name = name.toLowerCase();
+		var handlerWrapper = function () {
+			var args = QQWB.Array.fromArguments(arguments);
+			handler.apply(QQWB, args);
+            this._eventProvider.unbind(name, handlerWrapper);
+			handlerWrapper = null;
+		}
+        this._eventProvider.bind(name, handlerWrapper);
+    	return this;
+	}
 
     /**
      * Unbind an event

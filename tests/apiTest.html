@@ -263,6 +263,7 @@
 					    api = apilist.options[apilist.selectedIndex],
 						methodSelector = document.getElementById("requestmethod"),
 						paramHtml = [],
+					    // listMethods = api.getAttribute("data-methods").split("|"),
 					    listMethods = api.getAttribute("data-methods").split("|"),
 						listParams = T.JSON.parse(api.getAttribute("data-params"));
 
