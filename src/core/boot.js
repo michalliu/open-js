@@ -163,6 +163,7 @@ QQWB.extend("",{
            this.bind(this.events.DOCUMENT_READY_EVENT,handler);// cache the handlers, these hanlders will called when document is ready to go
            this._tryToTriggerDocumentReadyEvents(); // trigger the document ready event as early as posibble
        }
+	   return this;
     }
     /**
      * The door controls everything ready
