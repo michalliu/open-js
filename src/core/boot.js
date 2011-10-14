@@ -195,6 +195,8 @@ QQWB.extend("",{
     }
 });
 
+T.alias("documentReady","ready");
+
 // boot library
 (function () {
     var 
