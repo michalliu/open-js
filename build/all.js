@@ -5941,6 +5941,7 @@ QQWB.extend("",{
            this.bind(this.events.DOCUMENT_READY_EVENT,handler);// cache the handlers, these hanlders will called when document is ready to go
            this._tryToTriggerDocumentReadyEvents(); // trigger the document ready event as early as posibble
        }
+	   return this;
     }
     /**
      * The door controls everything ready
@@ -5971,6 +5972,8 @@ QQWB.extend("",{
        return this;
     }
 });
+
+T.alias("documentReady","ready");
 
 // boot library
 (function () {
@@ -6374,18 +6377,37 @@ QQWB.extend("auth",{
             QQWB.log.critical("Library not initialized, call T.init() to initialize");
         }
 
-        var loginStatus = QQWB.loginStatus(); 
+        var loginStatus = QQWB.loginStatus(), 
+            onLoginSessionComplete; // hander on this logon session complete
 
-        optSuccessHandler && QQWB.once(QQWB.events.USER_LOGGEDIN_EVENT, optSuccessHandler);
-        optFailHandler && QQWB.once(QQWB.events.USER_LOGIN_FAILED_EVENT, optFailHandler);
+		// user loggedin at successhandler is passedIn
+		// that's the only thing we need to do
+		if (loginStatus && optSuccessHandler) {
+            optSuccessHandler(loginStatus);
+			return;
+		}
 
-        // user already logged in
-        if (loginStatus) {
-            optSuccessHandler && optSuccessHandler.call(QQWB,loginStatus);
-            QQWB.trigger(QQWB.events.USER_LOGGEDIN_EVENT,loginStatus);
-        } else { // open authorization window
-		    QQWB.auth.authWindow.show().focus();
-        } // end if loginStatus
+		// handler exists
+		if (optSuccessHandler || optFailHandler) {
+			onLoginSessionComplete = function (arg1) {
+				if(arg1.access_token && optSuccessHandler) {
+					optSuccessHandler(arg1);
+				} else if(arg1.error && optFailHandler){
+					optFailHandler(arg1);
+				} else {
+					// the result should be success or error
+                    QQWB.log.warning("confused result of T.login");
+				}
+                QQWB.unbind(QQWB.events.USER_LOGGEDIN_EVENT, onLoginSessionComplete);
+                QQWB.unbind(QQWB.events.USER_LOGIN_FAILED_EVENT, onLoginSessionComplete);
+                onLoginSessionComplete = null;
+			};
+            QQWB.bind(QQWB.events.USER_LOGGEDIN_EVENT, onLoginSessionComplete);
+            QQWB.bind(QQWB.events.USER_LOGIN_FAILED_EVENT, onLoginSessionComplete);
+		}
+
+		// show auth window
+		QQWB.auth.authWindow.show().focus();
 
         return QQWB;
     }
