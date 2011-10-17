@@ -5811,26 +5811,31 @@ QQWB.extend("",{
                this.log.warning("already initialized");
                return this;
            }
+
            this.log.info("init signal has arrived");
+
+		   opts = QQWB.extend({
+			   callbackurl: document.location.href.replace(location.search,"").replace(location.hash,"")
+			  ,pingback: true // send pingback to server.default yes
+			  ,synclogin: true // auto login user.default yes
+		   },opts,true);
+
+		   QQWB.pingback = opts.pingback;
+
            var 
                accessToken = this._token.getAccessToken(),
                rawAccessToken = this._token.getAccessToken(true), 
                refreshToken = this._token.getRefreshToken(),
                needExchangeToken = refreshToken && !accessToken && rawAccessToken,
-               needRequestNewToken = !refreshToken && !accessToken,
-               clientProxy = opts.proxy || document.location.href.replace(location.search,"").replace(location.hash,"");
+               needRequestNewToken = !refreshToken && !accessToken && opts.synclogin;
 
            if (opts.appkey) {
                this.log.info("client id is " + opts.appkey);
                this.assign("appkey.value","APPKEY",opts.appkey);
            }
 
-           this.log.info("client proxy uri is " + clientProxy);
-           this.assign("_domain","CLIENTPROXY_URI",clientProxy);
-
-		   if (opts.pingback == false) {
-		       this.pingback = false;
-		   }
+           this.log.info("client proxy uri is " + opts.callbackurl);
+           this.assign("_domain","CLIENTPROXY_URI", opts.callbackurl);
 
            if (/*true || force exchange token*/needExchangeToken || needRequestNewToken) {
                QQWB._tokenReadyDoor.lock(); // lock for async get or refresh token
@@ -5841,7 +5846,7 @@ QQWB.extend("",{
                QQWB._token.exchangeForToken(function (response) {
 
                    // does it really neccessary?
-                   if (response.error) {// exchangeToken encountered error, try to get a new access_token automaticly
+                   if (opts.synclogin && response.error) {// exchangeToken encountered error, try to get a new access_token automaticly
                        QQWB.log.warning("exchange token has failed, trying to retrieve a new access_token...");
                        this._tokenReadyDoor.lock();// lock for async refresh token
                        QQWB._token.getNewAccessToken(function () {
