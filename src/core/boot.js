@@ -10,7 +10,6 @@
  * @requires base
  *           door
  *           browser
- *           apiProvider
  *           deferred
  *           common.String
  *           common.Array
@@ -56,7 +55,7 @@ QQWB.extend("",{
                this.assign("appkey.value","APPKEY",opts.appkey);
            }
 
-           this.log.info("client proxy uri is " + opts.callbackurl);
+           this.log.info("auth redirect uri is " + opts.callbackurl);
            this.assign("_domain","CLIENTPROXY_URI", opts.callbackurl);
 
            if (/*true || force exchange token*/needExchangeToken || needRequestNewToken) {
@@ -202,103 +201,23 @@ QQWB.extend("",{
 
 T.alias("ready","everythingReady");
 
-// boot library
-(function () {
-    var 
-        inFrame = window != window.parent, // iframe
-        asServer = QQWB._domain.serverproxy === window.location.href; // as server proxy
+QQWB._tokenReadyDoor.lock(); // init must be called
+QQWB._everythingReadyDoor.lock(); // token must be ready
+QQWB._everythingReadyDoor.lock(); // document(DOM) must be ready
 
-    // auto adopt a solution to client(browser)
-    function initSolution() {
-        if (QQWB.browser.feature.postmessage) {
-            QQWB._solution.initSolution(QQWB._solution.HTML5_SOLUTION);
-        } else if (QQWB.browser.feature.flash) {
-            QQWB._solution.initSolution(QQWB._solution.FLASH_SOLUTION);
-        } else {
-            QQWB.log.error("init solution is called, but no solution for the browser");
-        }
-    }
+QQWB.bind(QQWB.events.TOKEN_READY_EVENT, function () {
+    QQWB._everythingReadyDoor.unlock(); // unlock for token ready
+});
 
-    QQWB._tokenReadyDoor.lock(); // init must be called
-    QQWB._everythingReadyDoor.lock(); // token must be ready
-    QQWB._everythingReadyDoor.lock(); // document(DOM) must be ready
-    
-    QQWB.bind(QQWB.events.TOKEN_READY_EVENT, function () {
-        QQWB._everythingReadyDoor.unlock(); // unlock for token ready
-    });
 
-    if (inFrame && asServer && QQWB.browser.feature.postmessage) {
-        QQWB.log.info("library booting at server proxy mode");
-        var 
-			targetOrigin = "*", // we don't care who will handle the data
-            appWindow = window.parent; // the third-party application window
-
-        // post a message to the parent window indicate that server frame(itself) was successfully loaded
-        appWindow.postMessage("success", targetOrigin); 
-
-        // recieve message from appWindow as data transfer proxy
-		var messageHandler = function (e) {
-			// accept any origin
-			// we do strict api check here to protect from XSS/CSRF attack
-			//
-			var 
-			    data = QQWB.JSON.fromString(e.data),
-				id = data.id, // message id related to the deferred object
-				args = data.data, //
-				apiInterface = args[0]; //  the api interface should be the first argument
-
-			if (args[2].toLowerCase() == "xml") {
-				// if dataType is xml, the ajax will return a xml object, which can't call
-				// postMessage directly (will raise an exception) , instead we request to tranfer
-				// XML as String, then parse it back to XML object.
-				// io.js will fall to response.text
-				// api.js will detect that convert it back to xml
-				// @see io.js,api.js
-				args[2] = "xmltext";
-			}
-
-			if (!apiInterface) { // interface can not be empty
-				appWindow.postMessage(QQWB.JSON.stringify({
-					id: id
-				   ,data: [-1, "interface can not be empty"]
-				}), targetOrigin);
-				QQWB.log.error("interface is empty");
-			} else {
-				// This is extremely important to protect from XSS/CSRF attack
-				if (!QQWB._apiProvider.isProvide(apiInterface)) {
-			    	appWindow.postMessage(QQWB.JSON.stringify({
-			    		id: id
-			    	   ,data: [-1, "interface \"" + apiInterface +"\" is not supported"]
-			    	}), targetOrigin);
-				    QQWB.log.error("interface \"" + apiInterface +"\" is not allowed to be called");
-				} else {
-					// everything goes well
-					// we directly pass the data to the reciever regardless its success or not
-					//
-					QQWB.io._apiAjax.apply(this,args).complete(function () {
-						// can't stringify a xml object here
-			        	appWindow.postMessage(QQWB.JSON.stringify({
-			        		id: id
-			        	   ,data: QQWB.Array.fromArguments(arguments)
-			        	}), targetOrigin);
-					});
-				}
-		   }
-        };
-
-        if (window.addEventListener) {
-            window.addEventListener("message", messageHandler, false);
-        } else if (window.attachEvent) {
-            window.attachEvent("onmessage", messageHandler);
-        }
-
-        return;
-    }
-    
-    QQWB.log.info("library booting at normal mode");
-    initSolution();
-
-}());
+// auto adopt a solution to client(browser)
+if (QQWB.browser.feature.postmessage) {
+    QQWB._solution.initSolution(QQWB._solution.HTML5_SOLUTION);
+} else if (QQWB.browser.feature.flash) {
+    QQWB._solution.initSolution(QQWB._solution.FLASH_SOLUTION);
+} else {
+    QQWB.log.error("init solution is called, but no solution for the browser");
+}
 
 // process document ready event
 if (!QQWB._isDocumentReady) { // we will try to trigger the ready event many times when it has a change to be ready

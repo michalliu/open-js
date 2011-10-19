@@ -9,7 +9,7 @@
  * @module io
  * @requires base
  *           queryString
- *           apiProvider
+ *           weibo.util
  *           deferred
  *           common.XML
  *           common.JSON
@@ -367,13 +367,13 @@ QQWB.extend("io", {
 		      // error code over than 2000000 represent physicall error
 			  status = 2000000 + Math.abs((status ? status : 0));
               deferred.reject(status, statusText, elapsedtime, "");
-		  } else if ( typeof (retcode = QQWB._apiProvider._apiParseRetCode(responseText)) == "number"
+		  } else if ( typeof (retcode = QQWB.weibo.util.parseRetCode(responseText)) == "number"
 		             && 0 !== retcode
 			        ) { // api error
-		      errorcode = QQWB._apiProvider._apiParseErrorCode(responseText); 
+		      errorcode = QQWB.weibo.util.parseErrorCode(responseText); 
 		      // error code over than 1000000 and less than 2000000 represent logic error
 			  status = 1000000 + retcode * 1000 + 500 + (errorcode ? errorcode : 0);
-			  deferred.reject(status,  QQWB._apiProvider._apiGetErrorMessage(retcode,errorcode), elapsedtime, responseText);
+			  deferred.reject(status,  QQWB.weibo.util.getErrorMessage(retcode,errorcode), elapsedtime, responseText);
           } else {
 			  deferred.resolve(status, statusText, elapsedtime, parsedResponse, responseHeaders, dataType);
           }

@@ -9,15 +9,16 @@
  *
  * @author michalliu
  * @version 1.0
- * @package core
+ * @package misc
  * @module man
  * @requires base
- *           apiProvider
+ *           weibo.interface
+ *           weibo.util
  *           common.JSON
  */
 
 QQWB.provide("man", function (api) {
-	api = this._apiProvider.compat(api);
-    return this._apiProvider.getDescriptor(api) ? QQWB.JSON.stringify(this._apiProvider.getDescriptor(api)) : "no such api";
+	var descriptor = QQWB.weibo.interface.getDescriptor(QQWB.weibo.util.compat(api))
+    return descriptor ? QQWB.JSON.stringify(descriptor) : "no such api";
 });
 

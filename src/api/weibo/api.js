@@ -1,11 +1,11 @@
 /**
  * Tencent weibo javascript library
  *
- * API call
+ * Weibo API call
  *
  * Example:
   
-    T.api(
+    T.weibo.api(
        "/status/home_timeline"
       ,{
           maxpage: 20
@@ -18,7 +18,7 @@
  *
  *  Note:
  *
- *  T.api method supports cache, when the condition meets.
+ *  T.weibo.api method supports cache, when the condition meets.
  *  The cached api will run automaticlly.
  *
  *  If there is a problem when processing to meet the condition.
@@ -34,22 +34,23 @@
  *
  * @author michalliu
  * @version 1.0
- * @package core
+ * @package weibo
  * @module api
  * @requires base
  *           common.XML
  *           common.Array
  *           common.JSON
- *           apiProvider
- *           deferred
+ *           core.deferred
+ *           core.queryString
+ *           core.ping
  *           auth.token
  *           auth.auth
- *           queryString
+ *           weibo.util
  */
 
-QQWB.provide("api", function (api, apiParams, optDataType, optType, optSolution) {
+QQWB.provide("weibo.api", function (api, apiParams, optDataType, optType, optSolution) {
 
-	api = this._apiProvider.compat(api);
+	api = QQWB.weibo.util.compat(api);
 	apiParams = apiParams || {};
     optDataType = (optDataType || "json").toLowerCase();
     optType = optType || "GET";
@@ -96,14 +97,14 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optSolution)
 	// don't handle that, let server to the job
 	// then pass a failed message to the callback
     //
-	/*if (false && !QQWB._apiProvider.isProvide(api)) {
+	/*if (check if the specified api can be called) {
 		QQWB.log.error("can't call \"" + api +"\", not supported");
 		deferred.reject(-1, "api not supported"); // immediately error
 		return promise;
 	}*/
 
 	// no solution or selected solution failed initialze
-	// its not possible to implement to QQWB.api method working
+	// its not possible to implement to QQWB.weibo.api method working
 	// very little chance
 	if (!solution || solution.readyState === 2) {
 		QQWB.log.critical("solution error");
@@ -115,7 +116,7 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optSolution)
     //then cache the function do flash solution init
 	//if (!solution.support(api)) {
 		// choose other solution
-		// return  QQWB.api(api, apiParams, optDataType, optType, other solution);
+		// return  QQWB.weibo.api(api, apiParams, optDataType, optType, other solution);
 	//}
 
 	// if api called before the solution is ready, we cached it and waiting the solution ready
@@ -123,12 +124,12 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optSolution)
 	if (solution.readyState === 0) { //solution not ready
 		QQWB.log.warning("solution is not ready, your api call request has been cached, will invoke immediately when solution is ready");
     	solution.promise.done(function () { // when solution is ready
-		    QQWB.log.info("invoking cached api call \"QQWB.api( " + [api, apiParams, optDataType, optType].join(",") + " )\"...");
+		    QQWB.log.info("invoking cached api call \"QQWB.weibo.api( " + [api, apiParams, optDataType, optType].join(",") + " )\"...");
 
 			// emulate the request send it to server
 			// when data backs, resolve or reject the deferred object previously saved.
 			// then pass the data in accordingly
-			QQWB.api(api, apiParams, optDataType, optType)
+			QQWB.weibo.api(api, apiParams, optDataType, optType)
 			    .success(function () {
 				    deferred.resolveWith(deferred,QQWB.Array.fromArguments(arguments));
 				 })
@@ -136,7 +137,7 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optSolution)
 				    deferred.rejectWith(deferred,QQWB.Array.fromArguments(arguments));
 			     }); // keep the arguments
 		}).fail(function () { // solution failed, we use the arguments from boot section (boot.js)
-		    QQWB.log.error("can't invoking cached api call \"QQWB.api( " + [api, apiParams, optDataType, optType].join(",") + " )\"");
+		    QQWB.log.error("can't invoking cached api call \"QQWB.weibo.api( " + [api, apiParams, optDataType, optType].join(",") + " )\"");
 		    deferred.rejectWith(deferred,QQWB.Array.fromArguments(arguments));
 		});
 		return promise;
@@ -152,20 +153,20 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optSolution)
 	}
 
 	// record the serial
-	if (!QQWB.api.id) {
-		QQWB.extend(QQWB.api, {
+	if (!QQWB.weibo.api.id) {
+		QQWB.extend(QQWB.weibo.api, {
 			id: 0
             // how many api call this page does?
 		   ,total: function () {
-			   return QQWB.api.id;
+			   return QQWB.weibo.api.id;
 		    }
 		});
 	}
 
-    QQWB.api.id ++;
+    QQWB.weibo.api.id ++;
 
 	// describe what we are to do now
-    QQWB.log.info("[" + QQWB.api.id + "] requesting data \"" + QQWB._apiProvider.describe(api) + "\" from server...");
+    QQWB.log.info("[" + QQWB.weibo.api.id + "] send weibo api request \"" + api + "\"");
 
     // html5 solution
     if (solution === QQWB._solution[QQWB._solution.HTML5_SOLUTION]) {
@@ -182,8 +183,8 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optSolution)
 					// everything goes well
                  	// lazy create an collection object to maintain the deferred object
                  	// only html5 solution need this
-                 	if (!QQWB.api._deferredCollection) {
-                 		QQWB.extend(QQWB.api, {
+                 	if (!QQWB.weibo.api._deferredCollection) {
+                 		QQWB.extend(QQWB.weibo.api, {
                  		    _deferredCollection: {
                  		    }
                  		   ,deferredAt: function (deferredId) {
@@ -213,7 +214,7 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optSolution)
                  		});
                  	}
 
-					if (!QQWB.api.messageHandler) {
+					if (!QQWB.weibo.api.messageHandler) {
 						// add listeners for the data when data comes back
 						QQWB.provide("api.messageHandler", function (e) {
 							// we only trust the data back from the API server, ingore others
@@ -228,7 +229,7 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optSolution)
 								var 
 							    	data = QQWB.JSON.fromString(e.data),
 									id = data.id,
-									relateDeferred = QQWB.api.deferredAt(id),
+									relateDeferred = QQWB.weibo.api.deferredAt(id),
 							    	response = data.data;
 
 								if (relateDeferred) {
@@ -241,7 +242,7 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optSolution)
 										//relateDeferred.resolve.apply(relateDeferred,[response[2],response[3]]);
                                         relateDeferred.resolve(response[3]/* response body */, response[2]/* elpased time */, response[4]/*response header*/);
 							    	}
-									QQWB.api.uncollect(id);
+									QQWB.weibo.api.uncollect(id);
 								} else {
 	                                QQWB.log.warning("related deferred object not found, it shouldn't happen");
 								}
@@ -249,16 +250,16 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optSolution)
 						}); // end provide
 
                         if (window.addEventListener) {
-                            window.addEventListener("message", QQWB.api.messageHandler, false);
+                            window.addEventListener("message", QQWB.weibo.api.messageHandler, false);
                         } else if (window.attachEvent) {
-                            window.attachEvent("onmessage", QQWB.api.messageHandler);
+                            window.attachEvent("onmessage", QQWB.weibo.api.messageHandler);
                         }
 					}
                  
 					try {
 						// IE8 has problems if not wrapped by setTimeout
 						// @see http://ejohn.org/blog/how-javascript-timers-work/
-						var collectionID = QQWB.api.collect(deferred);
+						var collectionID = QQWB.weibo.api.collect(deferred);
 
 						// we send async request at the same time
 						// and through id we know the result belong
@@ -295,7 +296,7 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optSolution)
 
 	// describe that we have done the request
     (function () {
-        var serial = QQWB.api.id;
+        var serial = QQWB.weibo.api.id;
      	promise.complete(function () {
              QQWB.log.info("*[" + serial + "] done");
              serial = null; // defect memory leak in IE
@@ -316,3 +317,6 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optSolution)
 
     return promise;
 });
+
+// export a shorter name for weibo's api
+QQWB.alias("api","weibo.api");

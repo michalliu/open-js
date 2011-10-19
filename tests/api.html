@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html>
 	<head>
@@ -45,10 +46,7 @@
 			textarea#result{width:100%;height:300px;outline:none;}
 			
         </style>
-        <!--[if lte IE 6 ]>
-        <script src="../tools/firebug-lite/content/firebug-lite-dev.js"></script>
-        <![endif]-->
-        <script src="../build/all.min.js"></script>
+        <script src="../build/demo.js"></script>
         <script type="text/javascript">
             <!--
             //
@@ -218,16 +216,17 @@
 		//创建接口列表
     	(function () {
 			var api,
+			    apis = T.weibo.interface._collection,
 			    category,
 			    categories = {};
 
-			for (api in T._apiProvider.apis) {
-	        	if (T._apiProvider.apis.hasOwnProperty(api)) {
-					category = T._apiProvider.apis[api].category;
+			for (api in apis) {
+	        	if (apis.hasOwnProperty(api)) {
+					category = apis[api].category;
 			    	if (!categories.hasOwnProperty(category)) {
                         categories[category] = [];
 					}
-					categories[category].push([api,T._apiProvider.apis[api]]);
+					categories[category].push([api,apis[api]]);
 	        	}
         	}
 
@@ -264,7 +263,7 @@
 						methodSelector = document.getElementById("requestmethod"),
 						paramHtml = [],
 					    // listMethods = api.getAttribute("data-methods").split("|"),
-					    listMethods = api.getAttribute("data-methods").split("|"),
+					    listMethods = "GET|POST".split("|"),
 						listParams = T.JSON.parse(api.getAttribute("data-params"));
 
 					methodSelector.innerHTML = "";

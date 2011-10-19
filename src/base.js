@@ -203,7 +203,11 @@
        ,_alias: function (alias, origin) {
            origin = origin || twb;
            if(typeof alias === 'string') {
-               this[alias] = origin;
+			   if (!this[alias]) {
+                   this[alias] = origin;
+			   } else {
+                   QQWB.debug && window.console && window.console.log(QQWB.name + ": [WARNING] refused to alias \"" + alias + "\",name conflict");
+			   }
            } else if (Object.prototype.toString.call(alias) === "[object Array]") {
                for (var i=0,l=alias.length;i<l;i++) {
                    this[alias[i]] = origin;
@@ -221,7 +225,8 @@
         * @return {Void}
         */
        ,alias: function (alias, origin) {
-           twb._alias(alias, twb[origin]);
+           twb._alias(alias, twb.create(origin));
+		   return twb;
        }
 
        /**

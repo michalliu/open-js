@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html>
 	<head>
@@ -53,10 +54,7 @@
 			.apitestwrapper .testdesc .status-flag,.apitestwrapper .testdesc .status-text{float:left;}
 			#performance{font-size:12px;height:20px;line-height:20px;padding:0px 10px;background:gold;margin:0 auto; width:260px;text-align:center;border-radius:10px;visibility:hidden;}
         </style>
-        <!--[if lte IE 6 ]>
-        <script src="../tools/firebug-lite/content/firebug-lite-dev.js"></script>
-        <![endif]-->
-        <script src="../build/all.min.js"></script>
+        <script src="../build/demo.js"></script>
         <script type="text/javascript">
             <!--
             //
@@ -228,10 +226,11 @@
 			var 
 				apiCounter= 0,
 				api,
+				apis = T.weibo.interface._collection,
 			    apitesthtml = [];
 
-        	for (api in T._apiProvider.apis) {
-	        	if (T._apiProvider.apis.hasOwnProperty(api)) {
+        	for (api in apis) {
+	        	if (apis.hasOwnProperty(api)) {
 					apitesthtml.push(T.format.sprintf('<li class="apiitem" data-name="%s"><div class="apiseq">%s.</div><div class="apiname"><div class="apiprogresstext">%s</div><div class="apiprogress"></div></div><div class="apitestdetail"><div class="apitestflag status-flag status-idle"></div><div class="apitestresult">空闲</div><a class="apidiagnost" title="诊断信息" href="javascript:void(0);">+</a></div></li>', api, ++apiCounter, api));
 	        	}
         	}
@@ -293,7 +292,7 @@
 									progressElement.style.width = progress + "%"; 
 						    	}, 100);
 								// 自动配置相关参数
-								apiDescriptor = T._apiProvider.getDescriptor(api);
+								apiDescriptor = T.weibo.interface.getDescriptor(api);
 						    	if (apiDescriptor && apiDescriptor.supportParams) {
 							     	for (var paramname in apiDescriptor.supportParams) {
 								    	if (apiDescriptor.supportParams.hasOwnProperty(paramname)) {
