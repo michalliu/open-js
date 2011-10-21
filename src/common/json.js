@@ -26,7 +26,8 @@ QQWB.extend("JSON",{
         } else {
             // Make sure leading/trailing whitespace is removed (IE can't handle it)
             source = source.replace(/^\s+/,"").replace(/\s+$/,"");
-
+			// Remove those control characters under 0x20, it could cause JSON parse syntax error
+			source = source.replace(/[\u0000-\u0019]/g," ");
             if ( window.JSON && window.JSON.parse ) {
                 source = window.JSON.parse( source );
             } else {

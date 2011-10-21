@@ -10,6 +10,28 @@
  * @module interface
  * @requires base
  */
+QQWB.extend("_const", {
+    HTTP_METHOD_GET: "GET",
+    HTTP_METHOD_POST: "POST",
+    HTTP_METHOD_GET_OR_POST: "GET | POST",
+    API_CATEGORY_TIMELINE: "时间线",
+    API_CATEGORY_WEIBO: "微博相关",
+    API_CATEGORY_ACCOUNT: "账户相关",
+    API_CATEGORY_RELATION: "关系链相关",
+    API_CATEGORY_SIXIN: "私信相关",
+    API_CATEGORY_SEARCH: "搜索相关",
+    API_CATEGORY_TRENS: "热度趋势",
+    API_CATEGORY_QUERY: "查看数据",
+    API_CATEGORY_FAVORITE: "数据收藏",
+    API_CATEGORY_TOPIC: "话题相关",
+    API_CATEGORY_TAG: "标签相关",
+    API_CATEGORY_OTHER: "其他",
+    API_NO_DESCRIPTION: "暂时没有关于此参数的说明",
+    API_NO_DEFAULT_VALUE: "",
+    COMMON_NULL: null,
+    COMMON_EMPTY_STRING: ""
+});
+
 QQWB.extend("weibo.interface", {
 	// api name collection
     _collection: {
