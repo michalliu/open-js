@@ -22,12 +22,42 @@
  */
 
 QQWB.extend("",{
+	  init: function () {
+	  }
     /**
-     * Init with appkey and proxy
-     *
-     * @access public
+     * Init config basic parameters for qzone
+	 *
+     * Available weiboInitOpts
+	 *
+	 * {
+     *     appkey: "" // required, weibo or qzone appkey, for older version
+	 *    ,clientId: "" // required, weibo or qzone appkey, same as appkey but its newer name
+     *    ,callbackurl:"" // optional, default is currentpage, for older version
+	 *    ,redirectURI:"" // optional. default is currentpage, same as callbackurl but its newer name
+	 *    ,pingback: true/false // optional. default is true, send pingback to our server or don't
+	 * }
+	 *
+     * @access private
      */
-    init: function (opts) {
+	 ,_qzoneInit: function (qzoneInitOpts) {
+	  }
+    /**
+     * Init config basic parameters for weibo
+	 *
+     * Available weiboInitOpts
+	 *
+	 * {
+     *     appkey: "" // required, weibo or qzone appkey, for older version
+	 *    ,clientId: "" // required, weibo or qzone appkey, same as appkey but its newer name
+     *    ,callbackurl:"" // optional, default is currentpage, for older version
+	 *    ,redirectURI:"" // optional. default is currentpage, same as callbackurl but its newer name
+	 *    ,pingback: true/false // optional. default is true, send pingback to our server or don't
+	 *    ,synclogin: true/false // optional. default is true, enable sync login or not
+	 * }
+	 *
+     * @access private
+     */
+     ,_weiboInit: function (weiboInitOpts) {
            if (this._inited === true) {
                this.log.warning("already initialized");
                return this;
@@ -35,28 +65,33 @@ QQWB.extend("",{
 
            this.log.info("init signal has arrived");
 
-		   opts = QQWB.extend({
-			   callbackurl: document.location.href.replace(location.search,"").replace(location.hash,"")
+		   weiboInitOpts = QQWB.extend({
+			   redirectURI: document.location.href.replace(location.search,"").replace(location.hash,"")
 			  ,pingback: true // send pingback to server.default yes
 			  ,synclogin: true // auto login user.default yes
-		   },opts,true);
+		   },weiboInitOpts,true);
 
-		   QQWB.pingback = opts.pingback;
+		   QQWB.pingback = weiboInitOpts.pingback;
 
            var 
                accessToken = this._token.getAccessToken(),
                rawAccessToken = this._token.getAccessToken(true), 
                refreshToken = this._token.getRefreshToken(),
                needExchangeToken = refreshToken && !accessToken && rawAccessToken,
-               needRequestNewToken = !refreshToken && !accessToken && opts.synclogin;
+               needRequestNewToken = !refreshToken && !accessToken && weiboInitOpts.synclogin,
+			   sappkey = weiboInitOpts.appkey || weiboInitOpts.clientId, // this is to compatible with older version,we use appkey at older version
+			   sredirect = weiboInitOpts.callbackurl || weiboInitOpts.redirectURI; // this is to compatible with older version,we use appkey at older version
 
-           if (opts.appkey) {
-               this.log.info("client id is " + opts.appkey);
-               this.assign("appkey.value","APPKEY",opts.appkey);
-           }
+           if (sappkey) {
+               this.log.info("client id is " + sappkey);
+               this.assign("appkey.value","APPKEY",sappkey);
+		   } else {
+			   this.log.critical("can't init, appkey(clientId) is REQUIRED");
+			   return;
+		   }
 
-           this.log.info("auth redirect uri is " + opts.callbackurl);
-           this.assign("_domain","CLIENTPROXY_URI", opts.callbackurl);
+           this.log.info("auth redirect uri is " + sredirect);
+           this.assign("_domain","CLIENTPROXY_URI", sredirect);
 
            if (/*true || force exchange token*/needExchangeToken || needRequestNewToken) {
                QQWB._tokenReadyDoor.lock(); // lock for async get or refresh token
@@ -67,7 +102,7 @@ QQWB.extend("",{
                QQWB._token.exchangeForToken(function (response) {
 
                    // does it really neccessary?
-                   if (opts.synclogin && response.error) {// exchangeToken encountered error, try to get a new access_token automaticly
+                   if (weiboInitOpts.synclogin && response.error) {// exchangeToken encountered error, try to get a new access_token automaticly
                        QQWB.log.warning("exchange token has failed, trying to retrieve a new access_token...");
                        this._tokenReadyDoor.lock();// lock for async refresh token
                        QQWB._token.getNewAccessToken(function () {
