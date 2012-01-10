@@ -308,10 +308,17 @@ QQWB.extend("io", {
 			   // push to queue
                window.onFlashRequestComplete_8df046.callbacks.push(callback);
 			   
-			   if (QQWBFlashTransport && QQWBFlashTransport.httpRequest) {
-			       QQWBFlashTransport.httpRequest(cfg.url,cfg.data,cfg.type);
+			   if (cfg.flashObj && cfg.flashObj.httpRequest) {
+				   try {
+			           cfg.flashObj.httpRequest(cfg.url,cfg.data,cfg.type);
+				   } catch (pluginError) {
+					   var status = -2,
+					       statusText = (pluginError && pluginError.message) ? pluginError.message : pluginError;
+					   QQWB.log.warning("caught " + statusText + " exception QQWB.io._IOFlash");
+					   complete(status, statusText, QQWB.time.now() - started);
+				   }
 			   } else {
-			       QQWB.log.critical("flash transportation object error" + QQWBFlashTransportName);
+			       QQWB.log.critical("flash transportation object error");
 			   }
 		   }
 
@@ -326,11 +333,11 @@ QQWB.extend("io", {
      * Helper method to make api ajax call
      *
      */
-   ,_apiAjax: function (api, apiParams, dataType, type) {
+   ,_apiAjax: function (api, apiParams, dataType, type, platform) {
        // build ajax acceptable opt object from arguments
        var opts = {
                type: type.toUpperCase()
-              ,url: QQWB._domain.api + api
+              ,url: QQWB.getPlatform(platform).domain.api + api
               ,data: QQWB.queryString.encode(apiParams)
               ,dataType: dataType
            };
@@ -338,45 +345,48 @@ QQWB.extend("io", {
            opts.url += opts.data ? "?" + opts.data : "";
            delete opts.data;
        }
-       return QQWB.io.ajax(opts);
+       return QQWB.io.ajax(opts, platform);
     }
 	/**
 	 * Helper method to make api ajax call via flash
 	 *
 	 */
-  ,_apiFlashAjax: function (api, apiParams, dataType, type) {
+  ,_apiFlashAjax: function (api, apiParams, dataType, type, platform, flashObj) {
        var opts = {
                type: type.toUpperCase()
-              ,url: QQWB._domain.api + api
+              ,url: QQWB.getPlatform(platform).domain.api + api
               ,data: QQWB.queryString.encode(apiParams)
               ,dataType: dataType
+			  ,flashObj: flashObj
            };
        if (opts.type == "GET") {
            opts.url += opts.data ? "?" + opts.data : "";
            delete opts.data;
        }
-       return QQWB.io.flashAjax(opts);
+       return QQWB.io.flashAjax(opts, platform);
    }
    /**
 	* SendResponse regarding api call
 	*/
-  ,_apiResponder: function (deferred) {
+  ,_apiResponder: function (deferred, platform) {
 	  return function (status ,statusText ,elapsedtime ,parsedResponse ,responseText ,responseHeaders ,dataType) {
 		  var retcode,errorcode;
           if (status !== 200) { // http error
 		      // error code over than 2000000 represent physicall error
-			  status = 2000000 + Math.abs((status ? status : 0));
+		      status = 2000000 + Math.abs((status ? status : 0));
               deferred.reject(status, statusText, elapsedtime, "");
-		  } else if ( typeof (retcode = QQWB.weibo.util.parseRetCode(responseText)) == "number"
-		             && 0 !== retcode
-			        ) { // api error
-		      errorcode = QQWB.weibo.util.parseErrorCode(responseText); 
-		      // error code over than 1000000 and less than 2000000 represent logic error
-			  status = 1000000 + retcode * 1000 + 500 + (errorcode ? errorcode : 0);
-			  deferred.reject(status,  QQWB.weibo.util.getErrorMessage(retcode,errorcode), elapsedtime, responseText);
-          } else {
-			  deferred.resolve(status, statusText, elapsedtime, parsedResponse, responseHeaders, dataType);
-          }
+		  } else {
+			  if (platform === QQWB.platforms.WEIBO
+			      && typeof (retcode = QQWB.weibo.util.parseRetCode(responseText)) == "number"
+				  && 0 !== retcode) {
+		              errorcode = QQWB.weibo.util.parseErrorCode(responseText); 
+		              // error code over than 1000000 and less than 2000000 represent logic error
+		              status = 1000000 + retcode * 1000 + 500 + (errorcode ? errorcode : 0);
+		              deferred.reject(status,  QQWB.weibo.util.getErrorMessage(retcode,errorcode), elapsedtime, responseText);
+			  }
+			  //FIXME: parse logic error for other platform
+		      deferred.resolve(status, statusText, elapsedtime, parsedResponse, responseHeaders, dataType);
+		  }
 	  };
    }
    /**
@@ -398,7 +408,7 @@ QQWB.extend("io", {
 	* @param opts {Object} url configuration object
 	* @return {Object} promise object
 	*/
-  ,flashAjax: function (opts) {
+  ,flashAjax: function (opts, platform) {
        var 
            deferred = QQWB.deferred.deferred(),
            default_opts = {
@@ -407,7 +417,7 @@ QQWB.extend("io", {
            };
 
        QQWB.extend(default_opts, opts, true);
-       QQWB.io._IOFlash(default_opts).send(QQWB.io._apiResponder(deferred));
+       QQWB.io._IOFlash(default_opts).send(QQWB.io._apiResponder(deferred, platform));
 	   return deferred.promise();
    }
 	/**
@@ -417,7 +427,7 @@ QQWB.extend("io", {
 	 * @param opts {Object} ajax settings
 	 * @return {Object} deferred object
 	 */
-   ,ajax: function (opts) {
+   ,ajax: function (opts, platform) {
 
        var 
            deferred = QQWB.deferred.deferred(),
@@ -428,7 +438,7 @@ QQWB.extend("io", {
 
         QQWB.extend(default_opts, opts, true);
 
-        QQWB.io._IOAjax(default_opts).send(QQWB.io._apiResponder(deferred));
+        QQWB.io._IOAjax(default_opts).send(QQWB.io._apiResponder(deferred, platform));
 		return deferred.promise();
     }
 	/**

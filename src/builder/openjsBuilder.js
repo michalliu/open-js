@@ -8,12 +8,12 @@
  * @package builder
  * @module openjsForWeiboBuilder
  * @requires base
+ *           core.api
  *           weibo.api
  *           auth.auth
  *           core.deferred
  *           core.io
  *           event.event
  *           core.boot
- *           compat.find
  *           compat.localStorage
  */

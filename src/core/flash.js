@@ -23,7 +23,7 @@ QQWB.extend("flash",{
      * @param optCache {Number} indicate whether cache the swf file
      * @return Flash {Object}
      */
-   ,load: function (swfPath, optCallback, optCache) { 
+   ,load: function (swfPath,movieName,optCallback, optCache) { 
 
        // lazy create the loaded swfs
        if (!this.loadedSwfs) {
@@ -44,13 +44,12 @@ QQWB.extend("flash",{
        // this is the function name will be called inside flash
        // to indicate that the flash itself is ready now
        var movieContainerId= "movieContainer_" + QQWB.uid(),
-           movieName = "movie_" + QQWB.uid(),
            flashReadyCallbackName = "onFlashReady_a1f5b4ce",
            _flashReady = window[flashReadyCallbackName];
 
        window[flashReadyCallbackName] = function () {
 
-           optCallback && optCallback(movieName);
+           optCallback && optCallback();
            // restore back to original value
            window[flashReadyCallbackName] = _flashReady;
            // if the original value is undefined
@@ -61,7 +60,6 @@ QQWB.extend("flash",{
            // clean up variables in closure to avoid memory leak in IE
            _flashReady = null;
            optCallback && (optCallback = null);
-           movieName = null;
        };
 
        // code generated

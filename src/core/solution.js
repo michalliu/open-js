@@ -12,6 +12,7 @@
  *           common.Array
  *           dom
  *           flash
+ *           browser
  */
 QQWB.extend("_solution", {
 
@@ -21,89 +22,96 @@ QQWB.extend("_solution", {
 
    ,SILVER_LIGHT_SOLUTION: "silverlight"
 
-   ,initSolution: function (name) {
+   ,getBrowserBestSolution: function () {
+	   if (QQWB.browser.feature.postmessage) {
+           return this.HTML5_SOLUTION;
+       } else if (QQWB.browser.feature.flash) {
+           return this.FLASH_SOLUTION;
+       } else {
+		   return "";
+       }
+   }
+   ,initSolution: function (name, optPlatform) {
 
-       var solution,  // the choosed solution
+       // default init solution for current platform
+	   optPlatform = QQWB.platform == null ? QQWB.platforms.WEIBO : QQWB.platform;
 
-           // the whole initilized process is success?
-           // this is the deferred object for the whole process
-           // not the single solution
+	   var platform = QQWB.getPlatform(optPlatform),
+
+           // the choosed solution, platform and solution type specified
+           solution,
+
+		   // the current init session
+		   internalDeferred,
+
+		   // the whole solution init process
            solutionInit = QQWB.deferred.deferred();
 
-       // if the solution passed in we supported
-	   // and not initialized
-	   // then initialze it
-       if (!this[name] && QQWB.Array.inArray([this.HTML5_SOLUTION
+       // if the solution passed in we supported and not initialized then initialze it
+	   // we create a object to hold the solution object
+	   if (   (!this[optPlatform] || !this[optPlatform][name])
+	       && QQWB.Array.inArray([this.HTML5_SOLUTION
                                              ,this.FLASH_SOLUTION
                                              ,this.SILVER_LIGHT_SOLUTION]
                                              ,name)) {
-
-           // a choosed solution object
-           this[name] = {};
-
-		   // represent the solution's name
-		   this[name]["name"] = name;
-
-           // indicate choosed solution is ready or not
-           // 0 not resolved
-           // 1 solution is relsolved successfully
-           // 2 solution is rejected
-           this[name]["readyState"] = 0;
-
-           // the choosed solution id
-           // use to indendify the solution object
-           this[name]["id"] = "solution_" + QQWB.uid();
-
-           // the choosed solution deferred ready object
-           this[name]["deferred"] = QQWB.deferred.deferred();
-
-           // the choosed solution deferred ready promise object
-           this[name]["promise"] = this[name]["deferred"].promise();
-
+		   internalDeferred = QQWB.deferred.deferred();
+           QQWB.extend(["_solution",optPlatform,name].join("."), {
+			   "name": name // solution's name(type)
+			  ,"readyState": 0 //  0 not resolved;1 solution is relsolved successfully;2 solution is rejected;
+			  ,"id": "solution_" + optPlatform + QQWB.uid() // use to indendify the solution object
+			  ,"deferred": internalDeferred //  deferred ready object
+			  ,"promise": internalDeferred.promise() // deferred ready promise object
+           });
 	   }
 
-       // register callback to sub solutions deferred object
-       // if choosed solution failed then the whole solution failed,vice versa
-	   if (this[name] && this[name].readyState !== 0) {
-           this[name].deferred.success(function () {
+	   // if specified platform solution already initilized, don't do it again
+	   // if already inited we know the final result immediately
+	   if (this[optPlatform] && this[optPlatform][name] && this[optPlatform][name].readyState !== 0) {
+           this[optPlatform][name].deferred.success(function () {
                 solutionInit.resolve(QQWB.Array.fromArguments(arguments));
            }).fail(function () {
                 solutionInit.reject(QQWB.Array.fromArguments(arguments));
 	       });
+	   // platform and type of solution is not inited yet
 	   } else {
            // switch between solution types
            switch (name) {
+
                // this is the html5 solution
                case this.HTML5_SOLUTION:
+
                // the browser must support postmessage feature
                // to support html5 solution
                if (QQWB.browser.feature.postmessage) {
-                   // reference for choosed solution object
-                   solution = this[this.HTML5_SOLUTION];
+
+                   // a reference for choosed solution object
+                   solution = this[optPlatform][this.HTML5_SOLUTION];
+
+				   // add message handler in currentpage
                    var messageHandler = function (e) {
                        // we expected the message only come from serverproxy (we trusted)
                        // omit other messages, to protect your site alway from XSS/CSRF attack
-                       if (QQWB._domain.serverproxy.indexOf(e.origin) !== 0) {
+                       if (platform.domain.iframeProxy.indexOf(e.origin) !== 0) {
 	                       QQWB.log.warning("unexpected message arrived from " + e.origin + " with data " + e.data);
-	        	       } else { // this is the message we expected
+	        	       } else { // make sure it is the message we wanted
                            if (e.data === "success") {
-                               QQWB.log.info("html5 solution was successfully initialized");
+                               QQWB.log.info("html5 solution for platform **" + optPlatform + "** was successfully initialized");
                                solution.readyState = 1;
                                solution.deferred.resolve();
                            } else { // amm.. the trusted server post a message we don't understand
-                               QQWB.log.info("unexpected solution signal " + e.data);
+                               QQWB.log.warning("recieved unexpected solution signal for platform **" + optPlatform + "** " + e.data);
                            }
+
+                           // clean up things
+                           // unbind handlers
+                           if (window.addEventListener) {
+                               window.removeEventListener("message", messageHandler, false);
+                           } else if (window.attachEvent) {
+                               window.detachEvent("onmessage", messageHandler);
+                           }
+
+                           messageHandler = null;
                        }
-                       // clean up things
-                       //
-                       // unbind handlers
-                       if (window.addEventListener) {
-                           window.removeEventListener("message", messageHandler, false);
-                       } else if (window.attachEvent) {
-                           window.detachEvent("onmessage", messageHandler);
-                       }
-                       // 
-                       messageHandler = null;
                    };
 
                    if (window.addEventListener) {
@@ -113,27 +121,26 @@ QQWB.extend("_solution", {
                    }
 
                    // append the server frame to page
-                   QQWB.everythingReady(function () {
-                       QQWB.log.info("init html5 solution...");
-                       serverframe = QQWB.dom.createHidden("iframe", {id: solution.id,src: QQWB._domain.serverproxy});
+                   QQWB.ready(function () {
+					   
+                       QQWB.log.info("init html5 solution for platform **"+ optPlatform +"** ...");
+
+					   serverframe = QQWB.dom.createHidden("iframe", { 
+						   id: solution.id,
+						   src: platform.domain.iframeProxy
+					   });
+
                        QQWB.dom.append(serverframe);
-                       // the onload event is fired before the actually content loaded
-                       // so we set a delay of 1 sec
-                       // if serverframe doesn't post that message, we know there is an error
-                       // maybe a 404 Error?
-                       // the onload event will fired on chrome even the frame is 404 !!!
-                       // there is no frame.onerror event
-                       serverframe.onload = function (e) {
-                           setTimeout(function () {
-                               // should be 1 now, if everything is fine
-                               // if not there is a problem
-                               if (solution.readyState !== 1) {
-                                   QQWB.log.error("html5 solution initialition has failed, server proxy frame encountered error");
-                                   solution.readyState = 2;
-                                   solution.deferred.reject(-1,"server proxy frame not working");
-                               }
-                           }, 1 * 1000)/* check delayed */;
-                       };
+
+					   // detect server proxy working or not
+                       setTimeout(function () {
+                           if (solution.readyState !== 1) {
+                               QQWB.log.error("html5 solution for platform **" + optPlatform + "** init has failed");
+                               solution.readyState = 2;
+                               solution.deferred.reject(-1,"server proxy frame not working");
+                           }
+                       }, 1 * 30 * 1000);
+
                    });
                } else { // browser don't support postmessage feature, the html5 solution failed
                    QQWB.log.error("can't init solution \"" + name) +"\",browser doesn't support postmessage";
@@ -142,19 +149,21 @@ QQWB.extend("_solution", {
                break;
 
                case this.FLASH_SOLUTION:
-               // the browser must support flash feature to initliz flash solution
-               if (QQWB.browser.feature.flash) {
-                   // reference for choosed solution object
-                   solution = this[this.FLASH_SOLUTION];
 
-	        	   QQWB.everythingReady(function () {
-                       QQWB.log.info("init flash solution...");
+               if (QQWB.browser.feature.flash) {
+
+                   // a reference to choosed solution object
+                   solution = this[optPlatform][this.FLASH_SOLUTION];
+
+	        	   QQWB.ready(function () {
+                       QQWB.log.info("init flash solution for platform **" + optPlatform + "** ...");
+
 	        		   var resolveTimer,
-	        		       resolveTimeout = 10 * 1000,
-	        		       movieBox = QQWB.flash.load(QQWB._domain.flashproxy, function (moviename) {
+	        		       resolveTimeout = 10 * 1000, // max waiting for 10 seconds
+	        		       movieBox = QQWB.flash.load(platform.domain.flashProxy, solution.id, function () {
 							  QQWB.log.info("flash solution initlized successfully");
 	        	              solution.readyState = 1;
-							  window["QQWBFlashTransport"] = QQWB.flash.getSWFObjectByName(moviename);
+							  // window["QQWBFlashTransport"] = QQWB.flash.getSWFObjectByName(moviename);
 	        				  // clear the timer
 	        				  resolveTimer && clearTimeout(resolveTimer);
 	        	              solution.deferred.resolve();
@@ -165,7 +174,7 @@ QQWB.extend("_solution", {
 	        		   resolveTimer = setTimeout(function () {
 	        	    		   if (!solution.deferred.isResolved()) {
 	        	    		       solution.readyState = 2;
-	        	    		       solution.deferred.reject(-1, "encounter error while loading proxy swf, need newer flash player");
+	        	    		       solution.deferred.reject(-1, "encounter error while loading proxy swf for platform **" + optPlatform + "**, required newer flash player");
 	        	    		       // remove the box cotains the flash
 	        	    		       QQWB.dom.remove(movieBox);
 	        	    		   }
@@ -182,7 +191,6 @@ QQWB.extend("_solution", {
                case this.SILVER_LIGHT_SOLUTION:
                if (QQWB.browser.feature.silverlight) {
                    // silverlight not implemented
-                   ~1;
                    QQWB.log.error("sorry, silverlight solution is not implemented");
                } else {
                    QQWB.log.error("can't init solution \"" + name) +"\",browser doesn't support silverlight or silverlight is disabled";

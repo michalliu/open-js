@@ -5,7 +5,7 @@
  *
  * Example:
   
-    T.weibo.api(
+    T.qzone.api(
        "/status/home_timeline"
       ,{
           maxpage: 20
@@ -18,7 +18,7 @@
  *
  *  Note:
  *
- *  T.weibo.api method supports cache, when the condition meets.
+ *  T.qzone.api method supports cache, when the condition meets.
  *  The cached api will run automaticlly.
  *
  *  If there is a problem when processing to meet the condition.
@@ -34,7 +34,7 @@
  *
  * @author michalliu
  * @version 1.0
- * @package weibo
+ * @package qzone
  * @module api
  * @requires base
  *           common.XML
@@ -47,12 +47,12 @@
  *           core.solution
  *           auth.token
  *           auth.auth
- *           weibo.util
+ *           qzone.util
  */
 
-QQWB.provide("weibo.api", function (api, apiParams, optDataType, optType, optSolution) {
+QQWB.provide("qzone.api", function (api, apiParams, optDataType, optType, optSolution) {
 
-	api = QQWB.weibo.util.compat(api);
+	api = QQWB.qzone.util.compat(api);
 	apiParams = apiParams || {};
     optDataType = (optDataType || "json").toLowerCase();
     optType = optType || "GET";
@@ -60,8 +60,8 @@ QQWB.provide("weibo.api", function (api, apiParams, optDataType, optType, optSol
 	var 
     	promise,
 		solution,
-		weiboSolutions = QQWB._solution[QQWB.platforms.WEIBO],
-		weiboPlatform = QQWB.getPlatform(QQWB.platforms.WEIBO),
+		qzoneSolutions = QQWB._solution[QQWB.platforms.QZONE],
+		qzonePlatform = QQWB.getPlatform(QQWB.platforms.QZONE),
 		format = optDataType, // the format string in oauth querystring
 		supportedFormats = {json:true,xml:true/*,text:true*/},
     	deferred = QQWB.deferred.deferred();
@@ -84,12 +84,12 @@ QQWB.provide("weibo.api", function (api, apiParams, optDataType, optType, optSol
 	}
 
 	// solution has initialized let that solution handle the request
-	if(!weiboSolutions || !weiboSolutions[optSolution]) { // solution not initiallize, initialize it
+	if(!qzoneSolutions || !qzoneSolutions[optSolution]) { // solution not initiallize, initialize it
 	    QQWB.log.warning("adapt solution " + optSolution + ",initialzing...");
-	    QQWB._solution.initSolution(optSolution, QQWB.platforms.WEIBO);
+	    QQWB._solution.initSolution(optSolution, QQWB.platforms.QZONE);
 	}
 
-	solution = weiboSolutions[optSolution];
+	solution = qzoneSolutions[optSolution];
 
 	// don't handle that, let server to the job
 	// then pass a failed message to the callback
@@ -101,16 +101,16 @@ QQWB.provide("weibo.api", function (api, apiParams, optDataType, optType, optSol
 	}*/
 
 	// no solution or selected solution marked as failed
-	// its not possible to implement to QQWB.weibo.api method working
+	// its not possible to implement to QQWB.qzone.api method working
 	if (!solution || solution.readyState === 2) {
 		QQWB.log.critical("solution error");
 		deferred.reject(-1, "solution error",0/*time cost*/); // immediately error
 		return promise;
 	}
 
-	apiParams["oauth_consumer_key"] = QQWB.getAppkey(QQWB.platforms.WEIBO);
-	apiParams["oauth_token"] = QQWB._token.getAccessToken(false,weiboPlatform);
-	apiParams["oauth_version"] = "2.0";
+	apiParams["oauth_consumer_key"] = QQWB.getAppkey(QQWB.platforms.QZONE);
+	apiParams["access_token"] = QQWB._token.getAccessToken(false,qzonePlatform);
+	apiParams["openid"] = QQWB._token.getProperty("openId",null,qzonePlatform);
 	apiParams["format"] = format;
 
 
@@ -118,7 +118,7 @@ QQWB.provide("weibo.api", function (api, apiParams, optDataType, optType, optSol
     //then cache the function do flash solution init
 	//if (!solution.support(api)) {
 		// choose other solution
-		// return  QQWB.weibo.api(api, apiParams, optDataType, optType, other solution);
+		// return  QQWB.qzone.api(api, apiParams, optDataType, optType, other solution);
 	//}
 
 	// if api called before the solution is ready, we cached it and waiting the solution ready
@@ -126,19 +126,19 @@ QQWB.provide("weibo.api", function (api, apiParams, optDataType, optType, optSol
 	if (solution.readyState === 0) { //solution not ready
 		QQWB.log.warning("solution is not ready, your api call request has been cached, will invoke immediately when solution is ready");
     	solution.promise.done(function () { // when solution is ready
-		    QQWB.log.info("invoking cached api call \"QQWB.weibo.api( " + [api, apiParams, optDataType, optType].join(",") + " )\"...");
+		    QQWB.log.info("invoking cached api call \"QQWB.qzone.api( " + [api, apiParams, optDataType, optType].join(",") + " )\"...");
 
 			// emulate the request send it to server
 			// when data backs, resolve or reject the deferred object previously saved.
 			// then pass the data in accordingly
-			QQWB.weibo.api(api, apiParams, optDataType, optType)
+			QQWB.qzone.api(api, apiParams, optDataType, optType)
 			    .then(function () {
 				    deferred.resolveWith(deferred,arguments);
 				 },function (){
 				    deferred.rejectWith(deferred,arguments);
 			     });
 		}).fail(function () { // solution failed, we use the arguments from boot section (boot.js)
-		    QQWB.log.error("can't invoking cached api call \"QQWB.weibo.api( " + [api, apiParams, optDataType, optType].join(",") + " )\"");
+		    QQWB.log.error("can't invoking cached api call \"QQWB.qzone.api( " + [api, apiParams, optDataType, optType].join(",") + " )\"");
 		    deferred.rejectWith(deferred,arguments);
 		});
 		return promise;
@@ -147,7 +147,7 @@ QQWB.provide("weibo.api", function (api, apiParams, optDataType, optType, optSol
 	// must be here everything must be ready already from here
 	
     // user not logged in, don't bother to try to get data
-	if (!QQWB.loginStatus(null, weiboPlatform)) {
+	if (!QQWB.loginStatus(null, qzonePlatform)) {
         QQWB.log.warning("user is **NOT** login when making api call");
         // immediately error, don't do that, some api is public resources
 		// deferred.reject(-1, "not login", 0);
@@ -155,38 +155,38 @@ QQWB.provide("weibo.api", function (api, apiParams, optDataType, optType, optSol
 	}
 
 	// record the serial
-	if (!QQWB.weibo.api.id) {
-		QQWB.extend(QQWB.weibo.api, {
+	if (!QQWB.qzone.api.id) {
+		QQWB.extend(QQWB.qzone.api, {
 			id: 0
             // how many api call this page does?
 		   ,total: function () {
-			   return QQWB.weibo.api.id;
+			   return QQWB.qzone.api.id;
 		    }
 		});
 	}
 
-    QQWB.weibo.api.id ++;
+    QQWB.qzone.api.id ++;
 
 	// describe what we are to do now
-    QQWB.log.info("[" + QQWB.weibo.api.id + "] send weibo api request \"" + api + "\"");
+    QQWB.log.info("[" + QQWB.qzone.api.id + "] send qzone api request \"" + api + "\"");
 
     // html5 solution
-    if (solution === weiboSolutions[QQWB._solution.HTML5_SOLUTION]) {
+    if (solution === qzoneSolutions[QQWB._solution.HTML5_SOLUTION]) {
 			var serverProxy = document.getElementById(solution.id);
 			if (!serverProxy) { // double check to avoid the server frame was removed from dom unexpectly
 	            QQWB.log.critical("server proxy not found");
 	            deferred.reject(-1,"server proxy not found", 0);
 			} else {
                 // server proxy's url should be same as configuration, if not may be we got the wrong element
-				if (serverProxy.src !== weiboPlatform.domain.iframeProxy) { // double check to avoid the server frame src was modified unexpectly 
+				if (serverProxy.src !== qzonePlatform.domain.iframeProxy) { // double check to avoid the server frame src was modified unexpectly 
 	                QQWB.log.critical("server proxy is not valid, src attribute has unexpected value");
 	                deferred.reject(-1,"server proxy not valid", 0);
 				} else {
 					// everything goes well
                  	// lazy create an collection object to maintain the deferred object
                  	// only html5 solution need this
-                 	if (!QQWB.weibo.api._deferredCollection) {
-                 		QQWB.extend(QQWB.weibo.api, {
+                 	if (!QQWB.qzone.api._deferredCollection) {
+                 		QQWB.extend(QQWB.qzone.api, {
                  		    _deferredCollection: {
                  		    }
                  		   ,deferredAt: function (deferredId) {
@@ -216,12 +216,12 @@ QQWB.provide("weibo.api", function (api, apiParams, optDataType, optType, optSol
                  		});
                  	}
 
-					if (!QQWB.weibo.api.messageHandler) {
+					if (!QQWB.qzone.api.messageHandler) {
 						// add listeners for the data when data comes back
-						QQWB.provide("weibo.api.messageHandler", function (e) {
+						QQWB.provide("qzone.api.messageHandler", function (e) {
 							// we only trust the data back from the API server, ingore others
 							// This is important for security reson
-							if (weiboPlatform.domain.iframeProxy.indexOf(e.origin) !== 0) {
+							if (qzonePlatform.domain.iframeProxy.indexOf(e.origin) !== 0) {
 	                            QQWB.log.warning("unexpected message arrived from " + e.origin + " with data " + e.data);
 							} else {
 								// here is the result comes back
@@ -231,7 +231,7 @@ QQWB.provide("weibo.api", function (api, apiParams, optDataType, optType, optSol
 								var 
 							    	data = QQWB.JSON.fromString(e.data),
 									id = data.id,
-									relateDeferred = QQWB.weibo.api.deferredAt(id),
+									relateDeferred = QQWB.qzone.api.deferredAt(id),
 							    	response = data.data;
 
 								if (relateDeferred) {
@@ -244,7 +244,7 @@ QQWB.provide("weibo.api", function (api, apiParams, optDataType, optType, optSol
 										//relateDeferred.resolve.apply(relateDeferred,[response[2],response[3]]);
                                         relateDeferred.resolve(response[3]/* response body */, response[2]/* elpased time */, response[4]/*response header*/);
 							    	}
-									QQWB.weibo.api.uncollect(id);
+									QQWB.qzone.api.uncollect(id);
 								} else {
 	                                QQWB.log.warning("related deferred object not found, it shouldn't happen");
 								}
@@ -252,16 +252,16 @@ QQWB.provide("weibo.api", function (api, apiParams, optDataType, optType, optSol
 						}); // end provide
 
                         if (window.addEventListener) {
-                            window.addEventListener("message", QQWB.weibo.api.messageHandler, false);
+                            window.addEventListener("message", QQWB.qzone.api.messageHandler, false);
                         } else if (window.attachEvent) {
-                            window.attachEvent("onmessage", QQWB.weibo.api.messageHandler);
+                            window.attachEvent("onmessage", QQWB.qzone.api.messageHandler);
                         }
 					}
                  
 					try {
 						// IE8 has problems if not wrapped by setTimeout
 						// @see http://ejohn.org/blog/how-javascript-timers-work/
-						var collectionID = QQWB.weibo.api.collect(deferred);
+						var collectionID = QQWB.qzone.api.collect(deferred);
 
 						// we send async request at the same time
 						// and through id we know the result belong
@@ -272,8 +272,8 @@ QQWB.provide("weibo.api", function (api, apiParams, optDataType, optType, optSol
                             // @see http://msdn.microsoft.com/en-us/library/cc197015(v=vs.85).aspx
                             serverProxy.contentWindow.postMessage(QQWB.JSON.stringify({ 
                             	id: collectionID
-                               ,data: [api, apiParams, optDataType, optType, QQWB.platforms.WEIBO]
-                            }),weiboPlatform.domain.iframeProxy);
+                               ,data: [api, apiParams, optDataType, optType, QQWB.platforms.QZONE]
+                            }),qzonePlatform.domain.iframeProxy);
 						}, 0 );
 
 					} catch (ex) {
@@ -283,9 +283,9 @@ QQWB.provide("weibo.api", function (api, apiParams, optDataType, optType, optSol
 				} // end server proxy src modified check
 			} // end server proxy existance check
 
-	} else if (solution === weiboSolutions[QQWB._solution.FLASH_SOLUTION]) {
+	} else if (solution === qzoneSolutions[QQWB._solution.FLASH_SOLUTION]) {
 		// @see io.js onFlashRequestComplete_8df046 for api call sequence management
-		QQWB.io._apiFlashAjax(api, apiParams, optDataType, optType, QQWB.platforms.WEIBO, QQWB.flash.getSWFObjectByName(solution.id)).complete(function () {
+		QQWB.io._apiFlashAjax(api, apiParams, optDataType, optType, QQWB.platforms.QZONE, QQWB.flash.getSWFObjectByName(solution.id)).complete(function () {
 			if (arguments[0] !== 200) {
 				deferred.rejectWith(arguments);
 			} else {
@@ -297,7 +297,7 @@ QQWB.provide("weibo.api", function (api, apiParams, optDataType, optType, optSol
 
 	// describe that we have done the request
     (function () {
-        var serial = QQWB.weibo.api.id;
+        var serial = QQWB.qzone.api.id;
      	promise.complete(function () {
              QQWB.log.info("*[" + serial + "] done");
              serial = null; // defect memory leak in IE

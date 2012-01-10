@@ -4,26 +4,8 @@
  * Provide the namespace with some core methods
  *
  * @author michalliu
- * @version 1.0
+ * @version 2.0
  * @module base
- */
-
-/**
- * Constructor of SDK's error object
- *
- * Usage:
- *
- * throw QQWBError("message")
- *
- * @access public
- *
- * function QQWBError(message) {
- *     this.message = message;
- *     this.stack = (new Error()).stack;
- * }
- * 
- * QQWBError.prototype = new Error;
- * QQWBError.prototype.name = "QQWBError";
  */
 
 // base file
@@ -32,11 +14,6 @@
     var 
         twb, // the internal namespace object
         originalT = window.T; // get a reference of window's T
-
-    var 
-        protocol = "http";          // server protocol
-          scheme = protocol + "://", // server scheme
-            host = "open.t.qq.com",  // server host
 
     // Core base object
     twb = {
@@ -48,37 +25,13 @@
          *
          * @access public
          */
-        name: "Tencent weibo SDK"
+        name: "Open-JS"
 
 		/**
 		 * SDK version
 		 */
-	   ,version: "1.0"
+	   ,version: "2.0"
 
-		/**
-		 * Client appkey configuration object
-		 */
-	   ,appkey: {
-		   /**
-			* Client appkey
-			*/
-		   value: "{APPKEY}"
-		   /**
-			* Appkey version
-			* -1 not determined
-			* 1 oauth 1.0
-			* 2 oauth 2.0
-			*/
-		  ,version: "{APPKEY_VERSION}"
-          /**
-           * Indicate appkey is valid or not
-           *
-           * Is the http referer matched with the url registered by this appkey?
-           * If appkey is not verified,you may not use this sdk
-		   *
-           */
-		  ,verified: "{APPKEY_VERIFIED}" === "verified"
-	    }
         /**
          * Debug mode
          *
@@ -87,57 +40,11 @@
          * @access public
          */
        ,debug: true
+
 	   /**
-		* send pingback to our server, help us to improve this SDK
+		* Wether send pingback to our server, help us to improve this SDK
 		*/
 	   ,pingback: true
-
-        /**
-         * Domain configration
-         *
-         * @access private
-         */
-       ,_domain: {
-                   api : scheme + host + "{API_URI}"
-          ,       auth : scheme + host + "{AUTH_URI}"
-          ,      query : scheme + host +  "{QUERY_TOKEN_URI}"
-          ,   exchange : scheme + host +  "{EXCHANGE_TOKEN_URI}"
-          , flashproxy : scheme + host +  "{FLASHPROXY_URI}"     // server flash proxy
-          ,serverproxy : scheme + host +  "{SERVERPROXY_URI}"    // server html proxy
-          ,clientproxy : "{CLIENTPROXY_URI}" // autheciation redirect uri
-          //,cdn: "{CDN_URI}"
-        }
-		/*
-		 * global vars 
-		 */
-	   ,_const: {
-		   AUTH_WINDOW_NAME: "authClientProxy_ee5a0f93"
-		  ,AUTH_WINDOW_WIDTH: 575
-		  ,AUTH_WINDOW_HEIGHT: 465
-	    }
-        /**
-         * Cookie configration
-         *
-         * @access private
-         */
-       ,_cookie: {
-           names: {
-               accessToken: "QQWBToken"
-              ,refreshToken: "QQWBRefreshToken"
-           }
-          ,path: "/"
-          ,domain: ""
-        }
-        /**
-         * Rollback window's T to its original value
-         *
-         * @access public
-         * @return {Object} The internal twb object
-         */
-       ,noConflict: function () {
-           originalT && (window.T = originalT);
-           return twb;
-       }
 
         /**
          * Copy things from source into target
@@ -229,84 +136,139 @@
 		   return twb;
        }
 
-       /**
-        * Assign template vars with value
-        *
-        * Usage:
-        *
-        * 1). replace T.appkey from "{APPKEY}" to "123456"
-        *     T.assign("appkey","APPKEY","123456")
-        * 
-        * 2). search in namespace T replace all from "{APPKEY}" to "123456"
-        *     T.assign("","APPKEY","123456")
-        *
-        * 3). replace T.test.appkey from "{APPKEY}" to "123456"
-        *     T.assign("test.appkey","APPKEY","123456")
-        * 
-        * 4). search in namespace T.test replace all from "{APPKEY}" to "123456"
-        *     T.assign("test","APPKEY","123456")
-        *
-        * @deprecated render template vars by js
-        * @access public
-        * @param name {String} namespace
-        * @param replace {String} template vars
-        * @param value {String} replaced value
-        * @return {Void}
-        * @throws {Error}
-        */
-       ,assign: function (name, key, value) {
-            var
-                node = this,
-                lastNode = node,
-                nameParts = name ? name.split(".") : [],
-                c = nameParts.length;
-
-            for (var i=0; i<c; i++) {
-                var
-                    part = nameParts[i],
-                    nso = node[part];
-                if (!nso) { // should we use break here?
-                    throw new Error("Tencent weibo SDK: [ERROR] no such name " + part);
-                }
-                lastNode = node;
-                node = nso;
-            }
-
-            // node is either value of name or namespace
-            if (typeof node === "string") { // value goes here
-                lastNode[part] = node.replace(new RegExp("\\{" + key + "\\}","ig"),value);
-            } else if (typeof node === "object") { // namespace object goes here
-                for (var prop in node) {
-                    if (node.hasOwnProperty(prop) && typeof node[prop] === "string") {
-                        node[prop] = node[prop].replace(new RegExp("\\{" + key + "\\}","ig"),value);
-                    }
-                }
-            }
-       }
-
         /**
          * Generate a random id
          *
          * @access public
          * @return {String} The ramdom ID
          */
-       ,uid: function () {
-           return Math.random().toString(16).substr(2);
+       ,uid: function (optLength) {
+		   var rand = Math.random().toString(16).substr(2);
+		   if (optLength) {
+			   if (rand.length > optLength) {
+				   rand = rand.substr(0,optLength);
+			   } else if (rand.length < optLength) {
+				   for (var i=0,l=optLength-rand.length;i<l;i++) {
+					   rand += Math.random().toString(16).substr(2,1);
+				   }
+			   }
+		   }
+		   return rand;
        }
 
+
+        /**
+         * Rollback window's T to its original value
+         *
+         * @access public
+         * @return {Object} The internal twb object
+         */
+       ,noConflict: function () {
+           originalT && (window.T = originalT);
+           return twb;
+       }
+
+	   /**
+		* Platforms defination
+		*/
+	   ,platforms: {
+		   WEIBO: 0
+		  ,QZONE: 1
+	    }
     };
 
+	twb.extend("_const", {
+		HTTP_PROTOCOL: "http://"
+	   ,HTTPS_PROTOCOL: "https://"
+	   ,API_HOST_WEIBO: "open.t.qq.com"
+	   ,API_HOST_QZONE: "graph.qq.com"
+	   ,AUTH_HOST_WEIBO: "open.t.qq.com"
+	   ,AUTH_HOST_QZONE: "openapi.qzone.qq.com"
+	});
+
+	twb.extend("platforms.data." + twb.platforms.WEIBO, {
+	  	 domain: {
+			  api: twb._const.HTTP_PROTOCOL + twb._const.AUTH_HOST_WEIBO + "/api"
+			 ,auth: twb._const.HTTP_PROTOCOL + twb._const.AUTH_HOST_WEIBO + "/oauth2_html/login.php"
+			 ,iframeProxy: twb._const.HTTP_PROTOCOL + twb._const.AUTH_HOST_WEIBO + "/open-js/proxy.html"
+			 ,flashProxy: twb._const.HTTP_PROTOCOL + twb._const.AUTH_HOST_WEIBO + "/open-js/proxy.swf"
+			 ,exchangeToken: twb._const.HTTP_PROTOCOL + twb._const.AUTH_HOST_WEIBO + "/cgi-bin/exchange_token"
+			 ,autoToken: twb._const.HTTP_PROTOCOL + twb._const.AUTH_HOST_WEIBO + "/cgi-bin/auto_token"
+	  	 }
+		,authWindow: {
+			name: "openjsAuthWindow" + twb.platforms.WEIBO + twb.uid()
+		   ,dimension: {
+				pc: {
+		            width: 575
+		           ,height: 465
+				}
+			   ,mobile: {
+				   width: 0
+				  ,height: 0
+				}
+			}
+		   ,popup: true
+		   ,autoclose: true
+		 }
+		,cookie: {
+			names: {
+				accessToken: "QQWBAccessToken"/* + twb.platforms.WEIBO */
+			   ,refreshToken: "QQWBRefreshToken"/* + twb.platforms.WEIBO */
+			}
+		   ,path: "/"
+		   ,domain: ""
+		 }
+	});
+	twb.extend("platforms.data." + twb.platforms.QZONE, {
+	  	 domain: {
+			  api: twb._const.HTTPS_PROTOCOL + twb._const.API_HOST_QZONE + "/"
+			 ,auth: twb._const.HTTP_PROTOCOL + twb._const.AUTH_HOST_QZONE + "/oauth/show"
+			 ,openid: twb._const.HTTPS_PROTOCOL + twb._const.API_HOST_QZONE + "/oauth2.0/me"
+			 ,iframeProxy: twb._const.HTTPS_PROTOCOL + twb._const.API_HOST_QZONE + "/proxy/proxy.html"
+			 ,flashProxy: twb._const.HTTPS_PROTOCOL + twb._const.API_HOST_QZONE + "/proxy/proxy.swf"
+	  	 }
+		,authWindow: {
+			name: "openjsAuthWindow" + twb.platforms.QZONE + twb.uid()
+		   ,dimension: {
+				pc: {
+		            width: 569
+		           ,height: 468
+				}
+			   ,mobile: {
+				   width: 0
+				  ,height: 0
+				}
+			}
+		   ,popup: true
+		   ,autoclose: true
+		 }
+		,cookie: {
+			names: {
+				accessToken: "QQWBAccessToken" + twb.platforms.QZONE
+			   ,openId: "QQWBOpenId" + twb.platforms.QZONE
+			   ,clientId: "QQWBClientId" + twb.platforms.QZONE
+			}
+		   ,path: "/"
+		   ,domain: ""
+		 }
+	});
+	/**
+	 * getPlatform data if platform not passed
+	 * return current platform's data
+	 */
+	twb.create('getPlatform', function (platform) {
+		platform = platform == null ? QQWB.platform : platform;
+		return QQWB.platforms.data[platform];
+	});
+	/**
+	 * getPlatform appkey if platform not passed
+	 * return current platform's appkey
+	 */
+	twb.create("getAppkey", function (platform) {
+		return QQWB.getPlatform(platform).client.appkey || 0;
+	});
     // alternative names for interal function
     twb.alias('provide','create'); // provide a specific function
-    
     // expose variable
-    twb._alias.call(window,["QQWB","T"],twb); // we probably should only export one global variable
-
-    twb.assign("_domain","API_URI","/api"); // no trailer slash   
-    twb.assign("_domain","AUTH_URI","/oauth2_html/login.php");   
-    twb.assign("_domain","SERVERPROXY_URI","/open-js/proxy.html");   
-    twb.assign("_domain","FLASHPROXY_URI","/open-js/proxy.swf");   
-    twb.assign("_domain","EXCHANGE_TOKEN_URI","/cgi-bin/exchange_token");   
-    twb.assign("_domain","QUERY_TOKEN_URI","/cgi-bin/auto_token");   
-
+    twb._alias.call(window,["QQWB","T"],twb);
 }());

@@ -18,6 +18,7 @@ def usage():
         +"-q --quiet    dont print out log\n"\
         +"-y --yes      dont ask for confirmation\n"\
         +"-l --log      generate log file\n"\
+        +"-c --compress compress the final file\n"\
         +"-m --module   build with specific modules\n\n"\
         +"sample:\n"\
         +"browser,test,load were implied core.browser core.test core.load\n"\
@@ -44,7 +45,7 @@ def scanJsFileInTree(root):
 def scanTree(root, path_filter=None, scan_hidden=False):
     """Scan directory for files"""
     for dirpath,dirnames,filenames in os.walk(root):
-        for dirname in dirnames:
+        for dirname in dirnames[:]:
             if not scan_hidden and dirname.startswith('.'):
                 dirnames.remove(dirname)#dont enter that dir
 
@@ -264,7 +265,7 @@ class Source(object):
                 if line:
                     self.requires.add(line.groups()[0])
 
-def build(modulenames, targetfile, createlog=False):
+def build(modulenames, targetfile, createlog=False, compress=False):
 
     """start build library"""
 
@@ -301,6 +302,10 @@ def build(modulenames, targetfile, createlog=False):
         logfile.write("\n".join(["<script src=\"" + source.path.replace(_CWD,"..").replace("\\","/") + "\"></script>" for source in sources]))
         logfile.close()
 
+    if not compress:
+        return
+
+    # create minified file ?
     # packing javascript
     basefile,extension = os.path.splitext(targetfile)
     minifiedfile = "".join([basefile,".min",extension])
@@ -842,9 +847,10 @@ def main(argv):
     fileList=False # 创建文件列表清单文件
     savedDirectory=os.path.join(_CWD,"build")
     savedFileName="all.js" #默认目标文件名
+    compress=False #创建压缩版本的JS
 
     try:
-        opts,args = getopt.getopt(argv, "hqylm:",["help","quiet","yes","log","module="])
+        opts,args = getopt.getopt(argv, "hqylcm:",["help","quiet","yes","log","compress","module="])
     except getopt.GetoptError,err:
         log.error(str(err))
         usage()
@@ -859,6 +865,8 @@ def main(argv):
             executeDirectly = True
         elif opt in ("-l","--log"):
             fileList = True
+        elif opt in ("-c","--compress"):
+            compress = True
         elif opt in ("-m","--module"):
             opt = arg.split(",")
             for m in opt:
@@ -873,7 +881,7 @@ def main(argv):
         log.setLevel(logging.FATAL)
 
     if executeDirectly:
-        build(modules,savedFilePath,fileList)
+        build(modules,savedFilePath,fileList,compress)
         return
 
     #询问是否继续
@@ -893,7 +901,7 @@ def main(argv):
     while True:
         confirm = raw_input(">>>")
         if confirm.lower() == "yes":
-            build(modules,savedFilePath,fileList)
+            build(modules,savedFilePath,fileList,compress)
             break
         elif confirm.lower() == "no":
             sys.exit(0)

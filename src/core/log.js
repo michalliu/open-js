@@ -152,7 +152,7 @@ QQWB.extend("log", {
            ,message: message
            ,frame: window != window.parent ? "*":""
 		   ,source: window.name ? window.name : ""
-		   ,popup: (window.opener || window.name === QQWB._const.AUTH_WINDOW_NAME) ? "#":""
+		   ,popup: (window.opener || window.name.indexOf("openjsAuthWindow") == 0) ? "#":""
         });
 
         // capture message

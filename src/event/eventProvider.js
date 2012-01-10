@@ -60,6 +60,7 @@ QQWB.extend("_eventProvider",{
 			   for (var i=0,l=handlers.length; i<l; i++) {
 				   if (handler === handlers[i]) {
 					   handlers[i] = null;
+					   handlers = handlers.splice(i,1);
 				   }
 			   }
 		   } else { // unbind all the handlers
@@ -83,6 +84,8 @@ QQWB.extend("_eventProvider",{
 			   var handler = handlers[i];
 			   if (handler) {
 				   handler.call(QQWB,data);
+			   } else { // handler already set to null, then remove it
+			       QQWB._eventProvider.unbind(name, handler);
 			   }
            }
 	   }

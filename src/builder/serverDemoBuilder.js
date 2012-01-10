@@ -8,7 +8,9 @@
  * @package builder
  * @module openjsServerSideDemoBuilder
  * @requires base
+ *           core.api
  *           weibo.api
+ *           qzone.api
  *           auth.auth
  *           core.deferred
  *           core.io

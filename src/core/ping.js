@@ -62,6 +62,8 @@ QQWB.extend("ping", {
 	// ping when appkey initilizing, success or unsuccess
    ,pingInit: function () {
 
+	   // encode client info
+	   // browser browser's feature
 	   function getClientInfo () {
 		  var clientInfo = 1000000 
 		      feature = 0;
@@ -90,13 +92,23 @@ QQWB.extend("ping", {
 
 		  clientInfo += feature;
 
-		  // 1000(browertype)0(browserfeature)
-		  //
 		  return clientInfo;
 	   };
 
+	   // encode app info
+	   // appkey version
+	   // app platform
+	   // app platform os
 	   function getAppInfo () {
-		   var appInfo = 1000000;
+
+		   var appInfo = 1000000,
+		       appkeyVersion = QQWB.getPlatform().client.appkeyVersion,
+		       appkeyVersionNotSet = 0,
+			   appPlatform = typeof QQWB.platform == "number" ? QQWB.platform : 9,
+			   appkey = QQWB.getAppkey();
+
+		   appInfo += appPlatform * 1000; // 0 weibo; 1 qzone; and more...
+
 		   if (QQWB.browser.platform.mobile) {
 			   appInfo += 100;
 		   } else /*if (QQWB.browser.platform.pc)*/{
@@ -117,7 +129,8 @@ QQWB.extend("ping", {
 			   appInfo += 60;
 		   }
 
-		   appInfo += parseInt(QQWB.appkey.version,10);
+		   // appkeyVersion 0 (notset)
+		   appInfo += appkeyVersion ? appkeyVersion : appkeyVersionNotSet;
 
 		   // 1000(platform)(os)(appkeyversion)
 		   return appInfo;
@@ -125,10 +138,10 @@ QQWB.extend("ping", {
 
 	   return QQWB.ping.pingWith({
 		    sOp: "init"
-		   ,iFrom: QQWB.version.replace(/\./g,"")
+		   ,iFrom: parseInt(QQWB.version.replace(/\./g,""),10) + (typeof QQWB.platform != "number" ? -1 : QQWB.platform)
 		   ,iPubFrom: getAppInfo()
 		   ,sUrl: [document.title,document.location.href].join(QQWB.ping._paramSeprator)
-		   ,sText: QQWB.appkey.value
+		   ,sText: QQWB.getAppkey()
 		   ,iBak1: getClientInfo()
 	   }, QQWB.ping._stupidPingParamsOrder.concat("iFrom","iPubFrom","sUrl","iUrlType"
 	                                             ,"iPos","sText","iBak1","iBak2","sBak1","sBak2"));
@@ -138,9 +151,9 @@ QQWB.extend("ping", {
 	   return QQWB.ping.pingWith({
 		    sOp: "login"
 		   ,iSta: success ? 1 : 0
-		   ,iFrom: QQWB.version.replace(/\./g,"")
-		   ,sUrl: document.location.href
-		   ,sText: QQWB.appkey.value
+		   ,iFrom: parseInt(QQWB.version.replace(/\./g,""),10) + (typeof QQWB.platform != "number" ? -1 : QQWB.platform)
+		   ,sUrl: [document.title,document.location.href].join(QQWB.ping._paramSeprator)
+		   ,sText: QQWB.getAppkey()
 	   }, QQWB.ping._stupidPingParamsOrder.concat("iFrom","iPubFrom","sUrl","iUrlType"
 	                                             ,"iPos","sText","iBak1","iBak2","sBak1","sBak2"));
     }
@@ -202,10 +215,10 @@ QQWB.extend("ping", {
 	   return QQWB.ping.pingWith({
 		    sOp: "api"
 		   ,iSta: status
-		   ,iFrom: QQWB.version.replace(/\./g,"")
+		   ,iFrom: parseInt(QQWB.version.replace(/\./g,""),10) + (typeof QQWB.platform != "number" ? -1 : QQWB.platform)
 		   ,iPubFrom: solutionInfo
-		   ,sUrl: document.location.href
-		   ,sText: QQWB.appkey.value
+		   ,sUrl: [document.title,document.location.href].join(QQWB.ping._paramSeprator)
+		   ,sText: QQWB.getAppkey()
 		   ,iBak1: responseTime
 		   ,sBak1: [apiname, params].join(QQWB.ping._paramSeprator)
 		   //,sBak2: statusText
@@ -213,4 +226,3 @@ QQWB.extend("ping", {
 	                                             ,"iPos","sText","iBak1","iBak2","sBak1","sBak2"));
     }
 });
-

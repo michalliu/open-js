@@ -5,6 +5,7 @@
 	import flash.events.Event; 
     import flash.events.ErrorEvent; 
 	import flash.events.IOErrorEvent; 
+	import flash.events.HTTPStatusEvent; 
 	import flash.events.SecurityErrorEvent; 
 	import flash.net.URLLoader; 
 	import flash.net.URLLoaderDataFormat; 
@@ -14,6 +15,7 @@
 	import flash.net.URLVariables; 
 	import flash.system.Security;
     Security.allowDomain("*");
+	Security.allowInsecureDomain("*");
 	
 	public class proxy extends MovieClip
 	{
@@ -25,7 +27,6 @@
 		
 		private function httpRequest (uri:String, param:String="", method:String="GET"):void
 		{
-			
 		    var 
 		        urlRequest:URLRequest = new URLRequest(uri),
 		    	urlLoader:URLLoader = new URLLoader();
@@ -50,6 +51,7 @@
 		    urlLoader.addEventListener(Event.COMPLETE, urlRequestComplete);
 		    urlLoader.addEventListener(IOErrorEvent.IO_ERROR, urlRequestError);
 		    urlLoader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, urlRequestError);
+			urlLoader.addEventListener(HTTPStatusEvent.HTTP_STATUS, urlRequestProcessing);
 			try {
 		        urlLoader.load(urlRequest);
 			} catch (error:Error) {
@@ -71,6 +73,10 @@
 		private function urlRequestError(e:ErrorEvent):void {
 			ExternalInterface.call("QQWB.log.warning","[proxy.swf] URL request error " + e.type);
 			ExternalInterface.call("onFlashRequestComplete_8df046",e);
+		}
+		
+		private function urlRequestProcessing(e:HTTPStatusEvent):void {
+			ExternalInterface.call("QQWB.log.info","[proxy.swf] http status change " + " phase "+ e.eventPhase + "," + e.type + " " + e.status);
 		}
 		
 	}
