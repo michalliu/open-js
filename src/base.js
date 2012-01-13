@@ -225,7 +225,7 @@
 			 ,auth: twb._const.HTTP_PROTOCOL + twb._const.AUTH_HOST_QZONE + "/oauth/show"
 			 ,openid: twb._const.HTTPS_PROTOCOL + twb._const.API_HOST_QZONE + "/oauth2.0/me"
 			 ,iframeProxy: twb._const.HTTPS_PROTOCOL + twb._const.API_HOST_QZONE + "/proxy/proxy.html"
-			 ,flashProxy: twb._const.HTTPS_PROTOCOL + twb._const.API_HOST_QZONE + "/proxy/proxy.swf"
+			 ,flashProxy: twb._const.HTTPS_PROTOCOL + twb._const.API_HOST_QZONE + "/proxy/proxy_v15.swf"
 	  	 }
 		,authWindow: {
 			name: "openjsAuthWindow" + twb.platforms.QZONE + twb.uid()

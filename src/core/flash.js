@@ -67,7 +67,7 @@ QQWB.extend("flash",{
                               ,  'type="application/x-shockwave-flash"'
                               ,  'id="' + movieName + '"'
                               ,  QQWB.browser.msie ? 'name="' + movieName +  '"' : ''
-                              ,  QQWB.browser.msie ? 'data="' + swfPath + '"' : ''
+                              ,  QQWB.browser.msie ? 'data="' + swfPath + '"' : ''//FIXME: IE下会触发两次HTTP请求
                               ,  QQWB.browser.msie ? 'classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"' : ''
                               ,  'allowscriptaccess="always">'
                               ,  '<param name="movie" value="' + swfPath + '"></param>'

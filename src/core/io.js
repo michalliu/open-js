@@ -119,7 +119,7 @@ QQWB.extend("io", {
                        xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
                    }
 				   xhr.setRequestHeader("X-Requested-With","XMLHttpRequest");
-				   xhr.setRequestHeader("X-Requested-From","TencentWeiboJavascriptSDK");
+				   xhr.setRequestHeader("X-Requested-From","openjs");
 			   } catch (ex) {}
 
 			   xhr.send(cfg.data || null);
@@ -189,9 +189,15 @@ QQWB.extend("io", {
 					           complete(status, statusText, QQWB.time.now() - started, response, responses.text, responseHeaders, cfg.dataType); // take cfg.dataType back
 						   //}
 					   } // end readyState 4
-			       } catch (firefoxException) {
+			       } catch (firefoxOrInvalidJSONFormatParserException) {
+					   var ex = firefoxOrInvalidJSONFormatParserException;
 					   status = -2;
-					   statusText = (firefoxException && firefoxException.message) ? firefoxException.message : firefoxException;
+                       statusText = "";
+					   statusText += "Exception [Type:";
+					   statusText += (ex && ex.type) ? ex.type : "unknown exception type";
+					   statusText += ", Message:";
+					   statusText += (ex && ex.message) ? ex.message : ex;
+					   statusText += "]";
 					   QQWB.log.warning("caught " + statusText + " exception QQWB.io._IOAjax");
 					   if (!isAbort) {
 				           clearTimeout(ajaxTimeout);
@@ -256,17 +262,16 @@ QQWB.extend("io", {
 
 				       if (callback && (isAbort || readyState == 4)) {
 
-				           callback = null;
+				           callback = null; // to avoid memory leak in IE
 
 				           if (isAbort) {
 				        	   complete(-1, "request has aborted", QQWB.time.now() - started);
 				           } else {
-				        	   var success = /complete/i.test(_.type);
-				        	   status = success ? 200 : 204;
-				        	   statusText = success ? "ok" : _.type;
-				        	   responseHeaders = ""; //FIXME: fill responseHeaders with datas
-				        	   responses = {}; // internal object
-				        	   responses.text = _.target.data;
+							   status = this["httpStatus"];
+							   statusText = this["httpStatus"] == 200 ? "ok" : "";
+							   responseHeaders = ""; //flash don't support that this should be filled at future
+							   responses = {}; // internal object
+							   responses.text = this["httpResponseText"];
 
 				        	   if (cfg.dataType.toLowerCase() == "json") { // parse to json object
 				        		   response = QQWB.JSON.fromString(responses.text);
@@ -281,9 +286,15 @@ QQWB.extend("io", {
 				        	   complete(status, statusText, QQWB.time.now() - started, response, responses.text, responseHeaders, cfg.dataType);
 						   //}
 					   }
-					} catch (ex) {
+					} catch (firefoxOrInvalidJSONFormatParserException) {
+					   var ex = firefoxOrInvalidJSONFormatParserException;
 					   status = -2;
-					   statusText = (ex && ex.message) ? ex.message : ex;
+                       statusText = "";
+					   statusText += "Exception [Type:";
+					   statusText += (ex && ex.type) ? ex.type : "unknown exception type";
+					   statusText += ", Message:";
+					   statusText += (ex && ex.message) ? ex.message : ex;
+					   statusText += "]";
 					   QQWB.log.warning("caught " + statusText + " exception QQWB.io._IOFlash");
 					   if (!isAbort) {
 					       complete(status, statusText, QQWB.time.now() - started);
@@ -291,26 +302,90 @@ QQWB.extend("io", {
 					}
 			   };
 
-			   // register flash message callback
-			   // lazy initialize flash message callbacks
+			   // Init flash external interface callback function
 			   if (!window.onFlashRequestComplete_8df046) {
 
-				   // this function will be called by flash when httpRequest is done
-                   window.onFlashRequestComplete_8df046 = function (event) {
-					   // first in first out
-					   onFlashRequestComplete_8df046.callbacks.shift()(event);
+                   // this function will be called by flash when httpRequest is done
+                   window.onFlashRequestComplete_8df046 = function (eventData) {
+
+					   if (!eventData.ticket) {
+						   QQWB.log.error("ticket doesn't exists in response, " + QQWB.JSON.stringify(eventData));
+						   return;
+					   }
+
+					   var callback = window.onFlashRequestComplete_8df046.callbacks.getByTicket(eventData.ticket),
+					       srcEvt = eventData.srcEvent;
+					   // flash proxy send http response by two times 
+					   // first time is http status code
+					   // second time is http response body
+					   // when http status code responsed we dont take any action, just cache the result and waiting for response body responsed
+					   // sample response as follows
+                       // {"ticket":"0","srcEvent":{"responseURL":null,"status":200,"responseHeaders":[],"eventPhase":2,"type":"httpStatus","bubbles":false,"cancelable":false,"target":{"dataFormat":"text","bytesTotal":1,"bytesLoaded":1},"currentTarget":{"dataFormat":"text","bytesTotal":1,"bytesLoaded":1}}} 
+                       // {"ticket":"0","srcEvent":{"eventPhase":2,"type":"complete","bubbles":false,"cancelable":false,"target":{"dataFormat":"text","data":"0","bytesTotal":1,"bytesLoaded":1},"currentTarget":{"dataFormat":"text","data":"0","bytesTotal":1,"bytesLoaded":1}}} 
+                       
+                       
+                       // {"ticket":"0","srcEvent":{"responseURL":null,"status":401,"responseHeaders":[],"eventPhase":2,"type":"httpStatus","bubbles":false,"cancelable":false,"target":{"dataFormat":"text","bytesTotal":0,"bytesLoaded":0},"currentTarget":{"dataFormat":"text","bytesTotal":0,"bytesLoaded":0}}} 
+                       // {"ticket":"0","srcEvent":{"errorID":2032,"text":"Error #2032","eventPhase":2,"type":"ioError","bubbles":false,"cancelable":false,"target":{"dataFormat":"text","data":"","bytesTotal":0,"bytesLoaded":0},"currentTarget":{"dataFormat":"text","data":"","bytesTotal":0,"bytesLoaded":0}}} 
+                       
+                       
+                       // {"ticket":"0","srcEvent":{"responseURL":null,"status":0,"responseHeaders":[],"eventPhase":2,"type":"httpStatus","bubbles":false,"cancelable":false,"target":{"dataFormat":"text","bytesTotal":0,"bytesLoaded":0},"currentTarget":{"dataFormat":"text","bytesTotal":0,"bytesLoaded":0}}} 
+                       // {"ticket":"0","srcEvent":{"errorID":2170,"text":"Error #2170","eventPhase":2,"type":"securityError","bubbles":false,"cancelable":false,"target":{"dataFormat":"text","bytesTotal":0,"bytesLoaded":0},"currentTarget":{"dataFormat":"text","bytesTotal":0,"bytesLoaded":0}}} 
+					   // 
+					   if (!callback.readyState) {
+                           callback.readyState = 0;
+					   }
+
+					   if (/httpStatus/i.test(srcEvt.type)) { // this is a http status code response, cache it
+					       callback["httpStatus"] = srcEvt.status
+                           callback.readyState++;
+					   } else if (/error/i.test(srcEvt.type)) { // possible io_Error or security error
+					       callback["httpError"] = srcEvt.type
+                           callback.readyState++;
+					   } else if (/complete/i.test(srcEvt.type)) {
+					       callback["httpResponseText"] = srcEvt.target.data
+                           callback.readyState++;
+					   }
+
+					   if (callback.readyState == 2) {
+					       callback.call(callback);
+						   window.onFlashRequestComplete_8df046.callbacks.unregister(eventData.ticket)
+					   }
+
                    };
 
-				   // our callback queue
-                   window.onFlashRequestComplete_8df046.callbacks = [];
-		       }
-
-			   // push to queue
-               window.onFlashRequestComplete_8df046.callbacks.push(callback);
+				   // hashtable for callbacks 
+				   window.onFlashRequestComplete_8df046.callbacks = {
+					   _callbackPool:{}
+					  ,_ticketPrefix: "openjstkt"
+					  ,_ticketStartIndex: 0
+					  ,register: function (cb) {
+						  var ticket;
+						  this._ticketStartIndex++;
+						  ticket = this._ticketPrefix + this._ticketStartIndex;
+						  this._callbackPool[ticket] = cb;
+						  return ticket;
+					   }
+					  ,getByTicket: function (ticket) {
+						  if (!this._callbackPool[ticket]) {
+							  QQWB.log.error("get callback failed, callback doesn't exist at ticket " + ticket);
+						  }
+					      return this._callbackPool[ticket];
+					  }
+					  ,unregister: function (ticket) {
+						  if (this._callbackPool[ticket]) {
+							  delete this._callbackPool[ticket];
+							  return true;
+						  } else {
+							  QQWB.log.error("unregister callback failed, callback doesn't exist at ticket " + ticket);
+							  return false;
+						  }
+					  }
+				   };
+			   }
 			   
 			   if (cfg.flashObj && cfg.flashObj.httpRequest) {
 				   try {
-			           cfg.flashObj.httpRequest(cfg.url,cfg.data,cfg.type);
+					   cfg.flashObj.httpRequest(cfg.url,cfg.data,cfg.type,window.onFlashRequestComplete_8df046.callbacks.register(callback));
 				   } catch (pluginError) {
 					   var status = -2,
 					       statusText = (pluginError && pluginError.message) ? pluginError.message : pluginError;
@@ -320,7 +395,7 @@ QQWB.extend("io", {
 			   } else {
 			       QQWB.log.critical("flash transportation object error");
 			   }
-		   }
+		   } // end send
 
 		  ,abort: function () {
 			  if (callback) {
