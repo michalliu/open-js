@@ -1,0 +1,146 @@
+SDK source
+module:base
+package:
+requires:
+includes:
+author:michalliu
+version:1.0
+path:D:\Server\Apache2.2\htdocs\openjs\src\base.js
+
+SDK source
+module:log
+package:core
+requires:base
+includes:
+author:michalliu
+version:1.0
+path:D:\Server\Apache2.2\htdocs\openjs\src\core\log.js
+
+SDK source
+module:time
+package:util
+requires:base
+includes:
+author:michalliu
+version:1.0
+path:D:\Server\Apache2.2\htdocs\openjs\src\util\time.js
+
+SDK source
+module:String
+package:common
+requires:base
+includes:
+author:michalliu
+version:1.0
+path:D:\Server\Apache2.2\htdocs\openjs\src\common\string.js
+
+SDK source
+module:bigtable
+package:util
+requires:base,common.String
+includes:
+author:michalliu
+version:1.0
+path:D:\Server\Apache2.2\htdocs\openjs\src\util\bigtable.js
+
+SDK source
+module:Function
+package:common
+requires:base
+includes:
+author:michalliu
+version:1.0
+path:D:\Server\Apache2.2\htdocs\openjs\src\common\function.js
+
+SDK source
+module:Array
+package:common
+requires:base,String
+includes:
+author:michalliu
+version:1.0
+path:D:\Server\Apache2.2\htdocs\openjs\src\common\array.js
+
+SDK source
+module:deferred
+package:util
+requires:base,common.Function,common.Array
+includes:
+author:michalliu
+version:1.0
+path:D:\Server\Apache2.2\htdocs\openjs\src\util\deferred.js
+
+SDK source
+module:init
+package:core
+requires:util.bigtable,util.deferred,base
+includes:
+author:michalliu
+version:1.0
+path:D:\Server\Apache2.2\htdocs\openjs\src\core\init.js
+
+SDK source
+module:io
+package:core
+requires:core.log,base,util.time,core.init,util.bigtable
+includes:
+author:michalliu
+version:1.0
+path:D:\Server\Apache2.2\htdocs\openjs\src\core\io.js
+
+SDK source
+module:util
+package:weibo
+requires:base,common.String
+includes:
+author:michalliu
+version:1.0
+path:D:\Server\Apache2.2\htdocs\openjs\src\weibo\util.js
+
+SDK source
+module:queryString
+package:util
+requires:base
+includes:
+author:michalliu
+version:1.0
+path:D:\Server\Apache2.2\htdocs\openjs\src\util\queryString.js
+
+ThirdPartySource JSON2
+licence:Public Domain
+author:crockford
+path:D:\Server\Apache2.2\htdocs\openjs\src\.third-party\json2.js
+
+SDK source
+module:JSON
+package:common
+requires:base,String,JSON2
+includes:
+author:michalliu
+version:1.0
+path:D:\Server\Apache2.2\htdocs\openjs\src\common\json.js
+
+SDK source
+module:proxy
+package:builder
+requires:core.io,core.log,weibo.util,util.queryString,base,core.init,util.bigtable,common.JSON,common.Array,common.String
+includes:
+author:michalliu
+version:1.0
+path:D:\Server\Apache2.2\htdocs\openjs\src\builder\proxy.js
+
+<script src="../src/base.js"></script>
+<script src="../src/core/log.js"></script>
+<script src="../src/util/time.js"></script>
+<script src="../src/common/string.js"></script>
+<script src="../src/util/bigtable.js"></script>
+<script src="../src/common/function.js"></script>
+<script src="../src/common/array.js"></script>
+<script src="../src/util/deferred.js"></script>
+<script src="../src/core/init.js"></script>
+<script src="../src/core/io.js"></script>
+<script src="../src/weibo/util.js"></script>
+<script src="../src/util/queryString.js"></script>
+<script src="../src/.third-party/json2.js"></script>
+<script src="../src/common/json.js"></script>
+<script src="../src/builder/proxy.js"></script>

@@ -1,0 +1,87 @@
+﻿<items>
+        <item label="时间线:    主页时间线" param="pageflag|reqnum|pagetime" value="0|20|0" method="get" api="statuses/home_timeline" />
+        <item label="时间线:    vip用户时间线" param="pageflag|reqnum|pagetime|lastid" value="0|2|0|" method="get" api="statuses/home_timeline_vip" />
+        <item label="时间线:    广播大厅时间线" param="pos|reqnum" value="0|20" method="get" api="statuses/public_timeline" />
+        <item label="时间线:    其他用户发表时间线" param="pageflag|pagetime|reqnum|lastid|name" value="0|0|20|0|t" method="get" api="statuses/user_timeline" />
+        <item label="时间线:    @提到我的时间线" param="pageflag|pagetime|reqnum|lastid|type" value="0|0|20|0|0x1" method="get" api="statuses/mentions_timeline" />
+        <item label="时间线:    话题时间线" param="httext|pageflag|pageinfo|reqnum" value="pBoard|0||20" method="post" api="statuses/ht_timeline" />
+		<item label="时间线:    我发表时间线" param="pageflag|pagetime|reqnum|lastid" value="0|0|20|0" method="get" api="statuses/broadcast_timeline" />
+		<item label="时间线:    特别收听的人发表时间线" param="pageflag|pagetime|reqnum" value="0|0|20" method="get" api="statuses/special_timeline" />
+		<item label="时间线:    我发表时间线索引" param="pageflag|pagetime|reqnum|lastid|type|contenttype|accesslevel" value="0|20|||||" method="get" api="statuses/broadcast_timeline_ids" />
+		<item label="时间线:    首页时间线索引" param="pageflag|pagetime|reqnum|lastid|type|contenttype|accesslevel" value="0|20|||||" method="get" api="statuses/home_timeline_ids" />
+		<item label="时间线:    提及我的时间线索引" param="pageflag|pagetime|reqnum|lastid|type|contenttype|accesslevel" value="0|20|||||" method="get" api="statuses/mentions_timeline_ids" />
+		<item label="时间线:    用户发表时间线索引" param="pageflag|pagetime|reqnum|lastid|name|type|contenttype|accesslevel" value="0|20|||t|||" method="get" api="statuses/user_timeline_ids" />
+		<item label="时间线:    多用户发表时间线" param="pageflag|pagetime|reqnum|lastid|names|type|contenttype|accesslevel" value="0|20|||t,api_weibo|||" method="get" api="statuses/users_timeline" />
+		<item label="时间线:    多用户发表时间线索引" param="pageflag|pagetime|reqnum|lastid|names|type|contenttype|accesslevel" value="0|20|||t,api_weibo|||" method="get" api="statuses/users_timeline_ids" />
+		<item label="时间线:    同城发表时间线" param="pos|reqnum|country|province|city" value="0|20|1|11|1" method="get" api="statuses/area_timeline" />
+		<item label="时间线:    话题时间线(修复翻页问题)" param="reqnum|pageflag|flag|accesslevel|type|contenttype|httext|htid" value="10|0|0|0|0|0|iweibo|0" method="get" api="statuses/ht_timeline_ext" />
+		<item label="微博相关:  获取一条微博数据" param="id" value="51545056800467" method="get" api="t/show" />
+		<item label="微博相关:  发表一条微博" param="content|clientip|jing|wei" value="test|127.0.0.1||" method="post" api="t/add" />
+		<item label="微博相关:  删除一条微博" param="id" value="94035056272295" method="post" api="t/del" />
+		<item label="微博相关:  转播一条微博" param="content|clientip|jing|wei|reid" value="test|127.0.0.1|||77048060858014" method="post" api="t/re_add" />
+		<item label="微博相关:  回复一条微博" param="content|clientip|jing|wei|reid" value="test|127.0.0.1|||77048060858014" method="post" api="t/reply" />
+		<item label="微博相关:  发表一条图片微博" param="content|clientip|jing|wei|pic" value="test|127.0.0.1|||" method="post" api="t/add_pic" />
+		<item label="微博相关:  发表一条心情微博" param="content|clientip|jing|wei|signtype" value="test|127.0.0.1|||0" method="post" api="t/add_emotion" />
+		<item label="微博相关:  转播数或点评数" param="ids|flag" value="12704604231530709392|0" method="post" api="t/re_count" />
+		<item label="微博相关:  获取单条微博的转发和点评列表" param="flag|rootid|pageflag|pagetime|reqnum|twitterid" value="0|92035070199751|1|0|2|0" method="get" api="t/re_list" />
+		<item label="微博相关:  点评一条微博" param="content|clientip|jing|wei|reid" value="test|127.0.0.1|||28135069067568" method="post" api="t/comment" />
+		<item label="微博相关:  发表音频微博" param="content|clientip|jing|wei|url|title|author|reid" value="test|127.0.0.1|||http://url.cn|歌名|演唱者|12345678" method="post" api="t/add_music" />
+		<item label="微博相关:  发表视频微博" param="content|clientip|jing|wei|url" value="test|127.0.0.1|||http://url.cn" method="post" api="t/add_video" />
+		<item label="微博相关:  发表视频微博" param="content|clientip|jing|wei|url" value="test|127.0.0.1|||http://url.cn" method="post" api="t/add_video" />
+		<item label="微博相关:  获取视频信息" param="url" value="http://v.youku.com/v_show/id_XMjExODczODM2.html" method="post" api="t/getvideoinfo" />
+		<item label="微博相关:  根据微博ID批量得到微博数据" param="ids" value="39110101242147,39578069128701" method="get" api="t/list" />
+		<item label="微博相关:  预发表一条视频微博" param="content|clientip|jing|wei|vid|title" value="test|127.0.0.1||||" method="get" api="t/add_video_prev" />
+		<item label="微博相关:  获取转播的再次转播数" param="ids" value="8171051658365,55054116813124" method="get" api="t/sub_re_count" />
+		<item label="账户相关:  获取自己的详细资料" param="" value="" method="get" api="user/info" />
+		<item label="账户相关:  更新个人资料" param="nick|sex|year|month|day|countrycode|provincecode|citycode|introduction" value="||2000|1|1|1|11|1|xxxx" method="post" api="user/update" />
+		<item label="账户相关:  更新个人教育信息" param="year|level|schoolid|field|departmentid" value="1995|1|1|1|1" method="post" api="user/update_edu" />
+		<item label="账户相关:  更新个人资料头像" param="pic" value="" method="post" api="user/update_head" />
+		<item label="账户相关:  获取其他人资料" param="name" value="t" method="get" api="user/other_info" />
+		<item label="账户相关:  多用户信息" param="names" value="t,api_weibo" method="post" api="user/infos" />
+		<item label="账户相关:  验证账户是否合法（是否注册微博）" param="name" value="t" method="post" api="user/verify" />
+		<item label="账户相关:  获取心情微博" param="name|pageflag|id|timstamp|type|contenttype|accesslevel|emotiontype|reqnum" value="t|0|0|0|0|1|0|0xFFFFFFFF|10" method="post" api="user/emotion" />
+		<item label="关系链相关:我的听众列表" param="reqnum|startindex" value="20|0" method="get" api="friends/fanslist" />
+		<item label="关系链相关:我收听的人列表" param="reqnum|startindex" value="20|0" method="get" api="friends/idollist" />
+		<item label="关系链相关:黑名单列表" param="reqnum|startindex" value="20|0" method="get" api="friends/blacklist" />
+		<item label="关系链相关:特别收听列表" param="reqnum|startindex" value="20|0" method="get" api="friends/speciallist" />
+		<item label="关系链相关:收听某个用户" param="name" value="t" method="post" api="friends/add" />
+		<item label="关系链相关:取消收听某个用户" param="name" value="t" method="post" api="friends/del" />
+		<item label="关系链相关:特别收听某个用户" param="name" value="t" method="post" api="friends/addspecial" />
+		<item label="关系链相关:取消特别收听某个用户" param="name" value="t" method="post" api="friends/delspecial" />
+		<item label="关系链相关:添加某个用户到黑名单" param="name" value="t" method="post" api="friends/addblacklist" />
+		<item label="关系链相关:从黑名单中删除某个用户" param="name" value="t" method="post" api="friends/delblacklist" />
+		<item label="关系链相关:检查是否我的听众或收听的人" param="names|flag" value="t|2" method="get" api="friends/check" />
+		<item label="关系链相关:其他账户听众列表" param="reqnum|startindex|name" value="30|0|t" method="get" api="friends/user_fanslist" />
+		<item label="关系链相关:其他账户收听的人列表" param="reqnum|startindex|name" value="30|0|t" method="get" api="friends/user_idollist" />
+		<item label="关系链相关:其他账户特别收听的人列表" param="reqnum|startindex|name" value="30|0|" method="get" api="friends/user_speciallist" />
+		<item label="关系链相关:多听众列表" param="reqnum|startindex" value="100|0" method="get" api="friends/fanslist_s" />
+		<item label="关系链相关:多收听人列表" param="reqnum|startindex" value="100|0" method="get" api="friends/idollist_s" />
+		<item label="关系链相关:互听关系链列表" param="name|startindex|reqnum" value="t|0|30" method="get" api="friends/mutual_list" />
+		<item label="私信相关:  发私信" param="content|clientip|jing|wei|name" value="test|127.0.0.1|||mmplayer" method="post" api="private/add" />
+		<item label="私信相关:  删除一条私信" param="id" value="26154115313103" method="post" api="private/del" />
+		<item label="私信相关:  收件箱" param="pageflag|pagetime|reqnum|lastid" value="0|0|20|0" method="get" api="private/recv" />
+		<item label="私信相关:  发件箱" param="pageflag|pagetime|reqnum|lastid" value="0|0|20|0" method="get" api="private/send" />
+		<item label="搜索相关:  搜索用户" param="keyword|pagesize|page" value="test|10|1" method="get" api="search/user" />
+		<item label="搜索相关:  搜索微博" param="keyword|pagesize|page" value="test|10|1" method="get" api="search/t" />
+		<item label="搜索相关:  通过标签搜索用户" param="keyword|pagesize|page" value="test|10|1" method="get" api="search/userbytag" />
+		<item label="热度趋势:  话题热榜" param="type|reqnum|pos" value="3|20|0" method="get" api="trends/ht" />
+		<item label="热度趋势:  热门转播" param="reqnum|pos" value="20|0" method="get" api="trends/t" />
+		<item label="查看数据:  更新条数" param="op|type" value="0|9" method="get" api="info/update" />
+		<item label="数据收藏:  收藏一条微博" param="id" value="123456789" method="post" api="fav/addt" />
+		<item label="数据收藏:  取消收藏一条微博" param="id" value="123456789" method="post" api="fav/delt" />
+		<item label="数据收藏:  收藏的微博列表" param="pageflag|nexttime|prevtime|reqnum|lastid" value="0|0|0|20|0" method="get" api="fav/list_t" />
+		<item label="数据收藏:  订阅话题" param="id" value="123456789" method="post" api="fav/addht" />
+		<item label="数据收藏:  取消收藏话题" param="id" value="123456789" method="post" api="fav/delht" />
+		<item label="数据收藏:  获取已订阅话题列表" param="reqnum|pageflag|pagetime|lastid" value="20|0|0|0" method="get" api="fav/list_ht" />
+		<item label="话题相关:  根据话题名称查询话题ID" param="httexts" value="abc,efg" method="get" api="ht/ids" />
+		<item label="话题相关:  根据话题ID获取话题相关微博" param="ids" value="12704604231530709392" method="get" api="ht/info" />
+		<item label="标签相关:  添加标签" param="tag" value="snow" method="post" api="tag/add" />
+		<item label="标签相关:  删除标签" param="tagid" value="5131240618185167659" method="post" api="tag/del" />
+		<item label="其他:      我可能认识的人" param="ip|country_code|province_code|city_code" value="127.0.0.1|||" method="get" api="other/kownperson" />
+		<item label="其他:      可能认识的人" param="" value="" method="get" api="other/kownperson" />
+		<item label="其他:      短URL转长URL" param="url" value="3M6GSa" method="get" api="other/shorturl" />
+		<item label="其他:      获取表情接口" param="type" value="0" method="get" api="other/get_emotions" />
+		<item label="其他:      我可能认识的人" param="ip" value="127.0.0.1" method="get" api="other/kownperson" />
+		<item label="其他:      获取视频上传的key" param="" value="" method="get" api="other/videokey" />
+		<item label="其他:      一键转播热门排行" param="" value="" method="get" api="other/gettopreadd" />
+</items>

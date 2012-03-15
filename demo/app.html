@@ -1,0 +1,103 @@
+<!doctype html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="zh-CN"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="zh-CN"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js ie8 oldie" lang="zh-CN"> <![endif]-->
+<!--[if gt IE 8]><!--><html class="no-js" lang="zh-CN"> <!--<![endif]-->
+<head>
+	<meta charset="utf-8">
+	<title>Hometimline App</title>
+	<meta name="description" content="">
+	<meta name="author" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="">
+    <!--[if lt IE 7]><script src="http://192.168.2.101/openjs/tools/firebug-lite/build/firebug-lite.js"></script><![endif]-->
+	<script>
+	    // openjs环境变量
+    	QQWBENVS = {
+	        Debug: true,
+	    	LogLevel: 0,
+			CrossDomainMethod: "as3",
+			CookieDomain:"",
+			CookiePath:"/",
+    	}
+	</script>
+	<script src="path/to/openjs.js"></script>
+	<script>
+        T.init ({appkey: 800000006,synclogin:false,pingback: false/*, autoclose:true, samewindow: false*/});
+	</script>
+    <script>
+        var tpl_userinfo = 
+    		[
+    		 '<% if (userinfo) { %>',
+			 '欢迎,<%=userinfo.nick%>,<a href="#" onclick="doLogout();">注销</a>',
+    		 '<% } else { %>',
+    		     '<a href="#" onclick="doLogin();">授权</a>',
+    		 '<% } %>'
+    		],
+    
+			tpl_timeline = [
+			        '<div>主页时间线<div>',
+			    	'<ol>',
+			    	'<% for (var i=0,item,l=timeline.length; i<l  && (item = timeline[i]); i++) {%>',
+			    	'<li><%=item.text%></li>',
+			    	'<% } %>',
+			],
+
+			tpl_error = "<div>失败,<%=error.code%>,<%=error.message%></div>",
+
+			tpl_loading = "<div>正在加载数据, 请稍候...</div>",
+
+			tpl;
+
+	    tpl = T.template()
+		       .add(tpl_userinfo.join(""))
+		       .add('<% if (userinfo) { %>')
+		           .add('<% if (timeline) {%>')
+		                .add(tpl_timeline.join(""))
+		           .add('<% } else if(error) {%>')
+		               .add(tpl_error)
+		           .add('<% } else { %>')
+		           .add(tpl_loading)
+		           .add('<% } %>')
+		       .add('<% } else { %>')
+		           .add('<div>必须首先授权才能使用本应用。</div>')
+		       .add('<% } %>');
+
+    	function doLogin () {
+	    	T.login(function () {
+				location.reload();
+			},function () {
+				alert("您拒绝了授权");
+			});
+    	}
+
+    	function doLogout () {
+	    	T.logout(function () {
+				location.reload();
+	    	});
+    	}
+
+        T.ready(function () {
+    		var s = T.loginStatus(),
+			    el = document.getElementById("main");
+
+			el.innerHTML = tpl.renderWith({userinfo:s, timeline: null, error: null});
+
+			T.api("statuses/home_timeline",{},"json","get")
+			 .success(function (data) {
+			    el.innerHTML = tpl.renderWith({userinfo:s,timeline: data.data.info, error: null});
+			 })
+			 .error(function (code,message) {
+			    el.innerHTML = tpl.renderWith({userinfo:s, timeline: null, error: {code: code,message:message}});
+			 });
+
+    	});
+    </script>
+</head>
+<body>
+<div class="main" id="main">
+初始化中... ...
+</div>
+</body>
+</html>
+
