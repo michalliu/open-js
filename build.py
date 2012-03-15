@@ -329,7 +329,7 @@ def build(modulenames, targetfile, logFile=False):
     log.info("Packing through uglifyjs")
     # pack javascript through uglifyjs
     nodejs = os.path.join(_CWD, "tools", "node.exe")
-    uglifyjs = os.path.join(_CWD, "tools", "UglifyJS", "uglifyjs")
+    uglifyjs = os.path.join(_CWD, "tools", "UglifyJS", "bin" ,"uglifyjs")
     uglifyOptions = "-nc -v -o %s" % minifiedfile
 
     uglified = os.system("%s %s %s %s" % (nodejs, uglifyjs, uglifyOptions,targetfile))
