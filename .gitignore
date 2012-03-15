@@ -1,4 +1,5 @@
 .ignore
 .svn
 build
+build2.bat
 logs
