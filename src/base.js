@@ -190,8 +190,8 @@
 	  	 domain: {
 			  api: twb._const.HTTP_PROTOCOL + twb._const.AUTH_HOST_WEIBO + "/api"
 			 ,auth: twb._const.HTTP_PROTOCOL + twb._const.AUTH_HOST_WEIBO + "/oauth2_html/login.php"
-			 ,iframeProxy: twb._const.HTTP_PROTOCOL + twb._const.AUTH_HOST_WEIBO + "/open-js/proxy.html"
-			 ,flashProxy: twb._const.HTTP_PROTOCOL + twb._const.AUTH_HOST_WEIBO + "/open-js/proxy.swf"
+			 ,iframeProxy: twb._const.HTTP_PROTOCOL + twb._const.AUTH_HOST_WEIBO + "/proxy/proxy.html"
+			 ,flashProxy: twb._const.HTTP_PROTOCOL + twb._const.AUTH_HOST_WEIBO + "/proxy/proxy.swf"
 			 ,exchangeToken: twb._const.HTTP_PROTOCOL + twb._const.AUTH_HOST_WEIBO + "/cgi-bin/exchange_token"
 			 ,autoToken: twb._const.HTTP_PROTOCOL + twb._const.AUTH_HOST_WEIBO + "/cgi-bin/auto_token"
 	  	 }
