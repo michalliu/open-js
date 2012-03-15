@@ -431,9 +431,17 @@ QQWB.extend("_token",{
 
            loginStatus = _.loginStatus();
 
-           _l.info("user " + loginStatus.name + " logged in");
+		   if (loginStatus) {
 
-           _.trigger(_b.get("nativeevent","userloggedin"),loginStatus);
+               _l.info("user " + loginStatus.name + " logged in");
+
+               _.trigger(_b.get("nativeevent","userloggedin"),loginStatus);
+
+		   } else {
+
+			   _l.error("resolve response error, loginStatus is " + loginStatus);
+
+		   }
 
        } else if (response.error) {
 
