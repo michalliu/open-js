@@ -50,6 +50,12 @@ QQWB.extend("Object",{
 			}
 		}
 
+	},
+
+	isObject: function (test) {
+
+		return Object.prototype.toString.call(test) == "[object Object]";
+
 	}
 
 });

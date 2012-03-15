@@ -9,10 +9,16 @@
  * @package util
  * @module template
  * @requires base
+ *           common.Object
+ *           common.Array
  */
 (function () {
 
 	var _ = QQWB,
+
+	    _o = _.Object,
+
+		_a = _.Array,
 
 	    cache = {},
 
@@ -37,13 +43,66 @@
 		/**
 		 * Add template data
 		 *
+		 * Example:
+		 *
+		 * data({a:2,b:3})
+		 *
+		 * data([a,2,b,3])
+		 *
+		 * data(a,2).data(b,3)
+		 *
+		 * has same effect
+		 *
 		 * @param inData {Object} template data
 		 * @param inOverwrite {Boolean} whether override the existing data
 		 * @return {Object} template instance
 		 */
 		data: function (inData,inOverwrite) {
 
-			_.extend(this.data, inData, inOverwrite);
+			var dk,
+
+		    	dv,
+
+		    	arg = arguments;
+
+			if ( _o.isObject(inData)) {
+
+			    _.extend(this.datas, inData, inOverwrite);
+
+			} else if (_a.isArray(inData)) {
+
+				for (var i=0,l=inData.length; i < l; i+=2) {
+
+					dk = inData[i];
+
+					if ((i + 1) < l) {
+
+					    dv = inData[i+1];
+
+					}
+
+					if (inOverwrite || !(dv in this.datas)) {
+
+						this.datas[dk] = dv;
+
+					}
+
+				}
+
+			} else {
+
+				dk = arg[0];
+
+				dv = arg[1];
+
+				inOverwrite = arg[2];
+
+				if (dk && (inOverwrite || !(dv in this.datas))) {
+
+						this.datas[dk] = dv;
+				}
+
+			}
 
 			return this;
 
@@ -60,7 +119,7 @@
 
 			if (inOverwrite) {
 
-			    _.extend(this.data, inData, inOverwrite);
+			    _.extend(this.datas, inData, inOverwrite);
 
 			}
 
@@ -74,7 +133,7 @@
 		 */
 		render: function () {
 
-			return this.renderWith(this.data);
+			return this.renderWith(this.datas);
 
 		},
 
@@ -96,11 +155,11 @@
 	// create a template instance
     _.provide("template", function (name) {
 
-        var o =  _.Object.create(proto);
+        var o =  _o.create(proto);
 
 		o.tmpl = [];
 
-		o.data = {};
+		o.datas = {};
 
         /*
 		o.toString = function () {

@@ -19,7 +19,9 @@ QQWB.extend("Array",{
      * @return {Boolean}
      */
     isArray: function (arg) {
+
         return Object.prototype.toString.call(arg) === "[object Array]";
+
     }
     /**
      * Get whether an object in the array
