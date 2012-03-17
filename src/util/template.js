@@ -41,6 +41,30 @@
 		},
 
 		/**
+		 * Reset template
+		 *
+		 */
+		reset: function (resetTpl, resetData) {
+
+			if (!resetTpl && !resetData) {
+
+                this.tmpl = [];
+
+                this.datas = {};
+
+			} else {
+
+                resetTpl && (this.tmpl = []);
+
+		    	resetData && (this.datas = {});
+
+			}
+
+			return this;
+
+		},
+
+		/**
 		 * Add template data
 		 *
 		 * Example:
