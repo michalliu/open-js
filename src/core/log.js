@@ -12,6 +12,8 @@
  * @package core
  * @module log
  * @requires base
+ * @includes util.bigtable
+ *           util.time
  */
 
 QQWB.extend("log", {
