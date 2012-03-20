@@ -75,6 +75,8 @@
 		 *
 		 * data(a,2).data(b,3)
 		 *
+		 * data('a',2,'b',3)
+		 *
 		 * has same effect
 		 *
 		 * @param inData {Object} template data
@@ -87,7 +89,13 @@
 
 		    	dv,
 
-		    	arg = arguments;
+		    	args = arguments;
+
+			if (args.length > 3) {
+
+				inData = _a.fromArguments(args);
+
+			}
 
 			if ( _o.isObject(inData)) {
 
@@ -115,11 +123,11 @@
 
 			} else {
 
-				dk = arg[0];
+				dk = args[0];
 
-				dv = arg[1];
+				dv = args[1];
 
-				inOverwrite = arg[2];
+				inOverwrite = args[2];
 
 				if (dk && (inOverwrite || !(dv in this.datas))) {
 

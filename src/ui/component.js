@@ -20,6 +20,7 @@
  *
  * @includes common.Object
  *           util.queryString
+ *           common.Array
  */
 
 (function () {
@@ -38,9 +39,12 @@
 
 		components,
 
-	    proto;
+		getComponentByName,
 
-	components = _b.put("use","useable",[
+	    proto,
+
+
+	components = [
 		{
 			name: "微评论",
 
@@ -107,7 +111,7 @@
 
 			}
 		}
-	]);
+	];
 
 	proto = {
 
@@ -191,9 +195,28 @@
 
 			    msg;
 
+			// render component common process
 			function renderComponent() {
 
-		    	var c = that.createComponent(that.config);
+				var create,
+
+				    comp,
+
+					c;
+
+				comp = getComponentByName(that.name);
+
+				if (!comp.hasOwnProperty('create')) {
+
+					msg = "创建" + that.name + "组件失败，未定义create方法";
+
+		    		_l.error(msg);
+
+		    		throw new Error(msg);
+
+				}
+
+		    	c = comp.create(that.config);
 
 		    	if (typeof c != "undefined" && c.nodeType == 1) {
 
@@ -270,7 +293,27 @@
 			});
 		}
 		
-	}
+	};
+
+	getComponentByName = function getComponentByName(name) {
+
+        var _a = _.Array,
+
+		    c;
+
+		_a.each(components, function (i, v) {
+
+			if (v.name == name) {
+
+				c = v;
+
+				return false;
+			}
+
+		});
+
+		return c;
+	};
 
 	// component method
     _.provide("component", function (name, optConfig) {
@@ -278,8 +321,6 @@
 		var _ = QQWB,
 
 		    _s = _.String,
-
-		    _a = _.Array,
 
 			_o = _.Object,
 
@@ -293,16 +334,7 @@
 
 		name = _s.trim(name);
 
-		_a.each(components, function (i, v) {
-
-			if (v.name == name) {
-
-				conf = v;
-
-				return false;
-			}
-
-		});
+		conf = getComponentByName(name);
 
 		if (!conf) {
 
@@ -335,9 +367,8 @@
 
 		}
 
-		o.createComponent = conf.create;
-
     	return o;
+
     });
 
 }());
