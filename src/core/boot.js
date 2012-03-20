@@ -23,6 +23,12 @@
  *           core.token
  */
 
+if (typeof window['onloadopenjs'] == "function") {
+
+	window['onloadopenjs'].call(QQWB,true);
+
+}
+
 (function () {
 
 	var _ = QQWB,
@@ -363,9 +369,8 @@
 
 		switch (crossdomainMethod) {
 
-			case "postmessage":
-
 			case "html5":
+			case "postmessage":
 
                 if (_br.feature.postmessage) {
 

@@ -81,4 +81,4 @@ QQWB.extend("weibo.util", {
         return apiInterface.toLowerCase();
     }
 });
-}())
+}());
