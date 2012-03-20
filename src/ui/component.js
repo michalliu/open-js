@@ -38,81 +38,11 @@
 
         _a = _.Array,
 
-		components,
+		components = [],
 
 		getComponentByName,
 
 	    proto,
-
-
-	components = [
-		{
-			name: "微评论",
-
-			allowuse: true,
-
-			create: function (cfg) {
-
-				var msg,
-
-				    frame,
-
-				    url = "http://comment.v.t.qq.com",
-
-					qurl = location.href,
-
-					props = {};
-
-				if (!cfg.appkey) {
-
-					msg = "创建" + this.name + "组件失败，缺少Appkey";
-
-		    		_l.error(msg);
-
-					throw new Error(msg);
-				}
-
-				// remove location.search
-				/*
-				if (location.search) {
-
-					qurl = qurl.replace(location.search, "");
-
-				}*/
-
-				// remove location.hash
-				if (location.hash) {
-
-					qurl = qurl.replace(location.hash, "");
-
-				}
-
-				// url
-				qurl = encodeURIComponent(qurl);
-
-				_.extend(props, {
-
-					src: [url, "?", _q.encode({appkey: cfg.appkey, url: qurl})].join(""),
-
-					width: cfg.width || 560,
-
-					height: cfg.height || 500,
-
-					frameborder: 0,
-
-					scrolling: "yes",
-
-					allowtransparency: "true"
-
-				});
-
-				frame = _d.createElement("iframe", props);
-
-				return frame;
-
-			}
-		}
-	];
 
 	proto = {
 
@@ -210,14 +140,18 @@
 		},
 
 		// render component to element
-		renderInto: function (element) {
+		renderInto: function (context) {
 
 			var that = this,
 
-			    msg;
+		    	msg,
+
+				_context = context,
+
+		    	renderComponent;
 
 			// render component common process
-			function renderComponent() {
+			function renderComponent(root) {
 
 				var create,
 
@@ -241,15 +175,15 @@
 
 		    	if (typeof c != "undefined" && c.nodeType == 1) {
 
-		    	    element.appendChild(c);
+		    	    root.appendChild(c);
 
 		    	} else if (_s.isString(c)) {
 
-		    		element.innerHTML = c;
+		    		root.innerHTML = c;
 
 		    	} else {
 
-					msg = "创建" + that.name + "组件失败";
+					msg = "创建" + that.name + "组件失败，无法处理的create方法返回结果";
 
 		    		_l.error(msg);
 
@@ -259,27 +193,25 @@
 
 			}
 
-			// node exists
-			if (element.nodeType == 1) {
+			if (context && context.nodeType == 1) {
 
-				 renderComponent();
+				 renderComponent(context);
 
-		    // find node
-			} else if (_s.isString(element)) {
+			} else if (_s.isString(context)) {
 
 				_.dom.ready(function () {
 
-			    	element = _.dom.find(element);
+			    	context = _.dom.find(_context);
 
-			    	if (element.length > 0) {
+			    	if (context.length > 0) {
 
-			    		element = element[0];
+			    		context = context[0];
 
-						renderComponent();
+						renderComponent(context);
 
 			    	} else {
 
-						msg = "加载" + that.name + "组件失败，未找到父元素";
+						msg = "加载" + that.name + "组件失败，未找到节点" + _context;
 
 			    	    _l.error(msg);
 
@@ -291,7 +223,7 @@
 			// unexpected behavior
 			} else {
 
-				msg = "加载" + that.name + "组件失败，无效的父元素" + element;
+				msg = "加载" + that.name + "组件失败，无效的节点" + context;
 
 			    _l.error(msg);
 
@@ -305,13 +237,29 @@
 
 			var o,
 
-			    that = this;
+			    msg,
+
+			    that = this,
+
+				comp = getComponentByName(that.name);
 
 			_d.ready( function () {
 
-			    var o = document.getElementById("qqwb_root")
+			    var o = document.getElementById(comp.idname)
 
-				that.renderInto(o);
+				if (o && o.nodeType == 1) {
+
+				    that.renderInto(o);
+
+				} else {
+
+					msg = ['未找到',comp.name,'节点',comp.idname].join("");
+
+				    _l.error(msg);
+
+					throw new Error(msg);
+				}
+
 			});
 		}
 		
@@ -364,13 +312,6 @@
 
 			throw new Error(msg);
 
-		} else if (!conf.allowuse) {
-
-			msg = "无法使用组件" + name + "，暂不支持该组件";
-
-			_l.error(msg);
-
-			throw new Error(msg);
 		}
 
 		o = _.Object.create(proto);
@@ -390,5 +331,131 @@
     	return o;
 
     });
+
+	// 定义组件
+	_.extend('component', {
+
+		defineComponent: function (componentAttr) {
+
+			var err = '定义组件错误，',
+
+			    c,
+
+			    msg;
+
+			if (!componentAttr.hasOwnProperty('name')) {
+
+				msg = err + "必须为组件指定名称";
+
+				_l.error(msg);
+
+				throw new Error(msg);
+
+			} else if(!componentAttr.hasOwnProperty('create')) {
+
+				msg = err + "必须实现创建组件逻辑create方法";
+
+				_l.error(msg);
+
+				throw new Error(msg);
+
+			} else if(!componentAttr.hasOwnProperty('idname')) {
+
+				msg = err + "缺少idname";
+
+				_l.error(msg);
+
+				throw new Error(msg);
+
+			} else if(!componentAttr.hasOwnProperty('version')) {
+
+				msg = err + "缺少version";
+
+				_l.error(msg);
+
+				throw new Error(msg);
+			}
+
+			c = getComponentByName(componentAttr['name']);
+			
+			if (c && !c.allowRedefination) {
+
+				msg = err + "组件" + c.name + '已存在，并且不允许被重新定义';
+
+				_l.error(msg);
+
+				throw new Error(msg);
+
+			}
+
+			components.push(componentAttr);
+		}
+
+	});
+
+	// 定义微评论组件
+	_.component.defineComponent({
+
+			name: "微评论", // 名称
+
+			version: '1.0', // 版本
+
+			allowRedefination: false, // 默认为true
+
+			idname: 'qqwb_comment__', // HTML页面中的ID
+
+			create: function (cfg) { // 实现逻辑
+
+				var msg,
+
+				    frame,
+
+				    url = "http://comment.v.t.qq.com:8080/index.html",
+
+					qurl = location.href,
+
+					props = {};
+
+				if (!cfg.appkey) {
+
+					msg = "创建" + this.name + "组件失败，缺少Appkey";
+
+		    		_l.error(msg);
+
+					throw new Error(msg);
+				}
+
+				// remove location.hash
+				if (location.hash) {
+
+					qurl = qurl.replace(location.hash, "");
+
+				}
+
+				// url
+				qurl = encodeURIComponent(qurl);
+
+				_.extend(props, {
+
+					src: [url, "#", _q.encode({appkey: cfg.appkey, url: qurl})].join(""),
+
+					width: cfg.width || 560,
+
+					height: cfg.height || 500,
+
+					frameborder: 0,
+
+					scrolling: "no",
+
+					allowtransparency: "true"
+
+				});
+
+				frame = _d.createElement("iframe", props);
+
+				return frame;
+
+			}
+		});
 
 }());
