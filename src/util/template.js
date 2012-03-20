@@ -95,6 +95,10 @@
 
 				inData = _a.fromArguments(args);
 
+				inOverwrite = inData.splice(- 1, 1);
+
+				inOverwrite = inOverwrite.length > 0 ? inOverwrite[0] : false;
+
 			}
 
 			if ( _o.isObject(inData)) {

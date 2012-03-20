@@ -17,10 +17,9 @@
  *           core.log
  *           util.queryString
  *           common.String
+ *           common.Array
  *
  * @includes common.Object
- *           util.queryString
- *           common.Array
  */
 
 (function () {
@@ -36,6 +35,8 @@
 		_q = _.queryString,
 
 		_s = _.String,
+
+        _a = _.Array,
 
 		components,
 
@@ -137,13 +138,53 @@
 
 		},
 
-		// configuration
-		config: function (cfg) {
+		// width
+		width: function (width) {
 
-			_.extend(this.config, cfg, true);
+			_.extend(this.config, { width : width }, true);
 
 			return this;
+		},
 
+		// height
+		height: function (height) {
+
+			_.extend(this.config, { height : height }, true);
+
+			return this;
+		},
+
+		// expect an array
+		colors: function (colors) {
+
+			if (_s.isString(colors)) {
+
+				colors = _a.fromArguments(arguments);
+
+			}
+
+			if (_a.isArray(colors)) {
+
+			    _.extend(this.config, { "colors" : colors }, true);
+
+			} else {
+
+				_l.error("component set colors error, expect an array");
+			}
+
+			return this;
+		},
+
+		// style
+		style: function (styleName) {
+
+			_.extend(this.config, {
+
+				style: styleName
+
+			}, true);
+
+			return this;
 		},
 
 		// appkey
@@ -159,33 +200,13 @@
 
 		},
 
-		// style
-		style: function (styleName) {
+		// configuration
+		config: function (cfg) {
 
-			_.extend(this.config, {
-
-				style: styleName
-
-			}, true);
+			_.extend(this.config, cfg, true);
 
 			return this;
 
-		},
-
-		// width
-		width: function (width) {
-
-			_.extend(this.config, { width : width }, true);
-
-			return this;
-		},
-
-		// height
-		height: function (height) {
-
-			_.extend(this.config, { height : height }, true);
-
-			return this;
 		},
 
 		// render component to element
@@ -266,6 +287,7 @@
 
 			    	}
 				});
+
 			// unexpected behavior
 			} else {
 
@@ -297,9 +319,7 @@
 
 	getComponentByName = function getComponentByName(name) {
 
-        var _a = _.Array,
-
-		    c;
+		var c;
 
 		_a.each(components, function (i, v) {
 
