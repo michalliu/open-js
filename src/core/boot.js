@@ -23,12 +23,6 @@
  *           core.token
  */
 
-if (typeof window['onloadopenjs'] == "function") {
-
-	window['onloadopenjs'].call(QQWB,true);
-
-}
-
 (function () {
 
 	var _ = QQWB,

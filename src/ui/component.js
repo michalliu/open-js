@@ -51,11 +51,11 @@
 
 			if (typeof width == "object") {
 
-				_.extend(this.config, width, true);
+				_.extend(this.componentConfig, width, true);
 
 			} else {
 
-				_.extend(this.config, {
+				_.extend(this.componentConfig, {
 
 					width: width,
 
@@ -71,7 +71,7 @@
 		// width
 		width: function (width) {
 
-			_.extend(this.config, { width : width }, true);
+			_.extend(this.componentConfig, { width : width }, true);
 
 			return this;
 		},
@@ -79,28 +79,7 @@
 		// height
 		height: function (height) {
 
-			_.extend(this.config, { height : height }, true);
-
-			return this;
-		},
-
-		// expect an array
-		colors: function (colors) {
-
-			if (_s.isString(colors)) {
-
-				colors = _a.fromArguments(arguments);
-
-			}
-
-			if (_a.isArray(colors)) {
-
-			    _.extend(this.config, { "colors" : colors }, true);
-
-			} else {
-
-				_l.error("component set colors error, expect an array");
-			}
+			_.extend(this.componentConfig, { height : height }, true);
 
 			return this;
 		},
@@ -108,7 +87,7 @@
 		// style
 		style: function (styleName) {
 
-			_.extend(this.config, {
+			_.extend(this.componentConfig, {
 
 				style: styleName
 
@@ -117,23 +96,10 @@
 			return this;
 		},
 
-		// appkey
-		appkey: function (appkey) {
-
-			_.extend(this.config, {
-
-				appkey: appkey
-
-			}, true);
-
-			return this;
-
-		},
-
 		// configuration
 		config: function (cfg) {
 
-			_.extend(this.config, cfg, true);
+			_.extend(this.componentConfig, cfg, true);
 
 			return this;
 
@@ -159,11 +125,11 @@
 
 					c;
 
-				comp = getComponentByName(that.name);
+				comp = getComponentByName(that.componentName);
 
 				if (!comp.hasOwnProperty('create')) {
 
-					msg = "创建" + that.name + "组件失败，未定义create方法";
+					msg = "创建" + that.componentName + "组件失败，未定义create方法";
 
 		    		_l.error(msg);
 
@@ -171,7 +137,7 @@
 
 				}
 
-		    	c = comp.create(that.config);
+		    	c = comp.create(that.componentConfig);
 
 		    	if (typeof c != "undefined" && c.nodeType == 1) {
 
@@ -183,7 +149,7 @@
 
 		    	} else {
 
-					msg = "创建" + that.name + "组件失败，无法处理的create方法返回结果";
+					msg = "创建" + that.componentName + "组件失败，无法处理的create方法返回结果";
 
 		    		_l.error(msg);
 
@@ -211,7 +177,7 @@
 
 			    	} else {
 
-						msg = "加载" + that.name + "组件失败，未找到节点" + _context;
+						msg = "加载" + that.componentName + "组件失败，未找到节点" + _context;
 
 			    	    _l.error(msg);
 
@@ -223,7 +189,7 @@
 			// unexpected behavior
 			} else {
 
-				msg = "加载" + that.name + "组件失败，无效的节点" + context;
+				msg = "加载" + that.componentName + "组件失败，无效的节点" + context;
 
 			    _l.error(msg);
 
@@ -241,7 +207,7 @@
 
 			    that = this,
 
-				comp = getComponentByName(that.name);
+				comp = getComponentByName(that.componentName);
 
 			_d.ready( function () {
 
@@ -253,7 +219,7 @@
 
 				} else {
 
-					msg = ['未找到',comp.name,'节点',comp.idname].join("");
+					msg = ['未找到',comp.componentName,'节点',comp.idname].join("");
 
 				    _l.error(msg);
 
@@ -316,17 +282,19 @@
 
 		o = _.Object.create(proto);
 
-		o.name = name;
+		o.componentName = name;
 
 		if (optConfig) {
 
-			o.config = optConfig;
+			o.componentConfig = optConfig;
 
 		} else {
 
-		    o.config = {};
+		    o.componentConfig = {};
 
 		}
+
+		_.extend(o, conf.methods);
 
     	return o;
 
@@ -404,6 +372,8 @@
 
 			idname: 'qqwb_comment__', // HTML页面中的ID
 
+			attributes: 'width height style appkey title colors',
+
 			create: function (cfg) { // 实现逻辑
 
 				var msg,
@@ -437,7 +407,7 @@
 
 				_.extend(props, {
 
-					src: [url, "#", _q.encode({appkey: cfg.appkey, url: qurl})].join(""),
+					src: [url, "#", _q.encode({appkey: cfg.appkey, url: qurl, title: cfg.title, colorset:cfg.colors})].join(""),
 
 					width: cfg.width || 560,
 
@@ -455,7 +425,106 @@
 
 				return frame;
 
-			}
+			},
+
+			methods: {
+
+	        	// appkey
+	        	appkey: function (appkey) {
+
+	        		_.extend(this.componentConfig, {
+
+	        			appkey: appkey
+
+	        		}, true);
+
+	        		return this;
+
+				},
+
+	        	// expect an array
+	        	colors: function (colors) {
+
+	        		if (_s.isString(colors)) {
+
+	        			colors = _a.fromArguments(arguments);
+
+	        		}
+
+	        		if (_a.isArray(colors)) {
+
+	        		    _.extend(this.componentConfig, { "colors" : colors }, true);
+
+	        		} else {
+
+	        			_l.error("component set colors error, expect an array");
+	        		}
+
+	        		return this;
+	        	}
+
+			} // endof method
 		});
+
+	// try to render components
+	_l.debug('scanning components');
+
+	_d.ready(function () {
+
+		_a.forEach(components, function (c) {
+
+			var id = c.idname,
+
+			    attrs = (c.attributes || '').split(/\s+/),
+
+				datakeys,
+
+				dataval,
+
+			    cfg = {},
+
+			    e = document.getElementById(id);
+
+			datakeys = _a.forEach(attrs, function (v,i) {
+
+				return 'data-' + v;
+
+			});
+
+			if (e) {
+
+	            _l.debug(['try render component [', c.name, ' ', c.version,']'].join(''));
+
+			    dataval = _.dom.getProperties(e, datakeys);
+
+				_.Object.forEach(dataval, function (v, k) {
+
+					if (v) {
+
+						k = k.replace('data-','');
+
+						cfg[k] = v;
+
+					}
+
+				});
+
+	            _l.debug(['read configuration ', T.JSON.stringify(cfg)].join(''));
+
+				try {
+
+					_.component(c.name).config(cfg).render();
+
+				} catch (renderError) {
+
+					_l.error(['render component [', c.name, c.version, '] error exception: ', renderError].join(''));
+
+				}
+
+			}
+
+		}); // end forEach
+
+	});// end domReady
 
 }());

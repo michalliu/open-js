@@ -17,3 +17,10 @@
  *           compat.localStorage
  *           ui.component
  */
+
+if (typeof window['onloadopenjs'] == "function") {
+
+	window['onloadopenjs'].call(QQWB,true);
+
+}
+
