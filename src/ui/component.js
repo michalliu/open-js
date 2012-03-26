@@ -374,13 +374,13 @@
 
 			attributes: 'width height style appkey title colors',
 
-			create: function (cfg) { // 实现逻辑
+			create: function (cfg) { // 实现逻辑, this指向组件配置Map
 
 				var msg,
 
 				    frame,
 
-				    url = "http://comment.v.t.qq.com:8080/index.html",
+				    url = "http://comment.v.t.qq.com/index.html",
 
 					qurl = location.href,
 
@@ -407,7 +407,7 @@
 
 				_.extend(props, {
 
-					src: [url, "#", _q.encode({appkey: cfg.appkey, url: qurl, title: cfg.title, colorset:cfg.colors})].join(""),
+					src: [url, "#", _q.encode({appkey: cfg.appkey, url: qurl, title: cfg.title, colors:cfg.colors})].join(""),
 
 					width: cfg.width || 560,
 
@@ -430,7 +430,7 @@
 			methods: {
 
 	        	// appkey
-	        	appkey: function (appkey) {
+	        	appkey: function (appkey) { // this 指向组件instance
 
 	        		_.extend(this.componentConfig, {
 
@@ -466,10 +466,12 @@
 			} // endof method
 		});
 
-	// try to render components
-	_l.debug('scanning components');
+	// try to render components automaticlly through component's idname
+	_l.debug('scanning components ...');
 
 	_d.ready(function () {
+
+		var compFound = 0;
 
 		_a.forEach(components, function (c) {
 
@@ -515,15 +517,18 @@
 
 					_.component(c.name).config(cfg).render();
 
-				} catch (renderError) {
+				} catch (componentRenderError) {
 
-					_l.error(['render component [', c.name, c.version, '] error exception: ', renderError].join(''));
+					_l.error(['render component [', c.name, c.version, '] error exception: ', componentRenderError].join(''));
 
 				}
 
+				compFound++;
 			}
 
 		}); // end forEach
+
+	    _l.debug('found ' + compFound + ' components');
 
 	});// end domReady
 

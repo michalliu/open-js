@@ -23,7 +23,7 @@
  *           core.token
  */
 
-(function () {
+QQWB.bigtable.put('boot','solution', function () {
 
 	var _ = QQWB,
 
@@ -79,10 +79,16 @@
 
     everythingReady.lock(); // token must be ready
 
-    everythingReady.lock(); // document(DOM) must be ready
+	if (!_b.get("document", "ready")) {
+
+        everythingReady.lock(); // document(DOM) must be ready
+
+	}
     
     _.bind(_b.get("nativeevent","tokenready"), function () {
+
         everythingReady.unlock(); // unlock for token ready
+
     });
     
 	// post message implementation
@@ -355,11 +361,11 @@
 	}; // crossdomainImplementationError
 
 	// enviroment specified solution
-	if (window["QQWBENVS"] && typeof QQWBENVS.CrossDomainMethod != "undefined") {
+	if (typeof QQWB.envs.crossDomainMethod != 'undefined') {
 
 		_l.debug("read crossdomain method from enviroment variable");
 
-        crossdomainMethod = _s.trim(QQWBENVS.CrossDomainMethod.toLowerCase());
+        crossdomainMethod = _s.trim(QQWB.envs.crossDomainMethod.toLowerCase());
 
 		switch (crossdomainMethod) {
 
@@ -372,7 +378,7 @@
 
 				} else {
 
-                    _l.critical("can not setup enviroment specified solution " + QQWBENVS.CrossDomainMethod + ", please remove that enviroment variable");
+                    _l.critical("can not setup crossdomain method " + QQWB.envs.crossDomainMethod + ", browser not support");
 
 		        	crossdomainImplementationError("postmessage solution can not be setted up");
 				}
@@ -389,7 +395,7 @@
 
 				} else {
 
-                    _l.critical("can not setup enviroment specified solution " + QQWBENVS.CrossDomainMethod + ", please remove that enviroment variable");
+                    _l.critical("can not setup crossdomain method " + QQWB.envs.crossDomainMethod + ", browser not support");
 
 		        	crossdomainImplementationError("flash as3 solution can not be setted up");
 
@@ -419,227 +425,78 @@
         }
 	}
 
-}());
 
-// dom ready events
-(function () {
-
-	var _ = QQWB,
-
-	    _b = _.bigtable,
-
-	    try_trigger_doc_ready;
-
-    try_trigger_doc_ready = function () {
-
-	   var _ = QQWB,
-
-	       _b = _.bigtable,
-
-		   _l = _.log,
-
-	       ready = _b.get("document", "ready"),
-
-           tokenIsReady,
-
-		   inited,
-
-		   body,
-
-		   el;
-
-       if (ready) {
-           return;
-       }
-
-	   body = document.getElementsByTagName("body")[0];
-
-	   if (!body) {
-
-		   return;
-
-	   }
-
-       try {
-
-           el = body.appendChild(document.createElement("span"));
-
-           el.parentNode.removeChild(el);
-
-       } catch (ex) { // document isn't ready
-
-           return;
-
-       }
-
-	   _b.put("document", "ready", true);
-
-       _l.info ("document is ready");
-
-       _b.get("boot", "everythingready").unlock(); // unlock for document ready
-
-       tokenIsReady = _b.get("boot", "tokenready").isOpen();
-
-	   inited = _b.get("base","inited");
-
-       // dom is ready but token not ready and not inited
-	   // prompt to init
-	   if (!tokenIsReady && !inited ) { 
-
-		   _l.info("waiting for init ...");
-
-	   }
-
-       _.trigger(_b.get("nativeevent","documentready"));
-   };
-
-   _b.put("document", "tryready", try_trigger_doc_ready);
-
-
-
-    if (window.addEventListener) {
-
-        document.addEventListener("DOMContentLoaded", function () {
-
-            try_trigger_doc_ready();
-
-        }, false);
-
-    }
-
-    if (window.attachEvent) {
-
-        document.attachEvent("onreadystatechange", function () {
-
-            if (/complete/.test(document.readyState)) {
-
-                document.detachEvent("onreadystatechange", arguments.callee);
-
-                try_trigger_doc_ready();
-
-            }
-
-        });
-
-        if (window === window.top) { // not inside a frame
-
-            (function (){
-
-				var _ = QQWB,
-
-				    _b = _.bigtable,
-
-				    doc_ready = _b.get("document","ready");
-
-				if (doc_ready) {
-					return;
-				}
-
-                try {
-
-                    document.documentElement.doScroll("left");
-
-                } catch (ex) {
-
-                    setTimeout(arguments.callee, 0);
-
-                    return;
-                }
-
-                try_trigger_doc_ready();
-
-            }());
-        }
-    }
-
-    if (_.browser.webkit) {
-
-        (function () {
-
-			var _ = QQWB,
-
-			    _b = _.bigtable,
-
-				doc_ready = _b.get("document","ready");
-
-			if (doc_ready) {
-				return;
-			}
-
-            if (!(/load|complete/.test(document.readyState))) {
-
-                setTimeout(arguments.callee, 0);
-
-                return;
-
-            }
-
-            try_trigger_doc_ready();
-
-        }());
-    }
-
-}());
-
-// exhange token scheduler
-(function () {
-
-	var _ = QQWB,
-
-	    _l = _.log,
-
-		_c = _.cookie,
-
-	    _b = _.bigtable,
-
-        maintainTokenScheduler;
-
-	function maintainTokenStatus () {
-
-		var canMaintain = !!_._token.getAccessToken(), // user logged in set timer to exchange token
-
-	      	waitingTime; // server accept to exchange token 30 seconds before actually expire date
-
-        maintainTokenScheduler && _l.info("cancel the **OLD** maintain token schedule");
-
-        maintainTokenScheduler && clearTimeout(maintainTokenScheduler);
-
-		if (canMaintain) {
-
-		    // server should accept to exchange token 30 seconds before actually expire date
-	      	waitingTime = parseInt(_c.get(_b.get("cookie","accesstokenname")).split("|")[1],10)
-
-	                      - _.time.now()
-
-	                      - 15 * 1000 /*15 seconds ahead of actual expire date*/;
-
-			_l.info("scheduled to exchange token after " + waitingTime + "ms");
-
-			maintainTokenScheduler = setTimeout(function () {
-
-				_._token.exchangeForToken(function () {
-
-					maintainTokenStatus();
-
-				});
-
-			}, waitingTime);
-
-		} else {
-
-			maintainTokenScheduler && _l.info("cancel the exchange token schedule");
-
+	// maintain token status
+    (function () {
+    
+    	var _ = QQWB,
+    
+    	    _l = _.log,
+    
+    		_c = _.cookie,
+    
+    	    _b = _.bigtable,
+    
+            maintainTokenScheduler;
+    
+    	function maintainTokenStatus () {
+    
+    		var canMaintain = !!_._token.getAccessToken(), // user logged in set timer to exchange token
+    
+    	      	waitingTime; // server accept to exchange token 30 seconds before actually expire date
+    
+            maintainTokenScheduler && _l.info("cancel the **OLD** maintain token schedule");
+    
             maintainTokenScheduler && clearTimeout(maintainTokenScheduler);
+    
+    		if (canMaintain) {
+    
+    		    // server should accept to exchange token 30 seconds before actually expire date
+    	      	waitingTime = parseInt(_c.get(_b.get("cookie","accesstokenname")).split("|")[1],10)
+    
+    	                      - _.time.now()
+    
+    	                      - 15 * 1000 /*15 seconds ahead of actual expire date*/;
+    
+    			_l.info("scheduled to exchange token after " + waitingTime + "ms");
+    
+    			maintainTokenScheduler = setTimeout(function () {
+    
+    				_._token.exchangeForToken(function () {
+    
+    					maintainTokenStatus();
+    
+    				});
+    
+    			}, waitingTime);
+    
+    		} else {
+    
+    			maintainTokenScheduler && _l.info("cancel the exchange token schedule");
+    
+                maintainTokenScheduler && clearTimeout(maintainTokenScheduler);
+    
+    		}
+    	}
+    
+    	_.bind(_b.get("nativeevent","tokenready"),maintainTokenStatus);
+    
+    	_.bind(_b.get("nativeevent","userloggedin"),maintainTokenStatus);
+    
+    	_.bind(_b.get("nativeevent","userloginfailed"),maintainTokenStatus);
+    
+    	_.bind(_b.get("nativeevent","userloggedout"),maintainTokenStatus);
+    
+    }());
 
-		}
-	}
+});
 
-	_.bind(_b.get("nativeevent","tokenready"),maintainTokenStatus);
 
-	_.bind(_b.get("nativeevent","userloggedin"),maintainTokenStatus);
+if (QQWB.envs.autoboot != 'false') {
 
-	_.bind(_b.get("nativeevent","userloginfailed"),maintainTokenStatus);
+	QQWB.bigtable.put('boot','booting', true);
 
-	_.bind(_b.get("nativeevent","userloggedout"),maintainTokenStatus);
+	// boot
+	QQWB.bigtable.get('boot','solution')();
 
-}());
+}

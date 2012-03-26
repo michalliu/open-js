@@ -17,27 +17,12 @@
     // Core base object
     twb = {
 
-        /**
-         * Human readable name for this sdk
-         *
-         * Used for debug propose
-         *
-         * @access public
-         */
         name: "OpenJS"
 
-		/**
-		 * SDK version
-		 */
 	   ,version: "2.0"
 
-        /**
-         * Debug mode
-         *
-         * Speak pointless babble
-         *
-         * @access public
-         */
+	   ,abspath: "http://open.t.qq.com/openjs/path/to/openjs.js"
+
        ,debug: false
 
         /**
@@ -127,15 +112,59 @@
 
     };
 
-	twb.provide = twb.create;
-    
-	// allow cutomize configration before everything
-	if (window["QQWBENVS"] && typeof QQWBENVS.Debug != "undefined") {
+	(function detectEnvs () {
 
-		twb.debug = QQWBENVS.Debug;
+    	var i,l, s, sr, r, h, q, u, k, v, o // iter, length, script, scriptSrc, remainStr, hash, query, undefined, key, value, one
+    
+		    ie = !-[1,],
+
+			env = {},
+
+    	    scripts = document.getElementsByTagName('script');
+    
+    	for (i=0, l=scripts.length; i<l && (s=scripts[i]); i++) {
+    
+			sr = ie ? s.getAttribute('src',4) : s.src;
+
+    		if (sr && sr.indexOf(twb.abspath) == 0) {
+    
+    			r = sr.slice(twb.abspath.length);
+
+				h = r.split('#').pop();
+
+				q = r.indexOf('?') == 0 ? r.slice(1, r.indexOf('#') == -1 ? u : r.indexOf('#')) : '';
+
+    			break;
+    
+    		}
+    
+    	}
+
+		if (h) {
+
+			h = h.split('&');
+
+			for (i=0,l=h.length; i<l && (o=h[i]); i++) {
+
+				o = o.split('=');
+
+				env[o[0]] = o.length > 1 ? o[1] : u;
+			}
+
+		}
+
+	    twb.extend('envs',env);
+
+	}());
+
+	if (typeof twb.envs.debug != 'undefined') {
+
+		twb.debug = !!twb.envs.debug;
 
 	}
 
+	twb.provide = twb.create;
+    
 	window.QQWB = window.T = twb;
 
 }());

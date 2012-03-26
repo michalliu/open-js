@@ -10,6 +10,12 @@
  * @requires base
  *           sizzle
  *           common.Object
+ *           util.bigtable
+ *           core.log
+ *           core.event
+ *           core.init
+ *           core.browser
+ *
  * @includes common.String
  */
 
@@ -210,3 +216,172 @@
     QQWB.find = QQWB.dom.find;
 
 } ());
+
+// dom ready events
+(function () {
+
+	var _ = QQWB,
+
+	    _b = _.bigtable,
+
+	    try_trigger_doc_ready;
+
+    try_trigger_doc_ready = function () {
+
+	   var _ = QQWB,
+
+	       _b = _.bigtable,
+
+		   _l = _.log,
+
+	       ready = _b.get("document", "ready"),
+
+		   everythingReadyDoor = _b.get("boot", "everythingready"),
+
+		   tokenReadyDoor = _b.get("boot", "tokenready"),
+
+           tokenIsReady,
+
+		   inited,
+
+		   body,
+
+		   el;
+
+       if (ready) {
+           return;
+       }
+
+	   body = document.getElementsByTagName("body")[0];
+
+	   if (!body) {
+
+		   return;
+
+	   }
+
+       try {
+
+           el = body.appendChild(document.createElement("span"));
+
+           el.parentNode.removeChild(el);
+
+       } catch (ex) { // document isn't ready
+
+           return;
+
+       }
+
+	   _b.put("document", "ready", true);
+
+       _l.info ("document is ready");
+
+	   if (everythingReadyDoor) {
+
+           everythingReadyDoor.unlock(); // unlock for document ready
+
+	   }
+
+	   tokenIsReady = tokenReadyDoor && tokenReadyDoor.isOpen();
+
+	   inited = _b.get("base","inited");
+
+       // dom is ready but token not ready and not inited
+	   // prompt to init
+	   if (!tokenIsReady && !inited ) { 
+
+		   _l.info("waiting init ...");
+
+	   }
+
+       _.trigger(_b.get("nativeevent","documentready"));
+
+   };
+
+   _b.put("document", "tryready", try_trigger_doc_ready);
+
+
+
+    if (window.addEventListener) {
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            try_trigger_doc_ready();
+
+        }, false);
+
+    }
+
+    if (window.attachEvent) {
+
+        document.attachEvent("onreadystatechange", function () {
+
+            if (/complete/.test(document.readyState)) {
+
+                document.detachEvent("onreadystatechange", arguments.callee);
+
+                try_trigger_doc_ready();
+
+            }
+
+        });
+
+        if (window === window.top) { // not inside a frame
+
+            (function (){
+
+				var _ = QQWB,
+
+				    _b = _.bigtable,
+
+				    doc_ready = _b.get("document","ready");
+
+				if (doc_ready) {
+					return;
+				}
+
+                try {
+
+                    document.documentElement.doScroll("left");
+
+                } catch (ex) {
+
+                    setTimeout(arguments.callee, 0);
+
+                    return;
+                }
+
+                try_trigger_doc_ready();
+
+            }());
+        }
+    }
+
+    if (_.browser.webkit) {
+
+        (function () {
+
+			var _ = QQWB,
+
+			    _b = _.bigtable,
+
+				doc_ready = _b.get("document","ready");
+
+			if (doc_ready) {
+				return;
+			}
+
+            if (!(/load|complete/.test(document.readyState))) {
+
+                setTimeout(arguments.callee, 0);
+
+                return;
+
+            }
+
+            try_trigger_doc_ready();
+
+        }());
+    }
+
+}());

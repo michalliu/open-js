@@ -169,8 +169,8 @@ QQWB.extend("log", {
 QQWB.log.warn = QQWB.log.warning;
 
 // allow cutomize configration before everything
-if (window["QQWBENVS"] && typeof QQWBENVS.LogLevel == "number") {
+if (typeof QQWB.envs.logLevel != 'undefined') {
 
-	QQWB.log.setLevel(QQWBENVS.LogLevel);
+	QQWB.log.setLevel(parseInt(QQWBENVS.LogLevel, 10));
 
 }

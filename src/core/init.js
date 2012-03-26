@@ -29,9 +29,9 @@
     _b.put("authwindow","width","575");
     _b.put("authwindow","height","465");
 
-	if (window["QQWBENVS"] && typeof QQWBENVS.CookieDomain != "undefined") {
+	if (typeof QQWB.envs.cookieDomain != "undefined") {
 
-        _b.put("cookie","domain",QQWBENVS.CookieDomain);
+        _b.put("cookie","domain",QQWB.envs.cookieDomain);
 
 	} else {
 
@@ -39,9 +39,9 @@
 
 	}
 
-	if (window["QQWBENVS"] && typeof QQWBENVS.CookiePath != "undefined") {
+	if (typeof QQWB.envs.cookiePath != "undefined") {
 
-        _b.put("cookie","path",QQWBENVS.CookiePath);
+        _b.put("cookie","path",QQWB.envs.cookiePath);
 
 	} else {
 
@@ -70,6 +70,8 @@
 
     _b.put("io","timeout", 30 * 1000);
 
+	_b.put('boot','booting', false);
+
     QQWB.provide("init", function (opts) {
 
 		   var _ = QQWB,
@@ -82,7 +84,17 @@
 
 			   base = "base",
 
+			   booting = _b.get('boot','booting'),
+
 			   tokenReady;
+
+		   if (!booting) {
+
+            	_b.put('boot','booting', true);
+
+            	_b.get('boot','solution')();
+
+		   }
 
 	       tokenReady = _b.get("boot", "tokenready");
 
@@ -107,7 +119,7 @@
 
 			  ,samewindow: false // open authenciate window in same window
 
-		   },opts,true);
+		   }, opts, true);
 
 		   _b.put(base,"pingback",opts.pingback);
 
@@ -126,12 +138,19 @@
 
                needRequestNewToken = !refreshToken && !accessToken && opts.synclogin;
 
-           if (opts.appkey) {
+           if (typeof opts.appkey != 'undefined') {
 
-               _l.info("client id is " + opts.appkey);
+               _l.info("client id(appkey) is " + opts.appkey);
 
 			   _b.put("base", "appkey", opts.appkey);
-           }
+
+		   } else {
+
+			   _l.critical('client id(appkey) is NOT optional');
+
+			   return;
+
+		   }
 
            _l.info("client proxy uri is " + opts.callbackurl);
 
@@ -180,8 +199,6 @@
 
            }
 
-           _b.put(base, "inited", true);
-
            tokenReady.unlock(); // unlock init
 
 		   if (_p && opts.pingback) {
@@ -196,6 +213,8 @@
 
 			   }
 		   }
+
+           _b.put(base, "inited", true);
 
            return _;
     });
