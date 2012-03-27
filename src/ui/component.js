@@ -18,6 +18,7 @@
  *           util.queryString
  *           common.String
  *           common.Array
+ *           common.JSON
  *
  * @includes common.Object
  */
@@ -407,7 +408,7 @@
 
 				_.extend(props, {
 
-					src: [url, "#", _q.encode({appkey: cfg.appkey, url: qurl, title: cfg.title, colors:cfg.colors})].join(""),
+					src: [url, "#", _q.encode({appkey: cfg.appkey, url: qurl, title: cfg.title, colorset:cfg.colors})].join(""),
 
 					width: cfg.width || 560,
 
@@ -511,7 +512,7 @@
 
 				});
 
-	            _l.debug(['read configuration ', T.JSON.stringify(cfg)].join(''));
+	            _l.debug(['read configuration ', QQWB.JSON.stringify(cfg)].join(''));
 
 				try {
 

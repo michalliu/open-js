@@ -28,27 +28,8 @@
     _b.put("authwindow","name","authClientProxy_ee5a0f93");
     _b.put("authwindow","width","575");
     _b.put("authwindow","height","465");
-
-	if (typeof QQWB.envs.cookieDomain != "undefined") {
-
-        _b.put("cookie","domain",QQWB.envs.cookieDomain);
-
-	} else {
-
-        _b.put("cookie","domain","");
-
-	}
-
-	if (typeof QQWB.envs.cookiePath != "undefined") {
-
-        _b.put("cookie","path",QQWB.envs.cookiePath);
-
-	} else {
-
-        _b.put("cookie","path","/");
-
-	}
-
+    _b.put("cookie","domain",QQWB.envs.cookiedomain);
+    _b.put("cookie","path",QQWB.envs.cookiepath);
     _b.put("cookie","accesstokenname","QQWBToken");
     _b.put("cookie","refreshtokenname","QQWBRefreshToken");
 

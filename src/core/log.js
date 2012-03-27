@@ -168,9 +168,4 @@ QQWB.extend("log", {
 
 QQWB.log.warn = QQWB.log.warning;
 
-// allow cutomize configration before everything
-if (typeof QQWB.envs.logLevel != 'undefined') {
-
-	QQWB.log.setLevel(parseInt(QQWBENVS.LogLevel, 10));
-
-}
+QQWB.log.setLevel(QQWB.envs.loglevel);

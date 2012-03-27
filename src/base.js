@@ -21,7 +21,7 @@
 
 	   ,version: "2.0"
 
-	   ,abspath: "http://open.t.qq.com/openjs/path/to/openjs.js"
+	   ,abspath: "http://open.t.qq.com/path/to/openjs.js"
 
        ,debug: false
 
@@ -114,14 +114,66 @@
 
 	(function detectEnvs () {
 
-    	var i,l, s, sr, r, h, q, u, k, v, o // iter, length, script, scriptSrc, remainStr, hash, query, undefined, key, value, one
+    	var i,l, s, sr, r, h, q, u, k, v, o, envk, envv, envc, // iter, length, script, scriptSrc, remainStr, hash, query, undefined, key, value, one, envkey, envval, envconfig
     
 		    ie = !-[1,],
 
+			tpBol = 'boolean',
+
+			tpNum = 'number',
+
+			tpStr = 'string',
+
 			env = {},
+
+			knownEnvs = {
+				'autoboot': {'type':tpBol, 'default':true},
+				'loglevel': {'type':tpNum, 'default':0},
+				'cookiedomain': {'type':tpStr, 'default':''},
+				'cookiepath': {'type':tpStr, 'default':'/'},
+				'crossdomainmethod': {'type':tpStr, 'default':'auto'},
+				'debug': {'type':tpBol, 'default':false}
+			},
+
+			str2Bool,
+
+			str2Num,
+
+			strTrim,
 
     	    scripts = document.getElementsByTagName('script');
     
+		str2Bool = function str2Bool(str) {
+			str = strTrim(str).toLowerCase();
+			switch(str){
+				case 'yes':
+				case 'on':
+				case 'true':
+				return true;
+				case 'no':
+				case 'off':
+				case 'false':
+				return false;
+			}
+			return !!str;
+		};
+
+		str2Num = function str2Num (str,n) {
+
+			return parseInt(strTrim(str),n);
+
+		};
+
+		strTrim = String.prototype.trim ? function (str) {
+
+			return str == null ? "" : String.prototype.trim.call(str);
+
+		} : function (str) {
+
+			return str == null ? "" : str.toString().replace(/^\s+/,"").replace(/\s+$/,"");
+
+		};
+
     	for (i=0, l=scripts.length; i<l && (s=scripts[i]); i++) {
     
 			sr = ie ? s.getAttribute('src',4) : s.src;
@@ -148,20 +200,45 @@
 
 				o = o.split('=');
 
-				env[o[0]] = o.length > 1 ? o[1] : u;
+				envk = o[0].toLowerCase();
+				envv = o.length > 1 ? o[1] : u;
+
+				if (knownEnvs.hasOwnProperty(envk)) {
+
+					envc = knownEnvs[envk];
+
+					switch (envc.type) {
+						case tpBol:
+						envv = str2Bool(envv);
+						break;
+						case tpNum:
+						envv = str2Num(envv,10);
+						break;
+						case tpStr:
+						default:
+						envv = strTrim(envv);
+					}
+
+					env[envk] = envv;
+				}
+
 			}
 
 		}
 
+		// fill unsetted envs
+		for (var k in knownEnvs) {
+			if (knownEnvs.hasOwnProperty(k) && !env.hasOwnProperty(k)) {
+				env[k] = knownEnvs[k]['default'];
+			}
+		}
+
+		// fill with envs
 	    twb.extend('envs',env);
 
 	}());
 
-	if (typeof twb.envs.debug != 'undefined') {
-
-		twb.debug = !!twb.envs.debug;
-
-	}
+	twb.debug = twb.envs.debug;
 
 	twb.provide = twb.create;
     

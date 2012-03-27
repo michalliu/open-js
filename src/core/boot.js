@@ -360,52 +360,8 @@ QQWB.bigtable.put('boot','solution', function () {
 
 	}; // crossdomainImplementationError
 
-	// enviroment specified solution
-	if (typeof QQWB.envs.crossDomainMethod != 'undefined') {
-
-		_l.debug("read crossdomain method from enviroment variable");
-
-        crossdomainMethod = _s.trim(QQWB.envs.crossDomainMethod.toLowerCase());
-
-		switch (crossdomainMethod) {
-
-			case "html5":
-			case "postmessage":
-
-                if (_br.feature.postmessage) {
-
-                    setupHtml5Implementation();
-
-				} else {
-
-                    _l.critical("can not setup crossdomain method " + QQWB.envs.crossDomainMethod + ", browser not support");
-
-		        	crossdomainImplementationError("postmessage solution can not be setted up");
-				}
-
-			break;
-
-			case "flash":
-
-			case "as3":
-
-		    	if (_br.feature.flash) {
-
-                    setupFlashAs3Implementation();
-
-				} else {
-
-                    _l.critical("can not setup crossdomain method " + QQWB.envs.crossDomainMethod + ", browser not support");
-
-		        	crossdomainImplementationError("flash as3 solution can not be setted up");
-
-				}
-
-			break;
-		}
-
 	// auto detect
-	} else {
+	if (QQWB.envs.crossdomainmethod == 'auto') {
 
 		_l.debug("detecting crossdomain method");
 
@@ -423,6 +379,50 @@ QQWB.bigtable.put('boot','solution', function () {
 
 			crossdomainImplementationError("no solution available, need a modern browser or install lastest flash player");
         }
+
+	} else {
+
+		_l.debug("read crossdomain method from enviroment variable");
+
+        crossdomainMethod = _s.trim(QQWB.envs.crossdomainmethod.toLowerCase());
+
+		switch (crossdomainMethod) {
+
+			case "html5":
+			case "postmessage":
+
+                if (_br.feature.postmessage) {
+
+                    setupHtml5Implementation();
+
+				} else {
+
+                    _l.critical("can not setup crossdomain method " + QQWB.envs.crossdomainmethod + ", browser not support");
+
+		        	crossdomainImplementationError("postmessage solution can not be setted up");
+				}
+
+			break;
+
+			case "flash":
+
+			case "as3":
+
+		    	if (_br.feature.flash) {
+
+                    setupFlashAs3Implementation();
+
+				} else {
+
+                    _l.critical("can not setup crossdomain method " + QQWB.envs.crossdomainmethod + ", browser not support");
+
+		        	crossdomainImplementationError("flash as3 solution can not be setted up");
+
+				}
+
+			break;
+		}
+
 	}
 
 
@@ -492,7 +492,7 @@ QQWB.bigtable.put('boot','solution', function () {
 });
 
 
-if (QQWB.envs.autoboot != 'false') {
+if (QQWB.envs.autoboot) {
 
 	QQWB.bigtable.put('boot','booting', true);
 
