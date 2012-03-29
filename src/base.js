@@ -21,8 +21,6 @@
 
 	   ,version: "2.0"
 
-	   ,abspath: "http://open.t.qq.com/path/to/openjs.js"
-
        ,debug: false
 
         /**
@@ -124,6 +122,12 @@
 
 			tpStr = 'string',
 
+			ropenjs = /openjs\.js(.*)$/,
+
+			ropenjsproxy = /openjs\.proxy\.js(.*)$/,
+
+			matched,
+
 			env = {},
 
 			knownEnvs = {
@@ -178,18 +182,24 @@
     
 			sr = ie ? s.getAttribute('src',4) : s.src;
 
-    		if (sr && sr.indexOf(twb.abspath) == 0) {
-    
-    			r = sr.slice(twb.abspath.length);
+			if (sr) {
 
-				h = r.split('#').pop();
+				matched = sr.match(ropenjs) || sr.match(ropenjsproxy);
 
-				q = r.indexOf('?') == 0 ? r.slice(1, r.indexOf('#') == -1 ? u : r.indexOf('#')) : '';
+				if (matched) {
 
-    			break;
-    
-    		}
-    
+					r = matched[1];
+
+			    	h = r.split('#').pop();
+
+			    	q = r.indexOf('?') == 0 ? r.slice(1, r.indexOf('#') == -1 ? u : r.indexOf('#')) : '';
+
+    		    	break;
+
+				}
+
+			}
+
     	}
 
 		if (h) {

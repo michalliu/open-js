@@ -224,7 +224,7 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optOverride)
 
 									} else {
 
-										if (response[5] == "xmltext") {
+										if (response[5] == "_xml_") {
 
 											response[3] = _x.fromString(response[3]);
 

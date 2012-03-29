@@ -105,9 +105,9 @@
 	    		// postMessage directly (will raise an exception) , instead we request to tranfer
 	    		// XML as String, then parse it back to XML object.
 	    		// io.js will fall to response.text
-	    		// api.js will detect that convert it back to xml
+	    		// api.js will detect that convert it back to xmlobject
 	    		// @see io.js,api.js
-	    		args[2] = "xmltext";
+	    		args[2] = "_xml_";
 	    	}
 
 	    	if (!apiInterface) { // basic interface name validation

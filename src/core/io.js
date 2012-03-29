@@ -12,6 +12,7 @@
  *           core.log
  *           util.bigtable
  *           util.time
+ * @includes common.XML
  */
 (function () {
 
@@ -545,7 +546,7 @@
 	            // error code over than 1000000 and less than 2000000 represent logic error
 	      	    status = 1000000 + retcode * 1000 + 500 + (errorcode ? errorcode : 0);
 
-	      	    deferred.reject(status,  QQWB.weibo.util.getErrorMessage(retcode,errorcode), elapsedtime, responseText);
+	      	    deferred.reject(status,  QQWB.weibo.util.getErrorMessage(responseText), elapsedtime, responseText);
 
             } else {
 
