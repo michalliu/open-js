@@ -190,6 +190,8 @@
 
 					r = matched[1];
 
+					// @see firefox bug https://bugzilla.mozilla.org/show_bug.cgi?id=483304
+					// SRC attribute is safe to read of script tag in firefox by real browser test
 			    	h = r.split('#').pop();
 
 			    	q = r.indexOf('?') == 0 ? r.slice(1, r.indexOf('#') == -1 ? u : r.indexOf('#')) : '';
