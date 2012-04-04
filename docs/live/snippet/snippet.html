@@ -20,9 +20,11 @@
     </div>
 	<script>
 
-	    var hash = (location.hash || "#").split("#").pop(),
+	    var code = (location.search || "").match(/q=([^&]+)/),
+		    
+		    code = code ? code[1] : "default.html",
 
-		    url = ['./', 'code/', hash].join(""),
+		    url = ['./', 'code/', code].join(""),
 
 			runnable = document.getElementById("runnable"),
 

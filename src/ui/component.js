@@ -404,7 +404,7 @@
 				}
 
 				// url
-				qurl = encodeURIComponent(qurl);
+				// qurl = encodeURIComponent(qurl);
 
 				_.extend(props, {
 

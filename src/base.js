@@ -30,7 +30,7 @@
          * @return {Object} The internal twb object
          */
        ,noConflict: function () {
-           originalT && (window.T = originalT);
+           window.T = originalT;
            return twb;
        }
 
@@ -150,10 +150,10 @@
 		str2Bool = function str2Bool(str) {
 			str = strTrim(str).toLowerCase();
 			switch(str){
-				case 'yes':
-				case 'on':
-				case 'true':
-				return true;
+				//case 'yes':
+				//case 'on':
+				//case 'true':
+				//return true;
 				case 'no':
 				case 'off':
 				case 'false':
@@ -164,7 +164,7 @@
 
 		str2Num = function str2Num (str,n) {
 
-			return parseInt(strTrim(str),n);
+			return parseInt(strTrim(str),n) || 0;
 
 		};
 
@@ -190,6 +190,8 @@
 
 					r = matched[1];
 
+					// @see firefox bug https://bugzilla.mozilla.org/show_bug.cgi?id=483304
+					// SRC attribute is safe to read of script tag in firefox by real browser test
 			    	h = r.split('#').pop();
 
 			    	q = r.indexOf('?') == 0 ? r.slice(1, r.indexOf('#') == -1 ? u : r.indexOf('#')) : '';
