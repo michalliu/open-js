@@ -18,9 +18,9 @@
  *           ui.component
  */
 
-if (typeof window['onloadopenjs'] == "function") {
+if (typeof window['onOpenjsLoad'] == "function") {
 
-	window['onloadopenjs'].call(QQWB,true);
+	window['onOpenjsLoad'](QQWB);
 
 }
 

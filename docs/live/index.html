@@ -15,8 +15,12 @@
 		ul{list-style-type:circle;}
 		ul li{margin-top:10px;}
         h2 {display:block;padding:20px 0px;}
+        sup{font-family:verdana,Arial,sans-serif;}
+        sup a:link,sup a:visited{color:#06c;text-decoration:none;}
+        sup a:hover,sup a:active{color:#06c;text-decoration:underline;}
 
-		pre.code{font-family:Monaco, Consolas, "Lucida Console", monospace;font-size:12px;line-height:20px;border-left:5px solid #ccc;border-right:5px solid #ccc;padding: 5px 15px;margin:25px 0px;display:block;position:relative;}
+		pre.code{font-family:Monaco, Consolas, "Lucida Console", monospace;font-size:12px;line-height:20px;border-left:5px solid #ccc;border-right:5px solid #ccc;padding: 5px 10px;margin:25px 0px;display:block;position:relative;}
+        span.code{font-family:Monaco, Consolas, "Lucida Console", monospace;font-size:12px;margin-left:20px;}
         div.run{position:absolute;right:15px;width:26px;height:18px;top:0;background:url("./images/run.png") no-repeat -26px 0px;cursor:pointer;cursor:hand;}
 
 		.aside{background:#fff;position:fixed;top:0;left:0;bottom:0;width:150px;overflow-x:hidden;overflow-y:auto;padding:15px 0px 30px 30px;border-right:1px solid #bbb;box-shadow: 0 0 20px #ccc;z-index:3;}
@@ -32,20 +36,21 @@
 		.content p{text-indent:28px;line-height:30px;}
 		.content .caution{background:#f5f5f5;}
 		.content a{text-decoration:underline;}
-        .content .options{background:#eee;}
+        .content .options{background:#eee;padding:10px 0px;}
         .content .options .opttype{float:right;}
 		.content .options p{text-indent:0;font-weight:normal;line-height:16px;}
         .content .options .argument{width:95%;margin:10px auto 0px auto;font-size:14px;font-weight:bold;}
-        .content .options .option{border-top:1px solid #ddd;margin-top:10px;padding-top:10px;width:90%;margin:10px auto 0px auto;font-size:12px;font-weight:bold;}
+        .content .options .option{width:90%;margin:10px auto 0px auto;padding-top:10px;font-size:12px;font-weight:bold;border-top:1px solid #ddd;}
         .content .options .option .desc{font-weight:normal;}
-        b.header{font-weight:bold;font-size:18px;line-height:35px;}
-        span.code{font-family:Monaco, Consolas, "Lucida Console", monospace;font-size:12px;margin-left:20px;}
-        p.apidesc{text-indent:0;}
+
+        p.intro{text-indent:0;}
+        b.header{font-size:18px;line-height:35px;}
+
 	</style>
 	<script>
         function showSnippet( url ) {
             var f = document.getElementById('snippetframe');
-            f.src = ['./snippet/snippet.html', '?', 'r=', Math.random(), '#', url].join("");
+            f.src = ['./snippet/snippet.html', '?', 'q=', url].join("");
             f.style.borderLeft="1px solid #bbb";
             f.style.boxShadow="0 0 20px #ccc";
         }
@@ -97,22 +102,23 @@
 		<h2>升级说明</h2>
 		<p>2.0版本相对上一版本的主要变动如下：</p>
 		<ul>
-			<li>支持全新的OAuth2.0协议</li>
-			<li>支持设置 <a href="#环境变量">环境变量</a></li>
-			<li>支持 <a href="#模板">模板</a> 方法</li>
-			<li><a href="#init">init</a> 方法中支持更多的控制参数</li>
-			<li>允许独立调用 <a href="#api">api</a> 方法</li>
+			<!--<li>支持全新的OAuth2.0协议</li>-->
+			<li>增加 <a href="#环境变量">环境变量</a> 设置</li>
+			<li>增加 <a href="#模板">模版</a> 方法</li>
+			<li>增加 <a href="#模板">网站连接</a> 组件调用</li>
+			<!--<li><a href="#init">init</a> 方法中支持更多的控制参数</li>-->
+			<!--<li>允许独立调用 <a href="#api">api</a> 方法</li>-->
 			<li>进一步增强兼容性</li>
 		</ul>
 
 
 		<h2 id="开始使用">开始使用</h2>
-		<p>在页面中引用OpenJS的方式分同步引用和异步引用两种，如使用同步引用，OpenJS加载的时候会阻塞页面，使用异步引用的方法虽可以避免此问题，但需要开发者进行异步编程处理，增加了一些复杂度。开发者可根据自己的项目情况，自由选择。</p>
+		<p>在页面中引用OpenJS的方式分同步引用和异步引用两种。若用同步引用的方式，为优化网站性能，建议将OpenJS放置在页面底部加载<sup><a target="_blank" href="http://developer.yahoo.com/performance/rules.html#js_bottom">[1]</a></sup>。若用异步引用的方式，开发者须进行异步编程。开发者可根据自己的项目情况，自由选择。</p>
 		<ul>
 			<li>同步引用
 <pre class="code">
 <div class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("sync_reference.html")'></div>
-&lt;script src="//open.t.qq.com/openjs/path/to/openjs.js"&gt;&lt;/script&gt;
+&lt;script src="//mat1.gtimg.com/app/openjs/openjs.js"&gt;&lt;/script&gt;
 </pre>
 同步引用，无需回调函数
 <pre class="code">
@@ -129,17 +135,16 @@
       var js, fjs = d.getElementsByTagName(s)[0];
       if (d.getElementById(id)) {return;}
       js = d.createElement(s); js.id = id;
-      js.src = "//open.t.qq.com/openjs/path/to/openjs.js";
+      js.src = "//mat1.gtimg.com/app/openjs/openjs.js";
       fjs.parentNode.insertBefore(js, fjs);
     }(document, 'script', 'openjs'));
 &lt;/script&gt;
 </pre>
-异步引用需定义回调函数 <a href="#onloadopenjs">onloadopenjs</a>
+异步引用需定义回调函数 <a id="onOpenjsLoad" href="#onOpenjsLoad">onOpenjsLoad</a>
 <pre class="code">
 &lt;script&gt;
-    window['onloadopenjs'] = function () {
-        // 你的代码
-        // this指向OpenJS
+    window['onOpenjsLoad'] = function () {
+        alert("openJS加载成功");
     }
 &lt;/script&gt;
 </pre>
@@ -147,16 +152,12 @@
 		</ul>
 
 		<h2 id="环境变量">环境变量</h2>
-		<p>OpenJS默认的运行环境参数配置基于大多数人的需要，一般情况下不需要做任何设置。但在某些特殊情况下，开发者可以通过设置环境变量，改变OpenJS的默认行为。</p>
+		<p>OpenJS默认的运行环境参数配置基于大多数人的需要，一般情况下不需要做任何设置。在某些特殊情况下，开发者可以通过设置环境变量，改变OpenJS的默认行为。环境变量以Fragment URL<sup><a target="_blank" href="http://www.w3.org/TR/WD-html40-970708/htmlweb.html#h-4.1.1">[2]</a></sup>的形式传递，不区分大小写。</p>
 <pre class="code">
 <div class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("envs.html")'></div>
-&lt;script&gt;
-QQWBENVS = { // 声明OpenJS环境变量
-    Debug: true // 开启Debug模式
-};
-&lt;/script&gt;
-&lt;script src="//open.t.qq.com/openjs/path/to/openjs.js"&gt;&lt;/script&gt;
+&lt;script src="//mat1.gtimg.com/app/openjs/openjs.js#debug=yes"&gt;&lt;/script&gt;
 </pre>
+        <!--
 		<div class="options">
 			<div class="argument">QQWBENVS<span class="opttype">Map</span><div>默认值:undefined</div><p>OpenJS环境变量对象</p></div>
 			<div class="option">Debug<span class="opttype">Boolean</span><div>默认值:false(不开启调试模式)</div><p>开启Debug模式有助于跟踪调试，建议在开发过程中开启。</p></div>
@@ -165,14 +166,28 @@ QQWBENVS = { // 声明OpenJS环境变量
 			<div class="option">CookieDomain<span class="opttype">String</span><div>默认值:''</div><p>OpenJS需要使用Cookie保存用户的授权信息，该参数可以控制Cookie的domain域。</p></div>
 			<div class="option">CookiePath<span class="opttype">String</span><div>默认值:'/'</div><p>同CookieDomain一样，该参数控制Cookie的path字段。假如你不想把腾讯微博用户授权信息保存在根域下，请设置此环境变量控制。</p></div>
 		</div>
+		-->
 
+		<div class="options">
+			<div class="argument"></div>
+			<div class="option">debug<span class="opttype">Boolean</span><div>默认值:false(不开启调试模式)</div><p>开启Debug模式有助于跟踪调试，建议在开发过程中开启。</p></div>
+			<div class="option">logLevel<span class="opttype">Number</span><div>默认值:0(输出全部日志)</div><p>值越大意味着输出Log输出的信息越少越重要，默认输出尽可能详细的Log。</p></div>
+			<div class="option">crossDomainMethod<span class="opttype">String</span><div>默认值:'auto'(自动检测)</div><p>该参数可指定跨域解决方案。默认情况下OpenJS自动检测当前浏览器，并适配一种最优的方案，如果你十分确定要采用的跨域解决方案可以指定该参数。<div class="option">html5 <span class="desc">使用postmessage跨域</span></div><div class="option">flash <span class="desc">内嵌flash代理跨域(要求Flash Player 9以上)</span></div></p></div>
+			<div class="option">cookieDomain<span class="opttype">String</span><div>默认值:''</div><p>OpenJS需使用Cookie保存用户的授权信息，此参数可以控制Cookie的domain域。</p></div>
+			<div class="option">cookiePath<span class="opttype">String</span><div>默认值:'/'</div><p>与cookieDomain一样，此参数控制Cookie的path字段。如果你不想把腾讯微博用户授权信息保存在根域下，请设置此环境变量进行控制。</p></div>
+		</div>
 		<h2 id="开放平台API调用">开放平台API调用</h2>
 		<p>本节介绍要完成API调用所需使用的方法。</p>
 
 		<h2 id="网站连接">网站连接</h2>
-		<p id="component" class="apidesc"><b class="header">component</b><span class="code">T.component(inComponentName)</span><br/>
-		<b>component</b>方法用于创建腾讯微博网站连接组件
-		</p>
+		<p id="component" class="intro"><b class="header">component</b><span class="code">T.component(inComponentName)</span><br/>
+		<b>component</b>方法用于创建腾讯微博开放平台提供的网站连接组件。</p>
+
+<pre class="code">
+<div class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("sync_reference.html")'></div>
+&lt;script src="//mat1.gtimg.com/app/openjs/openjs.js"&gt;&lt;/script&gt;
+</pre>
+
 	</div>
 	<div class="bside">
     	<div class="snippetview">

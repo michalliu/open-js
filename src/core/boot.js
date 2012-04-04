@@ -363,7 +363,7 @@ QQWB.bigtable.put('boot','solution', function () {
 	// auto detect
 	if (QQWB.envs.crossdomainmethod == 'auto') {
 
-		_l.debug("detecting crossdomain method");
+		_l.debug("detect crossdomain method");
 
         if (_br.feature.postmessage) {
 
@@ -382,7 +382,7 @@ QQWB.bigtable.put('boot','solution', function () {
 
 	} else {
 
-		_l.debug("read crossdomain method from enviroment variable");
+		_l.debug("load crossdomain method " + QQWB.envs.crossdomainmethod);
 
         crossdomainMethod = _s.trim(QQWB.envs.crossdomainmethod.toLowerCase());
 

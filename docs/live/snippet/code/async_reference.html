@@ -9,31 +9,31 @@
           var js, fjs = d.getElementsByTagName(s)[0];
           if (d.getElementById(id)) {return;}
           js = d.createElement(s); js.id = id;
-          js.src = "//open.t.qq.com/openjs/path/to/openjs.js";
+          js.src = "//mat1.gtimg.com/app/openjs/openjs.js";
           fjs.parentNode.insertBefore(js, fjs);
         }(document, 'script', 'openjs'));
     </script>
     <script>
     
-        window['onloadopenjs'] = function (succ) {
+        window['onOpenjsLoad'] = function (ref) {
     
-    	    if (succ) {
+    	    if (ref) {
     
                 alert("openjs加载成功");
     
             } else {
     
-                alert("OpenJS加载失败");
+                alert("openJS加载失败");
     
         	}
     
-    		window['onloadopenjs'] = null;
+    		window['onOpenjsLoad'] = null;
     
         }
     
         setTimeout(function () {
     
-            onloadopenjs && onloadopenjs();
+            onOpenjsLoad && onOpenjsLoad();
     
         }, 10 * 1000); // 超时检查
     
