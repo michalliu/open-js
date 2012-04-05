@@ -194,7 +194,9 @@
 			<div class="option">callbackurl<span class="opttype">String</span><div class="optdefault">默认值:当前页面网址</div><p>用户授权成功后的回跳页面地址，如不设置则为当前页面网址。回跳页面地址必须与appkey匹配<sup><a href="#">[3]</a></sup>，否则无法完成授权。</p></div>
 			<div class="option">autoclose<span class="opttype">Boolean</span><div class="optdefault">默认值:true(自动关闭授权窗口)</div><p>默认自动关闭授权窗口，否则需开发者自行关闭回跳页面窗口。</p></div>
 			<div class="option">samewindow<span class="opttype">Boolean</span><div class="optdefault">默认值:false(弹新窗口授权)</div><p>默认为弹新窗口授权，否则在同一窗口授权。</p></div>
-			<div class="option">synclogin<span class="opttype">Boolean</span><div class="optdefault">默认值:true(同步QQ登录态)</div><p>默认自动同步QQ登录态，当OAuth Token丢失或无效且无法通过refresh的方式获得新Token时，则同步QQ帐号登录态。</p></div>
+<!-- 该字段将被废弃，并有新的用途
+			<div class="option">synclogin<span class="opttype">Boolean</span><div class="optdefault">默认值:false(同步QQ登录态)</div><p>默认自动同步QQ登录态，当OAuth Token丢失或无效且无法通过refresh的方式获得新Token时，则同步QQ帐号登录态。</p></div>
+-->
 			<div class="option">pingback<span class="opttype">Boolean</span><div class="optdefault">默认值:true(发送报告)</div><p>向服务器发送质量或错误报告，帮助我们更好的完善OpenJS。为假时不向服务器发送任何数据，该参数也可以为数字，取值为1至3的整数，代表要发送报告的级别。</p></div>
 		</div>
 
