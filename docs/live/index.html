@@ -42,6 +42,8 @@
         .content .options .argument{width:95%;margin:10px auto 0px auto;font-size:14px;font-weight:bold;}
         .content .options .option{width:90%;margin:10px auto 0px auto;padding-top:10px;font-size:12px;font-weight:bold;border-top:1px solid #ddd;}
         .content .options .option .desc{font-weight:normal;}
+        .content .options .optdefault{color:#666;}
+		span.optrequired{color:#666;padding-left:10px;}
 
         p.intro{text-indent:0;}
         b.header{font-size:18px;line-height:35px;}
@@ -75,13 +77,13 @@
 		<a class="toc_title" href="#开放平台API调用">开放平台API调用</a>
 
 		<ul class="toc_section">
-			<li>- <a href="init">init</a></li>
+			<li>- <a href="#init">init</a></li>
         </ul>
 
 		<a class="toc_title" href="#网站连接">网站连接</a>
 
 		<ul class="toc_section">
-			<li>- <a href="">微评论</a></li>
+			<li>- <a href="#component">微评论</a></li>
         </ul>
 
 		<a class="toc_title" href="#应用频道接入">应用频道接入</a>
@@ -119,10 +121,8 @@
 <pre class="code">
 <div class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("sync_reference.html")'></div>
 &lt;script src="//mat1.gtimg.com/app/openjs/openjs.js"&gt;&lt;/script&gt;
-</pre>
-同步引用，无需回调函数
-<pre class="code">
 &lt;script&gt;
+    // 同步引用，无需回调函数
     // 你的代码
 &lt;/script&gt;
 </pre>
@@ -131,6 +131,11 @@
 <pre class="code">
 <div class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("async_reference.html")'></div>
 &lt;script&gt;
+    // 异步引用需定义回调函数 <a id="onOpenjsLoad" href="#onOpenjsLoad">onOpenjsLoad</a>
+    window['onOpenjsLoad'] = function () {
+        alert("openJS加载成功");
+    }
+
     (function(d, s, id) {
       var js, fjs = d.getElementsByTagName(s)[0];
       if (d.getElementById(id)) {return;}
@@ -138,14 +143,6 @@
       js.src = "//mat1.gtimg.com/app/openjs/openjs.js";
       fjs.parentNode.insertBefore(js, fjs);
     }(document, 'script', 'openjs'));
-&lt;/script&gt;
-</pre>
-异步引用需定义回调函数 <a id="onOpenjsLoad" href="#onOpenjsLoad">onOpenjsLoad</a>
-<pre class="code">
-&lt;script&gt;
-    window['onOpenjsLoad'] = function () {
-        alert("openJS加载成功");
-    }
 &lt;/script&gt;
 </pre>
     	    </li>
@@ -170,18 +167,60 @@
 
 		<div class="options">
 			<div class="argument"></div>
-			<div class="option">debug<span class="opttype">Boolean</span><div>默认值:false(不开启调试模式)</div><p>开启Debug模式有助于跟踪调试，建议在开发过程中开启。</p></div>
-			<div class="option">logLevel<span class="opttype">Number</span><div>默认值:0(输出全部日志)</div><p>值越大意味着输出Log输出的信息越少越重要，默认输出尽可能详细的Log。</p></div>
-			<div class="option">crossDomainMethod<span class="opttype">String</span><div>默认值:'auto'(自动检测)</div><p>该参数可指定跨域解决方案。默认情况下OpenJS自动检测当前浏览器，并适配一种最优的方案，如果你十分确定要采用的跨域解决方案可以指定该参数。<div class="option">html5 <span class="desc">使用postmessage跨域</span></div><div class="option">flash <span class="desc">内嵌flash代理跨域(要求Flash Player 9以上)</span></div></p></div>
-			<div class="option">cookieDomain<span class="opttype">String</span><div>默认值:''</div><p>OpenJS需使用Cookie保存用户的授权信息，此参数可以控制Cookie的domain域。</p></div>
-			<div class="option">cookiePath<span class="opttype">String</span><div>默认值:'/'</div><p>与cookieDomain一样，此参数控制Cookie的path字段。如果你不想把腾讯微博用户授权信息保存在根域下，请设置此环境变量进行控制。</p></div>
+			<div class="option">debug<span class="opttype">Boolean</span><div class="optdefault">默认值:false(不开启调试模式)</div><p>开启Debug模式有助于跟踪调试，建议在开发过程中开启。</p></div>
+			<div class="option">logLevel<span class="opttype">Number</span><div class="optdefault">默认值:0(输出全部日志)</div><p>值越大意味着输出Log输出的信息越少越重要，默认输出尽可能详细的Log。</p></div>
+			<div class="option">crossDomainMethod<span class="opttype">String</span><div class="optdefault">默认值:'auto'(自动检测)</div><p>该参数可指定跨域解决方案。默认情况下OpenJS自动检测当前浏览器，并适配一种最优的方案，如果你十分确定要采用的跨域解决方案可以指定该参数。<div class="option">html5 <span class="desc">使用postmessage跨域</span></div><div class="option">flash <span class="desc">内嵌flash代理跨域(要求Flash Player 9以上)</span></div></p></div>
+			<div class="option">cookieDomain<span class="opttype">String</span><div class="optdefault">默认值:''</div><p>OpenJS需使用Cookie保存用户的授权信息，此参数可以控制Cookie的domain域。</p></div>
+			<div class="option">cookiePath<span class="opttype">String</span><div class="optdefault">默认值:'/'</div><p>与cookieDomain一样，此参数控制Cookie的path字段。如果你不想把腾讯微博用户授权信息保存在根域下，请设置此环境变量进行控制。</p></div>
+			<div class="option">autoboot<span class="opttype">Boolean</span><div class="optdefault">默认值:true(尽早加载跨域方案)</div><p>为真时先于init方法加载跨域方案，为假时等init执行时再加载跨域方案。</p></div>
 		</div>
+
 		<h2 id="开放平台API调用">开放平台API调用</h2>
-		<p>本节介绍要完成API调用所需使用的方法。</p>
+		<p id="init" class="intro"><b class="header">init</b><span class="code">T.init(inInitOpts)</span><br/>
+		初始化。</p>
+
+<pre class="code">
+<div class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("init.html")'></div>
+&lt;script&gt;
+    T.init({
+        appkey:800000006
+    });
+&lt;/script&gt;
+</pre>
+
+		<div class="options">
+			<div class="argument">inInitOpts<span class="optrequired">必选</span><span class="opttype">Map</span></div>
+			<div class="option">appkey<span class="optrequired">必选</span><span class="opttype">String</span><div class="optdefault">默认值:无</div><p>开放平台appkey，据协议和平台的差异性有时又叫appid或client id。</p></div>
+			<div class="option">callbackurl<span class="opttype">String</span><div class="optdefault">默认值:当前页面网址</div><p>用户授权成功后的回跳页面地址，如不设置则为当前页面网址。回跳页面地址必须与appkey匹配<sup><a href="#">[3]</a></sup>，否则无法完成授权。</p></div>
+			<div class="option">autoclose<span class="opttype">Boolean</span><div class="optdefault">默认值:true(自动关闭授权窗口)</div><p>默认自动关闭授权窗口，否则需开发者自行关闭回跳页面窗口。</p></div>
+			<div class="option">samewindow<span class="opttype">Boolean</span><div class="optdefault">默认值:false(弹新窗口授权)</div><p>默认为弹新窗口授权，否则在同一窗口授权。</p></div>
+			<div class="option">synclogin<span class="opttype">Boolean</span><div class="optdefault">默认值:true(同步QQ登录态)</div><p>默认自动同步QQ登录态，当OAuth Token丢失或无效且无法通过refresh的方式获得新Token时，则同步QQ帐号登录态。</p></div>
+			<div class="option">pingback<span class="opttype">Boolean</span><div class="optdefault">默认值:true(发送报告)</div><p>向服务器发送质量或错误报告，帮助我们更好的完善OpenJS。为假时不向服务器发送任何数据，该参数也可以为数字，取值为1至3的整数，代表要发送报告的级别。</p></div>
+		</div>
+
+		<p id="login" class="intro"><b class="header">login</b><span class="code">T.login(inSuccessHandler,inFailHandler)</span><br/>
+		用腾讯微博帐号登录授权应用，并根据授权结果回调相应函数。</p>
+
+<pre class="code">
+<div class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("login.html")'></div>
+&lt;script&gt;
+    T.login(function (loginStatus) {
+        alert(loginStatus.nick);
+    },function (loginError) {
+        alert(loginError.message);
+    });
+&lt;/script&gt;
+</pre>
+		<div class="options">
+		<div class="argument">inSuccessHandler(inLoginStatus)<span class="opttype">Function</span><div class="optdefault">默认值:无</div><p>用户登录授权成功后要执行的函数。</p></div>
+			<div class="option">inLoginStatus<span class="opttype">Map</span><div class="optdefault">回调数据</div><p>包含用户登录信息。<div class="option">access_token <span class="desc">授权后获得的OAuth2.0 Accesstoken</span></div><div class="option">name <span class="desc">微博用户名</span></div><div class="option">nick <span class="desc">微博昵称</span></div></p></div>
+		<div class="argument">inFailHandler(inLoginError)<span class="opttype">Function</span><div class="optdefault">默认值:无</div><p>用户登录授权失败后要执行的函数。</p></div>
+			<div class="option">inLoginError<span class="opttype">Map</span><div class="optdefault">回调数据</div><p>包含的用户登录失败信息。<div class="option">message <span class="desc">失败原因描述</span></div></p></div>
+        </div>
 
 		<h2 id="网站连接">网站连接</h2>
 		<p id="component" class="intro"><b class="header">component</b><span class="code">T.component(inComponentName)</span><br/>
-		<b>component</b>方法用于创建腾讯微博开放平台提供的网站连接组件。</p>
+		创建腾讯微博开放平台提供的网站连接组件。</p>
 
 <pre class="code">
 <div class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("sync_reference.html")'></div>

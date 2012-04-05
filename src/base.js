@@ -131,12 +131,12 @@
 			env = {},
 
 			knownEnvs = {
-				'autoboot': {'type':tpBol, 'default':true},
+				'debug': {'type':tpBol, 'default':false},
 				'loglevel': {'type':tpNum, 'default':0},
 				'cookiedomain': {'type':tpStr, 'default':''},
 				'cookiepath': {'type':tpStr, 'default':'/'},
 				'crossdomainmethod': {'type':tpStr, 'default':'auto'},
-				'debug': {'type':tpBol, 'default':false}
+				'autoboot': {'type':tpBol, 'default':true}
 			},
 
 			str2Bool,

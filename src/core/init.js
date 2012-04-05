@@ -94,7 +94,7 @@
 
 			  ,pingback: true // pingback level 
 
-			  ,synclogin: true // auto login user. default yes
+			  ,synclogin: false // auto login user. default yes
 
 			  ,autoclose: true // auto close the authwindow
 

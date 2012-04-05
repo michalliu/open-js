@@ -122,29 +122,45 @@ QQWB.extend("log", {
 	 */
     ,_out: function (level,message) {
 
-		var logbox;
+		var _ = QQWB,
+		    
+		    _b = _.bigtable,
+
+		    logbox;
 
 		output = [
+
 			window.name ? window.name : "",
-            (window.opener || window.name === QQWB.bigtable.get("authwindow","name")) ? "#":"",// window.name can cross domain!!
-			window != window.parent ? "*":"",
-			QQWB.name,
+
+            (window.opener || window.name === _b.get("authwindow","name")) ? "#" : "", // opened window, window.name can cross domain!!
+
+			window != window.parent ? "*" : "", // in frame
+
+			_.name,
+
 			": ",
+
 			"[" + level + "] ",
-			QQWB.time.shortTime() + " ",
+
+			_.time.shortTime() + " ",
+
             message,
+
 		].join("");
 
-		logbox = QQWB.bigtable.get("log","latest");
+		logbox = _b.get("log","latest");
 
 		if (!logbox) {
 
-			logbox = QQWB.bigtable.put("log", "latest",[]);
+			logbox = _b.put("log", "latest",[]);
 
 		}
+
         // black box
-		if (logbox.length >= 100) {
+		if (logbox.length >= 200) {
+
 			logbox.shift();
+
 		}
 
 		logbox.push(output);
@@ -153,13 +169,19 @@ QQWB.extend("log", {
         QQWB.debug && window.console && window.console.log(output);
      }
 	 /**
-	  * Get latest log, this ignores debug setting, max 100 logs
+	  * Get latest log, this ignores debug setting, max 200 logs
 	  *
 	  * @access public
 	  */
-	,latest: function () {
+	,last: function (inLimit) {
 
 		var latestlogs = QQWB.bigtable.get("log","latest");
+
+		if (latestlogs && inLimit) {
+
+			latestlogs = latestlogs.slice(0,inLimit);
+
+		}
 		
 		return latestlogs ? latestlogs.join("\n") : "";
 

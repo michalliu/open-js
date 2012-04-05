@@ -94,6 +94,10 @@ var authWindow = function () {
 
 					var _ = QQWB,
 
+					    response,
+
+						mark,
+
 					    _q = _.queryString;
 
                     if (awindow.closed) { // user close like ALT + F4
@@ -110,7 +114,7 @@ var authWindow = function () {
 
 		                try {
 
-		                 	response = awindow.location.hash;	
+		                 	response = awindow.location && awindow.location.href;
 
 		                } catch (ex) {
 
@@ -118,9 +122,14 @@ var authWindow = function () {
 		                }
 
 		                if (response) {
+						   
+						   mark = response.lastIndexOf('#');
 
-		         		   response = _q.decode(response.split("#").pop());
+						   response = mark == -1 ? "" : response.slice(mark+1);
 
+		         		   response = _q.decode(response);
+
+						   //TODO: posibble bug non standard oauth2.0 protocol
 		         		   if (parseInt(response.status,10) == 200) {
 
 		                        _._token.resolveResponse(response);
