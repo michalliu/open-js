@@ -10,6 +10,7 @@
  * @requires base
  *           core.init
  * @includes core.token
+ *           core.log
  */
 (function (){
 
@@ -81,7 +82,7 @@ var authWindow = function () {
 
 					window.name = name;
 
-					window.location.replace(url + "?" + query);
+					window.location.href = url + "?" + query;
 
 					return;
 				}
@@ -94,15 +95,28 @@ var authWindow = function () {
 
 					var _ = QQWB,
 
+					    _t = _._token,
+
 					    response,
 
 						mark,
 
 					    _q = _.queryString;
 
+                   if (!awindow) {
+
+						errormsg = "browser blocked popup authorize window";
+
+						_l.error(errormsg);
+
+                        _t.resolveResponse("error=" + errormsg, true);
+
+						return;
+					}
+					
                     if (awindow.closed) { // user close like ALT + F4
 
-                        _._token.resolveResponse("error=access_denied");
+                        _t.resolveResponse("error=access_denied", true);
 
 						authorizing = false;
 
@@ -121,7 +135,7 @@ var authWindow = function () {
 		                	response = null;
 		                }
 
-		                if (response) {
+		                if (response && response != "about:blank") { // window.open url firstly is about:blank
 						   
 						   mark = response.lastIndexOf('#');
 
@@ -132,7 +146,7 @@ var authWindow = function () {
 						   //TODO: posibble bug non standard oauth2.0 protocol
 		         		   if (parseInt(response.status,10) == 200) {
 
-		                        _._token.resolveResponse(response);
+		                        _t.resolveResponse(response, true);
 
 		         		   }
 
@@ -181,19 +195,35 @@ QQWB.extend("auth",{
 
 			_l = _.log,
 
+			_t = _._token,
+
 			inited = _b.get("base","inited"),
 
-            loginStatus = _.loginStatus(), 
+			syncloginenabled = _b.get("base","synclogin"),
+
+            loginStatus = _.auth.loginStatus(), 
+
+			error,
+
+			syncloginResponseText,
 
             onLoginSessionComplete; // hander on this logon session complete
 
         if (!inited) {
 
-            _l.critical(_.name + " not initialized, call T.init() to initialize");
+			error = _.name + " not initialized, call T.init() to initialize";
+
+            _l.critical(error);
 
         }
 
-		// user loggedin at successhandler is passedIn
+		if (error && optFailHandler) {
+
+			optFailHandler({message:error});
+
+			return _;
+		}
+
 		if (loginStatus && optSuccessHandler) {
 
             optSuccessHandler(loginStatus);
@@ -202,23 +232,52 @@ QQWB.extend("auth",{
 
 		}
 
-		if (optSuccessHandler || optFailHandler) {
+		// QQ loginstatus exhchange to oauth login status
+	    if (syncloginenabled) {
 
-			onLoginSessionComplete = function (arg1) {
+	    	syncloginResponseText = _b.get("synclogin","responsetext");
 
-				if(arg1.access_token && optSuccessHandler) {
+	    	if (syncloginResponseText) {
 
-					optSuccessHandler(arg1);
+	    	    _l.debug("using prefetched synclogin ...");
 
-				} else if(arg1.error && optFailHandler){
+	    		_t.resolveResponse(syncloginResponseText, false); // don't trigger any events
 
-					optFailHandler(arg1);
+                loginStatus = _.auth.loginStatus(); // update loginstatus after using preloaded sync login result
 
-				} else {
+	    		if (loginStatus) {
+
+	    	        _l.debug("synclogin succeed");
+
+	    			optSuccessHandler && optSuccessHandler(loginStatus);
+
+	    			return _;
+
+	    		}
+
+	    	}
+	    	
+	    	_l.debug("synclogin failed, fallback to login window");
+
+	    }
+
+	    if (optSuccessHandler || optFailHandler) {
+
+	    	onLoginSessionComplete = function (arg1) {
+
+	    		if(arg1.access_token && optSuccessHandler) {
+
+	    			optSuccessHandler(arg1);
+
+	    		} else if(arg1.error && optFailHandler){
+
+	    			optFailHandler(arg1);
+
+	    		} else {
 
                     _l.error("wired result of T.login " + arg1);
 
-				}
+	    		}
 
                 _.unbind(_b.get("nativeevent","userloggedin"), onLoginSessionComplete);
 
@@ -226,15 +285,15 @@ QQWB.extend("auth",{
 
                 onLoginSessionComplete = null;
 
-			};
+	    	};
 
             _.bind(_b.get("nativeevent","userloggedin"), onLoginSessionComplete);
 
             _.bind(_b.get("nativeevent","userloginfailed"), onLoginSessionComplete);
 
-		}
+	    }
 
-		authWindow.show();
+	    authWindow.show();
 
         return _;
     }
@@ -252,6 +311,8 @@ QQWB.extend("auth",{
 
 			_l = _.log,
 
+			_t = _._token,
+
 	        loginStatus = _.loginStatus();
 
        _l.info("logging out user");
@@ -262,11 +323,13 @@ QQWB.extend("auth",{
 
        } else {
 
-           _._token.clearAccessToken();
+           _t.clearAccessToken();
 
-           _._token.clearRefreshToken();
+           _t.clearRefreshToken();
 
-           _l.info("user " + (loginStatus.name || "unknown") + "logged out");
+		   _b.del("synclogin","responsetext");
+
+           _l.info("user " + (loginStatus.name || "unknown") + " logged out");
 
        }
 
@@ -288,11 +351,13 @@ QQWB.extend("auth",{
 
 	   var _ = QQWB,
 
-	       status,
+		   _t = _._token,
 
-           accessToken = _._token.getAccessToken(),
+           accessToken = _t.getAccessToken(),
 
-           user = _._token.getTokenUser();
+           user = _t.getTokenUser(),
+
+	       status;
 
        if (accessToken) {
 

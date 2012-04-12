@@ -40,6 +40,31 @@
 			return this;
 		},
 
+        /**
+         * Wrap tpl with html tag
+         */
+        wrapWithTag: function (inHtmlTag) {
+
+            var args = arguments,
+
+                head = [],
+
+                tail = [];
+
+            for (var i=0,l=arguments.length; i<l; i++) {
+
+                head.push(['<', args[i], '>'].join(''));
+
+                tail.push(['</', args[i], '>'].join(''));
+            }
+
+            head.length > 0 && this.tmpl.splice(0,0,head.join(''));
+
+            tail.length > 0 && this.tmpl.push(tail.join(''));
+
+            return this;
+        },
+
 		/**
 		 * Reset template
 		 *
@@ -75,7 +100,7 @@
 		 *
 		 * data(a,2).data(b,3)
 		 *
-		 * data('a',2,'b',3)
+		 * data('a',2,'b',3,true)
 		 *
 		 * has same effect
 		 *
@@ -153,13 +178,23 @@
 		 */
 		renderWith: function (inData, inOverwrite) {
 
-			if (inOverwrite) {
+            this.data.apply(this,arguments);
 
-			    _.extend(this.datas, inData, inOverwrite);
+            try {
 
-			}
+			    return _.template.renderTemplate(this.tmpl.join(""), this.datas);
 
-			return _.template.renderTemplate(this.tmpl.join(""), inData);
+            } catch (templateRenderError) {
+
+                msg = ["render template " , this.name , " error, " , templateRenderError].join('');
+
+                throw new Error(msg);
+
+                _l.error(msg);
+
+            }
+
+            return "";
 		},
 
 		/**
@@ -197,12 +232,7 @@
 
 		o.datas = {};
 
-        /*
-		o.toString = function () {
-
-			return ["[openjs template]" , name ? name : "anonymous"].join(" ");
-
-		}*/
+        o.name = name || "unknown";
 
     	return o;
 

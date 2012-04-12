@@ -76,7 +76,7 @@
 
        }
 
-       return _i.ajax(opts);
+       return _i.apiAjax(opts);
 
     }
 

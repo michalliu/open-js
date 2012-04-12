@@ -5,70 +5,60 @@
 <!--[if gt IE 8]><!--><html class="no-js" lang="zh-CN"> <!--<![endif]-->
 <head>
 	<meta charset="utf-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 	<title>openJS文档</title>
-	<style>
-		body {font-size:14px;line-height:22px;font-family:Helvetica, Arial, "Microsoft YaHei",sans-serif;background:#f4f4f4;padding:0;margin:0;}
-		a:link,a:visited{color: black;text-decoration:none;}
-        a:hover {text-decoration: underline;}
-        a:active {color:#06c;}
-		ul{list-style-type:circle;}
-		ul li{margin-top:10px;}
-        h2 {display:block;padding:20px 0px;}
-        sup{font-family:verdana,Arial,sans-serif;}
-        sup a:link,sup a:visited{color:#06c;text-decoration:none;}
-        sup a:hover,sup a:active{color:#06c;text-decoration:underline;}
-
-		pre.code{font-family:Monaco, Consolas, "Lucida Console", monospace;font-size:12px;line-height:20px;border-left:5px solid #ccc;border-right:5px solid #ccc;padding: 5px 10px;margin:25px 0px;display:block;position:relative;}
-        span.code{font-family:Monaco, Consolas, "Lucida Console", monospace;font-size:12px;margin-left:20px;}
-        div.run{position:absolute;right:15px;width:26px;height:18px;top:0;background:url("./images/run.png") no-repeat -26px 0px;cursor:pointer;cursor:hand;}
-
-		.aside{background:#fff;position:fixed;top:0;left:0;bottom:0;width:150px;overflow-x:hidden;overflow-y:auto;padding:15px 0px 30px 30px;border-right:1px solid #bbb;box-shadow: 0 0 20px #ccc;z-index:3;}
-        .aside .version {font-size: 10px;font-weight: normal;}
-		.aside a{text-decoration:underline;}
-        a.toc_title{display: block;margin-top: 10px;font-weight:bold;}
-		.aside .toc_section{list-style-type:none;padding:0px;margin:5px 0 0 5px;}
-
-		.bside{position:fixed;top:0;right:0;bottom:0;width:100%;height:100%;z-index:1;background:#f4f4f4;}
-        .bside .snippetview{margin-left:740px;height:100%;}
-
-		.content{position:relative;margin:0px 0 50px 210px;width:500px;word-wrap:break-word;word-break:break-all;z-index:2;text-shadow:0px 1px #fff;}
-		.content p{text-indent:28px;line-height:30px;}
-		.content .caution{background:#f5f5f5;}
-		.content a{text-decoration:underline;}
-        .content .options{background:#eee;padding:10px 0px;}
-        .content .options .opttype{float:right;}
-		.content .options p{text-indent:0;font-weight:normal;line-height:16px;}
-        .content .options .argument{width:95%;margin:10px auto 0px auto;font-size:14px;font-weight:bold;}
-        .content .options .option{width:90%;margin:10px auto 0px auto;padding-top:10px;font-size:12px;font-weight:bold;border-top:1px solid #ddd;}
-        .content .options .option .desc{font-weight:normal;}
-        .content .options .optdefault{color:#666;}
-		span.optrequired{color:#666;padding-left:10px;}
-
-        p.intro{text-indent:0;}
-        b.header{font-size:18px;line-height:35px;}
-
-	</style>
+    <link href="./css/index.css" rel="stylesheet" type="text/css" media="all" />
+    <!--[if not IE]><!--><link href="./css/webkitborder.css" rel="stylesheet" type="text/css" media="all" /><!--<![endif]-->
 	<script>
+
         function showSnippet( url ) {
-            var f = document.getElementById('snippetframe');
+            var f = document.getElementById('snippetframe'),
+                v = document.getElementById('snippetview');
+            v.style.display="block";
             f.src = ['./snippet/snippet.html', '?', 'q=', url].join("");
             f.style.borderLeft="1px solid #bbb";
             f.style.boxShadow="0 0 20px #ccc";
         }
 
         function closeSnippet() {
-            var f = document.getElementById('snippetframe');
+            var f = document.getElementById('snippetframe'),
+                v = document.getElementById('snippetview');
+
+            v.style.display="none";
             f.src = "about:blank";
             f.style.borderLeft="none";
             f.style.boxShadow="none";
+            location.hash="OpenJS";
         }
+
+        var hashPos = location.href.lastIndexOf('#'),
+
+            hash = hashPos == -1 ? "" : location.href.slice(hashPos+1),
+            
+            star = '*',
+
+            snippet;
+
+		if (hash.indexOf(star) == 0) {
+
+            snippet = hash.slice(star.length);
+
+        }
+
+		if (snippet) {
+
+            window.onload = function () {
+
+                showSnippet(snippet);
+
+            };
+        }
+
     </script>
 </head>
 <body>
     <div class="aside">
 
-		<a class="toc_title" href="#" lang="en">OpenJS <span class="version"> (2.0)</span></a>
+		<a class="toc_title" href="#" lang="en">OpenJS <span class="version"> (2.0 Beta)</span></a>
 
 		<a class="toc_title" href="#开始使用">开始使用</a>
 
@@ -77,13 +67,79 @@
 		<a class="toc_title" href="#开放平台API调用">开放平台API调用</a>
 
 		<ul class="toc_section">
+
 			<li>- <a href="#init">init</a></li>
+
+            <li> <b>授权</b>
+
+		        <ul class="toc_section">
+
+		        	<li>- <a href="#login">login</a></li>
+
+		        	<li>- <a href="#logout">logout</a></li>
+
+		        	<li>- <a href="#loginstatus">loginStatus</a></li>
+
+                </ul>
+
+            </li>
+
+			<li>- <a href="#api">api</a></li>
+
+			<li>- <a href="#tokenready">tokenReady</a></li>
+
+			<li>- <a href="#documentready">documentReady</a></li>
+
+			<li>- <a href="#ready">ready</a></li>
+
+            <li>- <a href="#component">component</a> <img src="http://mat1.gtimg.com/app/opent/images/wiki/resource/new.gif"></img></li>
+
+            <li> <b>事件</b>
+
+		        <ul class="toc_section">
+
+		    	<li>- <a href="#bind">bind</a></li>
+
+		    	<li>- <a href="#unbind">unbind</a></li>
+
+		    	<li>- <a href="#trigger">trigger</a></li>
+
+		    	<li>- <a href="#once">once</a></li>
+
+                </ul>
+
+            </li>
+            <li> <b>辅助</b>
+
+		        <ul class="toc_section">
+
+		    	<li>- <a href="#ajax">ajax</a></li>
+
+		    	<li>- <a href="#jsonp">jsonp</a></li>
+
+		    	<li>- <a href="#script">script</a></li>
+
+		    	<li>- <a href="#task">task</a></li>
+
+		    	<li>- <a href="#find">find</a></li>
+
+		    	<li>- <a href="#localstorage">localStorage</a></li>
+
+                <li>- <a href="#template">template</a> <img src="http://mat1.gtimg.com/app/opent/images/wiki/resource/new.gif"></img></li>
+
+                </ul>
+
+            </li>
+
         </ul>
 
+<!--
 		<a class="toc_title" href="#网站连接">网站连接</a>
 
 		<ul class="toc_section">
+
 			<li>- <a href="#component">微评论</a></li>
+
         </ul>
 
 		<a class="toc_title" href="#应用频道接入">应用频道接入</a>
@@ -91,6 +147,7 @@
 		<ul class="toc_section">
 			<li>- <a href="">component</a></li>
         </ul>
+-->
 
 		<a class="toc_title" href="#历史更新">历史更新</a>
 
@@ -98,11 +155,16 @@
 
 	</div>
     <div class="content">
+        <!--[if lt IE 7]> 
+        <div class="reminder">浏览器太旧了，建议使用 <a target="_blank" href="http://www.google.com/chrome">chrome浏览器</a>。</div>
+        <![endif]-->
 		<h2>OpenJS</h2>
-		<p>OpenJS是腾讯微博开放平台提供的Javascript库，开发者使用该库可以轻松完成腾讯微博用户授权，访问API接口，调用官方组件等功能。目前已有这些应用在使用OpenJS。</p>
+        <p>OpenJS是腾讯微博开放平台提供的Javascript库，开发者使用该库可以轻松完成腾讯微博用户授权，访问API接口，调用官方组件等功能，成功案例。
+            <div><a target="_blank" href="http://www.kaixin001.com/weibo/"><img alt="开心网" src="./images/kaixin.jpg" width="160" height="95"/></a><a target="_blank" href="./images/qplus_screenshot.png" title="q+应用截图" class="showcase"><img alt="腾讯Q+"src="./images/qplus.jpg" width="160" height="95"/></a><a target="_blank" href="#" title="你的应用" class="showcase"><img alt="你的应用"src="./images/yourapp.jpg" width="160" height="95"/></a></div>
+        </p>
 
 		<h2>升级说明</h2>
-		<p>2.0版本相对上一版本的主要变动如下：</p>
+		<p>2.0 beta 版本相对上一版本的主要变动如下：</p>
 		<ul>
 			<!--<li>支持全新的OAuth2.0协议</li>-->
 			<li>增加 <a href="#环境变量">环境变量</a> 设置</li>
@@ -115,11 +177,11 @@
 
 
 		<h2 id="开始使用">开始使用</h2>
-		<p>在页面中引用OpenJS的方式分同步引用和异步引用两种。若用同步引用的方式，为优化网站性能，建议将OpenJS放置在页面底部加载<sup><a target="_blank" href="http://developer.yahoo.com/performance/rules.html#js_bottom">[1]</a></sup>。若用异步引用的方式，开发者须进行异步编程。开发者可根据自己的项目情况，自由选择。</p>
+		<p>在页面中引用OpenJS的方式分同步引用和异步引用两种。若用同步引用的方式，为优化网站性能，建议将OpenJS放置在页面底部加载<sup><a target="_blank" href="http://developer.yahoo.com/performance/rules.html#js_bottom">[链]</a></sup>。若用异步引用的方式，开发者须进行异步编程。开发者可根据自己的项目情况，自由选择。</p>
 		<ul>
 			<li>同步引用
 <pre class="code">
-<div class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("sync_reference.html")'></div>
+<a class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("sync_reference.html")' href="#*sync_reference.html"></a>
 &lt;script src="//mat1.gtimg.com/app/openjs/openjs.js"&gt;&lt;/script&gt;
 &lt;script&gt;
     // 同步引用，无需回调函数
@@ -129,7 +191,7 @@
 		    </li>
 			<li>异步引用
 <pre class="code">
-<div class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("async_reference.html")'></div>
+<a class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("async_reference.html")' href="#*async_reference.html"></a>
 &lt;script&gt;
     // 异步引用需定义回调函数 <a id="onOpenjsLoad" href="#onOpenjsLoad">onOpenjsLoad</a>
     window['onOpenjsLoad'] = function () {
@@ -149,9 +211,9 @@
 		</ul>
 
 		<h2 id="环境变量">环境变量</h2>
-		<p>OpenJS默认的运行环境参数配置基于大多数人的需要，一般情况下不需要做任何设置。在某些特殊情况下，开发者可以通过设置环境变量，改变OpenJS的默认行为。环境变量以Fragment URL<sup><a target="_blank" href="http://www.w3.org/TR/WD-html40-970708/htmlweb.html#h-4.1.1">[2]</a></sup>的形式传递，不区分大小写。</p>
+		<p>OpenJS默认的运行环境参数配置基于大多数人的需要，一般情况下不需要做任何设置。在某些特殊情况下，开发者可以通过设置环境变量，改变OpenJS的默认行为。环境变量以Fragment URL<sup><a target="_blank" href="http://www.w3.org/TR/WD-html40-970708/htmlweb.html#h-4.1.1">[链]</a></sup>的形式传递，不区分大小写。</p>
 <pre class="code">
-<div class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("envs.html")'></div>
+<a class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("envs.html")' href="#*envs.html"></a>
 &lt;script src="//mat1.gtimg.com/app/openjs/openjs.js#debug=yes"&gt;&lt;/script&gt;
 </pre>
         <!--
@@ -169,8 +231,8 @@
 			<div class="argument"></div>
 			<div class="option">debug<span class="opttype">Boolean</span><div class="optdefault">默认值:false(不开启调试模式)</div><p>开启Debug模式有助于跟踪调试，建议在开发过程中开启。</p></div>
 			<div class="option">logLevel<span class="opttype">Number</span><div class="optdefault">默认值:0(输出全部日志)</div><p>值越大意味着输出Log输出的信息越少越重要，默认输出尽可能详细的Log。</p></div>
-			<div class="option">crossDomainMethod<span class="opttype">String</span><div class="optdefault">默认值:'auto'(自动检测)</div><p>该参数可指定跨域解决方案。默认情况下OpenJS自动检测当前浏览器，并适配一种最优的方案，如果你十分确定要采用的跨域解决方案可以指定该参数。<div class="option">html5 <span class="desc">使用postmessage跨域</span></div><div class="option">flash <span class="desc">内嵌flash代理跨域(要求Flash Player 9以上)</span></div></p></div>
-			<div class="option">cookieDomain<span class="opttype">String</span><div class="optdefault">默认值:''</div><p>OpenJS需使用Cookie保存用户的授权信息，此参数可以控制Cookie的domain域。</p></div>
+			<div class="option">crossDomainMethod<span class="opttype">String</span><div class="optdefault">默认值:'auto'(自动检测)</div><p>该参数可指定跨域解决方案。默认情况下OpenJS自动检测当前浏览器，并适配一种最优的方案，假如开发者十分确定要采用的跨域方案（如：iPhone应用）可以指定该参数。<div class="option">html5 <span class="desc">使用postmessage跨域</span></div><div class="option">flash <span class="desc">通过flash代理跨域(要求Flash Player 9以上)</span></div></p></div>
+			<div class="option">cookieDomain<span class="opttype">String</span><div class="optdefault">默认值:''</div><p>OpenJS需使用Cookie保存用户的授权信息，此参数可以控制该Cookie的domain域。</p></div>
 			<div class="option">cookiePath<span class="opttype">String</span><div class="optdefault">默认值:'/'</div><p>与cookieDomain一样，此参数控制Cookie的path字段。如果你不想把腾讯微博用户授权信息保存在根域下，请设置此环境变量进行控制。</p></div>
 			<div class="option">autoboot<span class="opttype">Boolean</span><div class="optdefault">默认值:true(尽早加载跨域方案)</div><p>为真时先于init方法加载跨域方案，为假时等init执行时再加载跨域方案。</p></div>
 		</div>
@@ -180,10 +242,9 @@
 		初始化。</p>
 
 <pre class="code">
-<div class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("init.html")'></div>
 &lt;script&gt;
     T.init({
-        appkey:800000006
+        appkey:801124049
     });
 &lt;/script&gt;
 </pre>
@@ -191,20 +252,20 @@
 		<div class="options">
 			<div class="argument">inInitOpts<span class="optrequired">必选</span><span class="opttype">Map</span></div>
 			<div class="option">appkey<span class="optrequired">必选</span><span class="opttype">String</span><div class="optdefault">默认值:无</div><p>开放平台appkey，据协议和平台的差异性有时又叫appid或client id。</p></div>
-			<div class="option">callbackurl<span class="opttype">String</span><div class="optdefault">默认值:当前页面网址</div><p>用户授权成功后的回跳页面地址，如不设置则为当前页面网址。回跳页面地址必须与appkey匹配<sup><a href="#">[3]</a></sup>，否则无法完成授权。</p></div>
+			<div class="option">callbackurl<span class="opttype">String</span><div class="optdefault">默认值:当前页面网址</div><p>用户授权成功后的回跳页面地址，如不设置则为当前页面网址。回跳页面地址必须与appkey匹配<sup><a href="#">[链]</a></sup>，否则无法完成授权。</p></div>
 			<div class="option">autoclose<span class="opttype">Boolean</span><div class="optdefault">默认值:true(自动关闭授权窗口)</div><p>默认自动关闭授权窗口，否则需开发者自行关闭回跳页面窗口。</p></div>
-			<div class="option">samewindow<span class="opttype">Boolean</span><div class="optdefault">默认值:false(弹新窗口授权)</div><p>默认为弹新窗口授权，否则在同一窗口授权。</p></div>
-<!-- 该字段将被废弃，并有新的用途
-			<div class="option">synclogin<span class="opttype">Boolean</span><div class="optdefault">默认值:false(同步QQ登录态)</div><p>默认自动同步QQ登录态，当OAuth Token丢失或无效且无法通过refresh的方式获得新Token时，则同步QQ帐号登录态。</p></div>
--->
+			<div class="option">samewindow<span class="opttype">Boolean</span><div class="optdefault">默认值:false(弹新窗口授权)</div><p>默认为弹新窗口授权，否则在同一窗口授权，在此情况下开发者须自己处理授权返回的token，或使用我们提供的通用方案<sup><a href="#">[链]</a></sup>。</p></div>
+			<div class="option">synclogin<span class="opttype">Boolean</span><div class="optdefault">默认值:false</div><p>默认为不使用QQ登录态授权。若该项为真，当<a href="#login">T.login</a>被调用时，首先尝试使用QQ登录态授权当前应用，如失败则弹新窗口授权）。</p></div>
 			<div class="option">pingback<span class="opttype">Boolean</span><div class="optdefault">默认值:true(发送报告)</div><p>向服务器发送质量或错误报告，帮助我们更好的完善OpenJS。为假时不向服务器发送任何数据，该参数也可以为数字，取值为1至3的整数，代表要发送报告的级别。</p></div>
 		</div>
+
+<p class="paragraph">§</p>
 
 		<p id="login" class="intro"><b class="header">login</b><span class="code">T.login(inSuccessHandler,inFailHandler)</span><br/>
 		用腾讯微博帐号登录授权应用，并根据授权结果回调相应函数。</p>
 
 <pre class="code">
-<div class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("login.html")'></div>
+<a class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("login.html")' href="#*login.html"></a>
 &lt;script&gt;
     T.login(function (loginStatus) {
         alert(loginStatus.nick);
@@ -220,21 +281,507 @@
 			<div class="option">inLoginError<span class="opttype">Map</span><div class="optdefault">回调数据</div><p>包含的用户登录失败信息。<div class="option">message <span class="desc">失败原因描述</span></div></p></div>
         </div>
 
-		<h2 id="网站连接">网站连接</h2>
-		<p id="component" class="intro"><b class="header">component</b><span class="code">T.component(inComponentName)</span><br/>
-		创建腾讯微博开放平台提供的网站连接组件。</p>
+<p class="paragraph">§</p>
+
+		<p id="logout" class="intro"><b class="header">logout</b><span class="code">T.logout(inHandler)</span><br/>
+		登出用户，清除用户授权信息。</p>
+
+		<div class="options">
+		<div class="argument">inHandler<span class="opttype">Function</span><div class="optdefault">默认值:无</div><p>用户登出后要执行的函数。</p></div>
+        </div>
+
+<p class="paragraph">§</p>
+
+		<p id="loginstatus" class="intro"><b class="header">loginStatus</b><span class="code">T.loginStatus()</span><br/>
+		获取用户登录信息，如用户已登录返回包含access_token的Map对象，如未登录返回undefined。</p>
+
+
+<p class="paragraph">§</p>
+
+		<p id="api" class="intro"><b class="header">api</b><span class="code">T.api(inName, inParamMap, inDataType, inType, inOverride)</span><br/>
+        调用开放平台API<sup><a target="_blank" href="http://wiki.open.t.qq.com/index.php/API%E6%96%87%E6%A1%A3">[链]</a></sup>，返回Defer对象<sup><a target="_blank" href="#">[链]</a></sup>。</p>
 
 <pre class="code">
-<div class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("sync_reference.html")'></div>
-&lt;script src="//mat1.gtimg.com/app/openjs/openjs.js"&gt;&lt;/script&gt;
+<a class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("api.html")' href="#*api.html"></a>
+&lt;script&gt;
+    T.api("/user/info")
+     .success(function (response){
+          alert(response.nick);
+      })
+     .error(function (code, message) {
+          alert(message);
+      });
+&lt;/script&gt;
+</pre>
+也支持如下书写方式，连续调用多个独立的API，也可参考<a href="#task">T.task</a>方法。
+<pre class="code">
+<a class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("api_muti.html")' href="#*api_muti.html"></a>
+&lt;script&gt;
+    T.api("/user/info")
+     .success(function (response){
+          alert(response.nick);
+      })
+     .error(function (code, message) {
+          alert(message);
+      })
+     .api("/statuses/home_timeline")
+     .success(function (response) {
+          alert(response);
+      })
+     .error(function (code, message) {
+      });
+&lt;/script&gt;
+</pre>
+		<div class="options">
+			<div class="argument">inName<span class="optrequired">必选</span><span class="opttype">String</span><div class="optdefault">默认值:无</div><p>要调用的API名称，如"/t/add"。（暂不支持"/t/add_pic"）</p></div>
+			<div class="argument">inParamMap<span class="opttype">Map</span><div class="optdefault">默认值:无</div><p>该API对应的参数列表，如{content:"test",clientip:"123.123.123.123"}，参数表中可忽略format字段，该字段由inDataType指定。</p></div>
+			<div class="argument">inDataType<span class="opttype">String</span><div class="optdefault">默认值:"json"</div><p>返回的数据格式，"json"或"xml"。</p></div>
+			<div class="argument">inType<span class="opttype">String</span><div class="optdefault">默认值:"get"</div><p>请求方法，"get"或"post"，建议调用写接口统一用"post"。</p></div>
+			<div class="argument">inOverride<span class="opttype">Map</span><div class="optdefault">默认值:无</div><p>覆盖当前使用的appkey和accessToken，此选项使T.api接口可以独立使用。</p><div class="option">appkey <span class="desc">使用此appkey发出api请求</span></div><div class="option">accesstoken <span class="desc">使用此accesstoken发出api请求。</span></div></div>
+        </div>
+
+<p class="paragraph">§</p>
+
+		<p id="tokenready" class="intro"><b class="header">tokenReady</b><span class="code">T.tokenReady(inHandler)</span><br/>
+		注册回调函数，inHandler在用户登录态确定后执行。</p>
+<pre class="code">
+<a class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("tokenReady.html")' href="#*tokenReady.html"></a>
+&lt;script&gt;
+    T.tokenReady(function () {
+        if (T.loginStatus()) {
+            alert("已登录");
+        } else {
+            alert("未登录");
+        }
+    });
+&lt;/script&gt;
+</pre>
+		<div class="options">
+		<div class="argument">inHandler<span class="opttype">Function</span><div class="optdefault">默认值:无</div><p>用户登录态确定后要执行的函数。</p></div>
+        </div>
+
+<p class="paragraph">§</p>
+
+		<p id="documentready" class="intro"><b class="header">documentReady</b><span class="code">T.documentReady(inHandler)</span><br/>
+		注册回调函数，inHandler在DOM树可用后执行。</p>
+
+<pre class="code">
+<a class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("documentReady.html")' href="#*documentReady.html"></a>
+&lt;script&gt;
+    T.documentReady(function () {
+        var div = document.createElement("div");
+        div.innerHTML = "DOM ready";
+        document.body.appendChild(div);
+    });
+&lt;/script&gt;
+</pre>
+		<div class="options">
+		<div class="argument">inHandler<span class="opttype">Function</span><div class="optdefault">默认值:无</div><p>DOM树可用后要执行的函数。</p></div>
+        </div>
+
+<p class="paragraph">§</p>
+
+		<p id="ready" class="intro"><b class="header">ready</b><span class="code">T.ready(inHandler)</span><br/>
+        注册回调函数，inHandler在<a href="#tokenready">tokenReady</a>和<a href="#documentready">documentReady</a>后执行。</p>
+<pre class="code">
+<a class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("ready.html")' href="#*ready.html"></a>
+&lt;script&gt;
+    T.ready(function () {
+        var stat = T.loginStatus(),
+            bar = document.createElement('div'),
+            str;
+    
+        if (stat) {
+            str = '欢迎' + stat.nick;
+        } else {
+            str = '未登录';
+        }
+    
+        bar.innerHTML = str;
+        document.body.appendChild(bar);
+    });
+&lt;/script&gt;
+</pre>
+		<div class="options">
+		<div class="argument">inHandler<span class="opttype">Function</span><div class="optdefault">默认值:无</div><p><a href="#tokenready">tokenReady</a>和<a href="#documentready">documentReady</a>后要执行的函数。</p></div>
+        </div>
+
+<p class="paragraph">§</p>
+
+		<p id="bind" class="intro"><b class="header">bind</b><span class="code">T.bind(inEventName, inHandler)</span><br/>
+        绑定事件<em>inEventName</em>，此事件发生时执行<em>inHandler</em>。</p>
+
+<pre class="code">
+<a class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("bind.html")' href="#*bind.html"></a>
+&lt;script&gt;
+    T.bind("ready",function () {
+        alert("ready");
+    });
+&lt;/script&gt;
 </pre>
 
+		<div class="options">
+		<div class="argument">inEventName<span class="optrequired">必选</span><span class="opttype">String</span><div class="optdefault">默认值:无</div><p id="openjs事件">事件名称，可为OpenJS的事件（下表），也可自定义。</p></div>
+        <div class="option">UserLoggedIn <span class="desc">用户授权后触发，参考<a href="#login">T.login</a>。</span></div>
+        <div class="option">UserLoginFailed <span class="desc">用户拒绝授权后触发，参考<a href="#login">T.login</a>。</span></div>
+        <div class="option">UserLoggedOut <span class="desc">登出后触发，参考<a href="#logout">T.logout</a>。</span></div>
+        <div class="option">tokenReady <span class="desc">token准备完毕后触发，参考<a href="#tokenready">T.tokenReady</a>。</span></div>
+        <div class="option">documentReady <span class="desc">DOM树可用后触发，参考<a href="#documentready">T.documentReady</a>。</span></div>
+        <div class="option">ready <span class="desc">token准备完毕并且DOM树可用后触发，参考<a href="#ready">T.ready</a>。</span></div>
+		<div class="argument">inHandler(inEventData*)<span class="optrequired">必选</span><span class="opttype">Function</span><div class="optdefault">默认值:无</div><p>事件发生时要执行的函数</p></div>
+            <div class="option">inEventData<span class="opttype">Mixed</span><div class="optdefault">事件数据，参考<a href="#trigger">T.trigger</a>。</div></div>
+        </div>
+
+<p class="paragraph">§</p>
+
+		<p id="unbind" class="intro"><b class="header">unbind</b><span class="code">T.unbind(inEventName, inHandler)</span><br/>
+        解除事件绑定<em>inEventName</em>，返回布尔值，表示解除绑定是否成功。</p>
+
+		<div class="options">
+        <div class="argument">inEventName<span class="optrequired">必选</span><span class="opttype">String</span><div class="optdefault">默认值:无</div><p>事件名称，可为<a href="#openjs事件">OpenJS的事件</a>，也可自定义。</p></div>
+        <div class="argument">inHandler<span class="optrequired">必选</span><span class="opttype">Function</span><div class="optdefault">默认值:无</div><p>要解除绑定的函数。</p></div>
+        </div>
+
+<p class="paragraph">§</p>
+
+		<p id="trigger" class="intro"><b class="header">trigger</b><span class="code">T.trigger(inEventName, inEventData*)</span><br/>
+        手动触发事件<em>inEventName</em>，返回数组，包含回调函数执行后的系列返回值。</p>
+
+<pre class="code">
+<a class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("trigger.html")' href="#*trigger.html"></a>
+&lt;script&gt;
+    T.bind("myEvent",function (myEventData) {
+        alert(myEventData);
+    });
+    T.trigger("myEvent","myData");
+&lt;/script&gt;
+</pre>
+
+		<div class="options">
+        <div class="argument">inEventName<span class="optrequired">必选</span><span class="opttype">String</span><div class="optdefault">默认值:无</div><p>自定义的事件名称，如无特殊需要，不建议手动触发<a href="#openjs事件">OpenJS的事件</a>。</p></div>
+        <div class="argument">inEventData<span class="opttype">Mixed</span><div class="optdefault">默认值:无</div><p>事件数据，参考<a href="#bind">T.bind</a></p></div>
+        </div>
+
+<p class="paragraph">§</p>
+
+		<p id="once" class="intro"><b class="header">once</b><span class="code">T.once(inEventName, inHandler)</span><br/>
+        与<a href="#bind">T.bind</a>一样，区别在于<em>inHanlder</em>执行后自动解除绑定。</p>
+
+<pre class="code">
+<a class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("once.html")' href="#*once.html"></a>
+&lt;script&gt;
+    T.once("myEvent",function (myEventData) {
+        alert(myEventData);
+    });
+    T.trigger("myEvent","myEventData1");
+    T.trigger("myEvent","myEventData2");
+&lt;/script&gt;
+</pre>
+
+<p class="paragraph">§</p>
+
+		<p id="ajax" class="intro"><b class="header">ajax</b><span class="code">T.ajax(inAjaxConfig)</span><br/>
+        AJAX请求，返回Defer对象<sup><a target="_blank" href="#">[链]</a></sup>。</p>
+
+<pre class="code">
+<a class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("ajax.html")' href="#*ajax.html"></a>
+&lt;script&gt;
+    T.ajax({
+        url: "ajaxsample.json"
+    }).success(function (response) {
+        alert(response);
+    }).error(function (code, message) {
+        alert(message);
+    });
+&lt;/script&gt;
+</pre>
+
+		<div class="options">
+        <div class="argument">inAjaxConfig<span class="optrequired">必选</span><span class="opttype">Map</span><div class="optdefault">默认值:无</div><p>AJAX请求配置。</p></div>
+            <div class="option">url<span class="optrequired">必选</span><span class="opttype">String</span><div class="optdefault">默认值：无</div><p>请求网址</p></div>
+            <div class="option">type<span class="opttype">String</span><div class="optdefault">默认值："get"</div><p>请求类型，<em>get</em>或<em>post</em>。</p></div>
+            <div class="option">data<span class="opttype">String<span class="vsep">|</span>Map</span><div class="optdefault">默认值：无</div><p>请求数据。</p></div>
+            <div class="option">dataType<span class="opttype">String</span><div class="optdefault">默认值："json"（数据转换为JSON对象）</div><p>返回结果的数据格式，<em>json</em>或<em>xml</em>或<em>text</em>。</p></div>
+			<div class="option">cache<span class="opttype">Boolean</span><div class="optdefault">默认值：false（不允许缓存）</div><p>GET类型的HTTP请求会被浏览器缓存。</p></div>
+			<div class="option">async<span class="opttype">String</span><div class="optdefault">默认值："async"（异步请求）</div><p>请求编程类型<em>async</em>或<em>sync</em>，异步或同步。</p></div>
+        </div>
+
+<p class="paragraph">§</p>
+
+		<p id="jsonp" class="intro"><b class="header">jsonp</b><span class="code">T.jsonp(inJsonpConfig)</span><br/>
+        JSONP<sup><a target="blank" href="http://en.wikipedia.org/wiki/JSONP">[链]</a></sup>请求，返回Defer对象。<sup><a target="_blank" href="#">[链]</a></sup>。</p>
+<pre class="code">
+<a class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("jsonp.html")' href="#*jsonp.html"></a>
+&lt;script&gt;
+    T.jsonp({
+        url: "jsonpurl"
+    }).success(function (response) {
+        alert(response);
+    }).error(function (code, message) {
+        alert(message);
+    });
+&lt;/script&gt;
+</pre>
+
+		<div class="options">
+        <div class="argument">inJsonpConfig<span class="optrequired">必选</span><span class="opttype">Map</span><div class="optdefault">默认值:无</div><p>jsonp请求配置。</p></div>
+            <div class="option">url<span class="optrequired">必选</span><span class="opttype">String</span><div class="optdefault">默认值：无</div><p>请求网址</p></div>
+            <div class="option">data<span class="opttype">String<span class="vsep">|</span>Map</span><div class="optdefault">默认值：无</div><p>附加在url的请求串。</p></div>
+            <div class="option">dataType<span class="opttype">String</span><div class="optdefault">默认值："json"（数据转换为JSON对象）</div><p>返回结果的数据格式，<em>json</em>或<em>xml</em>或<em>text</em>。</p></div>
+			<div class="option">cache<span class="opttype">Boolean</span><div class="optdefault">默认值：false（不允许缓存）</div><p>GET类型的HTTP请求会被浏览器缓存。</p></div>
+            <div class="option">charset<span class="opttype">String</span><div class="optdefault">默认值："utf-8"</div><p>所请求文件编码</p></div>
+        </div>
+
+<p class="paragraph">§</p>
+
+		<p id="script" class="intro"><b class="header">script</b><span class="code">T.script(inScriptConfig)</span><br/>
+        异步引入其它script，返回Defer对象<sup><a target="_blank" href="#">[链]</a></sup>。</p>
+
+<pre class="code">
+<a class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("script.html")' href="#*script.html"></a>
+&lt;script&gt;
+    T.script({
+        url: "http://code.jquery.com/jquery-1.7.2.min.js"
+    }).success(function () {
+        alert($);
+    }).error(function (code, message) {
+        alert(message);
+    });
+&lt;/script&gt;
+</pre>
+
+		<div class="options">
+        <div class="argument">inScriptConfig<span class="optrequired">必选</span><span class="opttype">Map</span><div class="optdefault">默认值:无</div><p>script请求配置。</p></div>
+            <div class="option">url<span class="optrequired">必选</span><span class="opttype">String</span><div class="optdefault">默认值：无</div><p>请求网址</p></div>
+            <div class="option">data<span class="opttype">String<span class="vsep">|</span>Map</span><div class="optdefault">默认值：无</div><p>附加在url的请求串。</p></div>
+			<div class="option">cache<span class="opttype">Boolean</span><div class="optdefault">默认值：true（允许缓存）</div><p>GET类型的HTTP请求会被浏览器缓存。</p></div>
+            <div class="option">charset<span class="opttype">String</span><div class="optdefault">默认值："utf-8"</div><p>所请求文件编码</p></div>
+        </div>
+
+<p class="paragraph">§</p>
+
+		<p id="task" class="intro"><b class="header">task</b><span class="code">T.task(inDeferred*)</span><br/>
+        创建任务组，同时完成多项异步任务，这些任务中如果有任一项失败，整个task失败，返回Defer对象<sup><a target="_blank" href="#">[链]</a></sup>。</p>
+
+<pre class="code">
+<a class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("task.html")' href="#*task.html"></a>
+&lt;script&gt;
+    T.task(
+          T.api("/statuses/home_timeline"),
+          T.api("/statuses/public_timeline")
+      )
+     .success(function (homeData, publicData) {
+          alert([homeData[0], publicData[0]]);
+      })
+     .error(function (code, message) {
+          alert(message);
+      });
+&lt;/script&gt;
+</pre>
+
+		<div class="options">
+        <div class="argument">inDeferred<span class="optrequired">必选</span><span class="opttype">Object</span><div class="optdefault">默认值:无</div><p>返回Defer对象的一个或多个异步请求。</p></div>
+        </div>
+
+<p class="paragraph">§</p>
+
+		<p id="find" class="intro"><b class="header">find</b><span class="code">T.find(selector, context, result)</span><br/>
+        OpenJS集成了jQuery的选择器引擎<a target="_blank" href="http://sizzlejs.com/">Sizzle</a>，以帮助开发者进行高效率开发。返回数组，包含匹配到的DOM元素。</p>
+
+<pre class="code">
+<a class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("find.html")' href="#*find.html"></a>
+&lt;script&gt;
+    T.documentReady(function () {
+        alert(T.find("ul > li"));
+    });
+&lt;/script&gt;
+</pre>
+
+		<div class="options">
+        <div class="argument">selector<span class="optrequired">必选</span><span class="opttype">String</span><div class="optdefault">默认值:无</div><p>选择指令。更多选择DOM元素的技巧，请参考<a target="_blank" href="https://github.com/jquery/sizzle/wiki/Sizzle-Home">Sizzle文档</a>。</p></div>
+        <div class="argument">context<span class="opttype">DOMElement</span><div class="optdefault">默认值:document</div><p>选择指令的上下文环境。</p></div>
+        <div class="argument">result<span class="opttype">Array</span><div class="optdefault">默认值:无</div><p>结果存储的数组。</p></div>
+        </div>
+
+<p class="paragraph">§</p>
+
+		<p id="localstorage" class="intro"><b class="header">localStorage</b><span class="code">T.localStorage</span><br/>
+        跨浏览器的localStorage对象，开发者可以使用此技术提升用户体验。</p>
+
+<pre class="code">
+<a class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("localStorage.html")' href="#*localStorage.html"></a>
+&lt;script&gt;
+    T.localStorage.set("mykey", "mydata");
+    alert(T.localStorage.get("mykey"));
+&lt;/script&gt;
+</pre>
+
+		<div class="options">
+		<div class="argument">set(key, value, expires)<span class="opttype">Function</span><p>保存数据到本地（请勿保存敏感数据）。</p></div>
+            <div class="option">key <span class="desc">键名</span></div>
+            <div class="option">value <span class="desc">键值</span></div>
+            <div class="option">expires <span class="desc">可选，保存期限（以天为单位），默认7天。</span></div>
+		<div class="argument">get(key, defaultValue)<span class="opttype">Function</span><p>从本地获取数据。</p></div>
+            <div class="option">key <span class="desc">键名</span></div>
+            <div class="option">defaultValue <span class="desc">可选，默认的返回值</span></div>
+		<div class="argument">del(key)<span class="opttype">Function</span><p>从本地删除数据。</p></div>
+            <div class="option">key <span class="desc">键名</span></div>
+        </div>
+
+
+<p class="paragraph">§</p>
+
+		<p id="template" class="intro"><b class="header">template</b><span class="code">T.template(inTemplateName)</span><br/>
+        小型js模板引擎<sup><a target="_blank" href="http://ejohn.org/blog/javascript-micro-templating/">[链]</a></sup>，返回模板对象，使用此对象可以方便的构造html。</p>
+
+<pre class="code">
+<a class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("template.html")' href="#*template.html"></a>
+&lt;script&gt;
+// 显示一个简单二维表格并隔行换色
+var table = T.template("mytable");
+table.add('&lt;% for(var i=0,l=data.length; i&lt;l; i++) {  %&gt;')
+     .add('&lt;% var name= data[i][0],score=data[i][1],highlight= i%2==0; %&gt;')
+     .add('&lt;tr style="background:&lt;%=highlight ? \"red\" : \"green\" %&gt;;"&gt;')
+     .add('&lt;td&gt;&lt;%=name%&gt;&lt;/td&gt;&lt;td&gt;&lt;%=score%&gt;&lt;/td&gt;')
+     .add('&lt;/tr&gt;')
+     .add('&lt;% } %&gt;')
+   .wrapWithTag('tbody','table')
+   .data('data',[["张三",90],["李四",85],["王五",80],["柳六",100]]);
+
+T.documentReady(function () {
+    document.body.innerHTML = table.render();
+});
+&lt;/script&gt;
+</pre>
+
+		<div class="options">
+        <div class="argument">inTemplateName<span class="opttype">String</span><div class="optdefault">默认值:"unknown"</div><p>模板名。</p></div>
+        </div>
+<br/>
+模板对象的方法<br/>
+<br/>
+		<div class="options">
+		<div class="argument">add(inTplStr)<span class="opttype">Function</span><p>添加模板字符串。</p></div>
+            <div class="option">inTplStr <span class="desc">模板字符串</span></div>
+		<div id="templatedata" class="argument">data(inTplData,inOverWrite)<span class="opttype">Function</span><p>添加模板数据。data方法支持多种写法，以下调用方法效果相同。
+<pre class="code">
+<a class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("template_add.html")' href="#*template_add.html"></a>
+&lt;script&gt;
+    var tp = T.template("mytemplate");
+    tp.add('&lt;ol&gt;')
+      .add('&lt;li&gt;&lt;%=x%&gt;&lt;/li&gt;')
+      .add('&lt;li&gt;&lt;%=y%&gt;&lt;/li&gt;')
+      .add('&lt;/ol&gt;');
+
+    var result1 = tp.data({"x":1,"y":2}).render();
+    tp.reset(false,true);
+
+    var result2 = tp.data(["x",1,"y",2]).render();
+    tp.reset(false,true);
+
+    var result3 = tp.data("x",1).data('y',2).render();
+    tp.reset(false,true);
+
+    // 采用这种写法必须明确指定inOverWrite
+    var result4 = tp.data("x",1,'y',2,true).render();
+    tp.reset(false,true);
+
+    alert(result1 && result1 == result2 && result2 == result3 && result3 == result4);
+&lt;/script&gt;
+</pre></p></div>
+            <div class="option">inTplData <span class="desc">模板数据</span></div>
+            <div class="option">inOverWrite <span class="desc">是否覆盖之前的模板数据</span></div>
+		<div class="argument">wrapWithTag(inHtmlTag*)<span class="opttype">Function</span><p>快捷方法，把模板字符串头部与尾部附加html标签。</p></div>
+            <div class="option">inHtmlTag <span class="desc">html标签，如tbdoy,table,div,iframe等</span></div>
+        <div class="argument">renderWith(inTplData,inOverWrite)<span class="opttype">Function</span><p>指定模板数据，并输出模板渲染结果，参数及用法与<a href="#templatedata">data方法</a>完全一致。</p></div>
+            <div class="option">inTplData <span class="desc">模板数据</span></div>
+            <div class="option">inOverWrite <span class="desc">是否覆盖之前的模板数据</span></div>
+		<div class="argument">render()<span class="opttype">Function</span><p>输出模板渲染结果。</p></div>
+		<div class="argument">reset(inResetTpl,inResetData)<span class="opttype">Function</span><p>重置模板字符串或重置模板数据。</p></div>
+            <div class="option">inResetTpl <span class="desc">是否清空模板字符串</span></div>
+            <div class="option">inResetData <span class="desc">是否清空模板数据</span></div>
+        </div>
+<br/>
+静态方法<br/>
+<br/>
+
+		<div class="options">
+        <div class="argument">renderTemplate(inTplStr, inTplData)<span class="opttype">Function</span><p>使用模板数据<em>inTplData</em>渲染模板<em>inTplStr</em>，返回渲染后的模板字符串。</p></div>
+            <div class="option">inTplStr <span class="desc">模板</span></div>
+            <div class="option">inTplData <span class="desc">模板数据</span></div>
+        </div>
+
+<p class="paragraph">§</p>
+
+		<p id="component" class="intro"><b class="header">component</b><span class="code">T.component(inComponentName)</span><br/>
+        创建网站连接的腾讯微博组件，返回网站连接组件对象。</p>
+
+<pre class="code">
+<a class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("component.html")' href="#*component.html"></a>
+&lt;script&gt;
+    T.component("微评论").appkey('801126062').renderInto("body");
+&lt;/script&gt;
+</pre>
+
+		<div class="options">
+        <div class="argument">inComponentName<span class="opttype">String</span><div class="optdefault">默认值:无</div><p>组件名称，目前仅支持"微评论"。</p></div>
+        </div>
+<br/>
+网站连接组件对象的公有方法<br/>
+<br/>
+		<div class="options">
+		<div class="argument">dimension(width,height)<span class="opttype">Function</span><p>设置组件宽，高。</p></div>
+            <div class="option">width <span class="desc">组件宽度</span></div>
+            <div class="option">height <span class="desc">组件高度</span></div>
+		<div class="argument">width(width)<span class="opttype">Function</span><p>设置组件宽度。</p></div>
+            <div class="option">width <span class="desc">组件宽度</span></div>
+		<div class="argument">height(height)<span class="opttype">Function</span><p>设置组件高度。</p></div>
+            <div class="option">height <span class="desc">组件高度</span></div>
+		<div class="argument">style(styleName)<span class="opttype">Function</span><p>设置组件样式。</p></div>
+            <div class="option">styleName <span class="desc">组件样式名</span></div>
+		<div class="argument">config(inConfig)<span class="opttype">Function</span><p>其它组件配置。</p></div>
+            <div class="option">inConfig <span class="desc">组件配置Map对象</span></div>
+		<div class="argument">renderInto(context)<span class="opttype">Function</span><p>在网站上渲染网站连接组件。</p></div>
+            <div class="option">context <span class="desc">要渲染到的DOM节点或选择符<sup><a href="#find">[链]</a></sup>，默认使用选择符选中的第一个元素。</span></div>
+		<div class="argument">render()<span class="opttype">Function</span><p>在网站上渲染网站连接组件，渲染该组件到组件预先指定的id。</p></div>
+        </div>
+
+<br/>
+微评论组件的私有方法<br/>
+<br/>
+		<div class="options">
+		<div class="argument">appkey(inAppkey)<span class="opttype">Function</span><p>设置微评论组件的Appkey。</p></div>
+            <div class="option">inAppkey <span class="desc">微评论组件的Appkey，如<em>801126062</em></span></div>
+		<div class="argument">colors(colors*)<span class="opttype">Function</span><p>设置微评论组件的Appkey。</p></div>
+            <div class="option">colors <span class="desc">微评论组件颜色设置，如blue,green,#06c等。最多4个，依次代表背景色，评论背景色，边框色，主字色</span></div>
+        </div>
+
+		<h2 id="历史更新">历史更新</h2>
+		<div class="options">
+            <div class="argument">版本: <a target="_blank" href="http://mat1.gtimg.com/app/openjs/openjs.js?v=2.0beta">2.0 beta</a><span class="opttype">2012.4</span><p><ul class="updatelist">
+                    <li>增加<a href="#环境变量">环境变量</a>设置。</li>
+                    <li>增加 <a href="#template">模版</a> 方法。</li>
+                    <li>增加 <a href="#component">网站连接组件</a> 调用方法。</li>
+                    <li>进一步增强浏览器兼容性。</li>
+            </ul></p></div>
+            <div class="argument">版本: <a target="_blank" href="http://mat1.gtimg.com/app/vt/public/openjs/v15.js?v=1.5">1.5</a><span class="optrequired">推荐使用</span><span class="opttype">2012.1</span><p><ul class="updatelist"><li>由于某些接口不需要鉴权，如public_timeline，因此移除了T.api接口的登录态检查。若<a href="#api">T.api</a>如出现鉴权错误，请调用 <a href="#loginstatus">T.loginStatus</a> 检查登录态是否正常。</li><li>修复IE6,7下使用flash方案跨域数据乱序的错误。</li></ul></p></div>
+            <div class="argument">版本: <a target="_blank" href="http://mat1.gtimg.com/app/vt/public/openjs/v10.js?v=1.0">1.0</a><span class="opttype">2011.10</span><p>初始版本</p></div>
+        </div>
+
+		<h2 id="常见问题">常见问题</h2>
+		<div class="options">
+                <ol class="faq">
+                    <li>
+                    我在使用过程中遇到问题应该如何解决？<br/>
+                    可以加入OpenJS专属QQ群，群号<em class="red">218662764</em>。如果你认为遇到了bug或是浏览器兼容性问题，可以在 <a target="_blank" href="http://code.google.com/p/openjs-project/issues/list">问题跟踪系统</a> 中提交你的问题，我们的开发人员会尽快跟踪处理。
+                    </li>
+                </ol>
+        </div>
 	</div>
 	<div class="bside">
-    	<div class="snippetview">
+    	<div class="snippetview" id="snippetview">
 			<iframe src="about:blank" id="snippetframe" frameBorder="0" width="100%" height="100%;"></iframe>
     	</div>
 	</div>
 </body>
 </html>
-

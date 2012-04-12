@@ -13,6 +13,7 @@
  *           util.bigtable
  *           util.time
  * @includes common.XML
+ *           common.Object
  */
 (function () {
 
@@ -20,11 +21,19 @@
 
 	    _b = _.bigtable,
 
+        _s = _.String,
+
+        _q = _.queryString,
+
 		_l = _.log,
+
+        _o = _.Object,
 
 		_t = _.time,
 
 	    iotimeout = _b.get("io", "timeout"),
+
+        buildUrlWithData,
 
 		ioscript,
 
@@ -38,7 +47,82 @@
 
 		apiResponder,
 
+        getIoProto,
+
+        compatOpts,
+
 		ajaxResponder;
+
+    getIoProto = function () {
+
+        return _.Object.create({
+
+                ajax : _.ajax,
+
+                jsonp: _.jsonp,
+
+                script: _.script
+        });
+
+    };
+
+    compatOpts = function (opts, logName) {
+
+        logName = logName || "unknown";
+
+        if (opts.data) {
+
+            if (_o.isObject(opts.data)) {
+
+                opts.data = _q.encode(opts.data);
+
+            } else if (_s.isString(opts.data)) {
+
+                opts.data = _s.trim(opts.data).replace(/^&+/, '');
+
+            } else {
+
+                _l.warn('[' + logName + '] ignored invalid params data ' + default_opts.data);
+
+            }
+
+            opts.url = joinUrlWithData(opts.url, opts.data);
+
+        }
+
+        if (_s.trim(opts.type).toUpperCase() == "GET" && !opts.cache) {
+
+           opts.url = joinUrlWithData(opts.url, "nocache=openjs" + QQWB.uid(5));
+
+       }
+
+       return opts;
+
+    };
+
+    joinUrlWithData = function (url, data) {
+
+        var queryMark = url.lastIndexOf('?'),
+
+            newurl;
+
+        if (queryMark == -1) {
+
+            newurl = [url, '?', data];
+
+        } else if (queryMark == url.length - 1) {
+
+            newurl = [url, data];
+            
+        } else {
+
+            newurl = [url, '&', data];
+
+        }
+
+        return newurl.join('');
+
+    };
 
 	ioscript = function (cfg) {
 
@@ -122,7 +206,7 @@
 
 				    clearTimeout(timer);
 
-                    complete && complete(404, e, _t.now() - start);
+                    complete && complete(500, "server error", _t.now() - start);
 
 				    complete = null;
                 };
@@ -200,6 +284,7 @@
 
 			   	}
                 
+                // http://www.w3.org/TR/XMLHttpRequest/#the-send-method
                 xhr.send(cfg.data || null);
                 
 				// xhr callback
@@ -602,16 +687,14 @@ QQWB.extend("io", {
 
 	   return deferred.promise();
    }
-	/**
-	 * Ajax request sender
-	 * 
-	 * @access public
-	 * @param opts {Object} ajax settings
-	 * @return {Object} deferred object
-	 */
-   ,ajax: function (opts) {
 
-       var deferred = QQWB.deferred.deferred(),
+   ,ajaxWith: function (opts, responder, proto) {
+
+       var _ = QQWB,
+
+           _s = _.String,
+
+           deferred = QQWB.deferred.deferred(),
 
            default_opts = {
 
@@ -619,13 +702,52 @@ QQWB.extend("io", {
 
               ,dataType: "json"
 
+              ,cache: false
+
            };
 
         QQWB.extend(default_opts, opts, true);
 
-        ioajax(default_opts).send(apiResponder(deferred));
+        if (!default_opts.url) {
 
-		return deferred.promise();
+            deferred.reject(-2, "invalid url", 0);
+
+		    return deferred.promise(proto);
+
+        }
+
+        default_opts.type = _s.trim(default_opts.type);
+
+        default_opts = compatOpts(default_opts, "script");
+
+        default_opts.dataType = _s.trim(default_opts.dataType);
+
+        if (default_opts.type.toUpperCase() == "GET" && default_opts.data) {
+
+            default_opts.url = joinUrlWithData(default_opts.url, default_opts.data);
+
+            if (!default_opts.cache) {
+
+                default_opts.url = joinUrlWithData(default_opts.url, "nocache=openjs" + QQWB.uid(5));
+
+            }
+        }
+
+        ioajax(default_opts).send(responder(deferred));
+
+		return deferred.promise(proto);
+    }
+	/**
+	 * Ajax request sender
+	 * 
+	 * @access public
+	 * @param opts {Object} ajax settings
+	 * @return {Object} deferred object
+	 */
+   ,apiAjax: function (opts) {
+
+       return QQWB.io.ajaxWith(opts,apiResponder);
+
     }
 
 	/**
@@ -641,46 +763,52 @@ QQWB.extend("io", {
 	 * @param opts {Object} ajax settings
 	 * @return {Object} deferred object
 	 */
-   ,ajax2: function (opts) {
+   ,ajax: function (opts) {
 
-       var deferred = QQWB.deferred.deferred(),
+       return QQWB.io.ajaxWith(opts, ajaxResponder, getIoProto());
 
-           default_opts = {
-
-               type: "get"
-
-              ,dataType: "json"
-
-           };
-
-        QQWB.extend(default_opts, opts, true);
-
-        ioajax(default_opts).send(ajaxResponder(deferred));
-
-		return deferred.promise();
     }
 
     /**
      * Dynamiclly load script
      *
      * @access public
-     * @param src {String} script src
-     * @param optCharset {String} script charset
+     * @param opts {Map} script config
      * @return {Object} promise
      */
-   ,script: function (src, optCharset) {
+   ,script: function (opts) {
 
-       var optCharset = optCharset || "utf-8",
+       var _ = QQWB,
 
-           deferred = QQWB.deferred.deferred();
+           _s = _.String,
 
-       ioscript({
+           proto = getIoProto(),
 
-           charset: optCharset
+           deferred = QQWB.deferred.deferred(),
 
-          ,url: src
+           default_opts = {
 
-       }).send(function (status, statusText, elapsedtime) {
+              charset: "utf-8"
+
+              ,cache: true
+
+              ,type: "get"
+
+           };
+
+       QQWB.extend(default_opts, opts, true);
+
+       if (!default_opts.url) {
+
+           deferred.reject(-2, "invalid url", 0);
+
+		   return deferred.promise(proto);
+
+       }
+
+       default_opts = compatOpts(default_opts, "script");
+
+       ioscript(default_opts).send(function (status, statusText, elapsedtime) {
 
            if (status !== 200) {
 
@@ -694,7 +822,8 @@ QQWB.extend("io", {
 
        });
 
-       return deferred.promise();
+       return deferred.promise(proto);
+
     }
     /**
      * JSONP request
@@ -705,7 +834,13 @@ QQWB.extend("io", {
      */
     ,jsonp: function (opts) {
 
-        var deferred = QQWB.deferred.deferred(),
+        var _ = QQWB,
+
+            _s = _.String,
+
+            proto = getIoProto(),
+
+            deferred = QQWB.deferred.deferred(),
 
             callbackName = "jsonp_" + QQWB.uid(5),
 
@@ -715,21 +850,29 @@ QQWB.extend("io", {
 
             default_opts = {
 
-                dataType: "text"
+                dataType: "json"
 
                ,charset: "utf-8"
 
-               ,url: ""
+               ,cache: false
+
+               ,type: "get"
 
             };
 
         QQWB.extend(default_opts, opts, true);
 
-        if (default_opts.data) {
+        if (!default_opts.url) {
 
-            default_opts.url += ("?" + default_opts.data +  "&callback=" + callbackName);
+            deferred.reject(-2, "invalid url", 0);
 
-        } 
+		    return deferred.promise(proto);
+
+        }
+
+        default_opts = compatOpts(default_opts, "jsonp");
+
+        default_opts.url = joinUrlWithData(default_opts.url, "callback=" + callbackName);
 
         window[callbackName] = function (data) {
 
@@ -773,16 +916,15 @@ QQWB.extend("io", {
 
         });
 
-       return deferred.promise();
+        return deferred.promise(proto);
 
     }
 });
 
-QQWB.ajax = QQWB.io.ajax2;
+QQWB.ajax = QQWB.io.ajax;
 
 QQWB.jsonp = QQWB.io.jsonp;
 
 QQWB.script = QQWB.io.script;
 
 }());
-

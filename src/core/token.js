@@ -10,6 +10,7 @@
  * @requires base
  * @includes util.queryString
  *           util.cookie
+ *           common.JSON
  */
 
 QQWB.extend("_token",{
@@ -37,15 +38,15 @@ QQWB.extend("_token",{
 
         user = this.getTokenUser(true);
 
-        _c.set(_b.get("cookie","accesstokenname")
+        _c.set(_b.get("cookie","getAccesstokenName")()
 
                        ,[accessToken, _t.now() + expireIn * 1000, optUsername || (user && user.name) || "", optNickname || (user && user.nick) || ""].join("|")
 
-                       ,365 * 24 * 3600
+                       ,_b.get("cookie","refreshtokenexpires")
 
-                       ,QQWB.bigtable.get("cookie","path")
+                       ,_b.get("cookie","path")
 
-                       ,QQWB.bigtable.get("cookie","domain")
+                       ,_b.get("cookie","domain")
             );
 
         return _;
@@ -70,7 +71,7 @@ QQWB.extend("_token",{
 
 			token;
 
-         token = _c.get(_b.get("cookie","accesstokenname"));
+        token = _c.get(_b.get("cookie","getAccesstokenName")());
 
          if (token) {
 
@@ -105,7 +106,7 @@ QQWB.extend("_token",{
 
 			token;
 
-         token = _c.get(_b.get("cookie","accesstokenname"));
+        token = _c.get(_b.get("cookie","getAccesstokenName")());
 
          if (token) {
 
@@ -141,7 +142,7 @@ QQWB.extend("_token",{
 
 		    _c = _.cookie;
 
-        return _c.del(_b.get("cookie","accesstokenname"),_b.get("cookie","path"),_b.get("cookie","domain"));
+        return _c.del(_b.get("cookie","getAccesstokenName")(),_b.get("cookie","path"),_b.get("cookie","domain"));
     }
 
     /**
@@ -158,11 +159,11 @@ QQWB.extend("_token",{
 
 		    _c = _.cookie;
 
-         _c.set(_b.get("cookie","refreshtokenname")
+        _c.set(_b.get("cookie","getRefreshtokenName")()
 
                 ,refreshToken
 
-                ,365 * 24 * 3600
+                ,_b.get("cookie","refreshtokenexpires")
 
                 ,_b.get("cookie","path")
 
@@ -180,7 +181,7 @@ QQWB.extend("_token",{
      */
    ,getRefreshToken: function () {
 
-        return QQWB.cookie.get(QQWB.bigtable.get("cookie","refreshtokenname"));
+       return QQWB.cookie.get(QQWB.bigtable.get("cookie","getRefreshtokenName")());
 
     }
 
@@ -192,7 +193,7 @@ QQWB.extend("_token",{
      */
    ,clearRefreshToken: function () {
 
-        return QQWB.cookie.del(QQWB.bigtable.get("cookie","refreshtokenname"),QQWB.bigtable.get("cookie","path"),QQWB.bigtable.get("cookie","domain"));
+       return QQWB.cookie.del(QQWB.bigtable.get("cookie","getRefreshtokenName")(),QQWB.bigtable.get("cookie","path"),QQWB.bigtable.get("cookie","domain"));
 
     }
 
@@ -221,6 +222,8 @@ QQWB.extend("_token",{
        _i.jsonp({
 
                 url: _b.get("uri","exchangetoken")
+
+               ,dataType: "text"
 
                ,data: _q.encode({
 
@@ -297,6 +300,36 @@ QQWB.extend("_token",{
        return _;
 
     }
+    ,loadSyncLoginToken: function () {
+
+	   var _ = QQWB,
+
+	       _b = _.bigtable,
+
+		   _q = _.queryString,
+
+		   _i = _.io;
+
+        return _i.jsonp({
+
+                   url: _b.get("uri","autotoken")
+
+                  ,dataType: "text"
+
+                  ,data: _q.encode({
+
+                       response_type: "token"
+
+                      ,client_id: _b.get("base", "appkey")
+
+                      ,scope: "all"
+
+                      ,state: "1"
+
+                   })
+
+           });
+	}
 
     /**
      * Obtain an access token
@@ -304,6 +337,7 @@ QQWB.extend("_token",{
      * @access public
      * @param optCallback {Function} callback function when result returned
      */
+	/*
    ,getNewAccessToken: function (optCallback) {
 
 	   var _ = QQWB,
@@ -323,6 +357,8 @@ QQWB.extend("_token",{
        _i.jsonp({
 
                url: _b.get("uri","autotoken")
+
+              ,dataType: "text"
 
               ,data: _q.encode({
 
@@ -352,7 +388,7 @@ QQWB.extend("_token",{
 
                _._token.setAccessToken(response.access_token, parseInt(response.expires_in,10), response.wb_name, response.wb_nick);
 
-               if (response.refresh_token) { // which should exists if accesstoken exists
+               if (response.refresh_token) {
 
                     _._token.setRefreshToken(response.refresh_token);
 
@@ -393,14 +429,15 @@ QQWB.extend("_token",{
        });
 
        return _;
-    }
+    } */
 
     /**
      * Auto resolve response from server
      *
      * @param responseText {String} the server response
      */
-   ,resolveResponse: function (responseText) {
+   ,resolveResponse: function (responseText, triggerAuthEvents) {
+
 	   var _ = QQWB,
 
 	       _b = _.bigtable,
@@ -415,7 +452,15 @@ QQWB.extend("_token",{
 
            response = _s.isString(responseText) ? _q.decode(responseText) : responseText;
 
+		   _l.debug(["resolve response ", T.JSON.stringify(response)].join(""));
+
        if (response.access_token) {
+
+           !response.expires_in && _l.error("token expires_in not retrieved");
+
+           !response.wb_name && _l.warning("weibo username not retrieved");
+
+           !response.wb_nick && _l.warning("weibo usernick not retrieved");
 
            _._token.setAccessToken(response.access_token, parseInt(response.expires_in,10), response.wb_name, response.wb_nick);
 
@@ -429,37 +474,121 @@ QQWB.extend("_token",{
 
            }
 
-           loginStatus = _.loginStatus();
+		   if (triggerAuthEvents) {
 
-		   if (loginStatus) {
+               loginStatus = _.loginStatus();
 
-               _l.info("user " + loginStatus.name + " logged in");
+		       if (loginStatus) {
 
-               _.trigger(_b.get("nativeevent","userloggedin"),loginStatus);
+                   _l.info("user " + loginStatus.name || "unknown" + " logged in");
 
-		   } else {
+                   _.trigger(_b.get("nativeevent","userloggedin"),loginStatus);
 
-			   _l.error("resolve response error, loginStatus is " + loginStatus);
+		       } else {
 
+		           _l.error("resolve response error, loginStatus is " + loginStatus);
+
+		       }
 		   }
 
        } else if (response.error) {
 
            _l.error("login error occurred " + response.error);
 
-           response.message = response.error;
+		   if (triggerAuthEvents) {
 
-           _.trigger(_b.get("nativeevent","userloginfailed"),response);
+              response.message = response.error;
+
+              triggerAuthEvents && _.trigger(_b.get("nativeevent","userloginfailed"),response);
+
+		   }
 
        } else {
 
            _l.error("unexpected result returned from server " + responseText);
 
-           response.message = response.error = "server error";
+		   if (triggerAuthEvents) {
 
-           _.trigger(_b.get("nativeevent","userloginfailed"),response);
+			   response = {};
+
+               response.message = response.error = "server error";
+
+               triggerAuthEvents && _.trigger(_b.get("nativeevent","userloginfailed"),response);
+		   }
+
        }
 
-    }
+	   return _;
+
+   },
+
+   /* the old version OpenJS use cookie name "QQWBToken" to save accesstoken, "QQWBRefreshToken" to save refresh token
+    * the new version OpenJS (since 2.0) use cookie name "QQWBToken_APPID" to save accesstoken, "QQWBRefreshToken_appid" to save refresh token
+    * this utility function will migrate old version token to the new version
+    * OpenJS version check is included
+    * This function is called on init
+    */
+   compatOldVersion: function () {
+
+       var _ = QQWB,
+
+           _b = _.bigtable,
+
+           _l = _.log,
+
+           _t = _._token,
+
+           _c = _.cookie,
+
+           needCompat = parseFloat(QQWB.version,10) >= 2.0,
+
+           cookiepath = _b.get("cookie","path"),
+
+           cookiedomain = _b.get("cookie","domain"),
+
+           tokenexpires = _b.get("cookie","refreshtokenexpires"),
+
+           rawaccesstoken = _c.get(_b.get("cookie","accesstokenname")),
+
+           rawrefreshtoken = _c.get(_b.get("cookie","refreshtokenname"));
+
+      if (needCompat && (rawaccesstoken || rawrefreshtoken)) {
+          //migrate accesstoken
+          if (rawaccesstoken) {
+
+              _c.set(_b.get("cookie","getAccesstokenName")()
+
+                      ,rawaccesstoken
+
+                      ,tokenexpires
+
+                      ,cookiepath
+
+                      ,cookiedomain);
+
+              _c.del(_b.get("cookie","accesstokenname"),cookiepath,cookiedomain);
+
+              _l.info("accesstoken storage has been updated");
+          }
+
+          if (rawrefreshtoken) {
+
+              _c.set(_b.get("cookie","getRefreshtokenName")()
+
+                ,rawrefreshtoken
+
+                ,tokenexpires
+
+                ,cookiepath
+
+                ,cookiedomain);
+
+              _c.del(_b.get("cookie","refreshtokenname"),cookiepath,cookiedomain);
+
+              _l.info("refreshtoken storage has been updated");
+          }
+
+      }
+   }
 
 });

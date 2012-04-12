@@ -32,13 +32,20 @@
     _b.put("cookie","path",QQWB.envs.cookiepath);
     _b.put("cookie","accesstokenname","QQWBToken");
     _b.put("cookie","refreshtokenname","QQWBRefreshToken");
-
+    _b.put("cookie","refreshtokenexpires",7 * 24 * 3600);
+    _b.put('cookie','getAccesstokenName', function () {
+        return [_b.get("cookie","accesstokenname"), _b.get("base", "appkey")].join("_");
+    });
+    _b.put('cookie','getRefreshtokenName', function () {
+        return [_b.get("cookie","refreshtokenname"), _b.get("base", "appkey")].join("_");
+    });
     _b.put("nativeevent","userloggedin","UserLoggedIn");
     _b.put("nativeevent","userloginfailed","UserLoginFailed");
     _b.put("nativeevent","userloggedout","UserLoggedOut");
     _b.put("nativeevent","tokenready","tokenReady");
     _b.put("nativeevent","documentready","documentReady");
     _b.put("nativeevent","everythingready","everythingReady");
+    _b.put("nativeevent","ready","ready");
 
     _b.put("solution","deferred",_.deferred.deferred());
     _b.put("solution","jscallbackname","onFlashReady_a1f5b4ce");
@@ -63,9 +70,21 @@
 
 			   _l = _.log,
 
+			   _t = _._token,
+
 			   base = "base",
 
 			   booting = _b.get('boot','booting'),
+
+               accessToken = _t.getAccessToken(),
+
+               rawAccessToken = _t.getAccessToken(true), 
+
+               refreshToken = _t.getRefreshToken(),
+
+               needExchangeToken = refreshToken && !accessToken && rawAccessToken,
+
+			   preloadSyncLoginToken = opts.synclogin && !refreshToken && !accessToken,
 
 			   tokenReady;
 
@@ -86,7 +105,7 @@
                return;
            }
 
-           _l.info("init signal has arrived");
+           _l.debug("init signal has arrived");
 
 		   opts = _.extend({
 
@@ -108,16 +127,8 @@
 
 		   _b.put(base,"samewindow",opts.samewindow);
 
-           var 
-               accessToken = _._token.getAccessToken(),
+		   _b.put(base,"synclogin",opts.synclogin);
 
-               rawAccessToken = _._token.getAccessToken(true), 
-
-               refreshToken = _._token.getRefreshToken(),
-
-               needExchangeToken = refreshToken && !accessToken && rawAccessToken,
-
-               needRequestNewToken = !refreshToken && !accessToken && opts.synclogin;
 
            if (typeof opts.appkey != 'undefined') {
 
@@ -137,50 +148,37 @@
 
            _b.put("uri","redirect",opts.callbackurl);
 
-           if (/*true || force exchange token*/needExchangeToken) {
+           if (needExchangeToken) {
 
-               tokenReady.lock();
+               tokenReady.lock("exchange token");
 
                _l.info("exchanging refresh token to access token...");
 
-               QQWB._token.exchangeForToken(function (response) {
+               _t.exchangeForToken(function (response) {
 
-                   // does it really neccessary?
-                   if (opts.synclogin && response.error) {// exchangeToken encountered error, try to get a new access_token automaticly
-
-                       QQWB.log.warning("exchange token has failed, trying to retrieve a new access_token...");
-
-                       tokenReady.lock();// lock for async refresh token
-
-                       QQWB._token.getNewAccessToken(function () {
-
-                           tokenReady.unlock();// unlock for async refresh token
-
-                       });
-
-                   }
-
-                   // don't put this segment to top
-                   // because of the stupid door-locking mechanism
-                   tokenReady.unlock();// unlock for async refresh token
-
-               });
-
-           } else if (needRequestNewToken) {
-
-               tokenReady.lock();
-
-               _l.info("retrieving new access token...");
-
-               _._token.getNewAccessToken(function () {
-
-                   tokenReady.unlock(); // unlock for async get token
+                   tokenReady.unlock("token exchanged");// unlock for async refresh token
 
                });
 
            }
 
-           tokenReady.unlock(); // unlock init
+		   if (preloadSyncLoginToken) {
+
+               _l.info("preload synclogin token");
+
+			   _t.loadSyncLoginToken().success(function (responseText) {
+
+			       _b.put("synclogin", "responsetext", responseText);
+
+			   }).error(function (status, statusText) {
+
+				   _l.error(["preload synclogin token failed,", status, " " , statusText].join(""));
+
+			   });
+
+		   }
+
+           tokenReady.unlock("init is called"); // unlock init
 
 		   if (_p && opts.pingback) {
 
@@ -194,6 +192,72 @@
 
 			   }
 		   }
+
+        	// maintain token status, this relies appkey is already known
+            (function () {
+            
+            	var _ = QQWB,
+            
+            	    _l = _.log,
+            
+            		_c = _.cookie,
+            
+            	    _b = _.bigtable,
+            
+                    maintainTokenScheduler;
+            
+            	function maintainTokenStatus () {
+            
+            		var canMaintain = !!_._token.getAccessToken(), // user logged in set timer to exchange token
+            
+            	      	waitingTime; // server accept to exchange token 30 seconds before actually expire date
+            
+                    maintainTokenScheduler && _l.info("cancel the **OLD** maintain token schedule");
+            
+                    maintainTokenScheduler && clearTimeout(maintainTokenScheduler);
+            
+            		if (canMaintain) {
+            
+            		    // server should accept to exchange token 30 seconds before actually expire date
+                        waitingTime = parseInt(_c.get(_b.get("cookie","getAccesstokenName")()).split("|")[1],10)
+            
+            	                      - _.time.now()
+            
+            	                      - 15 * 1000 /*15 seconds ahead of actual expire date*/;
+            
+            			_l.info("scheduled to exchange token after " + waitingTime + "ms");
+            
+            			maintainTokenScheduler = setTimeout(function () {
+            
+            				_._token.exchangeForToken(function () {
+            
+            					maintainTokenStatus();
+            
+            				});
+            
+            			}, waitingTime);
+            
+            		} else {
+            
+            			maintainTokenScheduler && _l.info("cancel the exchange token schedule");
+            
+                        maintainTokenScheduler && clearTimeout(maintainTokenScheduler);
+            
+            		}
+            	}
+            
+            	_.bind(_b.get("nativeevent","tokenready"),maintainTokenStatus);
+            
+            	_.bind(_b.get("nativeevent","userloggedin"),maintainTokenStatus);
+            
+            	_.bind(_b.get("nativeevent","userloginfailed"),maintainTokenStatus);
+            
+            	_.bind(_b.get("nativeevent","userloggedout"),maintainTokenStatus);
+            
+            }());
+
+           // compat cookie with older versions
+           _t.compatOldVersion();
 
            _b.put(base, "inited", true);
 

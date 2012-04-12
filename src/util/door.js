@@ -36,11 +36,11 @@ QQWB.extend("door", {
 			 *
 			 * @access public
 			 */
-            lock: function () {
+            lock: function (inReason) {
 
                 locks ++;
 
-				optLockDo && optLockDo.call(QQWB);
+				optLockDo && optLockDo.call(QQWB, inReason);
 
 				return this;
             }
@@ -49,13 +49,13 @@ QQWB.extend("door", {
 			 *
 			 * @access public
 			 */
-           ,unlock: function () {
+           ,unlock: function (inReason) {
 
                locks --;
 
 			   locks = Math.max(0,locks);
 
-			   optUnlockDo && optUnlockDo.call(QQWB);
+			   optUnlockDo && optUnlockDo.call(QQWB, inReason);
 
 			   return this;
             }

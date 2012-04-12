@@ -33,7 +33,17 @@ if (QQWB.browser.feature.localstorage) { // implement html5 localstorge
 
                 };
 
-            localStorage[key] = _.JSON.stringify(val);
+            try {
+
+                localStorage[key] = _.JSON.stringify(val);
+
+            } catch (stringifyJSONError) {
+
+                _.log.error("[localstorage] save error key [" + key + "] value [" + value + "]" + stringifyJSONError);
+
+                return;
+
+            }
 
             return localStorage[key];
         }
@@ -151,11 +161,21 @@ if (QQWB.browser.feature.localstorage) { // implement html5 localstorge
 
                 };
 
-                userData.load(storeName);
+                try {
 
-                userData.setAttribute(key,JSON.stringify(val));
+                    userData.load(storeName);
 
-                userData.save(storeName);
+                    userData.setAttribute(key,JSON.stringify(val));
+
+                    userData.save(storeName);
+
+                } catch (stringifyJSONError) {
+
+                    _.log.error("[localstorage] save error key [" + key + "] value [" + value + "]" + stringifyJSONError);
+
+                    return;
+
+                }
 
                 return userData.getAttribute(key);
 
@@ -225,8 +245,13 @@ if (QQWB.browser.feature.localstorage) { // implement html5 localstorge
 
 } else {
 
-    QQWB.log.warning("localStorage is not supported and no workaround");
+    QQWB.log.error("localStorage is not supported and no workaround");
 
+    QQWB.extend("localStorage", {
+        set: function () {return;},
+        get: function () {return;},
+        del: function () {return;}
+    });
 }
 
 if (QQWB.localStorage) {

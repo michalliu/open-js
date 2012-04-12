@@ -2,20 +2,19 @@
 <html>
 <head>
 	<meta charset="utf-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 	<title>Code Snippet - OpenJS </title>
 	<style>
 	body{font-size:14px;line-height:22px;font-family:Helvetica, Arial, "Microsoft YaHei",sans-serif;padding:0;margin:0;background:#fff;}
 	.code{display:block;position:fixed;width:90%;height:45%;left:30px;top:15px;font-family:Monaco, Consolas, "Lucida Console", monospace;font-size:12px;line-height:20px;outline:0;resize:none;text-align:right;}
-	.code textarea{width:100%;height:100%;}
+	.code textarea{display:block;width:100%;height:100%;*height:350px;}
 	.code .tip{color:#bbb;font-size:14px;}
 	.button{font-size:14px;padding:5px 10px;}
 	</style>
 </head>
 <body>
     <div class="code">
-        <textarea id="runnable" readonly>正在载入代码片段，请稍候... ...</textarea>
-		<span class="tip">可以先修改代码再运行</span><input type="button" value="运行" onclick="runcode()" disabled="disabled" id="runcode" class="button"/>  <input type="button" value="关闭" onclick="closeframe();" class="button" />
+        <textarea id="runnable" readonly>正在载入代码片段，请稍候... ...</textarea><br/>
+		<span class="tip">可以先修改代码再运行</span><input type="button" value="运行" onclick="runcode()" disabled="disabled" id="runcode" class="button"/>  <input type="button" value="新窗口" onclick="newwin();" class="button" /> <input type="button" value="关闭" onclick="closeframe();" class="button" />
 	    <iframe src="about:blank" width="100%" height="100%" frameBorder="0" id="sandbox"></iframe>
     </div>
 	<script>
@@ -69,6 +68,10 @@
     	function closeframe() {
 			parent.closeSnippet && parent.closeSnippet();
     	}
+
+        function newwin() {
+            window.open(url);
+        }
 
 	</script>
 </body>

@@ -51,43 +51,57 @@ QQWB.bigtable.put('boot','solution', function () {
 
 		crossdomainMethod;
 
-	tokenReady = _b.put("boot", "tokenready", QQWB.door.door(function () {
+	tokenReady = _b.put("boot", "tokenready", QQWB.door.door(function (reason) {
 
-        _l.info("tokenReady is locked");
+		_l.debug("tokenReady is locked" + (reason ? "," + reason : ""));
 
-    }, function () {
+    }, function (reason) {
 
-        _l.info("tokenReady is unlocked");
+		_l.debug("tokenReady is unlocked" + (reason ? "," + reason : ""));
 
-        tokenReady.isOpen() && _l.info("token is ready") && _.trigger(_b.get("nativeevent","tokenready"));
+        if (tokenReady.isOpen()) {
 
-    }));
+            _l.info("token is ready");
 
-	everythingReady = _b.put("boot", "everythingready", QQWB.door.door(function () {
+            _.trigger(_b.get("nativeevent","tokenready"));
 
-        _l.info("everythingReady is locked");
-
-    }, function () {
-
-        _l.info("everythingReady is unlocked");
-
-        everythingReady.isOpen() && _l.info("everything is ready") && _.trigger(_b.get("nativeevent","everythingready"));
+        }
 
     }));
 
-    tokenReady.lock(); // init must be called
+	everythingReady = _b.put("boot", "everythingready", QQWB.door.door(function (reason) {
 
-    everythingReady.lock(); // token must be ready
+		_l.debug("everythingReady is locked" + (reason ? "," + reason : ""));
+
+    }, function (reason) {
+
+		_l.debug("everythingReady is unlocked" + (reason ? "," + reason : ""));
+
+        if (everythingReady.isOpen()) {
+
+            _l.info("everything is ready");
+
+            _.trigger(_b.get("nativeevent","everythingready"));
+
+            _.trigger(_b.get("nativeevent","ready"));
+
+        }
+
+    }));
+
+    tokenReady.lock("waiting init");
+
+    everythingReady.lock("wait token ready"); // token must be ready
 
 	if (!_b.get("document", "ready")) {
 
-        everythingReady.lock(); // document(DOM) must be ready
+        everythingReady.lock("wait document ready");
 
 	}
     
     _.bind(_b.get("nativeevent","tokenready"), function () {
 
-        everythingReady.unlock(); // unlock for token ready
+        everythingReady.unlock("token is ready");
 
     });
     
@@ -426,71 +440,9 @@ QQWB.bigtable.put('boot','solution', function () {
 	}
 
 
-	// maintain token status
-    (function () {
-    
-    	var _ = QQWB,
-    
-    	    _l = _.log,
-    
-    		_c = _.cookie,
-    
-    	    _b = _.bigtable,
-    
-            maintainTokenScheduler;
-    
-    	function maintainTokenStatus () {
-    
-    		var canMaintain = !!_._token.getAccessToken(), // user logged in set timer to exchange token
-    
-    	      	waitingTime; // server accept to exchange token 30 seconds before actually expire date
-    
-            maintainTokenScheduler && _l.info("cancel the **OLD** maintain token schedule");
-    
-            maintainTokenScheduler && clearTimeout(maintainTokenScheduler);
-    
-    		if (canMaintain) {
-    
-    		    // server should accept to exchange token 30 seconds before actually expire date
-    	      	waitingTime = parseInt(_c.get(_b.get("cookie","accesstokenname")).split("|")[1],10)
-    
-    	                      - _.time.now()
-    
-    	                      - 15 * 1000 /*15 seconds ahead of actual expire date*/;
-    
-    			_l.info("scheduled to exchange token after " + waitingTime + "ms");
-    
-    			maintainTokenScheduler = setTimeout(function () {
-    
-    				_._token.exchangeForToken(function () {
-    
-    					maintainTokenStatus();
-    
-    				});
-    
-    			}, waitingTime);
-    
-    		} else {
-    
-    			maintainTokenScheduler && _l.info("cancel the exchange token schedule");
-    
-                maintainTokenScheduler && clearTimeout(maintainTokenScheduler);
-    
-    		}
-    	}
-    
-    	_.bind(_b.get("nativeevent","tokenready"),maintainTokenStatus);
-    
-    	_.bind(_b.get("nativeevent","userloggedin"),maintainTokenStatus);
-    
-    	_.bind(_b.get("nativeevent","userloginfailed"),maintainTokenStatus);
-    
-    	_.bind(_b.get("nativeevent","userloggedout"),maintainTokenStatus);
-    
-    }());
 
 });
-
+//TODO: version check and update infomation reminder
 
 if (QQWB.envs.autoboot) {
 

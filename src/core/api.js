@@ -73,7 +73,11 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optOverride)
 
     	deferred = _.deferred.deferred(),
 
-		promise = deferred.promise(),
+		proto = {"api": QQWB.api},
+
+		obj = QQWB.Object.create(proto),
+
+		promise = deferred.promise(obj),
 
 	    appkey,
 
@@ -98,7 +102,9 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optOverride)
 	actoken = optOverride.accesstoken || optOverride.token || _._token.getAccessToken();
 
 	if (!(format in supportedFormats)) {
+
 		format = "json";
+
 	}
 
 	apiParams["oauth_consumer_key"] = appkey;
@@ -120,12 +126,13 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optOverride)
 
 	}
 
-	if (!actoken) {
+	if (!actoken) { // some public api call doesn't need an accesstoken
 
 		_l.warn("accesstoken is empty");
 
 	}
 
+	// solution isn't ready
 	if (!solution.isResolved() && !solution.isRejected()) {
 
 		_l.warning("api call cached, waiting solution ready ...");
@@ -159,6 +166,7 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optOverride)
 		return promise;
 	}
 
+	// solution error
 	if (!solution.isResolved()) {
 
 		solution.fail(function () {
@@ -313,8 +321,14 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optOverride)
                 deferred.resolve(arguments[3]/* response body */, arguments[2]/* elpased time */, arguments[4]/*response header*/);
 			}
 		});
+
+	} else {
+
+		deferred.reject(-1, "invalid solutionName " + solutionName);
+
 	}
 
+	// pingback
     (function () {
 
 		var serial = counter,

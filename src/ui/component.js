@@ -408,11 +408,11 @@
 
 				_.extend(props, {
 
-					src: [url, "#", _q.encode({appkey: cfg.appkey, url: qurl, title: cfg.title, colorset:cfg.colors})].join(""),
+                    src: [url, "#", _q.encode({appkey: cfg.appkey, url: qurl, title: cfg.title, colorset: cfg.colors && cfg.colors.join('_')})].join(""),
 
-					width: cfg.width || 560,
+					width: cfg.width || "100%",
 
-					height: cfg.height || 500,
+					height: cfg.height || "500",
 
 					frameborder: 0,
 
@@ -468,7 +468,7 @@
 		});
 
 	// try to render components automaticlly through component's idname
-	_l.debug('scanning components ...');
+	_l.info('scanning components ...');
 
 	_d.ready(function () {
 
@@ -529,7 +529,7 @@
 
 		}); // end forEach
 
-	    _l.debug('found ' + compFound + ' components');
+	    _l.info('found ' + compFound + ' components');
 
 	});// end domReady
 

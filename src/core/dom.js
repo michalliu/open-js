@@ -278,7 +278,7 @@
 
 	   if (everythingReadyDoor) {
 
-           everythingReadyDoor.unlock(); // unlock for document ready
+           everythingReadyDoor.unlock("document is ready");
 
 	   }
 
@@ -290,7 +290,7 @@
 	   // prompt to init
 	   if (!tokenIsReady && !inited ) { 
 
-		   _l.info("waiting init ...");
+		   _l.info("waiting init signal ...");
 
 	   }
 

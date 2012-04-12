@@ -68,9 +68,8 @@
 
 		   if (optDefaultVal != undef && v == undef) {
 
-			   v = optDefaultVal;
+               return optDefaultVal;
 
-		       bigtable[k] = v;
 		   }
 
 		   return v;
