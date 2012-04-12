@@ -14,6 +14,6 @@ D:\Works\Git\open-js\tools\node.exe D:\Works\Git\open-js\tools\UglifyJS\uglifyjs
 D:\Works\Git\open-js\tools\node.exe D:\Works\Git\open-js\tools\UglifyJS\uglifyjs -nc -v -o .\static\js\snippet.js .\static\js\snippet.js
 XCOPY ..\src\images .\static\images\ /S /Q /Y
 XCOPY ..\src\snippet .\snippet\ /S /Q /Y
-java -jar D:\Works\Git\open-js\tools\htmlcompressor.jar --type html -o .\snippet\snippet.html .\snippet\snippet.html
-java -jar D:\Works\Git\open-js\tools\htmlcompressor.jar --type html -o .\index.html ..\src\index.html
+java -jar D:\Works\Git\open-js\tools\htmlcompressor.jar --type html --compress-js -o .\snippet\snippet.html .\snippet\snippet.html
+java -jar D:\Works\Git\open-js\tools\htmlcompressor.jar --type html --compress-js -o .\index.html ..\src\index.html
 CD ..
