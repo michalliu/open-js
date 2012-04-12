@@ -141,22 +141,21 @@ var authWindow = function () {
 
 						   response = mark == -1 ? "" : response.slice(mark+1);
 
-		         		   response = _q.decode(response);
+                           if (response) { // hash must be exists
 
-						   //TODO: posibble bug non standard oauth2.0 protocol
-		         		   if (parseInt(response.status,10) == 200) {
+		         		       response = _q.decode(response);
 
-		                        _t.resolveResponse(response, true);
+		                       _t.resolveResponse(response, true);
 
-		         		   }
+	                           authorizing = false;
 
-	                       authorizing = false;
+                               autoclose && awindow.close();
 
-                           autoclose && awindow.close();
+						       awindow = null;
 
-						   awindow = null;
+		                       return;
 
-		                   return;
+                           }
 
 		                }
 

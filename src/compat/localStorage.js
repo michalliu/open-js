@@ -19,19 +19,31 @@ if (QQWB.browser.feature.localstorage) { // implement html5 localstorge
 
         set: function (key, value, expireInDays) {
 
-            key = "k" + key;
-
             var _ = QQWB,
 
-                expire = _.time.secondsNow() + (expireInDays || 7) * 24 * 3600,
+                expire,
 
-                val = {
+                val;
 
-                    value: value
+            if (!key || value == null) {
 
-                   ,expire: expire
+                _.log.error(["[localstorage] save error, key or value is empty [" , key , "] value [" , value , "]"].join(''));
 
-                };
+                return false;
+
+            }
+
+            key = "k" + key;
+
+            expire = _.time.secondsNow() + (expireInDays || 7) * 24 * 3600;
+
+            val = {
+
+                value: value
+
+               ,expire: expire
+
+            };
 
             try {
 
@@ -50,11 +62,21 @@ if (QQWB.browser.feature.localstorage) { // implement html5 localstorge
 
        ,get: function (key, defaultVal) {
 
-           key = "k" + key;
-
 		   var _ = QQWB,
 
-		       temp = localStorage[key];
+               temp;
+
+           if (!key) {
+
+               _.log.error("[localstorage] get error, key is empty");
+
+               return;
+
+           }
+
+           key = "k" + key;
+
+		   temp = localStorage[key];
 
            if (temp && (temp = _.JSON.parse(temp)) && temp.value &&  _.time.secondsNow() < temp.expire) {
 
@@ -67,6 +89,16 @@ if (QQWB.browser.feature.localstorage) { // implement html5 localstorge
         }
 
        ,del: function (key) {
+
+           var _ = QQWB;
+
+           if (!key) {
+
+               _.log.error("[localstorage] del error, key is empty");
+
+               return false;
+
+           }
 
            key = "k" + key;
 
@@ -138,6 +170,14 @@ if (QQWB.browser.feature.localstorage) { // implement html5 localstorge
 
 			    	val;
 
+                if (!key || value == null) {
+
+                    _.log.error(["[localstorage] save error, key or value is empty [" , key , "] value [" , value , "]"].join(''));
+
+                    return false;
+
+                }
+
 				if (!userData) { // write to cache
 
 				    cache = _.bigtable.get("localstorage", "writecache", []);
@@ -187,6 +227,14 @@ if (QQWB.browser.feature.localstorage) { // implement html5 localstorge
 
 			       temp;
 
+               if (!key) {
+
+                   _.log.error("[localstorage] get error, key is empty");
+
+                   return;
+
+               }
+
                key = "k" + key;
 
 			   if (!userData) {
@@ -215,6 +263,14 @@ if (QQWB.browser.feature.localstorage) { // implement html5 localstorge
 			   var _ = QQWB,
 
 			       cache;
+
+               if (!key) {
+
+                   _.log.error("[localstorage] del error, key is empty");
+
+                   return false;
+
+               }
 
                if (!userData) {
                
