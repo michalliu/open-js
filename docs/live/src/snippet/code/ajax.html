@@ -1,0 +1,19 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>ajax</title>
+<script src="//mat1.gtimg.com/app/openjs/openjs.js#debug=yes"></script>
+<script defer="defer">
+    T.ajax({
+        url: "./sample/ajaxsample.json"
+    }).success(function (response) {
+        alert(response.message);
+    }).error(function (code, message) {
+        alert(message);
+    });
+</script>
+</head>
+<body>
+</body>
+</html>

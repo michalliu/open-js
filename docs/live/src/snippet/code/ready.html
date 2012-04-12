@@ -1,0 +1,33 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>ready</title>
+<script src="//mat1.gtimg.com/app/openjs/openjs.js#debug=yes"></script>
+<script defer="defer">
+T.init({appkey:800000006});
+T.ready(function () {
+    var stat = T.loginStatus(),
+        bar = document.createElement('div'),
+        str;
+
+    if (stat) {
+        str = '欢迎<a target="_blank" href="http://t.qq.com/'
+            + stat.name
+            + '">' 
+            + stat.nick 
+            + '</a> <a href="javascript:void(0);" onclick="T.logout();parent.location.reload();return false;">退出登录</a>';
+
+    } else {
+        str = '<a href="javascript:void(0);" onclick="T.login(function () {parent.location.reload();});return false;">使用腾讯微博帐号登录</a>';
+    }
+
+    bar.innerHTML = str;
+
+    document.body.appendChild(bar);
+});
+</script>
+</head>
+<body>
+</body>
+</html>

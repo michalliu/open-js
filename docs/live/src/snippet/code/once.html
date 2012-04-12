@@ -1,0 +1,18 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>once</title>
+<script src="//mat1.gtimg.com/app/openjs/openjs.js#debug=yes"></script>
+<script defer="defer">
+    T.once("myEvent",function (myEventData) {
+        // 此函数只支持执行一次
+        alert(myEventData);
+    });
+    T.trigger("myEvent","myEventData1");
+    T.trigger("myEvent","myEventData2");
+</script>
+</head>
+<body>
+</body>
+</html>

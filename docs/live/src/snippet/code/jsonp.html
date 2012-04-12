@@ -1,0 +1,20 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>jsonp</title>
+<script src="//mat1.gtimg.com/app/openjs/openjs.js#debug=yes"></script>
+<script defer="defer">
+    T.jsonp({
+        url: "http://open.t.qq.com/cgi-bin/exchange_token",
+        dataType: "text"
+    }).success(function (response) {
+        alert(response);
+    }).error(function (code, message) {
+        alert(message);
+    });
+</script>
+</head>
+<body>
+</body>
+</html>
