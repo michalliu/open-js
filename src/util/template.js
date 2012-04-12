@@ -43,7 +43,7 @@
         /**
          * Wrap tpl with html tag
          */
-        wrapWithTag: function (inHtmlTag) {
+        wrapTag: function (inHtmlTag) {
 
             var args = arguments,
 

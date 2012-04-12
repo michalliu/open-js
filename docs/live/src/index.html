@@ -600,7 +600,7 @@ table.add('&lt;% for(var i=0,l=data.length; i&lt;l; i++) {  %&gt;')
      .add('&lt;td&gt;&lt;%=name%&gt;&lt;/td&gt;&lt;td&gt;&lt;%=score%&gt;&lt;/td&gt;')
      .add('&lt;/tr&gt;')
      .add('&lt;% } %&gt;')
-   .wrapWithTag('tbody','table')
+   .wrapTag('tbody','table')
    .data('data',[["张三",90],["李四",85],["王五",80],["柳六",100]]);
 
 T.documentReady(function () {
@@ -646,7 +646,7 @@ T.documentReady(function () {
 </pre></p></div>
             <div class="option">inTplData <span class="desc">模板数据</span></div>
             <div class="option">inOverWrite <span class="desc">是否覆盖之前的模板数据</span></div>
-		<div class="argument">wrapWithTag(inHtmlTag*)<span class="opttype">Function</span><p>快捷方法，把模板字符串头部与尾部附加html标签。</p></div>
+		<div class="argument">wrapTag(inHtmlTag*)<span class="opttype">Function</span><p>快捷方法，把模板字符串头部与尾部附加html标签。</p></div>
             <div class="option">inHtmlTag <span class="desc">html标签，如tbdoy,table,div,iframe等</span></div>
         <div class="argument">renderWith(inTplData,inOverWrite)<span class="opttype">Function</span><p>指定模板数据，并输出模板渲染结果，参数及用法与<a href="#templatedata">data方法</a>完全一致。</p></div>
             <div class="option">inTplData <span class="desc">模板数据</span></div>

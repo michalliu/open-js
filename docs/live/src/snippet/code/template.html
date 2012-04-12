@@ -13,7 +13,7 @@ table.add('<% for(var i=0,l=data.length; i<l; i++) {  %>')
      .add('<td><%=name%></td><td><%=score%></td>')
      .add('</tr>')
      .add('<% } %>')
-     .wrapWithTag('tbody','table')
+     .wrapTag('tbody','table')
      .data('data',[["张三",90],["李四",85],["王五",80],["柳六",100]]);
 
 T.documentReady(function () {
