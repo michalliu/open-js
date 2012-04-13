@@ -16,4 +16,4 @@ XCOPY ..\src\images .\static\images\ /S /Q /Y
 XCOPY ..\src\snippet .\snippet\ /S /Q /Y
 java -jar D:\Works\Git\open-js\tools\htmlcompressor.jar --type html --compress-js -o .\snippet\snippet.html .\snippet\snippet.html
 java -jar D:\Works\Git\open-js\tools\htmlcompressor.jar --type html --compress-js -o .\index.html ..\src\index.html
-CD ..
+REM XCOPY ..\build ..\..\..\deployment\docs\ /S /Q /Y
