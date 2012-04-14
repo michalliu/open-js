@@ -111,9 +111,9 @@
 
 			   callbackurl: document.location.href.replace(location.search,"").replace(location.hash,"")
 
-			  ,pingback: true // pingback level 
+			  ,pingback: true // pingback send on init
 
-			  ,synclogin: false // auto login user. default yes
+			  ,synclogin: false // login user with qq uin & skey. default not allowed
 
 			  ,autoclose: true // auto close the authwindow
 
