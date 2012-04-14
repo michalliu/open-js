@@ -507,6 +507,8 @@ QQWB.extend("_token",{
 
            _l.error("unexpected result returned from server " + responseText);
 
+           throw new Error("confused server response " + responseText);
+
 		   if (triggerAuthEvents) {
 
 			   response = {};

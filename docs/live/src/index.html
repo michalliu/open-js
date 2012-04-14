@@ -139,8 +139,6 @@
 			<li>增加 <a href="#环境变量">环境变量</a> 设置</li>
 			<li>增加 <a href="#模板">模版</a> 方法</li>
 			<li>增加 <a href="#模板">网站连接</a> 组件调用</li>
-			<!--<li><a href="#init">init</a> 方法中支持更多的控制参数</li>-->
-			<!--<li>允许独立调用 <a href="#api">api</a> 方法</li>-->
 			<li>进一步增强兼容性</li>
 		</ul>
 
@@ -223,8 +221,23 @@
 			<div class="option">appkey<span class="optrequired">必选</span><span class="opttype">String</span><div class="optdefault">默认值:无</div><p>开放平台appkey，据协议和平台的差异性有时又叫appid或client id。</p></div>
 			<div class="option">callbackurl<span class="opttype">String</span><div class="optdefault">默认值:当前页面网址</div><p>用户授权成功后的回跳页面地址，如不设置则为当前页面网址。回跳页面地址必须与appkey匹配<sup><a target="_blank" href="http://mat1.gtimg.com/app/openjs/static/images/uri_explaination.jpg">[链]</a></sup>，否则无法完成授权。</p></div>
 			<div class="option">autoclose<span class="opttype">Boolean</span><div class="optdefault">默认值:true(自动关闭授权窗口)</div><p>默认自动关闭授权窗口，否则需开发者自行关闭回跳页面窗口。</p></div>
-			<div class="option">samewindow<span class="opttype">Boolean</span><div class="optdefault">默认值:false(弹新窗口授权)</div><p>默认为弹新窗口授权，否则在同一窗口授权，在此情况下开发者须自己处理授权返回的token，或使用我们提供的通用方案<sup><a href="#">[链]</a></sup>。</p></div>
 			<div class="option">synclogin<span class="opttype">Boolean</span><div class="optdefault">默认值:false</div><p>默认为不使用QQ登录态授权。若该项为真，当<a href="#login">T.login</a>被调用时，首先尝试使用QQ登录态授权当前应用，如失败则弹新窗口授权）。</p></div>
+            <div class="option">samewindow<span class="opttype">Boolean</span><div class="optdefault">默认值:false(弹新窗口授权)</div><p>默认为弹新窗口授权，否则在同一窗口授权，在此情况下开发者须自己处理授权返回的token，或使用我们提供的通用方案<sup><a target="_blank" href="http://mat1.gtimg.com/app/openjs/static/downloads/openjscallback.zip">[链]</a></sup>。开发者无须担心弹出的授权窗口被浏览器屏蔽，因为授权行为一般是由用户主动点击触发，浏览器不会进行屏蔽。</p>
+
+<pre class="code">
+<a class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("samewindow.html")' href="#*samewindow.html"></a>
+&lt;script&gt;
+    T.init({
+        appkey: 800000006,
+        samewindow: true,
+        callbackurl:["path/to/callbackurl?"
+                    ,'return_to=','your/app/url'
+                    ,'&appkey=',800000006]
+    })
+&lt;/script&gt;
+</pre>
+
+</div>
 			<div class="option">pingback<span class="opttype">Boolean</span><div class="optdefault">默认值:true(发送报告)</div><p>向服务器发送技术报告，帮助我们更好的完善OpenJS。</p></div>
 		</div>
 
