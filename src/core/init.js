@@ -184,13 +184,6 @@
 
 		       _p.pingInit();
 
-			   if ((typeof opts.pingback == "number" && opts.pingback > 1) || typeof opts.pingback == "boolean") {
-
-                   _.bind(_b.get("nativeevent","userloggedin"),_p.pingLoggedIn);
-
-                   _.bind(_b.get("nativeevent","userloginfailed"),_p.pingLoggedInFailed);
-
-			   }
 		   }
 
         	// maintain token status, this relies appkey is already known

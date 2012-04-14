@@ -166,38 +166,5 @@ QQWB.extend("ping", {
 
     }
 
-	// Send pingback when user authorize(loggin) success or fail
-   ,_pingAuthorize: function (success) {
-
-	   return QQWB.ping.pingWith({
-
-		    sOp: "login"
-
-		   ,iSta: success ? 1 : 0
-
-		   ,iFrom: QQWB.version.replace(/\./g,"")
-
-		   ,sUrl: document.location.href
-
-		   ,sText: QQWB.bigtable.get("base", "appkey")
-
-	   }, QQWB.bigtable.get("ping","paramorder").concat("iFrom","iPubFrom","sUrl","iUrlType","iPos","sText","iBak1","iBak2","sBak1","sBak2"));
-
-    }
-
-	// Send pingback when user successfull login
-   ,pingLoggedIn: function () {
-
-	   return QQWB.ping._pingAuthorize(true);
-
-    }
-
-	// Send pingback when user unsuccessfull login
-   ,pingLoggedInFailed: function () {
-
-	   return QQWB.ping._pingAuthorize(false);
-
-    }
-
 });
 
