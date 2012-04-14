@@ -61,7 +61,7 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optOverride)
 
 		_i = _.io,
 
-		counter = _b.get("api","count"),
+		counter = _b.get("api","count",0),
 
 		solution = _b.get("solution","deferred"),
 
@@ -328,47 +328,13 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optOverride)
 
 	}
 
-	// pingback
-    (function () {
+    //
+    promise.complete(function () {
 
-		var serial = counter,
+         _l.info("*[" + counter + "] done");
 
-		    name = solutionName,
-
-			pingback = _b.get("base", "pingback");
-
-     	promise.complete(function () {
-
-             _l.info("*[" + serial + "] done");
-
-             serial = null;
-
-     	});
-
-		if (_.ping && pingback && (typeof pingback == "boolean" || (typeof pingback == "number" && pingback > 2))) {
-
-			function sendPingback(status, statusText, responseTime) {
-
-				responseTime = responseTime || 0;
-
-                _.ping.pingAPI(api, _q.encode(apiParams), optDataType, optType, status, statusText, responseTime, name);
-
-			}
-
-			promise.success(function (response, elapsedTime) {
-
-                sendPingback(200,"ok",elapsedTime);
-
-			});
-
-			promise.fail(function (status, statusText, elapsedTime) {
-
-                sendPingback(status,statusText,elapsedTime);
-
-			});
-		}
-
-    }());
+    });
 
     return promise;
+
 });
