@@ -20,8 +20,8 @@
 
     _b.put("uri","api",[baseurl,"/api"].join(""));
     _b.put("uri","auth",[baseurl,"/oauth2_html/login.php"].join(""));
-    _b.put("uri","html5proxy",[baseurl,"/proxy/proxy.html"].join(""));
-    _b.put("uri","flashas3proxy",[baseurl,"/proxy/proxy_as3_v2.swf"].join(""));
+    _b.put("uri","html5proxy",[baseurl,"/open-js/proxy/proxy_v2.html"].join(""));
+    _b.put("uri","flashas3proxy",[baseurl,"/open-js/proxy/proxy_as3_v2.swf"].join(""));
     _b.put("uri","exchangetoken",[baseurl,"/cgi-bin/exchange_token"].join(""));
     _b.put("uri","autotoken",[baseurl,"/cgi-bin/auto_token"].join(""));
 

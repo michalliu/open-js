@@ -1,5 +1,6 @@
 .ignore
 .svn
+deployment
 build
 build2.bat
 logs
