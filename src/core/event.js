@@ -160,12 +160,16 @@ QQWB.extend("",{
 
 	        handlers = _b.get("eventhandler",name);
 
+		data = _a.fromArguments(arguments).slice(1);
+
 	    if (handlers) {
 
 	        return _a.forEach(handlers, function (handler, i) {
 
 			   if (handler) {
-				   return handler.call(_, data);
+
+				   return handler.apply(_, data);
+
 			   }
 
 			   return;
