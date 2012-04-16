@@ -5,6 +5,7 @@ IF EXIST build (
 MKDIR build
 CD build
 MKDIR static
+XCOPY ..\src\downloads .\static\downloads\ /S /Q /Y
 XCOPY ..\src\css .\static\css\ /S /Q /Y
 java -jar D:\Works\Git\open-js\tools\yuicompressor.jar --type css --charset utf-8 -v -o .\static\css\index.css .\static\css\index.css
 java -jar D:\Works\Git\open-js\tools\yuicompressor.jar --type css --charset utf-8 -v -o .\static\css\snippet.css .\static\css\snippet.css
