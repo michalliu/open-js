@@ -25,9 +25,9 @@
     _b.put("uri","exchangetoken",[baseurl,"/cgi-bin/exchange_token"].join(""));
     _b.put("uri","autotoken",[baseurl,"/cgi-bin/auto_token"].join(""));
 
-    _b.put("authwindow","name","authClientProxy_ee5a0f93");
-    _b.put("authwindow","width","575");
-    _b.put("authwindow","height","465");
+    _b.put("oauthwindow","name","authClientProxy_ee5a0f93");
+    _b.put("oauthwindow","width","575");
+    _b.put("oauthwindow","height","465");
     _b.put("cookie","domain",QQWB.envs.cookiedomain);
     _b.put("cookie","path",QQWB.envs.cookiepath);
     _b.put("cookie","accesstokenname","QQWBToken");
@@ -115,7 +115,7 @@
 
 			  ,synclogin: false // login user with qq uin & skey. default not allowed
 
-			  ,autoclose: true // auto close the authwindow
+			  ,autoclose: true // auto close the oauthwindow
 
 			  ,samewindow: false // open authenciate window in same window
 
