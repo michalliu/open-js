@@ -132,7 +132,7 @@ QQWB.extend("log", {
 
 			window.name ? window.name : "",
 
-            (window.opener || window.name === _b.get("authwindow","name")) ? "#" : "", // opened window, window.name can cross domain!!
+            (window.opener || window.name === _b.get("oauthwindow","name")) ? "#" : "", // opened window, window.name can cross domain!!
 
 			window != window.parent ? "*" : "", // in frame
 
