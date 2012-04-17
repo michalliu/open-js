@@ -10,24 +10,39 @@
  * @requires base
  *           util.bigtable
  *           util.deferred
+ *           common.String
  */
 (function () {
+
 	var _ = QQWB,
 
 	    _b = _.bigtable,
+
+        _s = _.String,
 
 		baseurl = "http://open.t.qq.com";
 
     _b.put("uri","api",[baseurl,"/api"].join(""));
     _b.put("uri","auth",[baseurl,"/oauth2_html/login.php"].join(""));
     _b.put("uri","html5proxy",[baseurl,"/open-js/proxy/proxy_v2.html"].join(""));
+    _b.put("uri","innerauthproxy",[baseurl,"/open-js/proxy/proxy_v2.html"].join(""));
     _b.put("uri","flashas3proxy",[baseurl,"/open-js/proxy/proxy_as3_v2.swf"].join(""));
     _b.put("uri","exchangetoken",[baseurl,"/cgi-bin/exchange_token"].join(""));
     _b.put("uri","autotoken",[baseurl,"/cgi-bin/auto_token"].join(""));
+    _b.put("uri","gettokenbypt",[baseurl,"/cgi-bin/oauth2/get_oauth2token_pt"].join(""));
 
     _b.put("oauthwindow","name","authClientProxy_ee5a0f93");
     _b.put("oauthwindow","width","575");
     _b.put("oauthwindow","height","465");
+
+    _b.put("innerauth","layerid","openjslayer" + QQWB.uid(5));
+    _b.put("innerauth","uri",[baseurl,"/dialog/internalauth.html"].join(""));
+    _b.put("innerauth","rootdomain","qq.com");
+    _b.put("innerauth","enabled", _s.endsWith(document.domain, _b.get("innerauth","rootdomain")));
+    _b.put("innerauth","eventproxyready","InnerAuthProxyFrameReady");
+    _b.put("innerauth","eventproxysizechange", "InnerAuthProxySizeChange");
+    _b.put("innerauth","eventproxytimeout", 10 * 1000);
+
     _b.put("cookie","domain",QQWB.envs.cookiedomain);
     _b.put("cookie","path",QQWB.envs.cookiepath);
     _b.put("cookie","accesstokenname","QQWBToken");
@@ -70,7 +85,13 @@
 
 			   _l = _.log,
 
+               _s = _.String,
+
 			   _t = _._token,
+
+               _d = _.dom,
+
+               _e = _.event,
 
 			   base = "base",
 
@@ -82,9 +103,15 @@
 
                refreshToken = _t.getRefreshToken(),
 
-               needExchangeToken = refreshToken && !accessToken && rawAccessToken,
+               innerauth = _b.get("innerauth","enabled"),
 
-			   preloadSyncLoginToken = opts.synclogin && !refreshToken && !accessToken,
+               innerauthProxyFrame,
+
+               innerauthProxyFrameReadyDo,
+
+               needExchangeToken = !innerauth && refreshToken && !accessToken && rawAccessToken,
+
+			   preloadSyncLoginToken = !innerauth && opts.synclogin && !refreshToken && !accessToken,
 
 			   tokenReady;
 
@@ -95,6 +122,7 @@
             	_b.get('boot','solution')();
 
 		   }
+
 
 	       tokenReady = _b.get("boot", "tokenready");
 
@@ -177,6 +205,83 @@
 			   });
 
 		   }
+
+           if (innerauth) {
+
+               innerauthProxyFrameReadyDo = function () {
+
+                   if (!innerauthProxyFrame) {
+
+                       _l.error("retrieve inner auth token error, proxy frame not loaded");
+
+                       tokenReady.unlock("retrieve inner auth token error");
+
+                   } else {
+
+                       innerauthProxyFrame.contentWindow.getToken(_b.get("base", "appkey"), false)
+
+                                          .success(function () {
+                                               console.log(arguments);
+                                           })
+
+                                          .error(function () {
+                                               console.log(arguments);
+                                           })
+
+                                          .complete(function () {
+
+                                             tokenReady.unlock("retrieve inner auth token finished");
+
+                                         });
+                       }
+               };
+
+               if (_b.get("solution","name") === 'html5') {
+
+                   _b.get("solution","deferred").complete(function () {
+
+                       innerauthProxyFrame = _b.get("solution", "frame");
+
+                       innerauthProxyFrameReadyDo();
+
+                   });
+
+               } else {
+
+                   _l.info('loading inner auth proxy frame ...');
+
+                   _d.ready(function () {
+
+                        innerauthProxyFrame = _d.createElement('iframe'), {
+
+                            id : "openjsframe_" + _.uid(5),
+
+                            src: _b.get("uri","innerauthproxy"),
+
+                            style: "display:none;"
+
+                        };
+
+                        _e.once(_b.get("innerauth","eventproxyready"), function () {
+
+                            innerauthProxyFrameReadyDo();
+
+                        });
+
+                        // timeout check
+                        setTimeout(function () {
+
+                            _e.trigger(_b.get("innerauth","eventproxyready"));
+
+                        },_b.get("innerauth","eventproxytimeout"));
+
+                        document.body.appendChild(innerauthProxyFrame);
+
+                   });
+
+               }
+
+           } // end if innerauth
 
            tokenReady.unlock("init is called"); // unlock init
 

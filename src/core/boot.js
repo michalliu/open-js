@@ -35,6 +35,10 @@ QQWB.bigtable.put('boot','solution', function () {
 
 		_br = _.browser,
 
+        innerauth = _b.get("innerauth","enabled"),
+
+        rootDomain = _b.get("innerauth","rootdomain"),
+
 		tokenReady,
 
 		everythingReady,
@@ -105,6 +109,18 @@ QQWB.bigtable.put('boot','solution', function () {
 
     });
     
+    if (innerauth) {
+
+         _l.info('enter inner auth model');
+
+         tokenReady.lock("waiting inner auth token");
+
+         _l.debug('set domain to ' + rootDomain);
+
+         document.domain = rootDomain;
+
+    }
+
 	// post message implementation
 	html5Implementation = function () {
 

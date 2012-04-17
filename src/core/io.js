@@ -649,7 +649,7 @@
 
             if (status !== 200) {
 
-                deferred.reject(status, statusText, elapsedtime, "");
+                deferred.reject(status, statusText, elapsedtime, responseText);
 
             } else {
 

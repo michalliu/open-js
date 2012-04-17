@@ -37,6 +37,7 @@
              'width': 'width',
              'usemap': 'useMap',
              'frameborder': 'frameBorder',
+             'innerhtml': 'innerHTML',
              //'allowtransparency': 'allowTransparency',
              'maxlength': 'maxLength',
              'type': 'type'
@@ -140,7 +141,7 @@
     
                 } else if (key in directElementAttrs) {
     
-                  element.setAttribute(directElementAttrs[key], val);
+                  element[directElementAttrs[key]] = val;
     
                 } else if (_.String.startsWith(key, 'aria-')) {
     
@@ -186,7 +187,7 @@
 					
                 } else if (propName in directElementAttrs) {
     
-				  inOptResult[propName] = element.getAttribute(directElementAttrs[propName]);
+                  inOptResult[propName] = element[directElementAttrs[propName]];
     
                 } else if (_.String.startsWith(propName, 'aria-')) {
 

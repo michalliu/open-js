@@ -11,9 +11,11 @@
  *           core.init
  *           core.token
  *           core.log
- *           core.bom
  *           util.bigtable
  *           common.String
+ *
+ * @include core.dom
+ *          core.event
  */
 
 (function (){
@@ -30,35 +32,65 @@
 
 	   oAuthWindow,
 
-	   innerAuthLayer,
+	   innerAuthLayer;
 
-	   oldDomain = document.domain;
-
-   innerAuthLayer = (function () {
-
-	   return {
+    innerAuthLayer = {
 
 		   show: function () {
 
-		   }
+               QQWB.documentReady(function () {
+
+                   var layerid = _b.get('innerauth', 'layerid'),
+
+                       appkey = _b.get("base", "appkey"),
+
+                       url = _b.get("innerauth","uri"),
+
+                       attrs = 'frameBorder="0" width="100%" height="100%" scrolling="no"',
+
+                       layer = document.getElementById(layerid);
+
+                   if (!layer) {
+
+                       layer = QQWB.dom.createElement('div', {
+
+                           id: _b.get('innerauth', 'layerid'),
+
+                           style: ['position:absolute;padding:5px;overflow:hidden;display:none;z-index:999;'
+                               , (QQWB.browser.msie && QQWB.browser.version < 9) ? 'progid:DXImageTransform.Microsoft.Gradient(GradientType=0, StartColorStr="#4c000000", EndColorStr="#4c000000");' : 'background-color:rgba(0,0,0,0.3);'].join(''),
+
+                           innerhtml: ['<iframe src="', url , '?appkey=', appkey, '" ', attrs, '></iframe>'].join('')
+
+                       });
+
+                       //
+                       QQWB.bind(_b.get("innerauth","eventproxysizechange"), function (w, h) {
+
+                           layer.style.width = w + 'px';
+
+                           layer.style.height = h + 'px';
+
+                           layer.style.left = Math.max(0,(QQWB.browser.viewport.width - w)) / 2 + 'px';
+
+                           layer.style.top = Math.max(0,(QQWB.browser.viewport.height - h)) / 2 + 'px';
+
+                       });
+
+                       document.body.appendChild(layer);
+
+                   }
+
+                   layer.style.display = "block"; // show auth layer
+
+               }); // end documentReady
+
+		   } // end show
 
 	   };
 
-   }());
-
    oAuthWindow = (function () {
 
-    	var width = _b.get("oauthwindow","width"),
-    
-        	height = _b.get("oauthwindow","height"),
-    
-    		name = _b.get("oauthwindow","name"),
-    
-    		url = _b.get("uri","auth"),
-    
-    		attrs = "toolbar=no,menubar=no,scrollbars=yes,resizable=yes,location=yes,status=no",
-    
-    		authorizing = false,
+       var  authorizing = false,
     
     		awindow = null;
     	
@@ -66,7 +98,17 @@
     
     		show: function () {
     
-    	        var appkey = _b.get("base", "appkey"),
+               	var width = _b.get("oauthwindow","width"),
+               
+                   	height = _b.get("oauthwindow","height"),
+               
+               		name = _b.get("oauthwindow","name"),
+               
+               		url = _b.get("uri","auth"),
+               
+               		attrs = "toolbar=no,menubar=no,scrollbars=yes,resizable=yes,location=yes,status=no",
+
+    	            appkey = _b.get("base", "appkey"),
     
     		        autoclose = _b.get("base","autoclose"),
     
@@ -82,9 +124,9 @@
     
     			if (!authorizing) {
     
-    		        x = (window.screenX || window.screenLeft) + ((window.outerWidth || document.documentElement.clientWidth) - width) / 2;
+                    x = (window.screenX || window.screenLeft) + Math.max(0,((window.outerWidth || document.documentElement.clientWidth) - width)) / 2;
     
-    		        y = (window.screenY || window.screenTop) + ((window.outerHeight || document.documentElement.clientHeight) - height) / 2;
+                    y = (window.screenY || window.screenTop) + Math.max(0,((window.outerHeight || document.documentElement.clientHeight) - height)) / 2;
     
     		        query =  _.queryString.encode({
     
