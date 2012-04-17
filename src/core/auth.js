@@ -9,173 +9,197 @@
  * @module auth
  * @requires base
  *           core.init
- * @includes core.token
+ *           core.token
  *           core.log
+ *           core.bom
+ *           util.bigtable
+ *           common.String
  */
+
 (function (){
 
-var authWindow = function () {
-
-	var _ = QQWB,
-	    
-	    _b = _.bigtable,
-
-	    width = _b.get("authwindow","width"),
-
-    	height = _b.get("authwindow","height"),
-
-		name = _b.get("authwindow","name"),
-
-		url = _b.get("uri","auth"),
-
-		attrs = "toolbar=no,menubar=no,scrollbars=yes,resizable=yes,location=yes,status=no",
-
-		authorizing = false,
-
-		awindow = null;
-	
-	return {
-
-		show: function () {
-
-	        var _ = QQWB,
-
-	            _b = _.bigtable,
-
-	            appkey = _b.get("base", "appkey"),
-
-		        autoclose = _b.get("base","autoclose"),
-
-		        samewindow = _b.get("base","samewindow"),
-
-				x,
-
-				y,
-
-				query,
-
-				props;
-
-			if (!authorizing) {
-
-		        x = (window.screenX || window.screenLeft) + ((window.outerWidth || document.documentElement.clientWidth) - width) / 2;
-
-		        y = (window.screenY || window.screenTop) + ((window.outerHeight || document.documentElement.clientHeight) - height) / 2;
-
-		        query =  _.queryString.encode({
-
-                     response_type: "token"
-
-                    ,client_id: appkey
-
-                    ,redirect_uri: _b.get("uri","redirect")
-
-                    ,scope: "all"
-
-                    ,status: 0
-
-                });
-
-		        props = ["width=" + width, "height=" + height, "left=" + x, "top=" + y].join(",")
-
-				if (samewindow) {
-
-					window.name = name;
-
-					window.location.href = url + "?" + query;
-
-					return;
-				}
-
-	            awindow = window.open(url + "?" + query, name, [props, attrs].join(","));
-
-				authorizing = true;
-
-		        (function () {
-
-					var _ = QQWB,
-
-					    _t = _._token,
-
-					    response,
-
-						mark,
-
-					    _q = _.queryString;
-
-                   if (!awindow) {
-
-						errormsg = "browser blocked popup authorize window";
-
-						_l.error(errormsg);
-
-                        _t.resolveResponse("error=" + errormsg, true);
-
-						return;
-					}
-					
-                    if (awindow.closed) { // user close like ALT + F4
-
-                        _t.resolveResponse("error=access_denied", true);
-
-						authorizing = false;
-
-						awindow = null;
-
-                        return;
-
-		            } else {
-
-		                try {
-
-		                 	response = awindow.location && awindow.location.href;
-
-		                } catch (ex) {
-
-		                	response = null;
-		                }
-
-		                if (response && response != "about:blank") { // window.open url firstly is about:blank
-						   
-						   mark = response.lastIndexOf('#');
-
-						   response = mark == -1 ? "" : response.slice(mark+1);
-
-                           if (response) { // hash must be exists
-
-		         		       response = _q.decode(response);
-
-		                       _t.resolveResponse(response, true);
-
-	                           authorizing = false;
-
-                               autoclose && awindow.close();
-
-						       awindow = null;
-
-		                       return;
-
-                           }
-
-		                }
-
-                        setTimeout(arguments.callee, 0);
-
-                    }
-
-                }());
-
-			} else {
-
-                awindow && awindow.focus();
-
-			}
-			
-		}
-
-	};
-
-}(); // end authWindow
+   var _ = QQWB,
+
+       _b = _.bigtable,
+
+	   _l = _.log,
+
+	   _t = _._token,
+
+	   _s = _.String,
+
+	   oAuthWindow,
+
+	   innerAuthLayer,
+
+	   oldDomain = document.domain;
+
+   innerAuthLayer = (function () {
+
+	   return {
+
+		   show: function () {
+
+		   }
+
+	   };
+
+   }());
+
+   oAuthWindow = (function () {
+
+    	var width = _b.get("oauthwindow","width"),
+    
+        	height = _b.get("oauthwindow","height"),
+    
+    		name = _b.get("oauthwindow","name"),
+    
+    		url = _b.get("uri","auth"),
+    
+    		attrs = "toolbar=no,menubar=no,scrollbars=yes,resizable=yes,location=yes,status=no",
+    
+    		authorizing = false,
+    
+    		awindow = null;
+    	
+    	return {
+    
+    		show: function () {
+    
+    	        var appkey = _b.get("base", "appkey"),
+    
+    		        autoclose = _b.get("base","autoclose"),
+    
+    		        samewindow = _b.get("base","samewindow"),
+    
+    				x,
+    
+    				y,
+    
+    				query,
+    
+    				props;
+    
+    			if (!authorizing) {
+    
+    		        x = (window.screenX || window.screenLeft) + ((window.outerWidth || document.documentElement.clientWidth) - width) / 2;
+    
+    		        y = (window.screenY || window.screenTop) + ((window.outerHeight || document.documentElement.clientHeight) - height) / 2;
+    
+    		        query =  _.queryString.encode({
+    
+                         response_type: "token"
+    
+                        ,client_id: appkey
+    
+                        ,redirect_uri: _b.get("uri","redirect")
+    
+                        ,scope: "all"
+    
+                        ,status: 0
+    
+                    });
+    
+    		        props = ["width=" + width, "height=" + height, "left=" + x, "top=" + y].join(",")
+    
+    				if (samewindow) {
+    
+    					window.name = name;
+    
+    					window.location.href = url + "?" + query;
+    
+    					return;
+    				}
+    
+    	            awindow = window.open(url + "?" + query, name, [props, attrs].join(","));
+    
+    				authorizing = true;
+    
+    		        (function () {
+    
+    					var _ = QQWB,
+    
+    					    _t = _._token,
+    
+    					    response,
+    
+    						mark,
+    
+    					    _q = _.queryString;
+    
+                       if (!awindow) {
+    
+    						errormsg = "browser blocked popup authorize window";
+    
+    						_l.error(errormsg);
+    
+                            _t.resolveResponse("error=" + errormsg, true);
+    
+    						return;
+    					}
+    					
+                        if (awindow.closed) { // user close like ALT + F4
+    
+                            _t.resolveResponse("error=access_denied", true);
+    
+    						authorizing = false;
+    
+    						awindow = null;
+    
+                            return;
+    
+    		            } else {
+    
+    		                try {
+    
+    		                 	response = awindow.location && awindow.location.href;
+    
+    		                } catch (ex) {
+    
+    		                	response = null;
+    		                }
+    
+    		                if (response && response != "about:blank") { // window.open url firstly is about:blank
+    						   
+    						   mark = response.lastIndexOf('#');
+    
+    						   response = mark == -1 ? "" : response.slice(mark+1);
+    
+                               if (response) { // hash must be exists
+    
+    		         		       response = _q.decode(response);
+    
+    		                       _t.resolveResponse(response, true);
+    
+    	                           authorizing = false;
+    
+                                   autoclose && awindow.close();
+    
+    						       awindow = null;
+    
+    		                       return;
+    
+                               }
+    
+    		                }
+    
+                            setTimeout(arguments.callee, 0);
+    
+                        }
+    
+                    }());
+    
+    			} else {
+    
+                    awindow && awindow.focus();
+    
+    			}
+    			
+    		}
+    
+    	};
+
+    }()); // end oAuthWindow
 
 QQWB.extend("auth",{
     /**
@@ -188,15 +212,7 @@ QQWB.extend("auth",{
      */
     login: function (optSuccessHandler, optFailHandler) {
 
-	    var _ = QQWB,
-
-	        _b = _.bigtable,
-
-			_l = _.log,
-
-			_t = _._token,
-
-			inited = _b.get("base","inited"),
+	    var inited = _b.get("base","inited"),
 
 			syncloginenabled = _b.get("base","synclogin"),
 
@@ -292,7 +308,7 @@ QQWB.extend("auth",{
 
 	    }
 
-	    authWindow.show();
+	    oAuthWindow.show();
 
         return _;
     }
@@ -304,15 +320,7 @@ QQWB.extend("auth",{
      */
    ,logout: function (optHandler) {
 
-	   var  _ = QQWB,
-
-	        _b = _.bigtable,
-
-			_l = _.log,
-
-			_t = _._token,
-
-	        loginStatus = _.loginStatus();
+	   var loginStatus = _.loginStatus();
 
        _l.info("logging out user");
 
@@ -348,11 +356,7 @@ QQWB.extend("auth",{
     */
    ,loginStatus: function (optCallback) {
 
-	   var _ = QQWB,
-
-		   _t = _._token,
-
-           accessToken = _t.getAccessToken(),
+       var accessToken = _t.getAccessToken(),
 
            user = _t.getTokenUser(),
 
