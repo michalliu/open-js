@@ -23,6 +23,8 @@
 
 	var _ = QQWB,
 
+	    _b = _.bigtable,
+
 	    sizzle = window.Sizzle,
 
         directElementAttrs = {
@@ -83,11 +85,7 @@
           */
         ready: function (handler) {
     
-            var _ = QQWB,
-    
-                _b = _.bigtable,
-    
-                ready = _b.get("document", "ready"),
+            var ready = _b.get("document", "ready"),
     
                 try_trigger_doc_ready;
     
@@ -119,7 +117,7 @@
     
     		return node;
     	},
-    
+
     	setProperties: function (element, properties) {
     
     		var _ = QQWB,
