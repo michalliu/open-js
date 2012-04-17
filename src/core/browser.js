@@ -341,7 +341,60 @@
 
 	}
 
+    function detectRendererMode() {
+
+        if (document.compatMode == 'BackCompat') {
+
+            return {quirks: true};
+
+        } else {
+
+            return {standard: true};
+
+        }
+
+    }
+
+    // http://andylangton.co.uk/articles/javascript/get-viewport-size-javascript/
+    function detectViewportSize() {
+
+		var el = window,
+
+            attr = 'inner',
+
+		    mode = document.compatMode;
+
+		if ( !('innerWidth' in el) ) {
+
+			attr = 'client';
+
+			el = mode == "BackCompat" ? document.body : document.documentElement;
+
+		}
+
+		return { width: el[attr+'Width'], height: el[attr+'Height'] };
+
+    }
+
     browserMatch = uaMatch(ua);
+
+    if (window.addEventListener) {
+
+        window.addEventListener('resize', function () {
+
+	        QQWB.extend('browser.viewport', detectViewportSize(),true);
+
+        },false);
+
+    } else if (window.attachEvent){
+
+        window.attachEvent('onresize', function () {
+
+	        QQWB.extend('browser.viewport', detectViewportSize(),true);
+
+        });
+
+    }
 
     QQWB.extend('browser',{
 
@@ -360,5 +413,10 @@
 	QQWB.extend('browser.platform', dectectPlatform());
 
 	QQWB.extend('browser.os', detectOS());
+
+    // this attribute is live
+	QQWB.extend('browser.viewport', detectViewportSize());
+
+	QQWB.extend('browser.rendererModel', detectRendererMode());
 
 }());
