@@ -29,34 +29,27 @@ function login() {
 
 }
 
+T.ready(function () {
+
+	var loginStatus = T.loginStatus(),
+	    template = T.template();
+
+	if (!loginStatus) {
+		template.add('未登录');
+	} else {
+		template.add('已登录');
+	}
+	template.add('<br/>');
+    if (window != window.parent) {
+		template.add("请点击新窗口按钮，在新打开的窗口预览效果。");
+	} else　{
+		template.add('<input type="button" value="登录授权" onclick="login();"/><input type="button" value="登出" onclick="T.logout();"/>');
+	}
+	document.body.innerHTML = template.render();
+});
 
 </script>
 </head>
 <body>
-<script>
-
-if (T.loginStatus()) {
-
-    document.write("已登录");
-
-} else {
-
-    document.write("未登录");
-
-}
-
-document.write("<br/>");
-
-if (window != window.parent) {
-
-    document.write("请点击新窗口按钮，在新打开的窗口预览效果。")
-
-} else {
-
-    document.write('<input type="button" value="登录授权" onclick="login();"/><input type="button" value="登出" onclick="T.logout();"/>');
-
-}
-
-</script>
 </body>
 </html>
