@@ -22,7 +22,9 @@
       })();
     
     </script>
-
+    <style>
+    .sub_toc_title{font-weight:bold;color:#333;}
+    </style>
 </head>
 <body>
     <div class="aside">
@@ -39,7 +41,7 @@
 
 			<li>- <a href="#init">init</a></li>
 
-            <li> <b>授权</b>
+            <li> <span class="sub_toc_title">授权</span>
 
 		        <ul class="toc_section">
 
@@ -63,7 +65,7 @@
 
             <li>- <a href="#component">component</a> <img src="http://mat1.gtimg.com/app/opent/images/wiki/resource/new.gif"></img></li>
 
-            <li> <b>事件</b>
+            <li> <span class="sub_toc_title">事件</span>
 
 		        <ul class="toc_section">
 
@@ -78,7 +80,7 @@
                 </ul>
 
             </li>
-            <li> <b>辅助</b>
+            <li> <span class="sub_toc_title">辅助</span>
 
 		        <ul class="toc_section">
 
@@ -89,6 +91,13 @@
 		    	<li>- <a href="#script">script</a></li>
 
 		    	<li>- <a href="#task">task</a></li>
+
+                </ul>
+
+            </li>
+            <li> <span class="sub_toc_title">扩展</span>
+
+		        <ul class="toc_section">
 
 		    	<li>- <a href="#find">find</a></li>
 
@@ -735,7 +744,7 @@ T.documentReady(function () {
 		<div class="options">
 		<div class="argument">appkey(inAppkey)<span class="opttype">Function</span><p>设置微评论组件的Appkey。</p></div>
             <div class="option">inAppkey <span class="desc">微评论组件的Appkey，如<em>801126062</em></span></div>
-		<div class="argument">colors(colors*)<span class="opttype">Function</span><p>设置微评论组件的Appkey。</p></div>
+		<div class="argument">colors(colors*)<span class="opttype">Function</span><p>自定义微评论组件的外观。</p></div>
             <div class="option">colors <span class="desc">微评论组件颜色设置，如blue,green,#06c等。最多4个，依次代表背景色，评论背景色，边框色，主字色</span></div>
         </div>
 

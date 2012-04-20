@@ -12,6 +12,7 @@
  *           core.token
  *           core.log
  *           util.bigtable
+ *           util.cookie
  *           common.String
  *
  * @include core.dom
@@ -27,6 +28,8 @@
 	   _l = _.log,
 
 	   _t = _._token,
+
+	   _c = _.cookie,
 
 	   _s = _.String,
 
@@ -44,11 +47,13 @@
 
                        appkey = _b.get("base", "appkey"),
 
-                       url = _b.get("innerauth","uri"),
+                       url = _b.get("uri","innerauth"),
 
                        attrs = 'frameBorder="0" width="100%" height="100%" scrolling="no"',
 
-                       layer = document.getElementById(layerid);
+                       layer = document.getElementById(layerid),
+
+					   lastw, lasth, resize, cleanup;
 
                    if (!layer) {
 
@@ -56,31 +61,86 @@
 
                            id: _b.get('innerauth', 'layerid'),
 
-                           style: ['position:absolute;padding:5px;overflow:hidden;display:none;z-index:999;'
-                               , (QQWB.browser.msie && QQWB.browser.version < 9) ? 'progid:DXImageTransform.Microsoft.Gradient(GradientType=0, StartColorStr="#4c000000", EndColorStr="#4c000000");' : 'background-color:rgba(0,0,0,0.3);'].join(''),
+                           style: ['position:absolute;padding:5px;overflow:hidden;z-index:999;visibility:hidden;'
+                               , (QQWB.browser.msie && QQWB.browser.version < 9) ? 'filter: progid:DXImageTransform.Microsoft.Gradient(GradientType=0, StartColorStr="#4c000000", EndColorStr="#4c000000");' : 'background-color:rgba(0,0,0,0.3);'].join(''),
 
                            innerhtml: ['<iframe src="', url , '?appkey=', appkey, '" ', attrs, '></iframe>'].join('')
 
                        });
 
+					   resize = function () {
+
+		 	               QQWB.trigger(_b.get("innerauth","eventproxysizechange"), lastw, lasth);
+
+		               };
+
+					   cleanup = function () {
+
+                           layer.parentNode.removeChild(layer);
+
+						   QQWB.unbind(_b.get("innerauth","eventproxysizechange"), false); // unbind all size change listener
+
+						   if (window.removeEventListener) {
+
+							   window.removeEventListener('resize', resize);
+
+						   } else if (window.detachEvent) {
+
+							   window.detachEvent('onresize', resize);
+
+						   }
+					   };
+
+					   QQWB.once(_b.get("innerauth","eventproxysubmit"), function (responseText) {
+
+						   QQWB._token.resolveResponse(responseText,true);
+
+						   cleanup();
+
+					   });
+
+					   QQWB.once(_b.get("innerauth","eventproxycancel"), function () {
+
+						   QQWB._token.resolveResponse("error=user_refused",true);
+
+						   cleanup();
+
+					   });
+
                        //
                        QQWB.bind(_b.get("innerauth","eventproxysizechange"), function (w, h) {
+
+						   var offsettop = document.body.scrollTop;
+
+						   lastw = w;
+
+						   lasth = h;
 
                            layer.style.width = w + 'px';
 
                            layer.style.height = h + 'px';
 
-                           layer.style.left = Math.max(0,(QQWB.browser.viewport.width - w)) / 2 + 'px';
+                           layer.style.left = offsettop + Math.max(0,(QQWB.browser.viewport.width - w)) / 2 + 'px';
 
-                           layer.style.top = Math.max(0,(QQWB.browser.viewport.height - h)) / 2 + 'px';
+                           layer.style.top = offsettop + Math.max(0,(QQWB.browser.viewport.height - h)) / 2 + 'px';
+
+                           layer.style.visibility = "visible"; // show auth layer
 
                        });
+
+					   if (window.addEventListener) {
+
+		                   window.addEventListener('resize', resize);
+
+	                   } else if(window.attachEvent) {
+
+	                   	   window.attachEvent('onresize', resize);
+
+	    	           }
 
                        document.body.appendChild(layer);
 
                    }
-
-                   layer.style.display = "block"; // show auth layer
 
                }); // end documentReady
 
@@ -256,6 +316,8 @@ QQWB.extend("auth",{
 
 	    var inited = _b.get("base","inited"),
 
+		    innerauth = _b.get("innerauth","enabled"),
+
 			syncloginenabled = _b.get("base","synclogin"),
 
             loginStatus = _.auth.loginStatus(), 
@@ -290,13 +352,15 @@ QQWB.extend("auth",{
 		}
 
 		// QQ loginstatus exhchange to oauth login status
-	    if (syncloginenabled) {
+		// this is not innerauth logic
+		// if synclogin enabled use the cached synclogin result otherwise drop it
+	    if (!innerauth && syncloginenabled) {
 
 	    	syncloginResponseText = _b.get("synclogin","responsetext");
 
 	    	if (syncloginResponseText) {
 
-	    	    _l.debug("using prefetched synclogin ...");
+	    	    _l.debug("using prefetched token ...");
 
 	    		_t.resolveResponse(syncloginResponseText, false); // don't trigger any events
 
@@ -332,7 +396,7 @@ QQWB.extend("auth",{
 
 	    		} else {
 
-                    _l.error("wired result of T.login " + arg1);
+                    _l.error("wired result of T.login " + QQWB.JSON.stringify(arg1));
 
 	    		}
 
@@ -350,7 +414,15 @@ QQWB.extend("auth",{
 
 	    }
 
-	    oAuthWindow.show();
+		if (innerauth) {
+
+			innerAuthLayer.show();
+
+		} else {
+
+	        oAuthWindow.show();
+
+	    }
 
         return _;
     }
@@ -362,7 +434,11 @@ QQWB.extend("auth",{
      */
    ,logout: function (optHandler) {
 
-	   var loginStatus = _.loginStatus();
+	   var loginStatus = _.loginStatus(),
+
+	       innerauth = _b.get("innerauth","enabled"),
+
+		   rootDomain = _b.get("innerauth","rootdomain");
 
        _l.info("logging out user");
 
@@ -381,6 +457,13 @@ QQWB.extend("auth",{
            _l.info("user " + (loginStatus.name || "unknown") + " logged out");
 
        }
+
+	   if (innerauth) {
+	       _c.del('uin','',rootDomain);
+	       _c.del('skey','',rootDomain);
+	       _c.del('luin','',rootDomain);
+	       _c.del('lskey','',rootDomain);
+	   }
 
        optHandler && optHandler();
 

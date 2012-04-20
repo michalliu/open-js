@@ -17,7 +17,9 @@ QQWB.extend("ping", {
 
 	   function baseParam () {
 
-	       var qq = QQWB.cookie.get("uin",null,"0").match(/\d+/)[0],
+	       var qq = QQWB.cookie.get("uin",null),
+
+		       qq = (qq || '0').match(/\d+/)[0],
 
 	           flowid = "";
 

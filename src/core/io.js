@@ -86,9 +86,13 @@
 
             }
 
+        }
+
+		if (_s.trim(opts.type).toUpperCase() == "GET") {
+
             opts.url = joinUrlWithData(opts.url, opts.data);
 
-        }
+		}
 
         if (_s.trim(opts.type).toUpperCase() == "GET" && !opts.cache) {
 

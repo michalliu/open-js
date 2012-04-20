@@ -491,11 +491,13 @@ QQWB.extend("_token",{
 		       }
 		   }
 
-       } else if (response.error) {
+       } else if (response.error || response.errorMsg) {
 
            _l.error("login error occurred " + response.error);
 
 		   if (triggerAuthEvents) {
+
+              response.error = response.error || response.errorMsg;
 
               response.message = response.error;
 
@@ -507,7 +509,7 @@ QQWB.extend("_token",{
 
            _l.error("unexpected result returned from server " + responseText);
 
-           throw new Error("confused server response " + responseText);
+           //throw new Error("confused server response " + responseText);
 
 		   if (triggerAuthEvents) {
 

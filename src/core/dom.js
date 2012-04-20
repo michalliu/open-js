@@ -38,6 +38,7 @@
              'usemap': 'useMap',
              'frameborder': 'frameBorder',
              'innerhtml': 'innerHTML',
+			 'src': 'src',
              //'allowtransparency': 'allowTransparency',
              'maxlength': 'maxLength',
              'type': 'type'

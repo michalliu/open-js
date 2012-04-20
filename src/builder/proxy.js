@@ -44,13 +44,22 @@
 
         getToken,
 
+		rootDomain = _b.get("innerauth","rootdomain"),
+
 		targetOrigin = "*", // we don't care who will handle the data
 
         appWindow = window.parent; // the third-party application window
 
-    if (_b.get("innerauth","enabled")) {
+		// this is a paradox
+		// we must disable document.domain downgrade to rootDomain(qq.com)
+		// because our online doc hosted on open.t.qq.com, we not wish these codes becomes inner
+		// on the other hand the proxy.html hosted open.t.qq.com must be enabled aslo @see init.js line 45
+		
+	//if (_b.get("innerauth","enabled")) {
+    if (_s.endsWith(document.domain,rootDomain)) {
 
-        document.domain = _b.get("innerauth","rootdomain");
+		// downgrade document.domain to root domain
+        document.domain = rootDomain;
 
         if (appWindow && appWindow.QQWB) {
 
@@ -68,7 +77,7 @@
 
                 return  _i.ajax({
 
-                    url: _b.get('base','gettokenbypt'),
+                    url: _b.get('uri','gettokenbypt'),
 
                     type: 'post',
 
@@ -77,7 +86,7 @@
                          ,'&response_type=', force ? 'token' : 'check'
                          ,'&seqid=', Math.floor(Math.random() * 10E5)
                          ,'&appfrom=openjs2.0'
-                         ,'g_tk=', safekey ? safekey[1] : ''].join(''),
+                         ,'&g_tk=', safekey ? safekey[1] : ''].join(''),
 
                     dataType: 'text'
 

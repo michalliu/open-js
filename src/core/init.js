@@ -11,12 +11,15 @@
  *           util.bigtable
  *           util.deferred
  *           common.String
+ *           core.log
  */
 (function () {
 
 	var _ = QQWB,
 
 	    _b = _.bigtable,
+
+		_l = _.log,
 
         _s = _.String,
 
@@ -30,17 +33,20 @@
     _b.put("uri","exchangetoken",[baseurl,"/cgi-bin/exchange_token"].join(""));
     _b.put("uri","autotoken",[baseurl,"/cgi-bin/auto_token"].join(""));
     _b.put("uri","gettokenbypt",[baseurl,"/cgi-bin/oauth2/get_oauth2token_pt"].join(""));
+    _b.put("uri","innerauth",[baseurl,"/cgi-bin/oauth2/inner_flow_page"].join(""));
 
     _b.put("oauthwindow","name","authClientProxy_ee5a0f93");
     _b.put("oauthwindow","width","575");
     _b.put("oauthwindow","height","465");
 
     _b.put("innerauth","layerid","openjslayer" + QQWB.uid(5));
-    _b.put("innerauth","uri",[baseurl,"/dialog/internalauth.html"].join(""));
+    _b.put("innerauth","originaldomain",document.domain);
     _b.put("innerauth","rootdomain","qq.com");
-    _b.put("innerauth","enabled", _s.endsWith(document.domain, _b.get("innerauth","rootdomain")));
+    _b.put("innerauth","enabled", document.domain != 'open.t.qq.com' && _s.endsWith(document.domain, _b.get("innerauth","rootdomain")));
     _b.put("innerauth","eventproxyready","InnerAuthProxyFrameReady");
     _b.put("innerauth","eventproxysizechange", "InnerAuthProxySizeChange");
+    _b.put("innerauth","eventproxysubmit", "InnerAuthResult");	
+    _b.put("innerauth","eventproxycancel", "InnerAuthRequestCancel");	
     _b.put("innerauth","eventproxytimeout", 10 * 1000);
 
     _b.put("cookie","domain",QQWB.envs.cookiedomain);
@@ -75,6 +81,14 @@
 
 	_b.put('boot','booting', false);
 
+	if (_b.get("innerauth","enabled")) {
+
+         _l.info('enter inner auth model, set domain to ' + _b.get("innerauth","rootdomain"));
+
+         document.domain = _b.get("innerauth","rootdomain"); // downgrade document.domain to root same as inner auth token proxy
+
+	}
+
     QQWB.provide("init", function (opts) {
 
 		   var _ = QQWB,
@@ -90,8 +104,6 @@
 			   _t = _._token,
 
                _d = _.dom,
-
-               _e = _.event,
 
 			   base = "base",
 
@@ -109,9 +121,9 @@
 
                innerauthProxyFrameReadyDo,
 
-               needExchangeToken = !innerauth && refreshToken && !accessToken && rawAccessToken,
+               needExchangeToken,
 
-			   preloadSyncLoginToken = !innerauth && opts.synclogin && !refreshToken && !accessToken,
+			   preloadSyncLoginToken,
 
 			   tokenReady;
 
@@ -147,6 +159,8 @@
 
 			  ,samewindow: false // open authenciate window in same window
 
+			  ,showappinfo: true // used in inner auth, if showappinfo is true, user will see appinfo when first use this app otherwise user will not see
+
 		   }, opts, true);
 
 		   _b.put(base,"pingback",opts.pingback);
@@ -172,70 +186,52 @@
 
 		   }
 
-           _l.info("client proxy uri is " + opts.callbackurl);
-
-           _b.put("uri","redirect",opts.callbackurl);
-
-           if (needExchangeToken) {
-
-               tokenReady.lock("exchange token");
-
-               _l.info("exchanging refresh token to access token...");
-
-               _t.exchangeForToken(function (response) {
-
-                   tokenReady.unlock("token exchanged");// unlock for async refresh token
-
-               });
-
-           }
-
-		   if (preloadSyncLoginToken) {
-
-               _l.info("preload synclogin token");
-
-			   _t.loadSyncLoginToken().success(function (responseText) {
-
-			       _b.put("synclogin", "responsetext", responseText);
-
-			   }).error(function (status, statusText) {
-
-				   _l.error(["preload synclogin token failed,", status, " " , statusText].join(""));
-
-			   });
-
-		   }
-
+		   // inner auth flow
            if (innerauth) {
+
+               tokenReady.lock("loading proxy frame and start auto login"); // lock for innerauth mechanism
 
                innerauthProxyFrameReadyDo = function () {
 
-                   if (!innerauthProxyFrame) {
+				    // override cookieDomain setting
+			    	// should be okay here, just in case of our frame is hijacked 
+			    	if (innerauthProxyFrame && innerauthProxyFrame.contentWindow && innerauthProxyFrame.contentWindow.getToken) {
 
-                       _l.error("retrieve inner auth token error, proxy frame not loaded");
+                        innerauthProxyFrame.contentWindow.getToken(_b.get("base", "appkey"), !opts.showappinfo)
 
-                       tokenReady.unlock("retrieve inner auth token error");
+                                           .success(function (responseText) {
 
-                   } else {
+                                               // _l.info("auto login success result cached " + responseText);
 
-                       innerauthProxyFrame.contentWindow.getToken(_b.get("base", "appkey"), false)
+			                                   // _b.put("synclogin", "responsetext", responseText);
 
-                                          .success(function () {
-                                               console.log(arguments);
-                                           })
+											   _t.resolveResponse(responseText, false);
 
-                                          .error(function () {
-                                               console.log(arguments);
-                                           })
+                                            })
 
-                                          .complete(function () {
+                                           .error(function (status, statusText, responseTime, responseText) {
 
-                                             tokenReady.unlock("retrieve inner auth token finished");
+				                               _l.error(["auto login failed,", status, ", " , statusText, ', ', responseText].join(""));
+											   
+                                            })
 
-                                         });
-                       }
+                                           .complete(function () {
+
+                                              tokenReady.unlock("done auto login");
+
+                                          });
+
+			    	 } else {
+
+                        _l.error("retrieve inner auth token error, proxy frame not loaded");
+
+                        tokenReady.unlock("failed to load innerauth proxy frame, auto login failed");
+
+			    	 }
+
                };
 
+			   // proxy frame is loading or loaded
                if (_b.get("solution","name") === 'html5') {
 
                    _b.get("solution","deferred").complete(function () {
@@ -246,13 +242,13 @@
 
                    });
 
-               } else {
+               } else { // load proxy frame now
 
                    _l.info('loading inner auth proxy frame ...');
 
                    _d.ready(function () {
 
-                        innerauthProxyFrame = _d.createElement('iframe'), {
+                        innerauthProxyFrame = _d.createElement('iframe', {
 
                             id : "openjsframe_" + _.uid(5),
 
@@ -260,9 +256,9 @@
 
                             style: "display:none;"
 
-                        };
+                        });
 
-                        _e.once(_b.get("innerauth","eventproxyready"), function () {
+                        _.once(_b.get("innerauth","eventproxyready"), function () {
 
                             innerauthProxyFrameReadyDo();
 
@@ -271,7 +267,7 @@
                         // timeout check
                         setTimeout(function () {
 
-                            _e.trigger(_b.get("innerauth","eventproxyready"));
+                            _.trigger(_b.get("innerauth","eventproxyready"));
 
                         },_b.get("innerauth","eventproxytimeout"));
 
@@ -281,7 +277,53 @@
 
                }
 
-           } // end if innerauth
+		   // outer auth flow
+		   } else {
+
+               _l.info("client proxy uri is " + opts.callbackurl);
+
+               _b.put("uri","redirect",opts.callbackurl);
+
+               needExchangeToken = refreshToken && !accessToken && rawAccessToken;
+
+		       preloadSyncLoginToken = opts.synclogin && !refreshToken && !accessToken;
+
+               if (needExchangeToken) {
+
+                   tokenReady.lock("exchange token");
+
+                   _l.info("exchanging refresh token to access token...");
+
+                   _t.exchangeForToken(function (response) {
+
+                       tokenReady.unlock("token exchanged");// unlock for async refresh token
+
+                   });
+
+               }
+
+		       if (preloadSyncLoginToken) {
+
+                   tokenReady.lock("start auto login");
+
+		           _t.loadSyncLoginToken().success(function (responseText) {
+
+                       _l.info("auto login success result cached " + responseText);
+
+		               _b.put("synclogin", "responsetext", responseText);
+
+		           }).error(function (status, statusText, responseTime, responseText) {
+
+				       _l.error(["auto login failed,", status, ", " , statusText, ', ', responseText].join(""));
+
+		           }).complete(function () {
+
+                       tokenReady.unlock("done auto login");
+
+		           });
+
+		       }
+		   } // end if innerauth 
 
            tokenReady.unlock("init is called"); // unlock init
 
