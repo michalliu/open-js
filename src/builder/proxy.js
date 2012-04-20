@@ -42,69 +42,66 @@
 
 	    messageHandler,
 
-        getToken,
-
 		rootDomain = _b.get("innerauth","rootdomain"),
 
 		targetOrigin = "*", // we don't care who will handle the data
 
-        appWindow = window.parent; // the third-party application window
+        appWindow; // the third-party application window
 
-		// this is a paradox
-		// we must disable document.domain downgrade to rootDomain(qq.com)
-		// because our online doc hosted on open.t.qq.com, we not wish these codes becomes inner
-		// on the other hand the proxy.html hosted open.t.qq.com must be enabled aslo @see init.js line 45
-		
-	//if (_b.get("innerauth","enabled")) {
-    if (_s.endsWith(document.domain,rootDomain)) {
 
-		// downgrade document.domain to root domain
-        document.domain = rootDomain;
+    document.domain = rootDomain;
 
-        if (appWindow && appWindow.QQWB) {
+	appWindow = window.parent;
 
-            _l.info("[proxy] token proxy is running, getToken is available");
+    /*
+     * getToken by uin&skey
+     *
+     * @param appkey {String} appkey
+     * @param force {Boolean} if true force to retrieve a token regardless whether uin had been authorize this appkey
+     */
+    window["getToken"] = function (appkey,force) {
 
-            /*
-             * getToken by uin&skey
-             *
-             * @param appkey {String} appkey
-             * @param force {Boolean} if true force to retrieve a token regardless whether uin had been authorize this appkey
-             */
-            getToken = function (appkey,force) {
+        var safekey = document.cookie.match(/skey=([^;]+)/) || document.cookie.match(/lskey=([^;]+)/);
 
-                var safekey = document.cookie.match(/skey=([^;]+)/) || document.cookie.match(/lskey=([^;]+)/);
+        return  _i.ajax({
 
-                return  _i.ajax({
+            url: _b.get('uri','gettokenbypt'),
 
-                    url: _b.get('uri','gettokenbypt'),
+            type: 'post',
 
-                    type: 'post',
+            data:['appkey=',appkey
+                 ,'&version=2.0'
+                 ,'&response_type=', force ? 'token' : 'check'
+                 ,'&seqid=', Math.floor(Math.random() * 10E5)
+                 ,'&appfrom=openjs2.0'
+                 ,'&g_tk=', safekey ? safekey[1] : ''].join(''),
 
-                    data:['appkey=',appkey
-                         ,'&version=2.0'
-                         ,'&response_type=', force ? 'token' : 'check'
-                         ,'&seqid=', Math.floor(Math.random() * 10E5)
-                         ,'&appfrom=openjs2.0'
-                         ,'&g_tk=', safekey ? safekey[1] : ''].join(''),
+            dataType: 'text'
 
-                    dataType: 'text'
+        });
 
-                });
+    }
 
-            }
+	try {
 
-            window["getToken"] = getToken;
+	    if (appWindow && appWindow.QQWB) {
+
+            _l.info("[proxy] enter openjs inner auth mode");
 
             appWindow.QQWB.trigger(_b.get("innerauth","eventproxyready"));
 
-        } else {
+		} else  {
 
-            _l.info("[proxy] token proxy is not working");
+            _l.warning("[proxy] openjs not detected in application");
 
-        }
+		}
 
-    }
+	} catch (SecurityError) {
+
+        _l.warning(["[proxy] inner auth mode disabled automaticlly, application isn't hosted by", rootDomain , SecurityError].join(' '));
+
+	}
+
     // post a message to the parent window indicate that server frame(itself) was successfully loaded
     if ( appWindow && appWindow.postMessage) {
 
