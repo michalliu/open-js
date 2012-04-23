@@ -35,7 +35,7 @@
 
 		<a class="toc_title" href="#环境变量">环境变量</a>
 
-		<a class="toc_title" href="#开放平台API调用">开放平台API调用</a>
+		<a class="toc_title" href="#腾讯微博API调用">腾讯微博API调用</a>
 
 		<ul class="toc_section">
 
@@ -102,6 +102,8 @@
 		    	<li>- <a href="#find">find</a></li>
 
 		    	<li>- <a href="#localstorage">localStorage</a></li>
+
+		    	<li>- <a href="#browser">browser</a></li>
 
                 <li>- <a href="#template">template</a> <img src="http://mat1.gtimg.com/app/opent/images/wiki/resource/new.gif"></img></li>
 
@@ -214,7 +216,7 @@
 			<div class="option">autoboot<span class="opttype">Boolean</span><div class="optdefault">默认值:true(尽早加载跨域方案)</div><p>为真时先于init方法加载跨域方案，为假时等init执行时再加载跨域方案。</p></div>
 		</div>
 
-		<h2 id="开放平台API调用">开放平台API调用</h2>
+		<h2 id="腾讯微博API调用">腾讯微博API调用</h2>
 		<p id="init" class="intro"><b class="header">init</b><span class="code">T.init(inInitOpts)</span><br/>
 		初始化。</p>
 
@@ -291,7 +293,7 @@
 <p class="paragraph">§</p>
 
 		<p id="api" class="intro"><b class="header">api</b><span class="code">T.api(inName, inParamMap, inDataType, inType, inOverride)</span><br/>
-        调用开放平台API<sup><a target="_blank" href="http://wiki.open.t.qq.com/index.php/API%E6%96%87%E6%A1%A3">[链]</a></sup>，返回Defer对象<sup><a target="_blank" href="http://wiki.open.t.qq.com/index.php/Open-js/DeferredObject">[链]</a></sup>。</p>
+        调用腾讯微博API<sup><a target="_blank" href="http://wiki.open.t.qq.com/index.php/API%E6%96%87%E6%A1%A3">[链]</a></sup>，返回Defer对象<sup><a target="_blank" href="http://wiki.open.t.qq.com/index.php/Open-js/DeferredObject">[链]</a></sup>。</p>
 
 <pre class="code">
 <a class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("api.html")' href="#*api.html"></a>
@@ -598,7 +600,7 @@
 <p class="paragraph">§</p>
 
 		<p id="localstorage" class="intro"><b class="header">localStorage</b><span class="code">T.localStorage</span><br/>
-        跨浏览器的localStorage对象，开发者可以使用此技术提升用户体验。</p>
+        跨浏览器的数据本地存储对象，开发者可以使用此技术提升用户体验。</p>
 
 <pre class="code">
 <a class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("localStorage.html")' href="#*localStorage.html"></a>
@@ -620,6 +622,93 @@
             <div class="option">key <span class="desc">键名</span></div>
         </div>
 
+
+<p class="paragraph">§</p>
+
+		<p id="browser" class="intro"><b class="header">browser</b><span class="code">T.browser</span><br/>
+        提供丰富的浏览器信息。</p>
+
+<pre class="code">
+<a class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("browser.html")' href="#*browser.html"></a>
+&lt;script&gt;
+    if (T.browser.msie && T.browser.version == 6) {
+        // 浏览器为IE6
+        // do something
+    }
+&lt;/script&gt;
+</pre>
+
+		<div class="options">
+		<div class="argument">version<span class="opttype">String<span class="vsep">|</span>Number</span><p>浏览器的版本信息。若浏览器类型为IE，该值为数字型，为准确的IE版本号。否则为字符串，是从UserAgent<sup><a target="_blank" href="http://en.wikipedia.org/wiki/User_agent">[链]</a></sup>字段中提取出的具有参考价值版本号。</p></div>
+		<div class="argument">engine<span class="opttype">String</span><p>包含检测到的浏览器内核信息。<pre class="code">
+    if(T.browser.engine == 'webkit') {
+        // do something
+    } 
+    // 等同于
+    if(T.browser.webkit) {
+        // do something
+    }
+</pre></p></div>
+            <div class="option">webkit <span class="desc">webkit内核的浏览器，如Chrome,Safari等</span></div>
+            <div class="option">opera <span class="desc">opera内核，opera浏览器</span></div>
+            <div class="option">msie <span class="desc">IE系列浏览器</span></div>
+            <div class="option">mozilla <span class="desc">如Firefox,Netscape等</span></div>
+            <div class="option">unknown <span class="desc">其它内核的浏览器</span></div>
+
+        <div class="argument">platform<span class="opttype">Map</span><p>浏览器所在平台侦测。</p></div>
+            <div class="option">name <span class="desc">平台名称，如"pc","iPhone","iPad"等</span><pre class="code">
+    //判断是否为iPhone
+    if (T.browser.platform.name == 'iPhone') {
+        //do something
+    }
+    等同于
+    if (T.browser.platform.iPhone) {
+        //do something
+    }
+</pre></div>
+            <div class="option">pc <span class="desc">为true时代表浏览器在PC平台（台式机，笔记本）上运行</span></div>
+            <div class="option">mobile <span class="desc">为true时代表浏览器在移动平台（手机，平板）上运行</span></div>
+
+        <div class="argument">feature<span class="opttype">Map</span><p>浏览器是否支持某项特性侦测。</p></div>
+            <div class="option">cookie <span class="desc">为true时代表支持Cookie</span></div>
+            <div class="option">flash <span class="desc">为true时代表支持Flash。<br/>&nbsp;&nbsp;&nbsp;&nbsp;进一步的，可以通过flash.version获得flash player版本号。通过flash[property]检查flash player的中的某个特性是否被支持。以下代码检测浏览器是否支持flash以及是否支持externalInterface<sup><a target="_blank" href="http://help.adobe.com/zh_CN/FlashPlatform/reference/actionscript/3/flash/external/ExternalInterface.html">[链]</a></sup>。</span><pre class="code">
+    if(T.browser.feature.flash) {
+        // 浏览器支持flash
+        if(T.browser.feature.flash.externalInterface) {
+            //flash player支持externalInterface
+        }
+    } 
+</pre></div>
+            <div class="option">userdata <span class="desc">为true时代表支持UserData<sup><a target="_blank" href="http://msdn.microsoft.com/en-us/library/ms531424(v=vs.85).aspx">[链]</a></sup></span></div>
+            <div class="option">userdata <span class="desc">为true时代表支持UserData</span></div>
+            <div class="option">postmessage <span class="desc">为true时代表支持postMessage</span></div>
+            <div class="option">canvas <span class="desc">为true时代表支持Canvas</span></div>
+            <div class="option">webgl <span class="desc">为true时代表支持WebGL</span></div>
+            <div class="option">geolocation <span class="desc">为true时代表支持geolocation</span></div>
+            <div class="option">websqldatabase <span class="desc">为true时代表支持websqldatabase</span></div>
+            <div class="option">indexeddb <span class="desc">为true时代表支持indexedDB</span></div>
+            <div class="option">websocket <span class="desc">为true时代表支持WebSocket</span></div>
+            <div class="option">localstorage <span class="desc">为true时代表支持localStorage</span></div>
+            <div class="option">sessionstorage <span class="desc">为true时代表支持sessionStorage</span></div>
+            <div class="option">webworker <span class="desc">为true时代表支持WebWorker</span></div>
+            <div class="option">applicationcache <span class="desc">为true时代表支持applicationCache</span></div>
+		<div class="argument">os<span class="opttype">Map</span><p>操作系统侦测。<pre class="code">
+    if(T.browser.os.name == 'windows') {
+        // do something
+    } 
+    // 等同于
+    if(T.browser.os.windows) {
+        // do something
+    }
+</pre></p></div>
+            <div class="option">name <span class="desc">操作系统名称，可能的值为"windows","mac","linux","unix","unknown"</span></div>
+        <div class="argument">viewport<span class="opttype">Map</span><p>浏览器可见区域大小。注意，该值是实时变化的。</p></div>
+            <div class="option">width <span class="desc">浏览器窗口可见区域的宽</span></div>
+            <div class="option">height <span class="desc">浏览器窗口可见区域的高</span></div>
+        <div class="argument">rendererMode<span class="opttype">Map</span><p>浏览器进入的渲染模式侦测。</p></div>
+            <div class="option">standard <span class="desc">为true时代表浏览器当前的渲染模式为标准</span></div>
+            <div class="option">quirks <span class="desc">为true时代表浏览器当前的渲染模式为怪异模式（兼容模式）</span></div>
+        </div>
 
 <p class="paragraph">§</p>
 
@@ -688,7 +777,8 @@ T.documentReady(function () {
         <div class="argument">renderWith(inTplData,inOverWrite)<span class="opttype">Function</span><p>指定模板数据，并输出模板渲染结果，参数及用法与<a href="#templatedata">data方法</a>完全一致。</p></div>
             <div class="option">inTplData <span class="desc">模板数据</span></div>
             <div class="option">inOverWrite <span class="desc">是否覆盖之前的模板数据</span></div>
-		<div class="argument">render()<span class="opttype">Function</span><p>输出模板渲染结果。</p></div>
+		<div class="argument">render()<span class="opttype">Function</span><p>输出模板渲染结果，类型为字符串。</p></div>
+		<div class="argument">renderAsFragment()<span class="opttype">Function</span><p>输出模板渲染结果，类型为DocumentFrament<sup><a target="_blank" href="http://ejohn.org/blog/dom-documentfragments/">[链]</a></sup>。</p></div>
 		<div class="argument">reset(inResetTpl,inResetData)<span class="opttype">Function</span><p>重置模板字符串或重置模板数据。</p></div>
             <div class="option">inResetTpl <span class="desc">是否清空模板字符串</span></div>
             <div class="option">inResetData <span class="desc">是否清空模板数据</span></div>

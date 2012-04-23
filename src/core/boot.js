@@ -49,6 +49,8 @@ QQWB.bigtable.put('boot','solution', function () {
 
 	    crossdomainImplementationError,
 
+        implementationTimeout = 15,
+
 		crossdomainMethod;
 
 	tokenReady = _b.put("boot", "tokenready", QQWB.door.door(function (reason) {
@@ -120,6 +122,8 @@ QQWB.bigtable.put('boot','solution', function () {
 
 			sd =  _b.get("solution","deferred"),
 			
+            timer,
+
 			messageHandler;
 
 		messageHandler = function (e) {
@@ -188,18 +192,9 @@ QQWB.bigtable.put('boot','solution', function () {
 
 			proxyframe.style.display = "none";
 
-			onProxyLoad = function () { // timeout checker
+			onProxyLoad = function () {
 
-			    setTimeout (function () {
-
-					if (!sd.isResolved()) {
-
-	        	        sd.reject(-6, "can't load proxy frame from path " + p + ",request timeout");
-
-						_l.critical("proxy frame error");
-					}
-
-				}, 3 * 1000);
+                timer && clearTimeout(timer);
 
 			}
 
@@ -213,11 +208,31 @@ QQWB.bigtable.put('boot','solution', function () {
 
             }
 
+            // max wait 15 seconds to load proxy frame
+			timer = setTimeout (function () {
+
+				if (!sd.isResolved()) {
+
+	                sd.reject(-6, "can't load proxy frame from path " + p + ",request timeout");
+
+					_l.critical("proxy frame error");
+				}
+
+			}, implementationTimeout * 1000);
+
+            // sometimes webkit will force to cancel the iframe load request
+            // due the signal thread mode in javascript
+            // we just to ensure the the frame will be loaded
+            setTimeout(function () {
+
+			    document.body.appendChild(proxyframe);
+
+            },0);
+
 			_b.put("solution", "frame", proxyframe);
 
-			document.body.appendChild(proxyframe);
-
 		});
+
 	}; // end html5 postmessage implementation
 
 	flashAs3Implementation = function () {
@@ -255,28 +270,24 @@ QQWB.bigtable.put('boot','solution', function () {
 	        _l.info ("init flash as3 solution ...");
 
 			window[jscallbackname] = function () { // will be invoke when flash loaded
-
-                 _l.info("flash solution initlized successfully");
 				 
-				 setTimeout(function () {
-
-                     movie = window[id] || document.getElementById(id);
-
-				     if (!movie) {
-
-				         _l.critical("proxy movie insertion error, os " + _br.os.name + "; browser engine " + _br.engine +"; version " + _br.version);
-
-				     } else {
-
-				    	 _b.put("solution", "flashmovie", movie);
-
-                         sd.resolve();
-
-				     }
-
-				 }, 0); // if don't use settimeout here, the swf can not load from cache under IE
-
                  timer && clearTimeout(timer);
+
+                 movie = window[id] || document.getElementById(id);
+
+				 if (!movie) {
+
+				     _l.critical("proxy swf has unexpected error, os " + _br.os.name + "; browser engine " + _br.engine +"; version " + _br.version);
+
+				 } else {
+
+                     _l.info("flash solution initlized successfully");
+
+				     _b.put("solution", "flashmovie", movie);
+
+                     sd.resolve();
+
+				 }
 
 				 try {
 
@@ -287,6 +298,7 @@ QQWB.bigtable.put('boot','solution', function () {
 				     window[jscallbackname] = undef;
 
 				 }
+
 			}
 
 			invisible = document.createElement("div");
@@ -300,31 +312,6 @@ QQWB.bigtable.put('boot','solution', function () {
             invisible.style.top = "-9999px";
 
 			// logic borrowed from swfobject.js @see http://code.google.com/p/swfobject/
-
-			if (_br.msie && _br.os.windows) {
-
-				invisible.innerHTML = ['<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" ', // classid IE only
-				                       'id="' + id + '" ',
-				                       'name="' + id + '">',
-				                       '<param name="movie" value="' + p + '"></param>', // IE only
-                                       '<param name="allowscriptaccess" value="always"></param>',
-				                       '</object>'
-				                      ].join("");
-
-			} else {
-
-				invisible.innerHTML = ['<object type= "application/x-shockwave-flash"',
-				                       'id="' + id + '" ',
-									   'data="' + p + '">',
-                                       '<param name="allowscriptaccess" value="always"></param>',
-				                       '</object>'
-				                      ].join("");
-
-			}
-
-
-			document.body.appendChild(invisible);
-
 		    timer =  setTimeout(function () {
             
                 if (!sd.isResolved()) {
@@ -332,11 +319,44 @@ QQWB.bigtable.put('boot','solution', function () {
                     sd.reject(-6, "can't load proxy swf from " + p + ",request timeout");
             
 					try {
+
 					    document.body.removeChild(invisible);
+
 				    } catch (ex) {}
                 }
             
-            }, 15 * 1000);
+            }, implementationTimeout * 1000);
+
+            // ensure this invisible node will insert into dom, cause of the single thread mode in javascript
+            setTimeout(function () {
+
+			    document.body.appendChild(invisible);
+
+                // this is a huge bug in flash
+                // the flash external interface calls when you set innerHTML to a div even that div doesn't append to DOM yet
+		    	if (_br.msie && _br.os.windows) {
+
+		    		invisible.innerHTML = ['<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" ', // classid IE only
+		    		                       'id="' + id + '" ',
+		    		                       'name="' + id + '">',
+		    		                       '<param name="movie" value="' + p + '"></param>', // IE only
+                                           '<param name="allowscriptaccess" value="always"></param>',
+		    		                       '</object>'
+		    		                      ].join("");
+
+		    	} else {
+
+		    		invisible.innerHTML = ['<object type= "application/x-shockwave-flash"',
+		    		                       'id="' + id + '" ',
+		    							   'data="' + p + '">',
+                                           '<param name="allowscriptaccess" value="always"></param>',
+		    		                       '</object>'
+		    		                      ].join("");
+
+		    	}
+
+            },0);
+
 		});
 
 	}; // end flash external interface solution

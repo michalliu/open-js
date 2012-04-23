@@ -116,6 +116,7 @@
 
 		    	args = arguments;
 
+             // muti arguments as input
 			if (args.length > 3) {
 
 				inData = _a.fromArguments(args);
@@ -142,7 +143,7 @@
 
 					}
 
-					if (inOverwrite || !(dv in this.datas)) {
+					if (inOverwrite || !(dk in this.datas)) {
 
 						this.datas[dk] = dv;
 
@@ -158,7 +159,7 @@
 
 				inOverwrite = args[2];
 
-				if (dk && (inOverwrite || !(dv in this.datas))) {
+				if (dk && (inOverwrite || !(dk in this.datas))) {
 
 						this.datas[dk] = dv;
 				}
@@ -207,6 +208,26 @@
 			return this.renderWith(this.datas);
 
 		},
+
+        renderAsFragment: function () {
+
+            var dummy = document.createElement('div'),
+
+                fragment = document.createDocumentFragment(),
+                
+                elem;
+
+            dummy.innerHTML = this.render();
+
+            while((elem = dummy.firstChild)) {
+
+                fragment.appendChild(elem);
+
+            }
+
+            return fragment;
+
+        },
 
 		toString: function () {
 

@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>browser</title>
+<script src="//mat1.gtimg.com/app/openjs/openjs.js#debug=yes"></script>
+<style>.gray{color:#ccc;}</style>
+<script defer="defer">
+T.documentReady(function () {
+
+    var b = T.browser,
+        line = T.template('line'),
+        featureName,
+        feature = T.template('feature'),
+        tpl = T.template('browserinfo');
+    
+    tpl.add("关于此浏览器<hr/>");
+    line.add('<%=key%> : <%=value%><br/>');
+    feature.add('<ol>');
+    
+    line.data('key','当前页面渲染模式')
+    if (b.rendererMode.standard) {
+        tpl.add(line.data('value', '标准模式').render());
+    } else if (b.rendererMode.quirks) {
+        tpl.add(line.data('value', '兼容模式').render());
+    }
+    tpl.add(line.data(['key','viewPort大小','value', b.viewport.width + 'px * ' + b.viewport.height + 'px;<span class="gray"> T.browser.viewport.width=' + b.viewport.width + '; T.browser.viewport.height=' + b.viewport.height + '</span>'],true).render());
+    tpl.add(line.data(['key','操作系统','value', b.os.name + ';<span class="gray"> T.browser.os.' + b.os.name + '=' + b.os[b.os.name] + '</span>'],true).render());
+    tpl.add(line.data(['key','平台名称','value', b.platform.name + ';<span class="gray"> T.browser.platform.name=' + b.platform.name + '</span>'],true).render());
+    tpl.add(line.data(['key','所属平台','value', b.platform.mobile ? '移动平台;<span class="gray"> T.browser.platform.mobile=' + b.platform.mobile + '</span>' : '桌面平台;<span class="gray"> T.browser.platform.desktop=' + b.platform.desktop + '</span>'],true).render());
+    tpl.add(line.data(['key','内核','value', b.engine + ';<span class="gray"> T.browser.' + b.engine + '=' + b[b.engine] + '</span>'],true).render());
+    tpl.add(line.data(['key','版本','value', b.version + ';<span class="gray"> T.browser.version=' + (typeof b.version == 'number' ? '' : '"') + b.version + (typeof b.version == 'number' ? '' : '"' + '</span>')],true).render());
+    
+    for (featureName in b.feature) {
+        if (b.feature.hasOwnProperty(featureName)) {
+            if (featureName == 'flash') {
+                feature.add('<li>'+featureName+';<span class="gray"> T.browser.feature.flash.version=' + b.feature.flash.version + '</span></li>');
+            } else {
+                feature.add('<li>'+featureName+';<span class="gray"> T.browser.feature.' + featureName + '=' + b.feature[featureName] + '</span></li>');
+            }
+        }
+    }
+    feature.add('</ol>');
+    tpl.add(line.data(['key','特性','value', feature.render()],true).render());
+    
+    document.body.innerHTML = tpl.render();
+});
+</script>
+</head>
+<body>
+</body>
+</html>

@@ -215,6 +215,16 @@
     
     QQWB.find = QQWB.dom.find;
 
+    if (QQWB.browser.rendererMode.quirks) {
+
+        QQWB.documentReady(function () {
+            // this attribute is live
+            QQWB.extend('browser.viewport', QQWB.bigtable.get("browser", 'detectviewportsize')(), true);
+
+        }); 
+
+    }
+
 } ());
 
 // dom ready events

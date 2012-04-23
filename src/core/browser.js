@@ -9,11 +9,14 @@
  * @module browser
  * @requires base
  *           log
+ *           util.bigtable
  */
 
 (function (){
 
     var browserMatch, // ua regexp match result
+
+        mobilePlatformMatch,
 
               ua = navigator.userAgent,
 
@@ -24,6 +27,9 @@
          rwebkit = /(webkit)[ \/]([\w.]+)/,
 
         rmozilla = /(mozilla)(?:.*? rv:([\w.]+))?/,
+
+	    // http://detectmobilebrowsers.com/
+        rmobileplatform = /android.+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od|ad)|iris|kindle|lge |maemo|midp|mmp|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i,
 
         browserFeatures = {}, // keep browser features
 
@@ -302,20 +308,6 @@
         }
     }
 
-	// code borrowed from http://detectmobilebrowsers.com/
-	function dectectPlatform() {
-
-		var platform = navigator.userAgent || navigator.vendor || window.opera;
-
-		if (/android.+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i.test(platform)) {
-
-			return {mobile: true};
-
-		}
-
-		return {pc: true};
-
-	}
 
 	function detectOS() {
 
@@ -355,8 +347,7 @@
 
     }
 
-    // http://andylangton.co.uk/articles/javascript/get-viewport-size-javascript/
-    function detectViewportSize() {
+    QQWB.bigtable.put("browser", 'detectviewportsize', function () {
 
 		var el = window,
 
@@ -372,9 +363,24 @@
 
 		}
 
-		return { width: el[attr+'Width'], height: el[attr+'Height'] };
+        // el(document.body) may not exists in quirks mode yet
+        if (el) {
+
+		    return { width: el[attr+'Width'], height: el[attr+'Height'] };
+
+        }
+
+		return { width: 0, height: 0};
+
+    });
+
+    // http://andylangton.co.uk/articles/javascript/get-viewport-size-javascript/
+    function detectViewportSize() {
+
+        return QQWB.bigtable.get("browser", 'detectviewportsize')();
 
     }
+
 
     browserMatch = uaMatch(ua);
 
@@ -410,13 +416,25 @@
 
     QQWB.extend('browser.feature',browserFeatures);
 
-	QQWB.extend('browser.platform', dectectPlatform());
+    mobilePlatformMatch = rmobileplatform.exec(navigator.userAgent || navigator.vendor || window.opera || '');
+
+    
+    if (mobilePlatformMatch) {
+
+        QQWB.extend('browser.platform', {name: mobilePlatformMatch[0], mobile: true});
+
+        QQWB.browser.platform[mobilePlatformMatch[0]] = true;
+
+    } else {
+
+        QQWB.extend('browser.platform', {name: "desktop", desktop: true});
+
+    }
 
 	QQWB.extend('browser.os', detectOS());
 
-    // this attribute is live
-	QQWB.extend('browser.viewport', detectViewportSize());
+	QQWB.extend('browser.rendererMode', detectRendererMode());
 
-	QQWB.extend('browser.rendererModel', detectRendererMode());
+    QQWB.extend('browser.viewport', detectViewportSize());
 
 }());

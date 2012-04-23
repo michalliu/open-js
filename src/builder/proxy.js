@@ -42,6 +42,8 @@
 
 	    messageHandler,
 
+        sameOrigin,
+
 		rootDomain = _b.get("innerauth","rootdomain"),
 
 		targetOrigin = "*", // we don't care who will handle the data
@@ -82,25 +84,35 @@
 
     }
 
-	try {
+    try {
 
-	    if (appWindow && appWindow.QQWB) {
+        sameOrigin = appWindow.location.href;
 
-            _l.info("[proxy] enter openjs inner auth mode");
+    } catch (SecurityError) {
+
+    }
+
+    if (sameOrigin) {
+
+        _l.info('[proxy] app and proxy are same origin');
+
+        if (appWindow.QQWB) {
+
+            _l.info('[proxy] openjs detected');
 
             appWindow.QQWB.trigger(_b.get("innerauth","eventproxyready"));
 
-		} else  {
+        } else {
 
-            _l.warning("[proxy] openjs not detected in application");
+            _l.warning("[proxy] openjs not detected");
 
-		}
+        }
 
-	} catch (SecurityError) {
+    } else {
 
-        _l.warning(["[proxy] inner auth mode disabled automaticlly, application isn't hosted by", rootDomain , SecurityError].join(' '));
+        _l.info('[proxy] app running at external auth mode');
 
-	}
+    }
 
     // post a message to the parent window indicate that server frame(itself) was successfully loaded
     if ( appWindow && appWindow.postMessage) {
