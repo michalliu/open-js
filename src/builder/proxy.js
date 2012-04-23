@@ -48,6 +48,8 @@
 
 		targetOrigin = "*", // we don't care who will handle the data
 
+		asyncCallbackName = _b.get('openjs','asynccallbackfunctionname'),
+
         appWindow; // the third-party application window
 
 
@@ -94,17 +96,42 @@
 
     if (sameOrigin) {
 
-        _l.info('[proxy] app and proxy are same origin');
+        _l.info('[proxy] app running at same origin');
 
         if (appWindow.QQWB) {
 
-            _l.info('[proxy] openjs detected');
+            _l.info('[proxy] openjs used in app');
 
             appWindow.QQWB.trigger(_b.get("innerauth","eventproxyready"));
 
-        } else {
+		}
+		/*
+		 * if appWindow.QQWB not exists this main code will never excecute
+		 * for proxy OpenJS is always sync loaded
+		 else if (typeof appWindow[asyncCallbackName] == "function") {
 
-            _l.warning("[proxy] openjs not detected");
+            _l.info('[proxy] openjs async loading in app');
+
+			(function () {
+
+				if (appWindow.QQWB) {
+
+                    _l.info('[proxy] openjs async loaded in app');
+
+                    appWindow.QQWB.trigger(_b.get("innerauth","eventproxyready"));
+
+					return;
+				}
+
+				setTimeout(arguments.callee, 200);
+
+			}());
+
+		} 
+		*/
+	   	else {
+
+            _l.warning("[proxy] openjs not detected in app");
 
         }
 

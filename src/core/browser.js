@@ -136,7 +136,7 @@
 
 					 if ( playerversion[0] >= 9 ) { // detect if flash player too old
 
-						 ret["externalInterface"] = true;
+						 ret["externalinterface"] = true;
 
 					 }
 

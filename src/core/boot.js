@@ -374,7 +374,7 @@ QQWB.bigtable.put('boot','solution', function () {
 
         _l.info("flash player version " + _br.feature.flash.version);
 
-        if (!_br.feature.flash.externalInterface) {
+        if (!_br.feature.flash.externalinterface) {
         
         	_l.warn("flash player too old, openjs may not work properly");
 

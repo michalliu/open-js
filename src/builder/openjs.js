@@ -14,13 +14,20 @@
  *           core.boot
  *           core.ping
  *           util.template
+ *           util.bigtable
  *           compat.localStorage
  *           ui.component
  */
 
-if (typeof window['onOpenjsLoad'] == "function") {
+(function () {
 
-	window['onOpenjsLoad'](QQWB);
+	var openjscallbackname = QQWB.bigtable.get('openjs','asynccallbackfunctionname');
 
-}
+    if (typeof window[openjscallbackname] == "function") {
+    
+    	window[openjscallbackname](QQWB);
+    
+    }
+
+}());
 

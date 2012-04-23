@@ -63,7 +63,7 @@
 
 			<li>- <a href="#ready">ready</a></li>
 
-            <li>- <a href="#component">component</a> <img src="http://mat1.gtimg.com/app/opent/images/wiki/resource/new.gif"></img></li>
+            <li>- <a href="#component">component</a> <img src="http://mat1.gtimg.com/app/opent/images/wiki/resource/new.gif" alt="新"/></li>
 
             <li> <span class="sub_toc_title">事件</span>
 
@@ -103,9 +103,9 @@
 
 		    	<li>- <a href="#localstorage">localStorage</a></li>
 
-		    	<li>- <a href="#browser">browser</a></li>
+		    	<li>- <a href="#browser">browser</a> <img src="http://mat1.gtimg.com/app/opent/images/wiki/resource/new.gif" alt="新"/></li>
 
-                <li>- <a href="#template">template</a> <img src="http://mat1.gtimg.com/app/opent/images/wiki/resource/new.gif"></img></li>
+                <li>- <a href="#template">template</a> <img src="http://mat1.gtimg.com/app/opent/images/wiki/resource/new.gif" alt="新"/></li>
 
                 </ul>
 
@@ -139,10 +139,9 @@
         <div class="reminder">浏览器太旧了，建议使用 <a target="_blank" href="http://www.google.com/chrome">chrome浏览器</a>。</div>
         <![endif]-->
 		<h2>OpenJS</h2>
-		<p>OpenJS是腾讯微博开放平台提供的Javascript库，开发者使用该库可以轻松完成腾讯微博用户授权，访问API接口，调用官方组件等功能。
+		<p>OpenJS是腾讯微博开放平台提供的Javascript库，开发者使用该库可以轻松完成腾讯微博用户授权，访问API接口，调用官方组件等功能。</p>
 		<h2>成功案例</h2>
         <div><a target="_blank" href="http://www.kaixin001.com/weibo/"><img alt="开心网" src="http://mat1.gtimg.com/app/openjs/static/images/kaixin.jpg" width="160" height="95"/></a><a target="_blank" href="http://mat1.gtimg.com/app/openjs/static/images/qplus_screenshot.png" title="q+应用截图" class="showcase"><img alt="腾讯Q+" src="http://mat1.gtimg.com/app/openjs/static/images/qplus.jpg" width="160" height="95"/></a><a href="#" title="你的应用" class="showcase"><img alt="你的应用" src="http://mat1.gtimg.com/app/openjs/static/images/yourapp.jpg" width="160" height="95"/></a></div>
-        </p>
 
 		<h2>升级说明</h2>
 		<p>2.0 beta 版本相对上一版本的主要变动如下：</p>
@@ -210,7 +209,7 @@
 			<div class="argument"></div>
 			<div class="option">debug<span class="opttype">Boolean</span><div class="optdefault">默认值:false(不开启调试模式)</div><p>开启Debug模式有助于跟踪调试，建议在开发过程中开启。</p></div>
 			<div class="option">logLevel<span class="opttype">Number</span><div class="optdefault">默认值:0(输出全部日志)</div><p>值越大意味着输出Log输出的信息越少越重要，默认输出尽可能详细的Log。</p></div>
-			<div class="option">crossDomainMethod<span class="opttype">String</span><div class="optdefault">默认值:'auto'(自动检测)</div><p>该参数可指定跨域解决方案。默认情况下OpenJS自动检测当前浏览器，并适配一种最优的方案，假如开发者十分确定要采用的跨域方案（如：iPhone应用）可以指定该参数。<div class="option">html5 <span class="desc">使用postmessage跨域</span></div><div class="option">flash <span class="desc">通过flash代理跨域(要求Flash Player 9以上)</span></div></p></div>
+			<div class="option">crossDomainMethod<span class="opttype">String</span><div class="optdefault">默认值:'auto'(自动检测)</div><p>该参数可指定跨域解决方案。默认情况下OpenJS自动检测当前浏览器，并适配一种最优的方案，假如开发者十分确定要采用的跨域方案（如：iPhone应用）可以指定该参数。</p><div class="option">html5 <span class="desc">使用postmessage跨域</span></div><div class="option">flash <span class="desc">通过flash代理跨域(要求Flash Player 9以上)</span></div></div>
 			<div class="option">cookieDomain<span class="opttype">String</span><div class="optdefault">默认值:''</div><p>OpenJS需使用Cookie保存用户的授权信息，此参数控制该Cookie<sup><a target="_blank" href="https://developer.mozilla.org/en/DOM/document.cookie">[链]</a></sup>的domain域<sup></sup>。</p></div>
 			<div class="option">cookiePath<span class="opttype">String</span><div class="optdefault">默认值:'/'</div><p>与cookieDomain一样，此参数控制Cookie<sup><a target="_blank" href="https://developer.mozilla.org/en/DOM/document.cookie">[链]</a></sup>的path域。如果你不想把腾讯微博用户授权信息保存在根路径下，请设置此环境变量进行控制。</p></div>
 			<div class="option">autoboot<span class="opttype">Boolean</span><div class="optdefault">默认值:true(尽早加载跨域方案)</div><p>为真时先于init方法加载跨域方案，为假时等init执行时再加载跨域方案。</p></div>
@@ -244,7 +243,7 @@
         samewindow: true,
         callbackurl:["path/to/callbackurl?"
                     ,'return_to=','your/app/url'
-                    ,'&appkey=',800000006]
+                    ,'&amp;appkey=',800000006]
     })
 &lt;/script&gt;
 </pre>
@@ -270,9 +269,15 @@
 </pre>
 		<div class="options">
 		<div class="argument">inSuccessHandler(inLoginStatus)<span class="opttype">Function</span><div class="optdefault">默认值:无</div><p>用户登录授权成功后要执行的函数。</p></div>
-			<div class="option">inLoginStatus<span class="opttype">Map</span><div class="optdefault">回调数据</div><p>包含用户登录信息。<div class="option">access_token <span class="desc">授权后获得的OAuth2.0 Accesstoken</span></div><div class="option">name <span class="desc">微博用户名</span></div><div class="option">nick <span class="desc">微博昵称</span></div></p></div>
+			<div class="option">inLoginStatus<span class="opttype">Map</span><div class="optdefault">回调数据</div><p>包含用户登录信息。</p>
+					<div class="option">access_token <span class="desc">授权后获得的OAuth2.0 Accesstoken</span></div>
+					<div class="option">name <span class="desc">微博用户名</span></div>
+					<div class="option">nick <span class="desc">微博昵称</span></div>
+            </div>
 		<div class="argument">inFailHandler(inLoginError)<span class="opttype">Function</span><div class="optdefault">默认值:无</div><p>用户登录授权失败后要执行的函数。</p></div>
-			<div class="option">inLoginError<span class="opttype">Map</span><div class="optdefault">回调数据</div><p>包含的用户登录失败信息。<div class="option">message <span class="desc">失败原因描述</span></div></p></div>
+			<div class="option">inLoginError<span class="opttype">Map</span><div class="optdefault">回调数据</div><p>包含的用户登录失败信息。</p>
+				<div class="option">message <span class="desc">失败原因描述</span></div>
+            </div>
         </div>
 
 <p class="paragraph">§</p>
@@ -640,7 +645,8 @@
 
 		<div class="options">
 		<div class="argument">version<span class="opttype">String<span class="vsep">|</span>Number</span><p>浏览器的版本信息。若浏览器类型为IE，该值为数字型，为准确的IE版本号。否则为字符串，是从UserAgent<sup><a target="_blank" href="http://en.wikipedia.org/wiki/User_agent">[链]</a></sup>字段中提取出的具有参考价值版本号。</p></div>
-		<div class="argument">engine<span class="opttype">String</span><p>包含检测到的浏览器内核信息。<pre class="code">
+		<div class="argument">engine<span class="opttype">String</span><p>包含检测到的浏览器内核信息。</p>
+<pre class="code">
     if(T.browser.engine == 'webkit') {
         // do something
     } 
@@ -648,7 +654,7 @@
     if(T.browser.webkit) {
         // do something
     }
-</pre></p></div>
+</pre></div>
             <div class="option">webkit <span class="desc">webkit内核的浏览器，如Chrome,Safari等</span></div>
             <div class="option">opera <span class="desc">opera内核，opera浏览器</span></div>
             <div class="option">msie <span class="desc">IE系列浏览器</span></div>
@@ -674,13 +680,12 @@
             <div class="option">flash <span class="desc">为true时代表支持Flash。<br/>&nbsp;&nbsp;&nbsp;&nbsp;进一步的，可以通过flash.version获得flash player版本号。通过flash[property]检查flash player的中的某个特性是否被支持。以下代码检测浏览器是否支持flash以及是否支持externalInterface<sup><a target="_blank" href="http://help.adobe.com/zh_CN/FlashPlatform/reference/actionscript/3/flash/external/ExternalInterface.html">[链]</a></sup>。</span><pre class="code">
     if(T.browser.feature.flash) {
         // 浏览器支持flash
-        if(T.browser.feature.flash.externalInterface) {
+        if(T.browser.feature.flash.externalinterface) {
             //flash player支持externalInterface
         }
     } 
 </pre></div>
             <div class="option">userdata <span class="desc">为true时代表支持UserData<sup><a target="_blank" href="http://msdn.microsoft.com/en-us/library/ms531424(v=vs.85).aspx">[链]</a></sup></span></div>
-            <div class="option">userdata <span class="desc">为true时代表支持UserData</span></div>
             <div class="option">postmessage <span class="desc">为true时代表支持postMessage</span></div>
             <div class="option">canvas <span class="desc">为true时代表支持Canvas</span></div>
             <div class="option">webgl <span class="desc">为true时代表支持WebGL</span></div>
@@ -692,7 +697,7 @@
             <div class="option">sessionstorage <span class="desc">为true时代表支持sessionStorage</span></div>
             <div class="option">webworker <span class="desc">为true时代表支持WebWorker</span></div>
             <div class="option">applicationcache <span class="desc">为true时代表支持applicationCache</span></div>
-		<div class="argument">os<span class="opttype">Map</span><p>操作系统侦测。<pre class="code">
+		<div class="argument">os<span class="opttype">Map</span><p>操作系统侦测。</p><pre class="code">
     if(T.browser.os.name == 'windows') {
         // do something
     } 
@@ -700,7 +705,7 @@
     if(T.browser.os.windows) {
         // do something
     }
-</pre></p></div>
+</pre></div>
             <div class="option">name <span class="desc">操作系统名称，可能的值为"windows","mac","linux","unix","unknown"</span></div>
         <div class="argument">viewport<span class="opttype">Map</span><p>浏览器可见区域大小。注意，该值是实时变化的。</p></div>
             <div class="option">width <span class="desc">浏览器窗口可见区域的宽</span></div>
@@ -744,7 +749,7 @@ T.documentReady(function () {
 		<div class="options">
 		<div class="argument">add(inTplStr)<span class="opttype">Function</span><p>添加模板字符串。</p></div>
             <div class="option">inTplStr <span class="desc">模板字符串</span></div>
-		<div id="templatedata" class="argument">data(inTplData,inOverWrite)<span class="opttype">Function</span><p>添加模板数据。data方法支持多种写法，以下调用方法效果相同。
+		<div id="templatedata" class="argument">data(inTplData,inOverWrite)<span class="opttype">Function</span><p>添加模板数据。data方法支持多种写法，以下调用方法效果相同。</p>
 <pre class="code">
 <a class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("template_add.html")' href="#*template_add.html"></a>
 &lt;script&gt;
@@ -769,7 +774,7 @@ T.documentReady(function () {
 
     alert(result1 && result1 == result2 && result2 == result3 && result3 == result4);
 &lt;/script&gt;
-</pre></p></div>
+</pre></div>
             <div class="option">inTplData <span class="desc">模板数据</span></div>
             <div class="option">inOverWrite <span class="desc">是否覆盖之前的模板数据</span></div>
 		<div class="argument">wrapTag(inHtmlTag*)<span class="opttype">Function</span><p>快捷方法，把模板字符串头部与尾部附加html标签。</p></div>
@@ -840,13 +845,13 @@ T.documentReady(function () {
 
 		<h2 id="历史更新">历史更新</h2>
 		<div class="options">
-            <div class="argument">版本: <a target="_blank" href="http://mat1.gtimg.com/app/openjs/openjs.js?v=2.0beta">2.0 beta</a><span class="opttype">2012.4</span><p><ul class="updatelist">
+            <div class="argument">版本: <a target="_blank" href="http://mat1.gtimg.com/app/openjs/openjs.js?v=2.0beta">2.0 beta</a><span class="opttype">2012.4</span><ul class="updatelist">
                     <li>增加<a href="#环境变量">环境变量</a>设置。</li>
                     <li>增加 <a href="#template">模版</a> 方法。</li>
                     <li>增加 <a href="#component">网站连接组件</a> 调用方法。</li>
                     <li>进一步增强浏览器兼容性。</li>
-            </ul></p></div>
-            <div class="argument">版本: <a target="_blank" href="http://mat1.gtimg.com/app/vt/public/openjs/v15.js?v=1.5">1.5</a><span class="optrequired">推荐使用</span><span class="opttype">2012.1</span><p><ul class="updatelist"><li>由于某些接口不需要鉴权，如public_timeline，因此移除了T.api接口的登录态检查。若<a href="#api">T.api</a>如出现鉴权错误，请调用 <a href="#loginstatus">T.loginStatus</a> 检查登录态是否正常。</li><li>修复IE6,7下使用flash方案跨域数据乱序的错误。</li></ul></p></div>
+            </ul></div>
+            <div class="argument">版本: <a target="_blank" href="http://mat1.gtimg.com/app/vt/public/openjs/v15.js?v=1.5">1.5</a><span class="optrequired">推荐使用</span><span class="opttype">2012.1</span><ul class="updatelist"><li>由于某些接口不需要鉴权，如public_timeline，因此移除了T.api接口的登录态检查。若<a href="#api">T.api</a>如出现鉴权错误，请调用 <a href="#loginstatus">T.loginStatus</a> 检查登录态是否正常。</li><li>修复IE6,7下使用flash方案跨域数据乱序的错误。</li></ul></div>
             <div class="argument">版本: <a target="_blank" href="http://mat1.gtimg.com/app/vt/public/openjs/v10.js?v=1.0">1.0</a><span class="opttype">2011.10</span><p>初始版本</p></div>
         </div>
 
@@ -862,7 +867,7 @@ T.documentReady(function () {
 	</div>
 	<div class="bside">
     	<div class="snippetview" id="snippetview">
-			<iframe src="about:blank" id="snippetframe" frameBorder="0" width="100%" height="100%;"></iframe>
+			<iframe src="about:blank" id="snippetframe" frameBorder="0" width="100%" height="100%"></iframe>
     	</div>
 	</div>
 </body>

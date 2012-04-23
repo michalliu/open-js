@@ -78,6 +78,7 @@
     _b.put("ping","paramsep",";");
 
     _b.put("io","timeout", 30 * 1000);
+	_b.put('openjs','asynccallbackfunctionname', "onOpenjsLoad");
 
 	_b.put('boot','booting', false);
 
@@ -211,7 +212,7 @@
 
                                            .error(function (status, statusText, responseTime, responseText) {
 
-				                               _l.error(["auto login failed,", status, ", " , statusText, ', ', responseText].join(""));
+				                               _l.error(["auto login failed,", status, ", " , statusText, ', ', _s.trim(responseText)].join(""));
 											   
                                             })
 

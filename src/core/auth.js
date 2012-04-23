@@ -53,6 +53,8 @@
 
                        layer = document.getElementById(layerid),
 
+					   _br = _.browser,
+
 					   lastw, lasth, resize, cleanup;
 
                    if (!layer) {
@@ -62,7 +64,7 @@
                            id: _b.get('innerauth', 'layerid'),
 
                            style: ['position:absolute;padding:5px;overflow:hidden;z-index:999;visibility:hidden;'
-                               , (QQWB.browser.msie && QQWB.browser.version < 9) ? 'filter: progid:DXImageTransform.Microsoft.Gradient(GradientType=0, StartColorStr="#4c000000", EndColorStr="#4c000000");' : 'background-color:rgba(0,0,0,0.3);'].join(''),
+                               , (_br.msie && _br.version < 9) ? 'filter: progid:DXImageTransform.Microsoft.Gradient(GradientType=0, StartColorStr="#4c000000", EndColorStr="#4c000000");' : 'background-color:rgba(0,0,0,0.3);'].join(''),
 
                            innerhtml: ['<iframe src="', url , '?appkey=', appkey, '" ', attrs, '></iframe>'].join('')
 
@@ -110,7 +112,10 @@
                        //
                        QQWB.bind(_b.get("innerauth","eventproxysizechange"), function (w, h) {
 
-						   var offsettop = document.body.scrollTop;
+						   // not correct in chrome
+						   //var offsettop = _br.rendererMode.standard ? document.documentElement.scrollTop : document.body.scrollTop;
+
+						   var offsettop = document.documentElement.scrollTop || document.body.scrollTop;
 
 						   lastw = w;
 
@@ -120,9 +125,9 @@
 
                            layer.style.height = h + 'px';
 
-                           layer.style.left = offsettop + Math.max(0,(QQWB.browser.viewport.width - w)) / 2 + 'px';
+                           layer.style.left = Math.max(0,(_br.viewport.width - w)) / 2 + 'px';
 
-                           layer.style.top = offsettop + Math.max(0,(QQWB.browser.viewport.height - h)) / 2 + 'px';
+                           layer.style.top = offsettop + Math.max(0,(_br.viewport.height - h)) / 2 + 'px';
 
                            layer.style.visibility = "visible"; // show auth layer
 

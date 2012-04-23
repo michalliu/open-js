@@ -211,21 +211,7 @@
 
         renderAsFragment: function () {
 
-            var dummy = document.createElement('div'),
-
-                fragment = document.createDocumentFragment(),
-                
-                elem;
-
-            dummy.innerHTML = this.render();
-
-            while((elem = dummy.firstChild)) {
-
-                fragment.appendChild(elem);
-
-            }
-
-            return fragment;
+			return QQWB.dom.createDocumentFragment(this.render());
 
         },
 

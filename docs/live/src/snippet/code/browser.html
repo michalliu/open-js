@@ -4,19 +4,19 @@
 <meta charset="utf-8">
 <title>browser</title>
 <script src="//mat1.gtimg.com/app/openjs/openjs.js#debug=yes"></script>
-<style>.gray{color:#ccc;}</style>
+<style>.gray{color:#ccc;}.green{background-color:#0f0;color:white;}.red{background-color:#f00;color:white;}</style>
 <script defer="defer">
 T.documentReady(function () {
 
     var b = T.browser,
         line = T.template('line'),
-        featureName,
         feature = T.template('feature'),
-        tpl = T.template('browserinfo');
+        tpl = T.template('browserinfo'),
+	    featureList='cookie flash userdata postmessage canvas webgl geolocation websqldatabase indexeddb websocket localstorage sessionstorage webworker applicationcache'.split(' '),featureName;
     
     tpl.add("关于此浏览器<hr/>");
     line.add('<%=key%> : <%=value%><br/>');
-    feature.add('<ol>');
+    feature.add('<ul>');
     
     line.data('key','当前页面渲染模式')
     if (b.rendererMode.standard) {
@@ -29,19 +29,18 @@ T.documentReady(function () {
     tpl.add(line.data(['key','平台名称','value', b.platform.name + ';<span class="gray"> T.browser.platform.name=' + b.platform.name + '</span>'],true).render());
     tpl.add(line.data(['key','所属平台','value', b.platform.mobile ? '移动平台;<span class="gray"> T.browser.platform.mobile=' + b.platform.mobile + '</span>' : '桌面平台;<span class="gray"> T.browser.platform.desktop=' + b.platform.desktop + '</span>'],true).render());
     tpl.add(line.data(['key','内核','value', b.engine + ';<span class="gray"> T.browser.' + b.engine + '=' + b[b.engine] + '</span>'],true).render());
-    tpl.add(line.data(['key','版本','value', b.version + ';<span class="gray"> T.browser.version=' + (typeof b.version == 'number' ? '' : '"') + b.version + (typeof b.version == 'number' ? '' : '"' + '</span>')],true).render());
+    tpl.add(line.data(['key','版本','value', b.version + ';<span class="gray"> T.browser.version=' + (typeof b.version == 'number' ? '' : '"') + b.version + (typeof b.version == 'number' ? '' : '"') + '</span>'],true).render());
     
-    for (featureName in b.feature) {
-        if (b.feature.hasOwnProperty(featureName)) {
-            if (featureName == 'flash') {
-                feature.add('<li>'+featureName+';<span class="gray"> T.browser.feature.flash.version=' + b.feature.flash.version + '</span></li>');
-            } else {
-                feature.add('<li>'+featureName+';<span class="gray"> T.browser.feature.' + featureName + '=' + b.feature[featureName] + '</span></li>');
-            }
-        }
+    for (var i=0,l=featureList.length; i < l && (featureName=featureList[i]);i++) {
+		feature.add('<li>' + featureName + ' <span class="' + (b.feature[featureName.toLowerCase()] ? "green\">支持" : "red\">不支持") +'</span>;<span class="gray"> T.browser.feature.' + featureName.toLowerCase() + '=' + b.feature[featureName] + '</span></li>');
     }
-    feature.add('</ol>');
+
+    feature.add('</ul>');
     tpl.add(line.data(['key','特性','value', feature.render()],true).render());
+
+    if (b.feature.flash) {
+		tpl.add(line.data(['key','flash播放器信息','value', '<ul><li>版本号:' + b.feature.flash.version + '</li><li>externalInterface:<span class="' + (b.feature.flash.externalinterface ? 'green">支持' : 'red">不支持')+ '</span></li></ul>'],true).render());
+    }
     
     document.body.innerHTML = tpl.render();
 });
