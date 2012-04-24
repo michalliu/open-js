@@ -120,41 +120,6 @@
     		return node;
     	},
 
-		//http://stackoverflow.com/questions/10270968/convert-innerhtml-string-to-dom-structure-in-javascript
-		createDocumentFragment: function (inMarkup) {
-
-		    var range, fragment, dummy, elem;
-
-			if (document.createRange && (range = document.createRange())
-		        	&& range.selectNodeContents
-		        	&& range.createContextualFragment) {
-
-				range.collapse(false);
-
-				range.selectNodeContents(document.body);
-
-				fragment = range.createContextualFragment(inMarkup);
-
-			} else {
-
-                dummy = document.createElement('div');
-
-                fragment = document.createDocumentFragment();
-                    
-                dummy.innerHTML = inMarkup;
-
-                while((elem = dummy.firstChild)) {
-
-                    fragment.appendChild(elem);
-
-                }
-
-			}
-
-            return fragment;
-
-		},
-
     	setProperties: function (element, properties) {
     
     		var _ = QQWB,

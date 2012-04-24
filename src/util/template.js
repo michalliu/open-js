@@ -209,12 +209,6 @@
 
 		},
 
-        renderAsFragment: function () {
-
-			return QQWB.dom.createDocumentFragment(this.render());
-
-        },
-
 		toString: function () {
 
 			try {
