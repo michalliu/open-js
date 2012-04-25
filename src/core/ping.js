@@ -104,7 +104,12 @@ QQWB.extend("ping", {
 
 		  clientInfo += feature;
 
-		  // 1000(browertype)0(browserfeature)
+		  if (QQWB.bigtable.get("innerauth","enabled")) {
+
+		      clientInfo += 10000;
+
+		  }
+
 		  return clientInfo;
 
 	   }
@@ -127,11 +132,11 @@ QQWB.extend("ping", {
 
 			   appInfo += 10;
 
-		   } else if (QQWB.browser.os.windows) {
+		   } else if (QQWB.browser.os.mac) {
 
 			   appInfo += 20;
 
-		   } else if (QQWB.browser.os.mac) {
+		   } else if (QQWB.browser.os.linux) {
 
 			   appInfo += 30;
 
@@ -139,12 +144,10 @@ QQWB.extend("ping", {
 
 			   appInfo += 40;
 
-		   } else if (QQWB.browser.os.linux) {
+		   } else /*if (QQWB.browser.os.unknown)*/{
 
 			   appInfo += 50;
 
-		   } else /*if (QQWB.browser.os.unknown)*/{
-			   appInfo += 60;
 		   }
 
 		   return appInfo;
@@ -169,4 +172,3 @@ QQWB.extend("ping", {
     }
 
 });
-

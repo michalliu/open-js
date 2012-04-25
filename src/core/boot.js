@@ -39,11 +39,13 @@ QQWB.bigtable.put('boot','solution', function () {
 
 		everythingReady,
 		
-		html5Implementation,
+		proxyFrameImplementation,
 
 		flashAs3Implementation,
 		
 		setupHtml5Implementation,
+
+		setupInnerAuthImplementation,
 
 		setupFlashAs3Implementation,
 
@@ -108,7 +110,7 @@ QQWB.bigtable.put('boot','solution', function () {
     });
     
 	// post message implementation
-	html5Implementation = function () {
+	proxyFrameImplementation = function (html5mode) {
 
 		var _ = QQWB,
 
@@ -122,54 +124,68 @@ QQWB.bigtable.put('boot','solution', function () {
 
 			sd =  _b.get("solution","deferred"),
 			
-            timer,
+            timer;
 
-			messageHandler;
+		if (html5mode) {
 
-		messageHandler = function (e) {
+			var messageHandler;
 
-            if (p.indexOf(e.origin) !== 0) {
+	     	messageHandler = function (e) {
 
-	            _l.warn("ignore a message from " + e.origin);
+                 if (p.indexOf(e.origin) !== 0) {
 
-			} else {
+	                 _l.warn("ignore a message from " + e.origin);
 
-				if (e.data === "success") {
+	     		} else {
 
-                    QQWB.log.info("html5 solution was successfully initialized");
+	     			if (e.data === "success") {
 
-					sd.resolve();
+                         _l.info("proxy frame was successfully loaded for html5 solution");
 
-                    if (window.addEventListener) {
+	     				sd.resolve();
 
-                        window.removeEventListener("message", messageHandler, false);
+                         if (window.addEventListener) {
 
-                    } else if (window.attachEvent) {
+                             window.removeEventListener("message", messageHandler, false);
 
-                        window.detachEvent("onmessage", messageHandler);
+                         } else if (window.attachEvent) {
 
-                    }
+                             window.detachEvent("onmessage", messageHandler);
 
-                    messageHandler = null;
+                         }
 
-				} else {
+                         messageHandler = null;
 
-	                _l.warn("ignore wired message from " + e.origin);
+	     			} else {
 
-				}
+	                     _l.warn("ignore wired message from " + e.origin);
 
-			}
-		};
+	     			}
 
-		if (window.addEventListener) {
+	     		}
+	    	};
 
-            window.addEventListener("message", messageHandler, false);
+	    	if (window.addEventListener) {
 
-        } else if (window.attachEvent) {
+                window.addEventListener("message", messageHandler, false);
 
-            window.attachEvent("onmessage", messageHandler);
+            } else if (window.attachEvent) {
 
-        }
+                window.attachEvent("onmessage", messageHandler);
+
+            }
+
+		} else {
+
+			_.once(_b.get("innerauth","eventproxyready"), function () {
+
+                _l.info("proxy frame was successfully loaded for inner auth");
+
+	     		sd.resolve();
+
+			});
+
+		}
 
 		_d.ready(function () {
 
@@ -179,7 +195,7 @@ QQWB.bigtable.put('boot','solution', function () {
 
 		    	onProxyLoad;
 
-			_l.info ("init html5 solution ...");
+			_l.info ("loading proxy frame ...");
 
 			//@see http://www.cnblogs.com/demix/archive/2009/09/16/1567906.html
 			//@see http://msdn.microsoft.com/en-us/library/ms535258(v=vs.85).aspx
@@ -233,7 +249,7 @@ QQWB.bigtable.put('boot','solution', function () {
 
 		});
 
-	}; // end html5 postmessage implementation
+	}; // end html5 and inner auth implementation
 
 	flashAs3Implementation = function () {
 		
@@ -364,12 +380,21 @@ QQWB.bigtable.put('boot','solution', function () {
 
 	setupHtml5Implementation = function () {
 
-        html5Implementation ();
+		// html5
+        proxyFrameImplementation (true);
 
         _b.put("solution","name","html5");
 
-	}; // end setupHtml5Implementation
+	};
 	
+	setupInnerAuthImplementation = function () {
+
+        proxyFrameImplementation (false);
+
+        _b.put("solution","name","innerauth");
+
+	};
+
 	setupFlashAs3Implementation = function () {
 
         _l.info("flash player version " + _br.feature.flash.version);
@@ -394,12 +419,21 @@ QQWB.bigtable.put('boot','solution', function () {
 
 	}; // crossdomainImplementationError
 
-	// auto detect
+	// don't need to cross domain
+	if (_b.get("innerauth","enabled")) {
+
+        setupInnerAuthImplementation()
+
+		return;
+
+	}
+
+	// cross domain implement
 	if (QQWB.envs.crossdomainmethod == 'auto') {
 
 		_l.debug("detect crossdomain method");
 
-        if (_br.feature.postmessage) {
+		if (_br.feature.postmessage) {
 
             setupHtml5Implementation();
 

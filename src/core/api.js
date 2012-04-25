@@ -183,155 +183,177 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optOverride)
 
     _l.info("[" + counter + "] sending weibo request...");
 
-    // html5 solution
-    if (solutionName === "html5") {
+	switch (solutionName) {
+		case 'innerauth':
+		proxyFrame = _b.get("solution", "frame");
 
-		    proxyFrame = _b.get("solution", "frame");
+		if (proxyFrame && proxyFrame.contentWindow &&  proxyFrame.contentWindow.apiAjax) {
 
-			if (!proxyFrame) {
+            proxyFrame.contentWindow.apiAjax(api, apiParams, optDataType, optType).complete(function () {
 
-	            _l.error(-1, "proxy frame not found");
+		    	if (arguments[0] !== 200) {
 
-	            deferred.reject(-1,"proxy frame not found");
+		    		deferred.rejectWith(deferred,arguments);
 
-			} else {
+		    	} else {
 
-					onDataBack = _b.get("api","ondataback");
+                    deferred.resolve(arguments[3]/* response body */, arguments[2]/* elpased time */, arguments[4]/*response header*/);
+		    	}
 
-					if (!onDataBack) {
+		    });
 
-						onDataBack = _b.put("api","ondataback", function (e) {
+		} else {
 
-							var data,
+	        _l.error(-1, "proxy frame not found");
 
-							    id,
+	        deferred.reject(-1,"proxy frame not found");
 
-								defr,
+		}
+		break;
+		case 'html5':
+		proxyFrame = _b.get("solution", "frame");
 
-								response;
+		if (!proxyFrame) {
 
-							if (_b.get("uri","html5proxy").indexOf(e.origin) !== 0) {
+	        _l.error(-1, "proxy frame not found");
 
-	                            _l.warn("ignore data from origin " + e.origin);
+	        deferred.reject(-1,"proxy frame not found");
 
-							} else {
+		} else {
 
-								data = _j.fromString(e.data);
+				onDataBack = _b.get("api","ondataback");
 
-								id = data.id;
+				if (!onDataBack) {
 
-								response = data.data;
+					onDataBack = _b.put("api","ondataback", function (e) {
 
-								defr = _b.get("api","resultdeferred" + id);
+						var data,
 
-								if (defr) {
+						    id,
 
-							        if (response[0] !== 200) {
+							defr,
 
-										defr.rejectWith(defr,response);
+							response;
 
-									} else {
+						if (_b.get("uri","html5proxy").indexOf(e.origin) !== 0) {
 
-										if (response[5] == "_xml_") {
+	                        _l.warn("ignore data from origin " + e.origin);
 
-											response[3] = _x.fromString(response[3]);
+						} else {
 
-										}
+							data = _j.fromString(e.data);
 
-                                        defr.resolve(response[3]/* response body */, response[2]/* elpased time */, response[4]/*response header*/);
-									}
+							id = data.id;
 
-								    _b.del("api","resultdeferred" + id);
+							response = data.data;
+
+							defr = _b.get("api","resultdeferred" + id);
+
+							if (defr) {
+
+						        if (response[0] !== 200) {
+
+									defr.rejectWith(defr,response);
 
 								} else {
 
-									_l.error("invalid api request id " + id);
+									if (response[5] == "_xml_") {
 
+										response[3] = _x.fromString(response[3]);
+
+									}
+
+                                    defr.resolve(response[3]/* response body */, response[2]/* elpased time */, response[4]/*response header*/);
 								}
+
+							    _b.del("api","resultdeferred" + id);
+
+							} else {
+
+								_l.error("invalid api request id " + id);
+
 							}
+						}
 
-						});
+					});
 
-                        if (window.addEventListener) {
+                    if (window.addEventListener) {
 
-                            window.addEventListener("message", onDataBack, false);
+                        window.addEventListener("message", onDataBack, false);
 
-                        } else if (window.attachEvent) {
+                    } else if (window.attachEvent) {
 
-                            window.attachEvent("onmessage", onDataBack);
+                        window.attachEvent("onmessage", onDataBack);
 
-                        }
-					}
+                    }
 
-					_b.put("api", "resultdeferred" + counter, deferred);
+				}
 
-					// IE8 has problems if not wrapped by setTimeout
-					setTimeout(function () {
+				_b.put("api", "resultdeferred" + counter, deferred);
 
-                        // @see http://msdn.microsoft.com/en-us/library/cc197015(v=vs.85).aspx
-                        proxyFrame.contentWindow.postMessage(_j.stringify({ 
+				// IE8 has problems if not wrapped by setTimeout
+				setTimeout(function () {
 
-                        	id: counter
+                    // @see http://msdn.microsoft.com/en-us/library/cc197015(v=vs.85).aspx
+                    proxyFrame.contentWindow.postMessage(_j.stringify({ 
 
-                           ,data: [api, apiParams, optDataType, optType]
+                    	id: counter
 
-                        }),_b.get("uri","html5proxy"));
+                       ,data: [api, apiParams, optDataType, optType]
 
-					}, 0 );
+                    }),_b.get("uri","html5proxy"));
 
-			}
+				}, 0 );
 
-	} else if (solutionName === "as3") {
+		}
+		break;
+		case 'as3':
+        function apiFlashAjax (api, apiParams, dataType, type) {
 
-       function apiFlashAjax (api, apiParams, dataType, type) {
+             var opts = {
 
-            var opts = {
+                     type: _s.trim(type.toUpperCase())
 
-                    type: _s.trim(type.toUpperCase())
+                    ,url: _b.get("uri","api") + api
 
-                   ,url: _b.get("uri","api") + api
+                    ,data: _q.encode(apiParams)
 
-                   ,data: _q.encode(apiParams)
+                    ,dataType: _s.trim(dataType.toLowerCase())
 
-                   ,dataType: _s.trim(dataType.toLowerCase())
+                 };
 
-                };
+             if (opts.type == "GET") {
 
-            if (opts.type == "GET") {
+                 opts.url += (opts.data ? "?" + opts.data : "");
 
-                opts.url += (opts.data ? "?" + opts.data : "");
+                 delete opts.data;
 
-                delete opts.data;
+             }
 
-            }
-
-            return _i.flashAjax(opts);
+             return _i.flashAjax(opts);
 
         }
 
-		// @see io.js onFlashRequestComplete_8df046 for api call sequence management
-		apiFlashAjax(api, apiParams, optDataType, optType).complete(function () {
+	 	// @see io.js onFlashRequestComplete_8df046 for api call sequence management
+	 	apiFlashAjax(api, apiParams, optDataType, optType).complete(function () {
 
-			if (arguments[0] !== 200) {
+	 		if (arguments[0] !== 200) {
 
-				deferred.rejectWith(deferred,arguments);
+	 			deferred.rejectWith(deferred,arguments);
 
-			} else {
+	 		} else {
 
-                deferred.resolve(arguments[3]/* response body */, arguments[2]/* elpased time */, arguments[4]/*response header*/);
-			}
-		});
-
-	} else {
-
+                 deferred.resolve(arguments[3]/* response body */, arguments[2]/* elpased time */, arguments[4]/*response header*/);
+	 		}
+	 	});
+		break;
+		default:
 		deferred.reject(-1, "invalid solutionName " + solutionName);
-
 	}
 
-    //
     promise.complete(function () {
 
-         _l.info("*[" + counter + "] done");
+        _l.info("*[" + counter + "] done");
 
     });
 

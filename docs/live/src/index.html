@@ -24,6 +24,11 @@
     </script>
     <style>
     .sub_toc_title{font-weight:bold;color:#333;}
+	ol.faq li {padding-bottom:10px;padding-top:10px;border-bottom:1px solid #ccc;border-top:1px solid #fff;}
+	ol.faq li.first{border-top:none;padding-top:0;}
+	ol.faq li.last{border-bottom:none;padding-bottom:0;}
+    .del{text-decoration:line-through;text-shadow:none;}
+    .light{background-color:#ffe;}
     </style>
 </head>
 <body>
@@ -139,7 +144,7 @@
         <div class="reminder">浏览器太旧了，建议使用 <a target="_blank" href="http://www.google.com/chrome">chrome浏览器</a>。</div>
         <![endif]-->
 		<h2>OpenJS</h2>
-		<p>OpenJS是腾讯微博开放平台提供的Javascript库，开发者使用该库可以轻松完成腾讯微博用户授权，访问API接口，调用官方组件等功能。</p>
+		<p>OpenJS是腾讯微博开放平台提供的Javascript库，开发者使用该库可以轻松完成腾讯微博用户授权，访问API接口，调用官方组件等功能，支持多种应用部署环境及无缝迁移。</p>
 		<h2>成功案例</h2>
         <div><a target="_blank" href="http://www.kaixin001.com/weibo/"><img alt="开心网" src="http://mat1.gtimg.com/app/openjs/static/images/kaixin.jpg" width="160" height="95"/></a><a target="_blank" href="http://mat1.gtimg.com/app/openjs/static/images/qplus_screenshot.png" title="q+应用截图" class="showcase"><img alt="腾讯Q+" src="http://mat1.gtimg.com/app/openjs/static/images/qplus.jpg" width="160" height="95"/></a><a href="#" title="你的应用" class="showcase"><img alt="你的应用" src="http://mat1.gtimg.com/app/openjs/static/images/yourapp.jpg" width="160" height="95"/></a></div>
 
@@ -194,16 +199,6 @@
 <a class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("envs.html")' href="#*envs.html"></a>
 &lt;script src="//mat1.gtimg.com/app/openjs/openjs.js#debug=yes"&gt;&lt;/script&gt;
 </pre>
-        <!--
-		<div class="options">
-			<div class="argument">QQWBENVS<span class="opttype">Map</span><div>默认值:undefined</div><p>OpenJS环境变量对象</p></div>
-			<div class="option">Debug<span class="opttype">Boolean</span><div>默认值:false(不开启调试模式)</div><p>开启Debug模式有助于跟踪调试，建议在开发过程中开启。</p></div>
-			<div class="option">LogLevel<span class="opttype">Number</span><div>默认值:0(输出全部日志)</div><p>该值越大意味着输出Log输出的信息越少也越重要，默认输出尽可能详细的Log。</p></div>
-			<div class="option">CrossDomainMethod<span class="opttype">String</span><div>默认值:''(自动检测)</div><p>该参数可指定跨域解决方案。默认情况下OpenJS自动检测当前浏览器，并适配一种最优的方案，如果你十分确定要采用的跨域解决方案可以指定该参数。<div class="option">html5 <span class="desc">采用postmessage的方式跨域</span></div><div class="option">flash <span class="desc">采用嵌入flash的方式跨域</span></div></p></div>
-			<div class="option">CookieDomain<span class="opttype">String</span><div>默认值:''</div><p>OpenJS需要使用Cookie保存用户的授权信息，该参数可以控制Cookie的domain域。</p></div>
-			<div class="option">CookiePath<span class="opttype">String</span><div>默认值:'/'</div><p>同CookieDomain一样，该参数控制Cookie的path字段。假如你不想把腾讯微博用户授权信息保存在根域下，请设置此环境变量控制。</p></div>
-		</div>
-		-->
 
 		<div class="options">
 			<div class="argument"></div>
@@ -215,6 +210,9 @@
 			<div class="option">autoboot<span class="opttype">Boolean</span><div class="optdefault">默认值:true(尽早加载跨域方案)</div><p>为真时先于init方法加载跨域方案，为假时等init执行时再加载跨域方案。</p></div>
 		</div>
 
+<br/>
+若为腾讯域内应用<sup><a href="#什么是腾讯域内应用">[链]</a></sup>，因为不再需要跨域，<em>crossDomainMethod</em> 自动失效。<br/>
+<br/>
 		<h2 id="腾讯微博API调用">腾讯微博API调用</h2>
 		<p id="init" class="intro"><b class="header">init</b><span class="code">T.init(inInitOpts)</span><br/>
 		初始化。</p>
@@ -251,6 +249,21 @@
 </div>
 			<div class="option">pingback<span class="opttype">Boolean</span><div class="optdefault">默认值:true(发送报告)</div><p>向服务器发送技术报告，帮助我们更好的完善OpenJS。</p></div>
 		</div>
+
+<br/>
+若为腾讯域内应用<sup><a href="#什么是腾讯域内应用">[链]</a></sup>，<a href="#init">T.init</a> 参数表变化如下：<br/>
+<br/>
+		<div class="options">
+			<div class="argument">inInitOpts<span class="optrequired">必选</span><span class="opttype">Map</span></div>
+			<div class="option">appkey<span class="optrequired">必选</span><span class="opttype">String</span><div class="optdefault">默认值:无</div><p>开放平台appkey，据协议和平台的差异性有时又叫appid或client id。</p></div>
+			<div class="option light">showappinfo<span class="opttype">Boolean</span><div class="optdefault">默认值:true(显示应用信息)</div><p>若为真当用户首次使用你的应用时，将显示应用信息及授权按钮。为假则忽略授权步骤，直接获取用户的授权。</p></div>
+			<div class="option del">callbackurl<span class="opttype del">String</span><div class="optdefault del">默认值:当前页面网址</div><p>用户授权成功后的回跳页面地址，如不设置则为当前页面网址。回跳页面地址必须与appkey匹配<sup><a target="_blank" href="http://mat1.gtimg.com/app/openjs/static/images/uri_explaination.jpg">[链]</a></sup>，否则无法完成授权。</p></div>
+			<div class="option del">autoclose<span class="opttype del">Boolean</span><div class="optdefault del">默认值:true(自动关闭授权窗口)</div><p>默认自动关闭授权窗口，否则需开发者自行关闭回跳页面窗口。</p></div>
+			<div class="option del">synclogin<span class="opttype del">Boolean</span><div class="optdefault del">默认值:false</div><p>默认为不使用QQ登录态授权。若该项为真，当<a href="#login">T.login</a>被调用时，首先尝试使用QQ登录态授权当前应用，如失败则弹新窗口授权）。</p></div>
+            <div class="option del">samewindow<span class="opttype del">Boolean</span><div class="optdefault del">默认值:false(弹新窗口授权)</div><p>默认为弹新窗口授权，否则在同一窗口授权，在此情况下开发者须自己处理授权返回的token，或使用我们提供的通用方案<sup><a target="_blank" href="http://mat1.gtimg.com/app/openjs/static/downloads/openjscallback.zip">[链]</a></sup>。开发者无须担心弹出的授权窗口被浏览器屏蔽，因为授权行为一般是由用户主动点击触发，浏览器不会进行屏蔽。</p>
+</div>
+			<div class="option">pingback<span class="opttype">Boolean</span><div class="optdefault">默认值:true(发送报告)</div><p>向服务器发送技术报告，帮助我们更好的完善OpenJS。</p></div>
+        </div>
 
 <p class="paragraph">§</p>
 
@@ -846,6 +859,7 @@ T.documentReady(function () {
         </div>
 
 		<h2 id="历史更新">历史更新</h2>
+
 		<div class="options">
             <div class="argument">版本: <a target="_blank" href="http://mat1.gtimg.com/app/openjs/openjs.js?v=2.0beta">2.0 beta</a><span class="opttype">2012.4</span><ul class="updatelist">
                     <li>增加<a href="#环境变量">环境变量</a>设置。</li>
@@ -860,10 +874,15 @@ T.documentReady(function () {
 		<h2 id="常见问题">常见问题</h2>
 		<div class="options">
                 <ol class="faq">
-                    <li>
+                    <li class="first">
                     我在使用过程中遇到问题应该如何解决？<br/>
                     可以加入OpenJS专属QQ群，群号<em class="red">221677647</em>。如果你认为遇到了bug或是浏览器兼容性问题，可以在 <a target="_blank" href="http://code.google.com/p/openjs-project/issues/list">问题跟踪系统</a> 中提交你的问题，我们的开发人员会尽快跟踪处理。
-                    </li>
+					</li>
+					<li class="last" id="什么是腾讯域内应用">
+					什么是腾讯域内应用？<br/>
+					腾讯域内应用，是指应用网址以<em>qq.com</em>结尾的应用，简称域内应用。注意，使用OpenJS开发的域内应用<em>document.domain</em>为<em>qq.com</em>。<br/>
+					OpenJS完美支持域内应用与域外应用互相迁移，意味者开发者无需更改任何代码即可把域外的应用迁移到域内使用，反之亦可。
+					</li>
                 </ol>
         </div>
 	</div>
