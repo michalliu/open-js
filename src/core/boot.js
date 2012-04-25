@@ -348,7 +348,6 @@ QQWB.bigtable.put('boot','solution', function () {
 
 			    document.body.appendChild(invisible);
 
-                // this is a huge bug in flash
                 // the flash external interface calls when you set innerHTML to a div even that div doesn't append to DOM yet
 		    	if (_br.msie && _br.os.windows) {
 

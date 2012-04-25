@@ -292,7 +292,7 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optOverride)
 				_b.put("api", "resultdeferred" + counter, deferred);
 
 				// IE8 has problems if not wrapped by setTimeout
-				setTimeout(function () {
+				//setTimeout(function () {
 
                     // @see http://msdn.microsoft.com/en-us/library/cc197015(v=vs.85).aspx
                     proxyFrame.contentWindow.postMessage(_j.stringify({ 
@@ -303,7 +303,7 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optOverride)
 
                     }),_b.get("uri","html5proxy"));
 
-				}, 0 );
+				//}, 0 );
 
 		}
 		break;
