@@ -126,6 +126,17 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optOverride)
 
 	}
 
+	if (api == '/t/add_pic') {
+
+		_l.error("/t/add_pic is not supported yet");
+
+		deferred.reject(-1, "暂不支持此接口，请使用 t/add_pic_url 代替",0);
+
+		return promise;
+
+	}
+
+
 	if (!actoken) { // some public api call doesn't need an accesstoken
 
 		_l.warn("accesstoken is empty");
@@ -291,8 +302,9 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optOverride)
 
 				_b.put("api", "resultdeferred" + counter, deferred);
 
+				// make postMessage async
 				// IE8 has problems if not wrapped by setTimeout
-				//setTimeout(function () {
+				setTimeout(function () {
 
                     // @see http://msdn.microsoft.com/en-us/library/cc197015(v=vs.85).aspx
                     proxyFrame.contentWindow.postMessage(_j.stringify({ 
@@ -303,7 +315,7 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optOverride)
 
                     }),_b.get("uri","html5proxy"));
 
-				//}, 0 );
+				}, 0 );
 
 		}
 		break;
