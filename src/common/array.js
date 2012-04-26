@@ -87,7 +87,7 @@ QQWB.extend("Array",{
        }
     }
     /**
-     * Enumerate the array
+     * Enumerate the array, The enumerate will stop of handler returns false
      *
      * Note:
      * If handler executed and returned false,
