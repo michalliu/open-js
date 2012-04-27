@@ -464,10 +464,10 @@ QQWB.extend("auth",{
        }
 
 	   if (innerauth) {
-	       _c.del('uin','',rootDomain);
-	       _c.del('skey','',rootDomain);
-	       _c.del('luin','',rootDomain);
-	       _c.del('lskey','',rootDomain);
+	       _c.del('uin','/',rootDomain);
+	       _c.del('skey','/',rootDomain);
+	       _c.del('luin','/',rootDomain);
+	       _c.del('lskey','/',rootDomain);
 	   }
 
        optHandler && optHandler();

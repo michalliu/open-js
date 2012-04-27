@@ -6,9 +6,9 @@
 <head>
 	<meta charset="utf-8">
 	<title>openJS文档</title>
-    <link href="http://mat1.gtimg.com/app/openjs/static/css/index.css" rel="stylesheet" type="text/css" media="all" />
-    <!--[if not IE]><!--><link href="http://mat1.gtimg.com/app/openjs/static/css/webkitborder.css" rel="stylesheet" type="text/css" media="all" /><!--<![endif]-->
-    <script src="http://mat1.gtimg.com/app/openjs/static/js/index.js"></script>
+    <link href="http://mat1.gtimg.com/app/openjs/static/css/index.css?v=427" rel="stylesheet" type="text/css" media="all" />
+    <!--[if !IE]><link href="http://mat1.gtimg.com/app/openjs/static/css/webkitborder.css" rel="stylesheet" type="text/css" media="all" /><![endif]-->
+    <script src="http://mat1.gtimg.com/app/openjs/static/js/index.js?v=427"></script>
     <script type="text/javascript">
     
       var _gaq = _gaq || [];
@@ -22,14 +22,6 @@
       })();
     
     </script>
-    <style>
-    .sub_toc_title{font-weight:bold;color:#333;}
-	ol.faq li {padding-bottom:10px;padding-top:10px;border-bottom:1px solid #ccc;border-top:1px solid #fff;}
-	ol.faq li.first{border-top:none;padding-top:0;}
-	ol.faq li.last{border-bottom:none;padding-bottom:0;}
-    .del{text-decoration:line-through;text-shadow:none;}
-    .light{background-color:#ffe;}
-    </style>
 </head>
 <body>
     <div class="aside">
@@ -39,6 +31,8 @@
 		<a class="toc_title" href="#开始使用">开始使用</a>
 
 		<a class="toc_title" href="#环境变量">环境变量</a>
+
+		<a class="toc_title" target="_blank" href="guidance.html">应用开发指南 <img src="http://mat1.gtimg.com/app/opent/images/wiki/resource/new.gif" alt="新"/></a>
 
 		<a class="toc_title" href="#腾讯微博API调用">腾讯微博API调用</a>
 
@@ -230,7 +224,6 @@
 			<div class="option">appkey<span class="optrequired">必选</span><span class="opttype">String</span><div class="optdefault">默认值:无</div><p>开放平台appkey，据协议和平台的差异性有时又叫appid或client id。</p></div>
 			<div class="option">callbackurl<span class="opttype">String</span><div class="optdefault">默认值:当前页面网址</div><p>用户授权成功后的回跳页面地址，如不设置则为当前页面网址。回跳页面地址必须与appkey匹配<sup><a target="_blank" href="http://mat1.gtimg.com/app/openjs/static/images/uri_explaination.jpg">[链]</a></sup>，否则无法完成授权。</p></div>
 			<div class="option">autoclose<span class="opttype">Boolean</span><div class="optdefault">默认值:true(自动关闭授权窗口)</div><p>默认自动关闭授权窗口，否则需开发者自行关闭回跳页面窗口。</p></div>
-			<div class="option">synclogin<span class="opttype">Boolean</span><div class="optdefault">默认值:false</div><p>默认为不使用QQ登录态授权。若该项为真，当<a href="#login">T.login</a>被调用时，首先尝试使用QQ登录态授权当前应用，如失败则弹新窗口授权）。</p></div>
             <div class="option">samewindow<span class="opttype">Boolean</span><div class="optdefault">默认值:false(弹新窗口授权)</div><p>默认为弹新窗口授权，否则在同一窗口授权，在此情况下开发者须自己处理授权返回的token，或使用我们提供的通用方案<sup><a target="_blank" href="http://mat1.gtimg.com/app/openjs/static/downloads/openjscallback.zip">[链]</a></sup>。开发者无须担心弹出的授权窗口被浏览器屏蔽，因为授权行为一般是由用户主动点击触发，浏览器不会进行屏蔽。</p>
 
 <pre class="code">
@@ -247,6 +240,7 @@
 </pre>
 
 </div>
+			<div class="option">synclogin<span class="opttype">Boolean</span><div class="optdefault">默认值:false</div><p>默认为不使用QQ登录态授权。若该项为真，当<a href="#login">T.login</a>被调用时，首先尝试使用QQ登录态授权当前应用，如失败则弹新窗口授权）。</p></div>
 			<div class="option">pingback<span class="opttype">Boolean</span><div class="optdefault">默认值:true(发送报告)</div><p>向服务器发送技术报告，帮助我们更好的完善OpenJS。</p></div>
 		</div>
 
@@ -259,9 +253,9 @@
 			<div class="option light">showappinfo<span class="opttype">Boolean</span><div class="optdefault">默认值:true(显示应用信息)</div><p>若为真当用户首次使用你的应用时，将显示应用信息及授权按钮。为假则忽略授权步骤，直接获取用户的授权。</p></div>
 			<div class="option del">callbackurl<span class="opttype del">String</span><div class="optdefault del">默认值:当前页面网址</div><p>用户授权成功后的回跳页面地址，如不设置则为当前页面网址。回跳页面地址必须与appkey匹配<sup><a target="_blank" href="http://mat1.gtimg.com/app/openjs/static/images/uri_explaination.jpg">[链]</a></sup>，否则无法完成授权。</p></div>
 			<div class="option del">autoclose<span class="opttype del">Boolean</span><div class="optdefault del">默认值:true(自动关闭授权窗口)</div><p>默认自动关闭授权窗口，否则需开发者自行关闭回跳页面窗口。</p></div>
-			<div class="option del">synclogin<span class="opttype del">Boolean</span><div class="optdefault del">默认值:false</div><p>默认为不使用QQ登录态授权。若该项为真，当<a href="#login">T.login</a>被调用时，首先尝试使用QQ登录态授权当前应用，如失败则弹新窗口授权）。</p></div>
             <div class="option del">samewindow<span class="opttype del">Boolean</span><div class="optdefault del">默认值:false(弹新窗口授权)</div><p>默认为弹新窗口授权，否则在同一窗口授权，在此情况下开发者须自己处理授权返回的token，或使用我们提供的通用方案<sup><a target="_blank" href="http://mat1.gtimg.com/app/openjs/static/downloads/openjscallback.zip">[链]</a></sup>。开发者无须担心弹出的授权窗口被浏览器屏蔽，因为授权行为一般是由用户主动点击触发，浏览器不会进行屏蔽。</p>
 </div>
+			<div class="option del">synclogin<span class="opttype del">Boolean</span><div class="optdefault del">默认值:false</div><p>默认为不使用QQ登录态授权。若该项为真，当<a href="#login">T.login</a>被调用时，首先尝试使用QQ登录态授权当前应用，如失败则弹新窗口授权）。</p></div>
 			<div class="option">pingback<span class="opttype">Boolean</span><div class="optdefault">默认值:true(发送报告)</div><p>向服务器发送技术报告，帮助我们更好的完善OpenJS。</p></div>
         </div>
 
@@ -861,7 +855,7 @@ T.documentReady(function () {
 		<h2 id="历史更新">历史更新</h2>
 
 		<div class="options">
-            <div class="argument">版本: <a target="_blank" href="http://mat1.gtimg.com/app/openjs/openjs.js?v=2.0beta">2.0 beta</a><span class="opttype">2012.4</span><ul class="updatelist">
+            <div class="argument">版本: <a target="_blank" href="http://mat1.gtimg.com/app/openjs/v20.js">2.0 beta</a><span class="opttype">2012.4</span><ul class="updatelist">
                     <li>增加<a href="#环境变量">环境变量</a>设置。</li>
                     <li>增加 <a href="#template">模版</a> 方法。</li>
                     <li>增加 <a href="#component">网站连接组件</a> 调用方法。</li>
