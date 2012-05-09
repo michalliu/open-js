@@ -408,7 +408,7 @@
 
 				_.extend(props, {
 
-                    src: [url, "#", _q.encode({appkey: cfg.appkey, url: qurl, title: cfg.title, colorset: cfg.colors && cfg.colors.join('_')})].join(""),
+                    src: [url, "#", _q.encode({appkey: cfg.appkey, url: qurl, title: cfg.title, colorset: cfg.colors})].join(""),
 
 					width: cfg.width || "100%",
 
