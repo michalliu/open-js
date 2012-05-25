@@ -884,23 +884,27 @@ QQWB.extend("io", {
 
             var response = data;
 
-			try {
+			if (_s.isString(data)) {
 
-                if (default_opts.dataType.toLowerCase() === "json") {
+		    	try {
 
-                    response = QQWB.JSON.fromString(data);
+                    if (default_opts.dataType.toLowerCase() === "json") {
 
-                } else if (default_opts.dataType.toLowerCase() === "xml") {
+                        response = QQWB.JSON.fromString(data);
 
-                    response = QQWB.XML.fromString(data);
+                    } else if (default_opts.dataType.toLowerCase() === "xml") {
 
-                }
+                        response = QQWB.XML.fromString(data);
 
-			} catch (ex) {
+                    }
 
-                _l.error("caught exception " + [ex.type, ex.message].join(" ") + " in ioajax");
+		    	} catch (ex) {
 
-                deferred.reject(-2, "exception " + ex, timeCost);
+                    _l.error("caught exception " + [ex.type, ex.message].join(" ") + " in ioajax");
+
+                    deferred.reject(-2, "exception " + ex, timeCost);
+
+		    	}
 
 			}
 
