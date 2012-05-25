@@ -9,6 +9,7 @@
  * @module cookie
  * @requires base
  *           core.browser
+ * @includes util.bigtable
  */
 
 if (QQWB.browser.feature.cookie) {
@@ -27,13 +28,13 @@ if (QQWB.browser.feature.cookie) {
          */
         set: function (name, value, opt_maxage, opt_path, opt_domain, enc) {
     
-		   var domain,
+           var domain,
 
-		       path,
+               path,
 
-		       expire;
+               expire;
 
-    	   enc = enc || escape;
+           enc = enc || QQWB.bigtable.get("cookie","defaultEncoder");
     
            if ( typeof opt_maxage === "undefined" || opt_maxage === null) {
     
@@ -59,7 +60,7 @@ if (QQWB.browser.feature.cookie) {
     
            document.cookie = [name + "=" + enc(value), expire, path, domain].join("; ");
     
-		   return QQWB;
+           return QQWB;
         }
     
         /**
@@ -71,7 +72,7 @@ if (QQWB.browser.feature.cookie) {
          */
        ,get: function (name, dec ,optDefault) {
     
-    	   dec = dec || unescape;
+           dec = dec || QQWB.bigtable.get("cookie","defaultDecoder");
     
            name = name + "=";
     
@@ -89,7 +90,7 @@ if (QQWB.browser.feature.cookie) {
     
            }
     
-    	   return optDefault;
+           return optDefault;
         }
     
         /**
@@ -118,6 +119,6 @@ if (QQWB.browser.feature.cookie) {
 
 } else {
 
-	QQWB.log.debug("cookie isn't support or be enabled");
+    QQWB.log.debug("cookie isn't support or be enabled");
 
 }
