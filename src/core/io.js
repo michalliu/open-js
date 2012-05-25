@@ -12,8 +12,10 @@
  *           core.log
  *           util.bigtable
  *           util.time
- * @includes common.XML
+ *           util.queryString
+ *           common.String
  *           common.Object
+ * @includes common.XML
  */
 (function () {
 
