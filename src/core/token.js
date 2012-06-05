@@ -267,6 +267,12 @@ QQWB.extend("_token",{
 
                }
 
+               if (!_.loginStatus()) {
+
+		           _l.warn("thirdparty cookie needs to be enabled, please follow this instruction to set P3P header http://url.cn/0ZbFuL");
+
+			   }
+
                _l.info("exchange token succeed");
 
            } else if (response.error) {
@@ -300,6 +306,7 @@ QQWB.extend("_token",{
        return _;
 
     }
+
     ,loadSyncLoginToken: function () {
 
 	   var _ = QQWB,
@@ -330,106 +337,6 @@ QQWB.extend("_token",{
 
            });
 	}
-
-    /**
-     * Obtain an access token
-     *
-     * @access public
-     * @param optCallback {Function} callback function when result returned
-     */
-	/*
-   ,getNewAccessToken: function (optCallback) {
-
-	   var _ = QQWB,
-
-	       _b = _.bigtable,
-
-		   _q = _.queryString,
-
-		   _l = _.log,
-
-		   _i = _.io,
-
-		   _s = _.String,
-
-		   appkey = _b.get("base", "appkey");
-
-       _i.jsonp({
-
-               url: _b.get("uri","autotoken")
-
-              ,dataType: "text"
-
-              ,data: _q.encode({
-
-                   response_type: "token"
-
-                  ,client_id: appkey
-
-                  ,scope: "all"
-
-                  ,state: "1"
-
-               })
-
-       }).success(function (response) {
-
-           var _response = response;
-
-           _s.isString(response) && (response = _q.decode(response));
-
-           if(response.access_token){
-
-               !response.expires_in && _l.error("token expires_in not retrieved");
-
-               !response.wb_name && _l.warning("weibo username not retrieved");
-
-               !response.wb_nick && _l.warning("weibo usernick not retrieved");
-
-               _._token.setAccessToken(response.access_token, parseInt(response.expires_in,10), response.wb_name, response.wb_nick);
-
-               if (response.refresh_token) {
-
-                    _._token.setRefreshToken(response.refresh_token);
-
-               } else {
-
-                   _l.warning("refresh token not retrieved");
-
-               }
-
-               _l.info("retrieve new access token succeed");
-
-           } else if (response.error) {
-
-               _l.error("retrieve new access token error " + response.error );
-
-           } else {
-
-               _l.error("unexpected result returned from server " + _response + " while retrieving new access token");
-
-           }
-
-       }).error(function (status, statusText) {
-
-           if (status === 404) {
-
-               _l.error("get token has failed, script not found");
-
-           } else {
-
-               _l.error("get token failed, " + statusText);
-
-           }
-
-       }).complete(function (arg1, arg2, arg3) {
-
-           optCallback && optCallback(arg1, arg2, arg3);
-
-       });
-
-       return _;
-    } */
 
     /**
      * Auto resolve response from server
@@ -486,9 +393,10 @@ QQWB.extend("_token",{
 
 		       } else {
 
-		           _l.error("resolve response error, loginStatus is " + loginStatus);
+		           _l.warn("thirdparty cookie needs to be enabled, please follow this instruction to set P3P header http://url.cn/0ZbFuL");
 
 		       }
+
 		   }
 
        } else if (response.error || response.errorMsg) {
@@ -530,7 +438,7 @@ QQWB.extend("_token",{
     * the new version OpenJS (since 2.0) use cookie name "QQWBToken_APPID" to save accesstoken, "QQWBRefreshToken_appid" to save refresh token
     * this utility function will migrate old version token to the new version
     * OpenJS version check is included
-    * This function is called on init
+    * This function will be called on init
     */
    compatOldVersion: function () {
 
