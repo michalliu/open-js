@@ -61,10 +61,12 @@
     });
 	//https://github.com/rack/rack/issues/225
     _b.put('cookie','defaultEncoder', function (inStr) {
-        return escape(escape(inStr));
+        // return escape(escape(inStr));
+        return escape(inStr);
     });
     _b.put('cookie','defaultDecoder', function (inStr) {
-        return unescape(unescape(inStr));
+        //return unescape(unescape(inStr));
+        return unescape(inStr);
     });
     _b.put("nativeevent","userloggedin","UserLoggedIn");
     _b.put("nativeevent","userloginfailed","UserLoginFailed");
