@@ -160,7 +160,19 @@
 
             if (context && context.nodeType == 1) {
 
-                 renderComponent(context);
+				if (_b.get("document", "ready")) {
+
+                    renderComponent(context);
+
+				} else {
+
+					_.dom.ready(function () {
+
+                        renderComponent(context);
+
+					});
+
+				}
 
             } else if (_s.isString(context)) {
 
@@ -736,7 +748,7 @@
 
                     _.jsonp({
 
-                        url : "http://172.27.20.71:8080/api/other/get_count",
+                        url : "http://172.27.20.71/api/other/get_count",
 
                         data : {
 
