@@ -748,7 +748,7 @@
 
                     _.jsonp({
 
-                        url : "http://172.27.20.71/api/other/get_count",
+                        url : "http://open.t.qq.com/api/other/get_count",
 
                         data : {
 
