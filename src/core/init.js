@@ -200,9 +200,9 @@
 
                _l.info("resolve token from url"); // lock for innerauth mechanism
 
-               wbname = location.href.match(/wb_name=([^&]+)/i);
+               wbname = location.href.match(/wb_name=([^&#]+)/i);
 
-               wbnick = location.href.match(/wb_nick=([^&]+)/i);
+               wbnick = location.href.match(/wb_nick=([^&#]+)/i);
 
                _t.resolveResponse(decodeURIComponent(matchedtoken[1]) + (wbname ? '&wb_name=' + wbname[1] : '') + (wbnick ? '&wb_nick=' + wbnick[1] : ''), false);
 
