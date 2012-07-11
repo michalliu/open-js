@@ -488,7 +488,7 @@
 
             idname: 'qqwb_share__', // HTML页面中的ID
 
-            attributes: 'icon counter counter_pos appkey content pic',
+            attributes: 'icon counter counter_pos cto_icon appkey content pic',
 
             create: function (cfg) {
 
@@ -579,7 +579,7 @@
                     sharebtn_style = _.template("sharebtn_style");
 
 
-                dshare_icon.src = "http://mat1.gtimg.com/app/newvt/share/images/share_icon_" + share_icon_index + ".png";
+                dshare_icon.src = cfg.cto_icon || ("http://mat1.gtimg.com/app/newvt/share/images/share_icon_" + share_icon_index + ".png");
 
                 dshare_icon.style.border = "0";
 
