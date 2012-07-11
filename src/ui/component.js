@@ -529,18 +529,8 @@
                 // 图标
                 if (cfg.icon) {
 
-                    temp = parseInt(cfg.icon,10);
+                    share_icon_index = parseInt(cfg.icon,10);
 
-                    if (temp < 0 || temp > 1) {
-
-                        _l.warn("已忽略的icon错误，icon" + cfg.icon + "不存在。");
-
-                    } else {
-
-                        share_icon_index = temp;
-
-                    }
-                
                 }
 
                 // 是否显示数字检查
@@ -663,6 +653,7 @@
                     return Math.floor(num * 10 / 10E3) / 10 + "万";
 
                 }
+
                 // 绘制计数
                 function drawCounter(count) {
 
