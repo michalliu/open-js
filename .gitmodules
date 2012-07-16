@@ -1,0 +1,6 @@
+[submodule "tools/firebug-lite"]
+	path = tools/firebug-lite
+	url = https://github.com/darwin/firebug.lite.git
+[submodule "tools/UglifyJS"]
+	path = tools/UglifyJS
+	url = https://github.com/michalliu/UglifyJS.git
