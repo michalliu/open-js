@@ -6,105 +6,91 @@
 <head>
 	<meta charset="utf-8">
 	<title>openJS文档</title>
-    <link href="http://mat1.gtimg.com/app/openjs/static/css/index.css?v=427" rel="stylesheet" type="text/css" media="all" />
-    <!--[if !IE]><link href="http://mat1.gtimg.com/app/openjs/static/css/webkitborder.css" rel="stylesheet" type="text/css" media="all" /><![endif]-->
-    <script src="http://mat1.gtimg.com/app/openjs/static/js/index.js?v=427"></script>
-    <script type="text/javascript">
-    
-      var _gaq = _gaq || [];
-      _gaq.push(['_setAccount', 'UA-30787688-1']);
-      _gaq.push(['_trackPageview']);
-    
-      (function() {
-        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-      })();
-    
-    </script>
+    <link href="http://mat1.gtimg.com/app/openjs/static/css/index_1.css" rel="stylesheet" type="text/css" media="all" />
+    <!--[if !IE]><!--><link href="http://mat1.gtimg.com/app/openjs/static/css/webkitborder_1.css" rel="stylesheet" type="text/css" media="all" /><!--<![endif]-->
+    <!--[if lt IE 7]>
+    <link href="http://mat1.gtimg.com/app/openjs/static/css/iefix.css" rel="stylesheet" type="text/css" media="all" />
+    <![endif]-->
 </head>
 <body>
     <div class="aside">
 
-		<a class="toc_title" href="#" lang="en">OpenJS <span class="version"> (2.0 Beta)</span></a>
+		<a hidefocus class="toc_title" href="#" lang="en">OpenJS <span class="version"> (2.0)</span></a>
 
-		<a class="toc_title" href="#开始使用">开始使用</a>
+		<a hidefocus class="toc_title" href="#开始使用">开始使用</a>
 
-		<a class="toc_title" href="#环境变量">环境变量</a>
+		<a hidefocus class="toc_title" href="#环境变量">环境变量</a>
 
-		<a class="toc_title" target="_blank" href="guidance.html">应用开发指南 <img src="http://mat1.gtimg.com/app/opent/images/wiki/resource/new.gif" alt="新"/></a>
+		<!--<a class="toc_title" target="_blank" href="guidance.html">应用开发指南 <img src="http://mat1.gtimg.com/app/opent/images/wiki/resource/new.gif" alt="新"/></a>-->
 
-		<a class="toc_title" href="#腾讯微博API调用">腾讯微博API调用</a>
+		<a hidefocus class="toc_title" href="#腾讯微博API调用">接口</a>
 
 		<ul class="toc_section">
 
-			<li>- <a href="#init">init</a></li>
+            <li> <a hidefocus href="#" class="sub_toc_title"><cite>[-]</cite> 核心</a>
+		        <ul class="toc_section">
 
-            <li> <span class="sub_toc_title">授权</span>
+                    <li>- <a hidefocus href="#init">init</a> <span class="comment">初始化</span></li>
+
+		        	<li>- <a hidefocus href="#login">login</a> <span class="comment">请求授权</span></li>
+
+		        	<li>- <a hidefocus href="#logout">logout</a> <span class="comment">清除授权</span></li>
+
+		        	<li>- <a hidefocus href="#loginstatus">loginStatus</a> <span class="comment">授权信息</span></li>
+                    
+                    <li>- <a hidefocus href="#api">api</a> <span class="comment">请求微博API</span></li>
+
+		         	<li>- <a hidefocus href="#tokenready">tokenReady</a></li>
+
+		         	<li>- <a hidefocus href="#documentready">documentReady</a></li>
+
+		         	<li>- <a hidefocus href="#ready">ready</a></li>
+
+                    <li>- <a hidefocus href="#component">component</a></li>
+                </ul>
+            </li>
+
+            <li class="collapsed"> <a hidefocus href="#" class="sub_toc_title"><cite>[+]</cite> 数据交互</a>
 
 		        <ul class="toc_section">
 
-		        	<li>- <a href="#login">login</a></li>
+		    	<li>- <a hidefocus href="#ajax">ajax</a></li>
 
-		        	<li>- <a href="#logout">logout</a></li>
+		    	<li>- <a hidefocus href="#task">task</a></li>
 
-		        	<li>- <a href="#loginstatus">loginStatus</a></li>
+		    	<li>- <a hidefocus href="#jsonp">jsonp</a></li>
+
+		    	<li>- <a hidefocus href="#script">script</a></li>
 
                 </ul>
 
             </li>
-
-			<li>- <a href="#api">api</a></li>
-
-			<li>- <a href="#tokenready">tokenReady</a></li>
-
-			<li>- <a href="#documentready">documentReady</a></li>
-
-			<li>- <a href="#ready">ready</a></li>
-
-            <li>- <a href="#component">component</a> <img src="http://mat1.gtimg.com/app/opent/images/wiki/resource/new.gif" alt="新"/></li>
-
-            <li> <span class="sub_toc_title">事件</span>
+            <li class="collapsed"> <a hidefocus href="#" class="sub_toc_title"><cite>[+]</cite>  事件</a>
 
 		        <ul class="toc_section">
 
-		    	<li>- <a href="#bind">bind</a></li>
+		    	<li>- <a hidefocus href="#bind">bind</a></li>
 
-		    	<li>- <a href="#unbind">unbind</a></li>
+		    	<li>- <a hidefocus href="#once">once</a></li>
 
-		    	<li>- <a href="#trigger">trigger</a></li>
+		    	<li>- <a hidefocus href="#trigger">trigger</a></li>
 
-		    	<li>- <a href="#once">once</a></li>
+		    	<li>- <a hidefocus href="#unbind">unbind</a></li>
 
                 </ul>
 
             </li>
-            <li> <span class="sub_toc_title">辅助</span>
+            <li class="collapsed"> <a hidefocus href="#" class="sub_toc_title"><cite>[+]</cite> 扩展</a>
 
 		        <ul class="toc_section">
 
-		    	<li>- <a href="#ajax">ajax</a></li>
+		    	<li>- <a hidefocus href="#find">find</a></li>
 
-		    	<li>- <a href="#jsonp">jsonp</a></li>
+                <li>- <a hidefocus href="#browser">browser</a></li>
 
-		    	<li>- <a href="#script">script</a></li>
+                <li>- <a hidefocus href="#template">template</a></li>
 
-		    	<li>- <a href="#task">task</a></li>
-
-                </ul>
-
-            </li>
-            <li> <span class="sub_toc_title">扩展</span>
-
-		        <ul class="toc_section">
-
-		    	<li>- <a href="#find">find</a></li>
-
-		    	<li>- <a href="#localstorage">localStorage</a></li>
-
-		    	<li>- <a href="#browser">browser</a> <img src="http://mat1.gtimg.com/app/opent/images/wiki/resource/new.gif" alt="新"/></li>
-
-                <li>- <a href="#template">template</a> <img src="http://mat1.gtimg.com/app/opent/images/wiki/resource/new.gif" alt="新"/></li>
+		    	<li>- <a hidefocus href="#localstorage">localStorage</a></li>
 
                 </ul>
 
@@ -128,30 +114,25 @@
         </ul>
 -->
 
-		<a class="toc_title" href="#历史更新">历史更新</a>
+		<a hidefocus class="toc_title" href="#历史更新">历史更新</a>
 
-		<a class="toc_title" href="#常见问题">常见问题</a>
+		<a hidefocus class="toc_title" href="#常见问题">常见问题 <img src="http://mat1.gtimg.com/app/opent/images/wiki/resource/hot.gif" alt="新"/></a>
+
+		<a hidefocus class="toc_title" href="#成功案例">成功案例</a>
 
 	</div>
     <div class="content">
         <!--[if lt IE 7]> 
-        <div class="reminder">浏览器太旧了，建议使用 <a target="_blank" href="http://www.google.com/chrome">chrome浏览器</a>。</div>
+        <div class="reminder">您的浏览器太旧了，建议使用 <a target="_blank" href="http://www.google.com/chrome">chrome浏览器</a>。</div>
         <![endif]-->
 		<h2>OpenJS</h2>
 		<p>OpenJS是腾讯微博开放平台提供的Javascript库，开发者使用该库可以轻松完成腾讯微博用户授权，访问API接口，调用官方组件等功能，支持多种应用部署环境及无缝迁移。</p>
-		<h2>成功案例</h2>
-        <div><a target="_blank" href="http://www.kaixin001.com/weibo/"><img alt="开心网" src="http://mat1.gtimg.com/app/openjs/static/images/kaixin.jpg" width="160" height="95"/></a><a target="_blank" href="http://mat1.gtimg.com/app/openjs/static/images/qplus_screenshot.png" title="q+应用截图" class="showcase"><img alt="腾讯Q+" src="http://mat1.gtimg.com/app/openjs/static/images/qplus.jpg" width="160" height="95"/></a><a href="#" title="你的应用" class="showcase"><img alt="你的应用" src="http://mat1.gtimg.com/app/openjs/static/images/yourapp.jpg" width="160" height="95"/></a></div>
-
-		<h2>升级说明</h2>
-		<p>2.0 beta 版本相对上一版本的主要变动如下：</p>
-		<ul>
-			<!--<li>支持全新的OAuth2.0协议</li>-->
-            <li>增加<a href="#环境变量">环境变量</a>设置。</li>
-            <li>增加 <a href="#template">模版</a> 方法。</li>
-            <li>增加 <a href="#component">网站连接组件</a> 调用方法。</li>
-            <li>进一步增强浏览器兼容性。</li>
-		</ul>
-
+        <p>如果你需要实现网站与腾讯微博连接，或者开发微博应用，只需要在页面上引入OpenJS，就可以轻松实现这些功能。相比传统的接入方式，如OAuth1.0，Openid&Openkey等，它具有以下优势：
+        <ul>
+            <li>无需后台程序支持，用户的浏览器直接与微博API服务器交互，速度快，开发者也无需维护和部署后台程序。</li>
+            <li>支持多种部署环境，如腾讯域内，微博应用频道，和第三方网站等。</li>
+        </ul>
+        </p>
 
 		<h2 id="开始使用">开始使用</h2>
 		<p>在页面中引用OpenJS的方式分同步引用和异步引用两种。若用同步引用的方式，为优化网站性能，建议将OpenJS放置在页面底部加载<sup><a target="_blank" href="http://developer.yahoo.com/performance/rules.html#js_bottom">[链]</a></sup>。若用异步引用的方式，开发者须进行异步编程。开发者可根据自己的项目情况，自由选择。</p>
@@ -222,18 +203,27 @@
 		<div class="options">
 			<div class="argument">inInitOpts<span class="optrequired">必选</span><span class="opttype">Map</span></div>
 			<div class="option">appkey<span class="optrequired">必选</span><span class="opttype">String</span><div class="optdefault">默认值:无</div><p>开放平台appkey，据协议和平台的差异性有时又叫appid或client id。</p></div>
-			<div class="option">callbackurl<span class="opttype">String</span><div class="optdefault">默认值:当前页面网址</div><p>用户授权成功后的回跳页面地址，如不设置则为当前页面网址。回跳页面地址必须与appkey匹配<sup><a target="_blank" href="http://mat1.gtimg.com/app/openjs/static/images/uri_explaination.jpg">[链]</a></sup>，否则无法完成授权。</p></div>
-			<div class="option">autoclose<span class="opttype">Boolean</span><div class="optdefault">默认值:true(自动关闭授权窗口)</div><p>默认自动关闭授权窗口，否则需开发者自行关闭回跳页面窗口。</p></div>
-            <div class="option">samewindow<span class="opttype">Boolean</span><div class="optdefault">默认值:false(弹新窗口授权)</div><p>默认为弹新窗口授权，否则在同一窗口授权，在此情况下开发者须自己处理授权返回的token，或使用我们提供的通用方案<sup><a target="_blank" href="http://mat1.gtimg.com/app/openjs/static/downloads/openjscallback.zip">[链]</a></sup>。开发者无须担心弹出的授权窗口被浏览器屏蔽，因为授权行为一般是由用户主动点击触发，浏览器不会进行屏蔽。</p>
+			<div class="option">callbackurl<span class="opttype">String</span><div class="optdefault">默认值:当前页面网址</div><p>用户授权成功后的回跳页面地址，如不设置则为当前页面网址。回跳页面地址必须与appkey匹配<sup><a target="_blank" href="http://mat1.gtimg.com/app/openjs/static/images/uri_explaination.jpg">[链]</a></sup>，否则无法完成授权。建议开发者在服务器上部署一个带有提示性文字的html文件，并把callbackurl指向这个文件，以带来更好的用户体验。</p></div>
+            <div class="option">autoclose<span class="opttype">Boolean</span><div class="optdefault">默认值:true(自动关闭授权窗口)</div><p>默认自动关闭授权窗口，授权页面一旦回跳到开发者指定的<em>callbackurl</em>就立刻关闭授权窗口。为假则没有此操作，开发者需要自行关闭窗口 (调用浏览器的window.close接口)。</p></div>
+            <div class="option">samewindow<span class="opttype">Boolean</span><div class="optdefault">默认值:false(弹新窗口授权)</div><p>默认为弹新窗口授权，否则在同一窗口完成授权(类似OAuth1.0的体验)，此方法用来解决某些浏览器安装了第三方弹窗屏蔽插件，造成无法授权的问题。</p><p>注意，在此情况下开发者必须自己处理授权返回的token，如果您不想编写代码，也可以使用我们提供的通用方案<sup><a target="_blank" href="http://mat1.gtimg.com/app/openjs/static/downloads/openjscallback.zip">[链]</a></sup>。</p><p>在一般情况下，开发者无须担心弹出的授权窗口被浏览器屏蔽，因为授权行为一般是由用户主动点击触发，浏览器不会进行屏蔽。</p>
 
 <pre class="code">
 <a class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("samewindow.html")' href="#*samewindow.html"></a>
 &lt;script&gt;
+    // 注意：
+    // 采用弹窗授权模式的应用可以不用这样构造callbackurl
+    // 以下代码只针对samewindow为true的情况，并且采用通用方案时
+    // 使用
+
+    // path_to_callbackurl 是指您部署的通用方案网址
+    // return_to 后的参数 your_app_url 是指用户成功授权后页面要
+    // 跳转到的网址，一般应该是应用的入口
+    // appkey 后的参数 your_appkey 是固定字段，指开发者的appkey
     T.init({
         appkey: 800000006,
         samewindow: true,
-        callbackurl:["path/to/callbackurl?"
-                    ,'return_to=','your/app/url'
+        callbackurl:["path_to_callbackurl?"
+                    ,'return_to=','your_app_url'
                     ,'&amp;appkey=',your_appkey].join("")
     })
 &lt;/script&gt;
@@ -852,16 +842,17 @@ T.documentReady(function () {
             <div class="option">colors <span class="desc">微评论组件颜色设置，如blue,green,#06c等。最多4个，依次代表背景色，评论背景色，边框色，主字色</span></div>
         </div>
 
+
 		<h2 id="历史更新">历史更新</h2>
 
 		<div class="options">
-            <div class="argument">版本: <a target="_blank" href="http://mat1.gtimg.com/app/openjs/v20.js">2.0 beta</a><span class="opttype">2012.4</span><ul class="updatelist">
+            <div class="argument">版本: <a target="_blank" href="http://mat1.gtimg.com/app/openjs/v20.js">2.0</a><span class="optrequired">推荐使用</span><span class="opttype">2012.4</span><ul class="updatelist">
                     <li>增加<a href="#环境变量">环境变量</a>设置。</li>
                     <li>增加 <a href="#template">模版</a> 方法。</li>
                     <li>增加 <a href="#component">网站连接组件</a> 调用方法。</li>
                     <li>进一步增强浏览器兼容性。</li>
             </ul></div>
-            <div class="argument">版本: <a target="_blank" href="http://mat1.gtimg.com/app/vt/public/openjs/v15.js?v=1.5">1.5</a><span class="optrequired">推荐使用</span><span class="opttype">2012.1</span><ul class="updatelist"><li>由于某些接口不需要鉴权，如public_timeline，因此移除了T.api接口的登录态检查。若<a href="#api">T.api</a>如出现鉴权错误，请调用 <a href="#loginstatus">T.loginStatus</a> 检查登录态是否正常。</li><li>修复IE6,7下使用flash方案跨域数据乱序的错误。</li></ul></div>
+            <div class="argument">版本: <a target="_blank" href="http://mat1.gtimg.com/app/vt/public/openjs/v15.js?v=1.5">1.5</a><span class="opttype">2012.1</span><ul class="updatelist"><li>由于某些接口不需要鉴权，如public_timeline，因此移除了T.api接口的登录态检查。若<a href="#api">T.api</a>如出现鉴权错误，请调用 <a href="#loginstatus">T.loginStatus</a> 检查登录态是否正常。</li><li>修复IE6,7下使用flash方案跨域数据乱序的错误。</li></ul></div>
             <div class="argument">版本: <a target="_blank" href="http://mat1.gtimg.com/app/vt/public/openjs/v10.js?v=1.0">1.0</a><span class="opttype">2011.10</span><p>初始版本</p></div>
         </div>
 
@@ -869,21 +860,73 @@ T.documentReady(function () {
 		<div class="options">
                 <ol class="faq">
                     <li class="first">
-                    我在使用过程中遇到问题应该如何解决？<br/>
-                    可以加入OpenJS专属QQ群，群号<em class="red">221677647</em>。如果你认为遇到了bug或是浏览器兼容性问题，可以在 <a target="_blank" href="http://code.google.com/p/openjs-project/issues/list">问题跟踪系统</a> 中提交你的问题，我们的开发人员会尽快跟踪处理。
+                    <b>我在使用过程中遇到问题应该如何解决？</b><br/>
+                    请首先查阅 <a target="_blank" href="http://wiki.open.t.qq.com/index.php/%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98FAQ">接口常见问题</a>。如果仍未解决，可以加入OpenJS专属QQ群 <em class="red">221677647</em>。如果你认为遇到了bug或是浏览器兼容性问题，可以在 <a target="_blank" href="http://code.google.com/p/openjs-project/issues/list">问题跟踪系统</a> 中提交你的问题，我们的开发人员会尽快跟踪处理。
 					</li>
-					<li class="last" id="什么是腾讯域内应用">
-					什么是腾讯域内应用？<br/>
-					腾讯域内应用，是指应用网址以<em>qq.com</em>结尾的应用，简称域内应用。注意，使用OpenJS开发的域内应用<em>document.domain</em>为<em>qq.com</em>。<br/>
+					<li id="check_sign_error">
+                    <b>check sign error？</b><br/>
+                    check sign error是调用api时最常见的一个错误，造成这个错误的原因是被调用的接口需要鉴权，而当前没有获得用户授权，<a href="#loginstatus">T.loginStatus()</a> 返回undefined。要解决这个问题，请首先查阅 <a href="http://wiki.open.t.qq.com/index.php/API%E6%96%87%E6%A1%A3">API文档</a> 确定被调用接口是否需要鉴权。
+                    <p>若接口不需要鉴权而出现了鉴权错误，请检查传入的appkey是否正确，若appkey不正确也会产生此错误。</p>
+                    <p>若接口要求鉴权，而T.loginStatus()返回undefined，可以考虑使用 <a href="#login">T.login()</a> 获得用户授权后再调用接口，或调用 <a href="#api">T.api</a> 时声明accesstoken。</p>
+					</li>
+					<li id="fusion_api">
+                    <b>OpenJS与fusion api有什么关系？它与其它js库兼容吗？</b><br/>
+                    OpenJS 和 Fusion api 没有关系，它们都是独立的js库。OpenJS可以与现有的js库或框架兼容，它会在使用者的网站上声明 <em>QQWB</em> 和 <em>T</em> 两个全局变量，它在运行过程中也会产生少量的带有特殊前缀的临时全局变量，不会影响其它js代码的执行。
+					</li>
+					<li id="fusion_api">
+                    <b>OpenJS是如何实现跨域数据提交的？</b><br/>
+                    对于支持 <a target="_blank" href="https://developer.mozilla.org/en/DOM/window.postMessage">postMessage</a> 的浏览器，我们优先使用此方法，在其余浏览器我们采用flash提供的跨域机制完成数据传输(flashplayer要求支持ExternalInterface)，要查看浏览器是否支持这两种技术，请访问<a target="_blank" href="http://open.t.qq.com/open-js/doc/snippet/code/browser.html">此页面</a>。
+					</li>
+					<li id="iframe_problem">
+                    <b>用OpenJS开发的应用非嵌入的时候正常，用iframe嵌入到其它页面就不正常了，是不是OpenJS不支持iframe？</b><br/>
+                    OpenJS自带的鉴权机制会利用cookie保存用户的授权信息，当您的应用嵌入到另外一个页面时，就会遇到 <a target="_blank" href="http://msdn.microsoft.com/en-us/library/ms537343(v=vs.85).aspx">第三方cookie</a> 的问题，简单来说就是被嵌入非同源的页面无法读取或写入cookie。开发者只需要按照 <a href="http://viralpatel.net/blogs/how-to-set-third-party-cookies-with-iframe/">这篇教程</a> 在程序中输出 <em>p3p header</em> 即可。一般情况下，在腾讯微博应用频道上线的应用都是以iframe嵌入的，会遇到这个问题。
+					</li>
+					<li id="authorization_information">
+                    <b>用户授权了应用，这个授权可以持续多久有效？</b><br/>
+                    使用OpenJS自带的授权机制进行授权，用户的授权信息会保存cookie里，如果用户不主动清除cookie并且 <a href="#logout">T.logout()</a> 没有被调用（实际上也是清除cookie），授权是一直有效的，否则的话用户需要重新授权。
+					</li>
+					<li id="authorization_error">
+                    <b>授权出错，redirect_uri与注册的应用网址不匹配？</b><br/>
+                    oauth2.0协议对外暴露了appid，为防止有人冒用其它人的appid让用户授权，非法获得用户的信任。我们要求授权后页面回跳的地址必须是该appid拥有者所指定的地址（应用网址），否则便阻止用户授权。<p>这可能会给开发者应用开发过程中的调试带来不便，我们建议在开发过程中采用配置HOSTS文件改变域名到IP映射的办法解决这个问题，或者也可以在开发阶段采用ip地址作为网址，应用提交审核或正式上线时再切换到域名。</p>
+					</li>
+                    <!--
+					<li id="fusion_api">
+                    <b>我已经用了PHPSDK或其它SDK，还能用OpenJS吗？</b><br/>
+                    OpenJS可以与其它SDK结合使用，OpenJS可以接受OAuth2.0协议的AccessToken，通过URL地址栏传递Token，T.api函数可独立指定token
+					</li>
+                    -->
+					<li id="什么是腾讯域内应用">
+                    <b>什么是腾讯域内应用？</b><br/>
+                    腾讯域内应用，是指应用网址以<em>qq.com</em>结尾的应用，简称域内应用。<br/>OpenJS同时支持腾讯域内应用与域外应用的开发，两者的区别是授权画面不一样，域内应用采用浮层式的体验，域外应用采用弹窗的体验。<br/><p>注意，使用OpenJS开发的域内应用<em>document.domain</em>为<em>qq.com</em>。</p>
 					OpenJS完美支持域内应用与域外应用互相迁移，意味者开发者无需更改任何代码即可把域外的应用迁移到域内使用，反之亦可。
 					</li>
                 </ol>
         </div>
+
+		<h2 id="成功案例">成功案例</h2>
+
+        <div><a target="_blank" href="http://www.kaixin001.com/weibo/"><img alt="开心网" src="http://mat1.gtimg.com/app/openjs/static/images/kaixin.jpg" width="160" height="95"/></a><a target="_blank" href="http://mat1.gtimg.com/app/openjs/static/images/qplus_screenshot.png" title="q+应用截图" class="showcase"><img alt="腾讯Q+" src="http://mat1.gtimg.com/app/openjs/static/images/qplus.jpg" width="160" height="95"/></a><a href="#" title="你的应用" class="showcase"><img alt="你的应用" src="http://mat1.gtimg.com/app/openjs/static/images/yourapp.jpg" width="160" height="95"/></a></div>
+
 	</div>
 	<div class="bside">
     	<div class="snippetview" id="snippetview">
 			<iframe src="about:blank" id="snippetframe" frameBorder="0" width="100%" height="100%"></iframe>
     	</div>
 	</div>
+<script src="http://mat1.gtimg.com/app/appt/js/jquery-1.7.1.min.js"></script>
+<script src="http://mat1.gtimg.com/app/openjs/static/js/index_1.js"></script>
+<script type="text/javascript">
+    
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-30787688-1']);
+      _gaq.push(['_trackPageview']);
+    
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    
+    </script>
 </body>
 </html>
