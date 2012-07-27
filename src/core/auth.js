@@ -18,28 +18,28 @@
  * @include core.dom
  *          core.event
  */
-
+/*jslint laxcomma:true*/
 (function (){
 
    var _ = QQWB,
 
        _b = _.bigtable,
 
-	   _l = _.log,
+       _l = _.log,
 
-	   _t = _._token,
+       _t = _._token,
 
-	   _c = _.cookie,
+       _c = _.cookie,
 
-	   _s = _.String,
+       _s = _.String,
 
-	   oAuthWindow,
+       oAuthWindow,
 
-	   innerAuthLayer;
+       innerAuthLayer;
 
     innerAuthLayer = {
 
-		   show: function () {
+           show: function () {
 
                QQWB.documentReady(function () {
 
@@ -53,9 +53,9 @@
 
                        layer = document.getElementById(layerid),
 
-					   _br = _.browser,
+                       _br = _.browser,
 
-					   lastw, lasth, resize, cleanup;
+                       lastw, lasth, resize, cleanup;
 
                    if (!layer) {
 
@@ -70,56 +70,56 @@
 
                        });
 
-					   resize = function () {
+                       resize = function () {
 
-		 	               QQWB.trigger(_b.get("innerauth","eventproxysizechange"), lastw, lasth);
+                            QQWB.trigger(_b.get("innerauth","eventproxysizechange"), lastw, lasth);
 
-		               };
+                       };
 
-					   cleanup = function () {
+                       cleanup = function () {
 
                            layer.parentNode.removeChild(layer);
 
-						   QQWB.unbind(_b.get("innerauth","eventproxysizechange"), false); // unbind all size change listener
+                           QQWB.unbind(_b.get("innerauth","eventproxysizechange"), false); // unbind all size change listener
 
-						   if (window.removeEventListener) {
+                           if (window.removeEventListener) {
 
-							   window.removeEventListener('resize', resize);
+                               window.removeEventListener('resize', resize);
 
-						   } else if (window.detachEvent) {
+                           } else if (window.detachEvent) {
 
-							   window.detachEvent('onresize', resize);
+                               window.detachEvent('onresize', resize);
 
-						   }
-					   };
+                           }
+                       };
 
-					   QQWB.once(_b.get("innerauth","eventproxysubmit"), function (responseText) {
+                       QQWB.once(_b.get("innerauth","eventproxysubmit"), function (responseText) {
 
-						   QQWB._token.resolveResponse(responseText,true);
+                           QQWB._token.resolveResponse(responseText,true);
 
-						   cleanup();
+                           cleanup();
 
-					   });
+                       });
 
-					   QQWB.once(_b.get("innerauth","eventproxycancel"), function () {
+                       QQWB.once(_b.get("innerauth","eventproxycancel"), function () {
 
-						   QQWB._token.resolveResponse("error=user_refused",true);
+                           QQWB._token.resolveResponse("error=user_refused",true);
 
-						   cleanup();
+                           cleanup();
 
-					   });
+                       });
 
                        //
                        QQWB.bind(_b.get("innerauth","eventproxysizechange"), function (w, h) {
 
-						   // not correct in chrome
-						   //var offsettop = _br.rendererMode.standard ? document.documentElement.scrollTop : document.body.scrollTop;
+                           // not correct in chrome
+                           //var offsettop = _br.rendererMode.standard ? document.documentElement.scrollTop : document.body.scrollTop;
 
-						   var offsettop = document.documentElement.scrollTop || document.body.scrollTop;
+                           var offsettop = document.documentElement.scrollTop || document.body.scrollTop;
 
-						   lastw = w;
+                           lastw = w;
 
-						   lasth = h;
+                           lasth = h;
 
                            layer.style.width = w + 'px';
 
@@ -133,15 +133,15 @@
 
                        });
 
-					   if (window.addEventListener) {
+                       if (window.addEventListener) {
 
-		                   window.addEventListener('resize', resize);
+                           window.addEventListener('resize', resize);
 
-	                   } else if(window.attachEvent) {
+                       } else if(window.attachEvent) {
 
-	                   	   window.attachEvent('onresize', resize);
+                              window.attachEvent('onresize', resize);
 
-	    	           }
+                       }
 
                        document.body.appendChild(layer);
 
@@ -149,51 +149,51 @@
 
                }); // end documentReady
 
-		   } // end show
+           } // end show
 
-	   };
+       };
 
    oAuthWindow = (function () {
 
        var  authorizing = false,
     
-    		awindow = null;
-    	
-    	return {
+            awindow = null;
+        
+        return {
     
-    		show: function () {
+            show: function () {
     
-               	var width = _b.get("oauthwindow","width"),
+                   var width = _b.get("oauthwindow","width"),
                
-                   	height = _b.get("oauthwindow","height"),
+                       height = _b.get("oauthwindow","height"),
                
-               		name = _b.get("oauthwindow","name"),
+                       name = _b.get("oauthwindow","name"),
                
-               		url = _b.get("uri","auth"),
+                       url = _b.get("uri","auth"),
                
-               		attrs = "toolbar=no,menubar=no,scrollbars=yes,resizable=yes,location=yes,status=no",
+                       attrs = "toolbar=no,menubar=no,scrollbars=yes,resizable=yes,location=yes,status=no",
 
-    	            appkey = _b.get("base", "appkey"),
+                    appkey = _b.get("base", "appkey"),
     
-    		        autoclose = _b.get("base","autoclose"),
+                    autoclose = _b.get("base","autoclose"),
     
-    		        samewindow = _b.get("base","samewindow"),
+                    samewindow = _b.get("base","samewindow"),
     
-    				x,
+                    x,
     
-    				y,
+                    y,
     
-    				query,
+                    query,
     
-    				props;
+                    props;
     
-    			if (!authorizing) {
+                if (!authorizing) {
     
                     x = (window.screenX || window.screenLeft) + Math.max(0,((window.outerWidth || document.documentElement.clientWidth) - width)) / 2;
     
                     y = (window.screenY || window.screenTop) + Math.max(0,((window.outerHeight || document.documentElement.clientHeight) - height)) / 2;
     
-    		        query =  _.queryString.encode({
+                    query =  _.queryString.encode({
     
                          response_type: "token"
     
@@ -207,88 +207,88 @@
     
                     });
     
-    		        props = ["width=" + width, "height=" + height, "left=" + x, "top=" + y].join(",")
+                    props = ["width=" + width, "height=" + height, "left=" + x, "top=" + y].join(",");
     
-    				if (samewindow) {
+                    if (samewindow) {
     
-    					window.name = name;
+                        window.name = name;
     
-    					window.location.href = url + "?" + query;
+                        window.location.href = url + "?" + query;
     
-    					return;
-    				}
+                        return;
+                    }
     
-    	            awindow = window.open(url + "?" + query, name, [props, attrs].join(","));
+                    awindow = window.open(url + "?" + query, name, [props, attrs].join(","));
     
-    				authorizing = true;
+                    authorizing = true;
     
-    		        (function () {
+                    (function () {
     
-    					var _ = QQWB,
+                        var _ = QQWB,
     
-    					    _t = _._token,
+                            _t = _._token,
     
-    					    response,
+                            response,
     
-    						mark,
+                            mark,
     
-    					    _q = _.queryString;
+                            _q = _.queryString;
     
                        if (!awindow) {
     
-    						errormsg = "browser blocked popup authorize window";
+                            errormsg = "browser blocked popup authorize window";
     
-    						_l.error(errormsg);
+                            _l.error(errormsg);
     
                             _t.resolveResponse("error=" + errormsg, true);
     
-    						return;
-    					}
-    					
+                            return;
+                        }
+                        
                         if (awindow.closed) { // user close like ALT + F4
     
                             _t.resolveResponse("error=access_denied", true);
     
-    						authorizing = false;
+                            authorizing = false;
     
-    						awindow = null;
+                            awindow = null;
     
                             return;
     
-    		            } else {
+                        } else {
     
-    		                try {
+                            try {
     
-    		                 	response = awindow.location && awindow.location.href;
+                                 response = awindow.location && awindow.location.href;
     
-    		                } catch (ex) {
+                            } catch (ex) {
     
-    		                	response = null;
-    		                }
+                                response = null;
+                            }
     
-    		                if (response && response != "about:blank") { // window.open url firstly is about:blank
-    						   
-    						   mark = response.lastIndexOf('#');
+                            if (response && response != "about:blank") { // window.open url firstly is about:blank
+                               
+                               mark = response.lastIndexOf('#');
     
-    						   response = mark == -1 ? "" : response.slice(mark+1);
+                               response = mark == -1 ? "" : response.slice(mark+1);
     
                                if (response) { // hash must be exists
     
-    		         		       response = _q.decode(response);
+                                    response = _q.decode(response);
     
-    		                       _t.resolveResponse(response, true);
+                                   _t.resolveResponse(response, true);
     
-    	                           authorizing = false;
+                                   authorizing = false;
     
                                    autoclose && awindow.close();
     
-    						       awindow = null;
+                                   awindow = null;
     
-    		                       return;
+                                   return;
     
                                }
     
-    		                }
+                            }
     
                             setTimeout(arguments.callee, 0);
     
@@ -296,15 +296,15 @@
     
                     }());
     
-    			} else {
+                } else {
     
                     awindow && awindow.focus();
     
-    			}
-    			
-    		}
+                }
+                
+            }
     
-    	};
+        };
 
     }()); // end oAuthWindow
 
@@ -319,91 +319,91 @@ QQWB.extend("auth",{
      */
     login: function (optSuccessHandler, optFailHandler) {
 
-	    var inited = _b.get("base","inited"),
+        var inited = _b.get("base","inited"),
 
-		    innerauth = _b.get("innerauth","enabled"),
+            innerauth = _b.get("innerauth","enabled"),
 
-			syncloginenabled = _b.get("base","synclogin"),
+            syncloginenabled = _b.get("base","synclogin"),
 
             loginStatus = _.auth.loginStatus(), 
 
-			error,
+            error,
 
-			syncloginResponseText,
+            syncloginResponseText,
 
             onLoginSessionComplete; // hander on this logon session complete
 
         if (!inited) {
 
-			error = _.name + " not initialized, call T.init() to initialize";
+            error = _.name + " not initialized, call T.init() to initialize";
 
             _l.critical(error);
 
         }
 
-		if (error && optFailHandler) {
+        if (error && optFailHandler) {
 
-			optFailHandler({message:error});
+            optFailHandler({message:error});
 
-			return _;
-		}
+            return _;
+        }
 
-		if (loginStatus && optSuccessHandler) {
+        if (loginStatus && optSuccessHandler) {
 
             optSuccessHandler(loginStatus);
 
-			return _;
+            return _;
 
-		}
+        }
 
-		// QQ loginstatus exhchange to oauth login status
-		// this is not innerauth logic
-		// if synclogin enabled use the cached synclogin result otherwise drop it
-	    if (!innerauth && syncloginenabled) {
+        // QQ loginstatus exhchange to oauth login status
+        // this is not innerauth logic
+        // if synclogin enabled use the cached synclogin result otherwise drop it
+        if (!innerauth && syncloginenabled) {
 
-	    	syncloginResponseText = _b.get("synclogin","responsetext");
+            syncloginResponseText = _b.get("synclogin","responsetext");
 
-	    	if (syncloginResponseText) {
+            if (syncloginResponseText) {
 
-	    	    _l.debug("using prefetched token ...");
+                _l.debug("using prefetched token ...");
 
-	    		_t.resolveResponse(syncloginResponseText, false); // don't trigger any events
+                _t.resolveResponse(syncloginResponseText, false); // don't trigger any events
 
                 loginStatus = _.auth.loginStatus(); // update loginstatus after using preloaded sync login result
 
-	    		if (loginStatus) {
+                if (loginStatus) {
 
-	    	        _l.debug("synclogin succeed");
+                    _l.debug("synclogin succeed");
 
-	    			optSuccessHandler && optSuccessHandler(loginStatus);
+                    optSuccessHandler && optSuccessHandler(loginStatus);
 
-	    			return _;
+                    return _;
 
-	    		}
+                }
 
-	    	}
-	    	
-	    	_l.debug("synclogin failed, fallback to login window");
+            }
+            
+            _l.debug("synclogin failed, fallback to login window");
 
-	    }
+        }
 
-	    if (optSuccessHandler || optFailHandler) {
+        if (optSuccessHandler || optFailHandler) {
 
-	    	onLoginSessionComplete = function (arg1) {
+            onLoginSessionComplete = function (arg1) {
 
-	    		if(arg1.access_token && optSuccessHandler) {
+                if(arg1.access_token && optSuccessHandler) {
 
-	    			optSuccessHandler(arg1);
+                    optSuccessHandler(arg1);
 
-	    		} else if(arg1.error && optFailHandler){
+                } else if(arg1.error && optFailHandler){
 
-	    			optFailHandler(arg1);
+                    optFailHandler(arg1);
 
-	    		} else {
+                } else {
 
                     _l.error("wired result of T.login " + QQWB.JSON.stringify(arg1));
 
-	    		}
+                }
 
                 _.unbind(_b.get("nativeevent","userloggedin"), onLoginSessionComplete);
 
@@ -411,23 +411,23 @@ QQWB.extend("auth",{
 
                 onLoginSessionComplete = null;
 
-	    	};
+            };
 
             _.bind(_b.get("nativeevent","userloggedin"), onLoginSessionComplete);
 
             _.bind(_b.get("nativeevent","userloginfailed"), onLoginSessionComplete);
 
-	    }
+        }
 
-		if (innerauth) {
+        if (innerauth) {
 
-			innerAuthLayer.show();
+            innerAuthLayer.show();
 
-		} else {
+        } else {
 
-	        oAuthWindow.show();
+            oAuthWindow.show();
 
-	    }
+        }
 
         return _;
     }
@@ -439,11 +439,11 @@ QQWB.extend("auth",{
      */
    ,logout: function (optHandler) {
 
-	   var loginStatus = _.loginStatus(),
+       var loginStatus = _.loginStatus(),
 
-	       innerauth = _b.get("innerauth","enabled"),
+           innerauth = _b.get("innerauth","enabled"),
 
-		   rootDomain = _b.get("innerauth","rootdomain");
+           rootDomain = _b.get("innerauth","rootdomain");
 
        _l.info("logging out user");
 
@@ -457,18 +457,18 @@ QQWB.extend("auth",{
 
            _t.clearRefreshToken();
 
-		   _b.del("synclogin","responsetext");
+           _b.del("synclogin","responsetext");
 
            _l.info("user " + (loginStatus.name || "unknown") + " logged out");
 
        }
 
-	   if (innerauth) {
-	       _c.del('uin','/',rootDomain);
-	       _c.del('skey','/',rootDomain);
-	       _c.del('luin','/',rootDomain);
-	       _c.del('lskey','/',rootDomain);
-	   }
+       if (innerauth) {
+           _c.del('uin','/',rootDomain);
+           _c.del('skey','/',rootDomain);
+           _c.del('luin','/',rootDomain);
+           _c.del('lskey','/',rootDomain);
+       }
 
        optHandler && optHandler();
 
@@ -490,7 +490,7 @@ QQWB.extend("auth",{
 
            user = _t.getTokenUser(),
 
-	       status;
+           status;
 
        if (accessToken) {
 
