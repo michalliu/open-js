@@ -1,1 +1,299 @@
-test
+<!doctype html> <!--[if lt IE 7]><html class="no-js ie6 oldie" lang="zh-CN"><![endif]--> <!--[if IE 7]><html class="no-js ie7 oldie" lang="zh-CN"><![endif]--> <!--[if IE 8]><html class="no-js ie8 oldie" lang="zh-CN"><![endif]--> <!--[if gt IE 8]><!--><html class="no-js" lang="zh-CN"> <!--<![endif]--> <head> <meta charset="utf-8"> <title>openJS文档</title> <link href="http://mat1.gtimg.com/app/openjs/static/css/index_1.css" rel="stylesheet" type="text/css" media="all"/> <!--[if !IE]><!--><link href="http://mat1.gtimg.com/app/openjs/static/css/webkitborder_1.css" rel="stylesheet" type="text/css" media="all"/><!--<![endif]--> <!--[if lt IE 7]><link href="http://mat1.gtimg.com/app/openjs/static/css/iefix.css" rel="stylesheet" type="text/css" media="all"/><![endif]--> </head> <body> <div class="aside"> <a hidefocus class="toc_title" href="#" lang="en">OpenJS <span class="version"> (2.0)</span></a> <a hidefocus class="toc_title" href="#开始使用">开始使用</a> <a hidefocus class="toc_title" href="#环境变量">环境变量</a> <a hidefocus class="toc_title" href="#腾讯微博API调用">接口</a> <ul class="toc_section"> <li> <a hidefocus href="#" class="sub_toc_title"><cite>[-]</cite> 核心</a> <ul class="toc_section"> <li>- <a hidefocus href="#init">init</a> <span class="comment">初始化</span></li> <li>- <a hidefocus href="#login">login</a> <span class="comment">请求授权</span></li> <li>- <a hidefocus href="#logout">logout</a> <span class="comment">清除授权</span></li> <li>- <a hidefocus href="#loginstatus">loginStatus</a> <span class="comment">授权信息</span></li> <li>- <a hidefocus href="#api">api</a> <span class="comment">请求微博API</span></li> <li>- <a hidefocus href="#tokenready">tokenReady</a></li> <li>- <a hidefocus href="#documentready">documentReady</a></li> <li>- <a hidefocus href="#ready">ready</a></li> <li>- <a hidefocus href="#component">component</a></li> </ul> </li> <li class="collapsed"> <a hidefocus href="#" class="sub_toc_title"><cite>[+]</cite> 数据交互</a> <ul class="toc_section"> <li>- <a hidefocus href="#ajax">ajax</a></li> <li>- <a hidefocus href="#task">task</a></li> <li>- <a hidefocus href="#jsonp">jsonp</a></li> <li>- <a hidefocus href="#script">script</a></li> </ul> </li> <li class="collapsed"> <a hidefocus href="#" class="sub_toc_title"><cite>[+]</cite> 事件</a> <ul class="toc_section"> <li>- <a hidefocus href="#bind">bind</a></li> <li>- <a hidefocus href="#once">once</a></li> <li>- <a hidefocus href="#trigger">trigger</a></li> <li>- <a hidefocus href="#unbind">unbind</a></li> </ul> </li> <li class="collapsed"> <a hidefocus href="#" class="sub_toc_title"><cite>[+]</cite> 扩展</a> <ul class="toc_section"> <li>- <a hidefocus href="#find">find</a></li> <li>- <a hidefocus href="#browser">browser</a></li> <li>- <a hidefocus href="#template">template</a></li> <li>- <a hidefocus href="#localstorage">localStorage</a></li> </ul> </li> </ul> <a hidefocus class="toc_title" href="#历史更新">历史更新</a> <a hidefocus class="toc_title" href="#常见问题">常见问题 <img src="http://mat1.gtimg.com/app/opent/images/wiki/resource/hot.gif" alt="新"/></a> <a hidefocus class="toc_title" href="#成功案例">成功案例</a> </div> <div class="content"> <!--[if lt IE 7]><div class="reminder">您的浏览器太旧了，建议使用 <a target="_blank" href="http://www.google.com/chrome">chrome浏览器</a>。</div><![endif]--> <h2>OpenJS</h2> <p>OpenJS是腾讯微博开放平台提供的Javascript库，开发者使用该库可以轻松完成腾讯微博用户授权，访问API接口，调用官方组件等功能，支持多种应用部署环境及无缝迁移。</p> <p>如果你需要实现网站与腾讯微博连接，或者开发微博应用，只需要在页面上引入OpenJS，就可以轻松实现这些功能。相比传统的接入方式，如OAuth1.0，Openid&Openkey等，它具有以下优势： <ul> <li>无需后台程序支持，用户的浏览器直接与微博API服务器交互，速度快，开发者也无需维护和部署后台程序。</li> <li>支持多种部署环境，如腾讯域内，微博应用频道，和第三方网站等。</li> </ul> </p> <h2 id="开始使用">开始使用</h2> <p>在页面中引用OpenJS的方式分同步引用和异步引用两种。若用同步引用的方式，为优化网站性能，建议将OpenJS放置在页面底部加载<sup><a target="_blank" href="http://developer.yahoo.com/performance/rules.html#js_bottom">[链]</a></sup>。若用异步引用的方式，开发者须进行异步编程。开发者可根据自己的项目情况，自由选择。</p> <ul> <li>同步引用 <pre class="code">
+<a class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("sync_reference.html")' href="#*sync_reference.html"></a>
+&lt;script src="//mat1.gtimg.com/app/openjs/openjs.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+    // 同步引用，无需回调函数
+    // 你的代码
+&lt;/script&gt;
+</pre> </li> <li>异步引用 <pre class="code">
+<a class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("async_reference.html")' href="#*async_reference.html"></a>
+&lt;script&gt;
+    // 异步引用需定义回调函数 <a id="onOpenjsLoad" href="#onOpenjsLoad">onOpenjsLoad</a>
+    window['onOpenjsLoad'] = function () {
+        alert("openJS加载成功");
+    }
+
+    (function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) {return;}
+      js = d.createElement(s); js.id = id;
+      js.src = "//mat1.gtimg.com/app/openjs/openjs.js";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'openjs'));
+&lt;/script&gt;
+</pre> </li> </ul> <h2 id="环境变量">环境变量</h2> <p>OpenJS默认的运行环境参数配置基于大多数人的需要，一般情况下不需要做任何设置。在某些特殊情况下，开发者可以通过设置环境变量，改变OpenJS的默认行为。环境变量以Fragment URL<sup><a target="_blank" href="http://www.w3.org/TR/WD-html40-970708/htmlweb.html#h-4.1.1">[链]</a></sup>的形式传递，不区分大小写。</p> <pre class="code">
+<a class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("envs.html")' href="#*envs.html"></a>
+&lt;script src="//mat1.gtimg.com/app/openjs/openjs.js#debug=yes"&gt;&lt;/script&gt;
+</pre> <div class="options"> <div class="argument"></div> <div class="option">debug<span class="opttype">Boolean</span><div class="optdefault">默认值:false(不开启调试模式)</div><p>开启Debug模式有助于跟踪调试，建议在开发过程中开启。</p></div> <div class="option">logLevel<span class="opttype">Number</span><div class="optdefault">默认值:0(输出全部日志)</div><p>值越大意味着输出Log输出的信息越少越重要，默认输出尽可能详细的Log。</p></div> <div class="option">crossDomainMethod<span class="opttype">String</span><div class="optdefault">默认值:'auto'(自动检测)</div><p>该参数可指定跨域解决方案。默认情况下OpenJS自动检测当前浏览器，并适配一种最优的方案，假如开发者十分确定要采用的跨域方案（如：iPhone应用）可以指定该参数。</p><div class="option">html5 <span class="desc">使用postmessage跨域</span></div><div class="option">flash <span class="desc">通过flash代理跨域(要求Flash Player 9以上)</span></div></div> <div class="option">cookieDomain<span class="opttype">String</span><div class="optdefault">默认值:''</div><p>OpenJS需使用Cookie保存用户的授权信息，此参数控制该Cookie<sup><a target="_blank" href="https://developer.mozilla.org/en/DOM/document.cookie">[链]</a></sup>的domain域<sup></sup>。</p></div> <div class="option">cookiePath<span class="opttype">String</span><div class="optdefault">默认值:'/'</div><p>与cookieDomain一样，此参数控制Cookie<sup><a target="_blank" href="https://developer.mozilla.org/en/DOM/document.cookie">[链]</a></sup>的path域。如果你不想把腾讯微博用户授权信息保存在根路径下，请设置此环境变量进行控制。</p></div> <div class="option">autoboot<span class="opttype">Boolean</span><div class="optdefault">默认值:true(尽早加载跨域方案)</div><p>为真时先于init方法加载跨域方案，为假时等init执行时再加载跨域方案。</p></div> </div> <br/> 若为腾讯域内应用<sup><a href="#什么是腾讯域内应用">[链]</a></sup>，因为不再需要跨域，<em>crossDomainMethod</em> 自动失效。<br/> <br/> <h2 id="腾讯微博API调用">腾讯微博API调用</h2> <p id="init" class="intro"><b class="header">init</b><span class="code">T.init(inInitOpts)</span><br/> 初始化。</p> <pre class="code">
+&lt;script&gt;
+    T.init({
+        appkey:800000006
+    });
+&lt;/script&gt;
+</pre> <div class="options"> <div class="argument">inInitOpts<span class="optrequired">必选</span><span class="opttype">Map</span></div> <div class="option">appkey<span class="optrequired">必选</span><span class="opttype">String</span><div class="optdefault">默认值:无</div><p>开放平台appkey，据协议和平台的差异性有时又叫appid或client id。</p></div> <div class="option">callbackurl<span class="opttype">String</span><div class="optdefault">默认值:当前页面网址</div><p>用户授权成功后的回跳页面地址，如不设置则为当前页面网址。回跳页面地址必须与appkey匹配<sup><a target="_blank" href="http://mat1.gtimg.com/app/openjs/static/images/uri_explaination.jpg">[链]</a></sup>，否则无法完成授权。建议开发者在服务器上部署一个带有提示性文字的html文件，并把callbackurl指向这个文件，以带来更好的用户体验。</p></div> <div class="option">autoclose<span class="opttype">Boolean</span><div class="optdefault">默认值:true(自动关闭授权窗口)</div><p>默认自动关闭授权窗口，授权页面一旦回跳到开发者指定的<em>callbackurl</em>就立刻关闭授权窗口。为假则没有此操作，开发者需要自行关闭窗口 (调用浏览器的window.close接口)。</p></div> <div class="option">samewindow<span class="opttype">Boolean</span><div class="optdefault">默认值:false(弹新窗口授权)</div><p>默认为弹新窗口授权，否则在同一窗口完成授权(类似OAuth1.0的体验)，此方法用来解决某些浏览器安装了第三方弹窗屏蔽插件，造成无法授权的问题。</p><p>注意，在此情况下开发者必须自己处理授权返回的token，如果您不想编写代码，也可以使用我们提供的通用方案<sup><a target="_blank" href="http://mat1.gtimg.com/app/openjs/static/downloads/openjscallback.zip">[链]</a></sup>。</p><p>在一般情况下，开发者无须担心弹出的授权窗口被浏览器屏蔽，因为授权行为一般是由用户主动点击触发，浏览器不会进行屏蔽。</p> <pre class="code">
+<a class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("samewindow.html")' href="#*samewindow.html"></a>
+&lt;script&gt;
+    // 注意：
+    // 采用弹窗授权模式的应用可以不用这样构造callbackurl
+    // 以下代码只针对samewindow为true的情况，并且采用通用方案时
+    // 使用
+
+    // path_to_callbackurl 是指您部署的通用方案网址
+    // return_to 后的参数 your_app_url 是指用户成功授权后页面要
+    // 跳转到的网址，一般应该是应用的入口
+    // appkey 后的参数 your_appkey 是固定字段，指开发者的appkey
+    T.init({
+        appkey: 800000006,
+        samewindow: true,
+        callbackurl:["path_to_callbackurl?"
+                    ,'return_to=','your_app_url'
+                    ,'&amp;appkey=',your_appkey].join("")
+    })
+&lt;/script&gt;
+</pre> </div> <div class="option">synclogin<span class="opttype">Boolean</span><div class="optdefault">默认值:false</div><p>默认为不使用QQ登录态授权。若该项为真，当<a href="#login">T.login</a>被调用时，首先尝试使用QQ登录态授权当前应用，如失败则弹新窗口授权）。</p></div> <div class="option">pingback<span class="opttype">Boolean</span><div class="optdefault">默认值:true(发送报告)</div><p>向服务器发送技术报告，帮助我们更好的完善OpenJS。</p></div> </div> <br/> 若为腾讯域内应用<sup><a href="#什么是腾讯域内应用">[链]</a></sup>，<a href="#init">T.init</a> 参数表变化如下：<br/> <br/> <div class="options"> <div class="argument">inInitOpts<span class="optrequired">必选</span><span class="opttype">Map</span></div> <div class="option">appkey<span class="optrequired">必选</span><span class="opttype">String</span><div class="optdefault">默认值:无</div><p>开放平台appkey，据协议和平台的差异性有时又叫appid或client id。</p></div> <div class="option light">showappinfo<span class="opttype">Boolean</span><div class="optdefault">默认值:true(显示应用信息)</div><p>若为真当用户首次使用你的应用时，将显示应用信息及授权按钮。为假则忽略授权步骤，直接获取用户的授权。</p></div> <div class="option del">callbackurl<span class="opttype del">String</span><div class="optdefault del">默认值:当前页面网址</div><p>用户授权成功后的回跳页面地址，如不设置则为当前页面网址。回跳页面地址必须与appkey匹配<sup><a target="_blank" href="http://mat1.gtimg.com/app/openjs/static/images/uri_explaination.jpg">[链]</a></sup>，否则无法完成授权。</p></div> <div class="option del">autoclose<span class="opttype del">Boolean</span><div class="optdefault del">默认值:true(自动关闭授权窗口)</div><p>默认自动关闭授权窗口，否则需开发者自行关闭回跳页面窗口。</p></div> <div class="option del">samewindow<span class="opttype del">Boolean</span><div class="optdefault del">默认值:false(弹新窗口授权)</div><p>默认为弹新窗口授权，否则在同一窗口授权，在此情况下开发者须自己处理授权返回的token，或使用我们提供的通用方案<sup><a target="_blank" href="http://mat1.gtimg.com/app/openjs/static/downloads/openjscallback.zip">[链]</a></sup>。开发者无须担心弹出的授权窗口被浏览器屏蔽，因为授权行为一般是由用户主动点击触发，浏览器不会进行屏蔽。</p> </div> <div class="option del">synclogin<span class="opttype del">Boolean</span><div class="optdefault del">默认值:false</div><p>默认为不使用QQ登录态授权。若该项为真，当<a href="#login">T.login</a>被调用时，首先尝试使用QQ登录态授权当前应用，如失败则弹新窗口授权）。</p></div> <div class="option">pingback<span class="opttype">Boolean</span><div class="optdefault">默认值:true(发送报告)</div><p>向服务器发送技术报告，帮助我们更好的完善OpenJS。</p></div> </div> <p class="paragraph">§</p> <p id="login" class="intro"><b class="header">login</b><span class="code">T.login(inSuccessHandler,inFailHandler)</span><br/> 用腾讯微博帐号登录授权应用，并根据授权结果回调相应函数。</p> <pre class="code">
+<a class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("login.html")' href="#*login.html"></a>
+&lt;script&gt;
+    T.login(function (loginStatus) {
+        alert(loginStatus.nick);
+    },function (loginError) {
+        alert(loginError.message);
+    });
+&lt;/script&gt;
+</pre> <div class="options"> <div class="argument">inSuccessHandler(inLoginStatus)<span class="opttype">Function</span><div class="optdefault">默认值:无</div><p>用户登录授权成功后要执行的函数。</p></div> <div class="option">inLoginStatus<span class="opttype">Map</span><div class="optdefault">回调数据</div><p>包含用户登录信息。</p> <div class="option">access_token <span class="desc">授权后获得的OAuth2.0 Accesstoken</span></div> <div class="option">name <span class="desc">微博用户名</span></div> <div class="option">nick <span class="desc">微博昵称</span></div> </div> <div class="argument">inFailHandler(inLoginError)<span class="opttype">Function</span><div class="optdefault">默认值:无</div><p>用户登录授权失败后要执行的函数。</p></div> <div class="option">inLoginError<span class="opttype">Map</span><div class="optdefault">回调数据</div><p>包含的用户登录失败信息。</p> <div class="option">message <span class="desc">失败原因描述</span></div> </div> </div> <p class="paragraph">§</p> <p id="logout" class="intro"><b class="header">logout</b><span class="code">T.logout(inHandler)</span><br/> 登出用户，清除用户授权信息。</p> <div class="options"> <div class="argument">inHandler<span class="opttype">Function</span><div class="optdefault">默认值:无</div><p>用户登出后要执行的函数。</p></div> </div> <p class="paragraph">§</p> <p id="loginstatus" class="intro"><b class="header">loginStatus</b><span class="code">T.loginStatus()</span><br/> 获取用户登录信息，如用户已登录返回包含access_token的Map对象，如未登录返回undefined。</p> <p class="paragraph">§</p> <p id="api" class="intro"><b class="header">api</b><span class="code">T.api(inName, inParamMap, inDataType, inType, inOverride)</span><br/> 调用腾讯微博API<sup><a target="_blank" href="http://wiki.open.t.qq.com/index.php/API%E6%96%87%E6%A1%A3">[链]</a></sup>，返回Defer对象<sup><a target="_blank" href="http://wiki.open.t.qq.com/index.php/Open-js/DeferredObject">[链]</a></sup>。</p> <pre class="code">
+<a class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("api.html")' href="#*api.html"></a>
+&lt;script&gt;
+    T.api("/user/info")
+     .success(function (response){
+          alert(response.nick);
+      })
+     .error(function (code, message) {
+          alert(message);
+      });
+&lt;/script&gt;
+</pre> 也支持如下书写方式，连续调用多个独立的API，也可参考<a href="#task">T.task</a>方法。 <pre class="code">
+<a class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("api_muti.html")' href="#*api_muti.html"></a>
+&lt;script&gt;
+    T.api("/user/info")
+     .success(function (response){
+          alert(response.nick);
+      })
+     .error(function (code, message) {
+          alert(message);
+      })
+     .api("/statuses/home_timeline")
+     .success(function (response) {
+          alert(response);
+      })
+     .error(function (code, message) {
+      });
+&lt;/script&gt;
+</pre> <div class="options"> <div class="argument">inName<span class="optrequired">必选</span><span class="opttype">String</span><div class="optdefault">默认值:无</div><p>要调用的API名称，如"/t/add"。（暂不支持"/t/add_pic"）</p></div> <div class="argument">inParamMap<span class="opttype">Map</span><div class="optdefault">默认值:无</div><p>该API对应的参数列表，如{content:"test",clientip:"123.123.123.123"}，参数表中可忽略format字段，该字段由inDataType指定。</p></div> <div class="argument">inDataType<span class="opttype">String</span><div class="optdefault">默认值:"json"</div><p>返回的数据格式，"json"或"xml"。</p></div> <div class="argument">inType<span class="opttype">String</span><div class="optdefault">默认值:"get"</div><p>请求方法，"get"或"post"，建议调用写接口统一用"post"。</p></div> <div class="argument">inOverride<span class="opttype">Map</span><div class="optdefault">默认值:无</div><p>覆盖当前使用的appkey和accessToken，此选项使T.api接口可以独立使用。</p><div class="option">appkey <span class="desc">使用此appkey发出api请求</span></div><div class="option">accesstoken <span class="desc">使用此accesstoken发出api请求。</span></div></div> </div> <p class="paragraph">§</p> <p id="tokenready" class="intro"><b class="header">tokenReady</b><span class="code">T.tokenReady(inHandler)</span><br/> 注册回调函数，inHandler在用户登录态确定后执行。</p> <pre class="code">
+<a class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("tokenReady.html")' href="#*tokenReady.html"></a>
+&lt;script&gt;
+    T.tokenReady(function () {
+        if (T.loginStatus()) {
+            alert("已登录");
+        } else {
+            alert("未登录");
+        }
+    });
+&lt;/script&gt;
+</pre> <div class="options"> <div class="argument">inHandler<span class="opttype">Function</span><div class="optdefault">默认值:无</div><p>用户登录态确定后要执行的函数。</p></div> </div> <p class="paragraph">§</p> <p id="documentready" class="intro"><b class="header">documentReady</b><span class="code">T.documentReady(inHandler)</span><br/> 注册回调函数，inHandler在DOM树可用后执行。</p> <pre class="code">
+<a class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("documentReady.html")' href="#*documentReady.html"></a>
+&lt;script&gt;
+    T.documentReady(function () {
+        var div = document.createElement("div");
+        div.innerHTML = "DOM ready";
+        document.body.appendChild(div);
+    });
+&lt;/script&gt;
+</pre> <div class="options"> <div class="argument">inHandler<span class="opttype">Function</span><div class="optdefault">默认值:无</div><p>DOM树可用后要执行的函数。</p></div> </div> <p class="paragraph">§</p> <p id="ready" class="intro"><b class="header">ready</b><span class="code">T.ready(inHandler)</span><br/> 注册回调函数，inHandler在<a href="#tokenready">tokenReady</a>和<a href="#documentready">documentReady</a>后执行。</p> <pre class="code">
+<a class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("ready.html")' href="#*ready.html"></a>
+&lt;script&gt;
+    T.ready(function () {
+        var stat = T.loginStatus(),
+            bar = document.createElement('div'),
+            str;
+    
+        if (stat) {
+            str = '欢迎' + stat.nick;
+        } else {
+            str = '未登录';
+        }
+    
+        bar.innerHTML = str;
+        document.body.appendChild(bar);
+    });
+&lt;/script&gt;
+</pre> <div class="options"> <div class="argument">inHandler<span class="opttype">Function</span><div class="optdefault">默认值:无</div><p><a href="#tokenready">tokenReady</a>和<a href="#documentready">documentReady</a>后要执行的函数。</p></div> </div> <p class="paragraph">§</p> <p id="bind" class="intro"><b class="header">bind</b><span class="code">T.bind(inEventName, inHandler)</span><br/> 绑定事件<em>inEventName</em>，此事件发生时执行<em>inHandler</em>。</p> <pre class="code">
+<a class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("bind.html")' href="#*bind.html"></a>
+&lt;script&gt;
+    T.bind("ready",function () {
+        alert("ready");
+    });
+&lt;/script&gt;
+</pre> <div class="options"> <div class="argument">inEventName<span class="optrequired">必选</span><span class="opttype">String</span><div class="optdefault">默认值:无</div><p id="openjs事件">事件名称，可为OpenJS的事件（下表），也可自定义。</p></div> <div class="option">UserLoggedIn <span class="desc">用户授权后触发，参考<a href="#login">T.login</a>。</span></div> <div class="option">UserLoginFailed <span class="desc">用户拒绝授权后触发，参考<a href="#login">T.login</a>。</span></div> <div class="option">UserLoggedOut <span class="desc">登出后触发，参考<a href="#logout">T.logout</a>。</span></div> <div class="option">tokenReady <span class="desc">token准备完毕后触发，参考<a href="#tokenready">T.tokenReady</a>。</span></div> <div class="option">documentReady <span class="desc">DOM树可用后触发，参考<a href="#documentready">T.documentReady</a>。</span></div> <div class="option">ready <span class="desc">token准备完毕并且DOM树可用后触发，参考<a href="#ready">T.ready</a>。</span></div> <div class="argument">inHandler(inEventData*)<span class="optrequired">必选</span><span class="opttype">Function</span><div class="optdefault">默认值:无</div><p>事件发生时要执行的函数</p></div> <div class="option">inEventData<span class="opttype">Mixed</span><div class="optdefault">事件数据，参考<a href="#trigger">T.trigger</a>。</div></div> </div> <p class="paragraph">§</p> <p id="unbind" class="intro"><b class="header">unbind</b><span class="code">T.unbind(inEventName, inHandler)</span><br/> 解除事件绑定<em>inEventName</em>，返回布尔值，表示解除绑定是否成功。</p> <div class="options"> <div class="argument">inEventName<span class="optrequired">必选</span><span class="opttype">String</span><div class="optdefault">默认值:无</div><p>事件名称，可为<a href="#openjs事件">OpenJS的事件</a>，也可自定义。</p></div> <div class="argument">inHandler<span class="optrequired">必选</span><span class="opttype">Function</span><div class="optdefault">默认值:无</div><p>要解除绑定的函数。</p></div> </div> <p class="paragraph">§</p> <p id="trigger" class="intro"><b class="header">trigger</b><span class="code">T.trigger(inEventName, inEventData*)</span><br/> 手动触发事件<em>inEventName</em>，返回数组，包含回调函数执行后的系列返回值。</p> <pre class="code">
+<a class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("trigger.html")' href="#*trigger.html"></a>
+&lt;script&gt;
+    T.bind("myEvent",function (myEventData) {
+        alert(myEventData);
+    });
+    T.trigger("myEvent","myData");
+&lt;/script&gt;
+</pre> <div class="options"> <div class="argument">inEventName<span class="optrequired">必选</span><span class="opttype">String</span><div class="optdefault">默认值:无</div><p>自定义的事件名称，如无特殊需要，不建议手动触发<a href="#openjs事件">OpenJS的事件</a>。</p></div> <div class="argument">inEventData<span class="opttype">Mixed</span><div class="optdefault">默认值:无</div><p>事件数据，参考<a href="#bind">T.bind</a></p></div> </div> <p class="paragraph">§</p> <p id="once" class="intro"><b class="header">once</b><span class="code">T.once(inEventName, inHandler)</span><br/> 与<a href="#bind">T.bind</a>一样，区别在于<em>inHanlder</em>执行后自动解除绑定。</p> <pre class="code">
+<a class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("once.html")' href="#*once.html"></a>
+&lt;script&gt;
+    T.once("myEvent",function (myEventData) {
+        alert(myEventData);
+    });
+    T.trigger("myEvent","myEventData1");
+    T.trigger("myEvent","myEventData2");
+&lt;/script&gt;
+</pre> <p class="paragraph">§</p> <p id="ajax" class="intro"><b class="header">ajax</b><span class="code">T.ajax(inAjaxConfig)</span><br/> AJAX请求，返回Defer对象<sup><a target="_blank" href="http://wiki.open.t.qq.com/index.php/Open-js/DeferredObject">[链]</a></sup>。</p> <pre class="code">
+<a class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("ajax.html")' href="#*ajax.html"></a>
+&lt;script&gt;
+    T.ajax({
+        url: "ajaxsample.json"
+    }).success(function (response) {
+        alert(response);
+    }).error(function (code, message) {
+        alert(message);
+    });
+&lt;/script&gt;
+</pre> <div class="options"> <div class="argument">inAjaxConfig<span class="optrequired">必选</span><span class="opttype">Map</span><div class="optdefault">默认值:无</div><p>AJAX请求配置。</p></div> <div class="option">url<span class="optrequired">必选</span><span class="opttype">String</span><div class="optdefault">默认值：无</div><p>请求网址</p></div> <div class="option">type<span class="opttype">String</span><div class="optdefault">默认值："get"</div><p>请求类型，<em>get</em>或<em>post</em>。</p></div> <div class="option">data<span class="opttype">String<span class="vsep">|</span>Map</span><div class="optdefault">默认值：无</div><p>请求数据。</p></div> <div class="option">dataType<span class="opttype">String</span><div class="optdefault">默认值："json"（数据转换为JSON对象）</div><p>返回结果的数据格式，<em>json</em>或<em>xml</em>或<em>text</em>。</p></div> <div class="option">cache<span class="opttype">Boolean</span><div class="optdefault">默认值：false（不允许缓存）</div><p>GET类型的HTTP请求会被浏览器缓存。</p></div> <div class="option">async<span class="opttype">String</span><div class="optdefault">默认值："async"（异步请求）</div><p>请求编程类型<em>async</em>或<em>sync</em>，异步或同步。</p></div> </div> <p class="paragraph">§</p> <p id="jsonp" class="intro"><b class="header">jsonp</b><span class="code">T.jsonp(inJsonpConfig)</span><br/> JSONP<sup><a target="blank" href="http://en.wikipedia.org/wiki/JSONP">[链]</a></sup>请求，返回Defer对象。<sup><a target="_blank" href="http://wiki.open.t.qq.com/index.php/Open-js/DeferredObject">[链]</a></sup>。</p> <pre class="code">
+<a class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("jsonp.html")' href="#*jsonp.html"></a>
+&lt;script&gt;
+    T.jsonp({
+        url: "jsonpurl"
+    }).success(function (response) {
+        alert(response);
+    }).error(function (code, message) {
+        alert(message);
+    });
+&lt;/script&gt;
+</pre> <div class="options"> <div class="argument">inJsonpConfig<span class="optrequired">必选</span><span class="opttype">Map</span><div class="optdefault">默认值:无</div><p>jsonp请求配置。</p></div> <div class="option">url<span class="optrequired">必选</span><span class="opttype">String</span><div class="optdefault">默认值：无</div><p>请求网址</p></div> <div class="option">data<span class="opttype">String<span class="vsep">|</span>Map</span><div class="optdefault">默认值：无</div><p>附加在url的请求串。</p></div> <div class="option">dataType<span class="opttype">String</span><div class="optdefault">默认值："json"（数据转换为JSON对象）</div><p>返回结果的数据格式，<em>json</em>或<em>xml</em>或<em>text</em>。</p></div> <div class="option">cache<span class="opttype">Boolean</span><div class="optdefault">默认值：false（不允许缓存）</div><p>GET类型的HTTP请求会被浏览器缓存。</p></div> <div class="option">charset<span class="opttype">String</span><div class="optdefault">默认值："utf-8"</div><p>所请求文件编码</p></div> </div> <p class="paragraph">§</p> <p id="script" class="intro"><b class="header">script</b><span class="code">T.script(inScriptConfig)</span><br/> 异步引入其它script，返回Defer对象<sup><a target="_blank" href="http://wiki.open.t.qq.com/index.php/Open-js/DeferredObject">[链]</a></sup>。</p> <pre class="code">
+<a class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("script.html")' href="#*script.html"></a>
+&lt;script&gt;
+    T.script({
+        url: "http://code.jquery.com/jquery-1.7.2.min.js"
+    }).success(function () {
+        alert($);
+    }).error(function (code, message) {
+        alert(message);
+    });
+&lt;/script&gt;
+</pre> <div class="options"> <div class="argument">inScriptConfig<span class="optrequired">必选</span><span class="opttype">Map</span><div class="optdefault">默认值:无</div><p>script请求配置。</p></div> <div class="option">url<span class="optrequired">必选</span><span class="opttype">String</span><div class="optdefault">默认值：无</div><p>请求网址</p></div> <div class="option">data<span class="opttype">String<span class="vsep">|</span>Map</span><div class="optdefault">默认值：无</div><p>附加在url的请求串。</p></div> <div class="option">cache<span class="opttype">Boolean</span><div class="optdefault">默认值：true（允许缓存）</div><p>GET类型的HTTP请求会被浏览器缓存。</p></div> <div class="option">charset<span class="opttype">String</span><div class="optdefault">默认值："utf-8"</div><p>所请求文件编码</p></div> </div> <p class="paragraph">§</p> <p id="task" class="intro"><b class="header">task</b><span class="code">T.task(inDeferred*)</span><br/> 创建任务组，同时完成多项异步任务，这些任务中如果有任一项失败，整个task失败，返回Defer对象<sup><a target="_blank" href="http://wiki.open.t.qq.com/index.php/Open-js/DeferredObject">[链]</a></sup>。</p> <pre class="code">
+<a class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("task.html")' href="#*task.html"></a>
+&lt;script&gt;
+    T.task(
+          T.api("/statuses/home_timeline"),
+          T.api("/statuses/public_timeline")
+      )
+     .success(function (homeData, publicData) {
+          alert([homeData[0], publicData[0]]);
+      })
+     .error(function (code, message) {
+          alert(message);
+      });
+&lt;/script&gt;
+</pre> <div class="options"> <div class="argument">inDeferred<span class="optrequired">必选</span><span class="opttype">Object</span><div class="optdefault">默认值:无</div><p>返回Defer对象的一个或多个异步请求。</p></div> </div> <p class="paragraph">§</p> <p id="find" class="intro"><b class="header">find</b><span class="code">T.find(selector, context, result)</span><br/> OpenJS集成了jQuery的选择器引擎<a target="_blank" href="http://sizzlejs.com/">Sizzle</a>，以帮助开发者进行高效率开发。返回数组，包含匹配到的DOM元素。</p> <pre class="code">
+<a class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("find.html")' href="#*find.html"></a>
+&lt;script&gt;
+    T.documentReady(function () {
+        alert(T.find("ul > li"));
+    });
+&lt;/script&gt;
+</pre> <div class="options"> <div class="argument">selector<span class="optrequired">必选</span><span class="opttype">String</span><div class="optdefault">默认值:无</div><p>选择指令。更多选择DOM元素的技巧，请参考<a target="_blank" href="https://github.com/jquery/sizzle/wiki/Sizzle-Home">Sizzle文档</a>。</p></div> <div class="argument">context<span class="opttype">DOMElement</span><div class="optdefault">默认值:document</div><p>选择指令的上下文环境。</p></div> <div class="argument">result<span class="opttype">Array</span><div class="optdefault">默认值:无</div><p>结果存储的数组。</p></div> </div> <p class="paragraph">§</p> <p id="localstorage" class="intro"><b class="header">localStorage</b><span class="code">T.localStorage</span><br/> 跨浏览器的数据本地存储对象，开发者可以使用此技术提升用户体验。</p> <pre class="code">
+<a class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("localStorage.html")' href="#*localStorage.html"></a>
+&lt;script&gt;
+    T.localStorage.set("mykey", "mydata");
+    alert(T.localStorage.get("mykey"));
+&lt;/script&gt;
+</pre> <div class="options"> <div class="argument">set(key, value, expires)<span class="opttype">Function</span><p>保存数据到本地（请勿保存敏感数据）。</p></div> <div class="option">key <span class="desc">键名</span></div> <div class="option">value <span class="desc">键值</span></div> <div class="option">expires <span class="desc">可选，保存期限（以天为单位），默认7天。</span></div> <div class="argument">get(key, defaultValue)<span class="opttype">Function</span><p>从本地获取数据。</p></div> <div class="option">key <span class="desc">键名</span></div> <div class="option">defaultValue <span class="desc">可选，默认的返回值</span></div> <div class="argument">del(key)<span class="opttype">Function</span><p>从本地删除数据。</p></div> <div class="option">key <span class="desc">键名</span></div> </div> <p class="paragraph">§</p> <p id="browser" class="intro"><b class="header">browser</b><span class="code">T.browser</span><br/> 提供丰富的浏览器信息。</p> <pre class="code">
+<a class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("browser.html")' href="#*browser.html"></a>
+&lt;script&gt;
+    if (T.browser.msie && T.browser.version == 6) {
+        // 浏览器为IE6
+        // do something
+    }
+&lt;/script&gt;
+</pre> <div class="options"> <div class="argument">version<span class="opttype">String<span class="vsep">|</span>Number</span><p>浏览器的版本信息。若浏览器类型为IE，该值为数字型，为准确的IE版本号。否则为字符串，是从UserAgent<sup><a target="_blank" href="http://en.wikipedia.org/wiki/User_agent">[链]</a></sup>字段中提取出的具有参考价值版本号。</p></div> <div class="argument">engine<span class="opttype">String</span><p>包含检测到的浏览器内核信息。</p> <pre class="code">
+    if(T.browser.engine == 'webkit') {
+        // do something
+    } 
+    // 等同于
+    if(T.browser.webkit) {
+        // do something
+    }
+</pre></div> <div class="option">webkit <span class="desc">webkit内核的浏览器，如Chrome,Safari等</span></div> <div class="option">opera <span class="desc">opera内核，opera浏览器</span></div> <div class="option">msie <span class="desc">IE系列浏览器</span></div> <div class="option">mozilla <span class="desc">如Firefox,Netscape等</span></div> <div class="option">unknown <span class="desc">其它内核的浏览器</span></div> <div class="argument">platform<span class="opttype">Map</span><p>浏览器所在平台侦测。</p></div> <div class="option">name <span class="desc">平台名称，如"pc","iPhone","iPad"等</span><pre class="code">
+    //判断是否为iPhone
+    if (T.browser.platform.name == 'iPhone') {
+        //do something
+    }
+    等同于
+    if (T.browser.platform.iPhone) {
+        //do something
+    }
+</pre></div> <div class="option">pc <span class="desc">为true时代表浏览器在PC平台（台式机，笔记本）上运行</span></div> <div class="option">mobile <span class="desc">为true时代表浏览器在移动平台（手机，平板）上运行</span></div> <div class="argument">feature<span class="opttype">Map</span><p>浏览器是否支持某项特性侦测。</p></div> <div class="option">cookie <span class="desc">为true时代表支持Cookie</span></div> <div class="option">flash <span class="desc">为true时代表支持Flash。<br/>&nbsp;&nbsp;&nbsp;&nbsp;进一步的，可以通过flash.version获得flash player版本号。通过flash[property]检查flash player的中的某个特性是否被支持。以下代码检测浏览器是否支持flash以及是否支持externalInterface<sup><a target="_blank" href="http://help.adobe.com/zh_CN/FlashPlatform/reference/actionscript/3/flash/external/ExternalInterface.html">[链]</a></sup>。</span><pre class="code">
+    if(T.browser.feature.flash) {
+        // 浏览器支持flash
+        if(T.browser.feature.flash.externalinterface) {
+            //flash player支持externalInterface
+        }
+    } 
+</pre></div> <div class="option">userdata <span class="desc">为true时代表支持UserData<sup><a target="_blank" href="http://msdn.microsoft.com/en-us/library/ms531424(v=vs.85).aspx">[链]</a></sup></span></div> <div class="option">postmessage <span class="desc">为true时代表支持postMessage</span></div> <div class="option">canvas <span class="desc">为true时代表支持Canvas</span></div> <div class="option">webgl <span class="desc">为true时代表支持WebGL</span></div> <div class="option">geolocation <span class="desc">为true时代表支持geolocation</span></div> <div class="option">websqldatabase <span class="desc">为true时代表支持websqldatabase</span></div> <div class="option">indexeddb <span class="desc">为true时代表支持indexedDB</span></div> <div class="option">websocket <span class="desc">为true时代表支持WebSocket</span></div> <div class="option">localstorage <span class="desc">为true时代表支持localStorage</span></div> <div class="option">sessionstorage <span class="desc">为true时代表支持sessionStorage</span></div> <div class="option">webworker <span class="desc">为true时代表支持WebWorker</span></div> <div class="option">applicationcache <span class="desc">为true时代表支持applicationCache</span></div> <div class="argument">os<span class="opttype">Map</span><p>操作系统侦测。</p><pre class="code">
+    if(T.browser.os.name == 'windows') {
+        // do something
+    } 
+    // 等同于
+    if(T.browser.os.windows) {
+        // do something
+    }
+</pre></div> <div class="option">name <span class="desc">操作系统名称，可能的值为"windows","mac","linux","unix","unknown"</span></div> <div class="argument">viewport<span class="opttype">Map</span><p>浏览器可见区域大小。注意，该值是实时变化的。</p></div> <div class="option">width <span class="desc">浏览器窗口可见区域的宽</span></div> <div class="option">height <span class="desc">浏览器窗口可见区域的高</span></div> <div class="argument">rendererMode<span class="opttype">Map</span><p>浏览器进入的渲染模式侦测。</p></div> <div class="option">standard <span class="desc">为true时代表浏览器当前的渲染模式为标准</span></div> <div class="option">quirks <span class="desc">为true时代表浏览器当前的渲染模式为怪异模式（兼容模式）</span></div> </div> <p class="paragraph">§</p> <p id="template" class="intro"><b class="header">template</b><span class="code">T.template(inTemplateName)</span><br/> 小型js模板引擎<sup><a target="_blank" href="http://ejohn.org/blog/javascript-micro-templating/">[链]</a></sup>，返回模板对象，使用此对象可以方便的构造html。</p> <pre class="code">
+<a class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("template.html")' href="#*template.html"></a>
+&lt;script&gt;
+// 显示一个简单二维表格并隔行换色
+var table = T.template("mytable");
+table.add('&lt;% for(var i=0,l=data.length; i&lt;l; i++) {  %&gt;')
+     .add('&lt;% var name= data[i][0],score=data[i][1],highlight= i%2==0; %&gt;')
+     .add('&lt;tr style="background:&lt;%=highlight ? \"red\" : \"green\" %&gt;;"&gt;')
+     .add('&lt;td&gt;&lt;%=name%&gt;&lt;/td&gt;&lt;td&gt;&lt;%=score%&gt;&lt;/td&gt;')
+     .add('&lt;/tr&gt;')
+     .add('&lt;% } %&gt;')
+   .wrapTag('tbody','table')
+   .data('data',[["张三",90],["李四",85],["王五",80],["柳六",100]]);
+
+T.documentReady(function () {
+    document.body.innerHTML = table.render();
+});
+&lt;/script&gt;
+</pre> <div class="options"> <div class="argument">inTemplateName<span class="opttype">String</span><div class="optdefault">默认值:"unknown"</div><p>模板名。</p></div> </div> <br/> 模板对象的方法<br/> <br/> <div class="options"> <div class="argument">add(inTplStr)<span class="opttype">Function</span><p>添加模板字符串。</p></div> <div class="option">inTplStr <span class="desc">模板字符串</span></div> <div id="templatedata" class="argument">data(inTplData,inOverWrite)<span class="opttype">Function</span><p>添加模板数据。data方法支持多种写法，以下调用方法效果相同。</p> <pre class="code">
+<a class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("template_add.html")' href="#*template_add.html"></a>
+&lt;script&gt;
+    var tp = T.template("mytemplate");
+    tp.add('&lt;ol&gt;')
+      .add('&lt;li&gt;&lt;%=x%&gt;&lt;/li&gt;')
+      .add('&lt;li&gt;&lt;%=y%&gt;&lt;/li&gt;')
+      .add('&lt;/ol&gt;');
+
+    var result1 = tp.data({"x":1,"y":2}).render();
+    tp.reset(false,true);
+
+    var result2 = tp.data(["x",1,"y",2]).render();
+    tp.reset(false,true);
+
+    var result3 = tp.data("x",1).data('y',2).render();
+    tp.reset(false,true);
+
+    // 采用这种写法必须明确指定inOverWrite
+    var result4 = tp.data("x",1,'y',2,true).render();
+    tp.reset(false,true);
+
+    alert(result1 && result1 == result2 && result2 == result3 && result3 == result4);
+&lt;/script&gt;
+</pre></div> <div class="option">inTplData <span class="desc">模板数据</span></div> <div class="option">inOverWrite <span class="desc">是否覆盖之前的模板数据</span></div> <div class="argument">wrapTag(inHtmlTag*)<span class="opttype">Function</span><p>快捷方法，把模板字符串头部与尾部附加html标签。</p></div> <div class="option">inHtmlTag <span class="desc">html标签，如tbody,table,div,iframe等</span></div> <div class="argument">renderWith(inTplData,inOverWrite)<span class="opttype">Function</span><p>指定模板数据，并输出模板渲染结果，参数及用法与<a href="#templatedata">data方法</a>完全一致。</p></div> <div class="option">inTplData <span class="desc">模板数据</span></div> <div class="option">inOverWrite <span class="desc">是否覆盖之前的模板数据</span></div> <div class="argument">render()<span class="opttype">Function</span><p>输出模板渲染结果，类型为字符串。</p></div> <div class="argument">reset(inResetTpl,inResetData)<span class="opttype">Function</span><p>重置模板字符串或重置模板数据。</p></div> <div class="option">inResetTpl <span class="desc">是否清空模板字符串</span></div> <div class="option">inResetData <span class="desc">是否清空模板数据</span></div> </div> <br/> 静态方法<br/> <br/> <div class="options"> <div class="argument">renderTemplate(inTplStr, inTplData)<span class="opttype">Function</span><p>使用模板数据<em>inTplData</em>渲染模板<em>inTplStr</em>，返回渲染后的模板字符串。</p></div> <div class="option">inTplStr <span class="desc">模板</span></div> <div class="option">inTplData <span class="desc">模板数据</span></div> </div> <p class="paragraph">§</p> <p id="component" class="intro"><b class="header">component</b><span class="code">T.component(inComponentName)</span><br/> 创建网站连接的腾讯微博组件，返回网站连接组件对象。</p> <pre class="code">
+<a class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("component.html")' href="#*component.html"></a>
+&lt;script&gt;
+    T.component("微评论").appkey('801126062').renderInto("body");
+&lt;/script&gt;
+</pre> <div class="options"> <div class="argument">inComponentName<span class="opttype">String</span><div class="optdefault">默认值:无</div><p>组件名称，目前仅支持"微评论"。</p></div> </div> <br/> 网站连接组件对象的公有方法<br/> <br/> <div class="options"> <div class="argument">dimension(width,height)<span class="opttype">Function</span><p>设置组件宽，高。</p></div> <div class="option">width <span class="desc">组件宽度</span></div> <div class="option">height <span class="desc">组件高度</span></div> <div class="argument">width(width)<span class="opttype">Function</span><p>设置组件宽度。</p></div> <div class="option">width <span class="desc">组件宽度</span></div> <div class="argument">height(height)<span class="opttype">Function</span><p>设置组件高度。</p></div> <div class="option">height <span class="desc">组件高度</span></div> <div class="argument">style(styleName)<span class="opttype">Function</span><p>设置组件样式。</p></div> <div class="option">styleName <span class="desc">组件样式名</span></div> <div class="argument">config(inConfig)<span class="opttype">Function</span><p>其它组件配置。</p></div> <div class="option">inConfig <span class="desc">组件配置Map对象</span></div> <div class="argument">renderInto(context)<span class="opttype">Function</span><p>在网站上渲染网站连接组件。</p></div> <div class="option">context <span class="desc">要渲染到的DOM节点或选择符<sup><a href="#find">[链]</a></sup>，默认使用选择符选中的第一个元素。</span></div> <div class="argument">render()<span class="opttype">Function</span><p>在网站上渲染网站连接组件，渲染该组件到组件预先指定的id。</p></div> </div> <br/> 微评论组件的私有方法<br/> <br/> <div class="options"> <div class="argument">appkey(inAppkey)<span class="opttype">Function</span><p>设置微评论组件的Appkey。</p></div> <div class="option">inAppkey <span class="desc">微评论组件的Appkey，如<em>801126062</em></span></div> <div class="argument">colors(colors*)<span class="opttype">Function</span><p>自定义微评论组件的外观。</p></div> <div class="option">colors <span class="desc">微评论组件颜色设置，如blue,green,#06c等。最多4个，依次代表背景色，评论背景色，边框色，主字色</span></div> </div> <h2 id="历史更新">历史更新</h2> <div class="options"> <div class="argument">版本: <a target="_blank" href="http://mat1.gtimg.com/app/openjs/v20.js">2.0</a><span class="optrequired">推荐使用</span><span class="opttype">2012.4</span><ul class="updatelist"> <li>增加<a href="#环境变量">环境变量</a>设置。</li> <li>增加 <a href="#template">模版</a> 方法。</li> <li>增加 <a href="#component">网站连接组件</a> 调用方法。</li> <li>进一步增强浏览器兼容性。</li> </ul></div> <div class="argument">版本: <a target="_blank" href="http://mat1.gtimg.com/app/vt/public/openjs/v15.js?v=1.5">1.5</a><span class="opttype">2012.1</span><ul class="updatelist"><li>由于某些接口不需要鉴权，如public_timeline，因此移除了T.api接口的登录态检查。若<a href="#api">T.api</a>如出现鉴权错误，请调用 <a href="#loginstatus">T.loginStatus</a> 检查登录态是否正常。</li><li>修复IE6,7下使用flash方案跨域数据乱序的错误。</li></ul></div> <div class="argument">版本: <a target="_blank" href="http://mat1.gtimg.com/app/vt/public/openjs/v10.js?v=1.0">1.0</a><span class="opttype">2011.10</span><p>初始版本</p></div> </div> <h2 id="常见问题">常见问题</h2> <div class="options"> <ol class="faq"> <li class="first"> <b>我在使用过程中遇到问题应该如何解决？</b><br/> 请首先查阅 <a target="_blank" href="http://wiki.open.t.qq.com/index.php/%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98FAQ">接口常见问题</a>。如果仍未解决，可以加入OpenJS专属QQ群 <em class="red">221677647</em>。如果你认为遇到了bug或是浏览器兼容性问题，可以在 <a target="_blank" href="http://code.google.com/p/openjs-project/issues/list">问题跟踪系统</a> 中提交你的问题，我们的开发人员会尽快跟踪处理。 </li> <li id="check_sign_error"> <b>check sign error？</b><br/> check sign error是调用api时最常见的一个错误，造成这个错误的原因是被调用的接口需要鉴权，而当前没有获得用户授权，<a href="#loginstatus">T.loginStatus()</a> 返回undefined。要解决这个问题，请首先查阅 <a href="http://wiki.open.t.qq.com/index.php/API%E6%96%87%E6%A1%A3">API文档</a> 确定被调用接口是否需要鉴权。 <p>若接口不需要鉴权而出现了鉴权错误，请检查传入的appkey是否正确，若appkey不正确也会产生此错误。</p> <p>若接口要求鉴权，而T.loginStatus()返回undefined，可以考虑使用 <a href="#login">T.login()</a> 获得用户授权后再调用接口，或调用 <a href="#api">T.api</a> 时声明accesstoken。</p> </li> <li id="fusion_api"> <b>OpenJS与fusion api有什么关系？它与其它js库兼容吗？</b><br/> OpenJS 和 Fusion api 没有关系，它们都是独立的js库。OpenJS可以与现有的js库或框架兼容，它会在使用者的网站上声明 <em>QQWB</em> 和 <em>T</em> 两个全局变量，它在运行过程中也会产生少量的带有特殊前缀的临时全局变量，不会影响其它js代码的执行。 </li> <li id="fusion_api"> <b>OpenJS是如何实现跨域数据提交的？</b><br/> 对于支持 <a target="_blank" href="https://developer.mozilla.org/en/DOM/window.postMessage">postMessage</a> 的浏览器，我们优先使用此方法，在其余浏览器我们采用flash提供的跨域机制完成数据传输(flashplayer要求支持ExternalInterface)，要查看浏览器是否支持这两种技术，请访问<a target="_blank" href="http://open.t.qq.com/open-js/doc/snippet/code/browser.html">此页面</a>。 </li> <li id="iframe_problem"> <b>用OpenJS开发的应用非嵌入的时候正常，用iframe嵌入到其它页面就不正常了，是不是OpenJS不支持iframe？</b><br/> OpenJS自带的鉴权机制会利用cookie保存用户的授权信息，当您的应用嵌入到另外一个页面时，就会遇到 <a target="_blank" href="http://msdn.microsoft.com/en-us/library/ms537343(v=vs.85).aspx">第三方cookie</a> 的问题，简单来说就是被嵌入非同源的页面无法读取或写入cookie。开发者只需要按照 <a href="http://viralpatel.net/blogs/how-to-set-third-party-cookies-with-iframe/">这篇教程</a> 在程序中输出 <em>p3p header</em> 即可。一般情况下，在腾讯微博应用频道上线的应用都是以iframe嵌入的，会遇到这个问题。 </li> <li id="authorization_information"> <b>用户授权了应用，这个授权可以持续多久有效？</b><br/> 使用OpenJS自带的授权机制进行授权，用户的授权信息会保存cookie里，如果用户不主动清除cookie并且 <a href="#logout">T.logout()</a> 没有被调用（实际上也是清除cookie），授权是一直有效的，否则的话用户需要重新授权。 </li> <li id="authorization_error"> <b>授权出错，redirect_uri与注册的应用网址不匹配？</b><br/> oauth2.0协议对外暴露了appid，为防止有人冒用其它人的appid让用户授权，非法获得用户的信任。我们要求授权后页面回跳的地址必须是该appid拥有者所指定的地址（应用网址），否则便阻止用户授权。<p>这可能会给开发者应用开发过程中的调试带来不便，我们建议在开发过程中采用配置HOSTS文件改变域名到IP映射的办法解决这个问题，或者也可以在开发阶段采用ip地址作为网址，应用提交审核或正式上线时再切换到域名。</p> </li> <li id="什么是腾讯域内应用"> <b>什么是腾讯域内应用？</b><br/> 腾讯域内应用，是指应用网址以<em>qq.com</em>结尾的应用，简称域内应用。<br/>OpenJS同时支持腾讯域内应用与域外应用的开发，两者的区别是授权画面不一样，域内应用采用浮层式的体验，域外应用采用弹窗的体验。<br/><p>注意，使用OpenJS开发的域内应用<em>document.domain</em>为<em>qq.com</em>。</p> OpenJS完美支持域内应用与域外应用互相迁移，意味者开发者无需更改任何代码即可把域外的应用迁移到域内使用，反之亦可。 </li> </ol> </div> <h2 id="成功案例">成功案例</h2> <div><a target="_blank" href="http://www.kaixin001.com/weibo/"><img alt="开心网" src="http://mat1.gtimg.com/app/openjs/static/images/kaixin.jpg" width="160" height="95"/></a><a target="_blank" href="http://mat1.gtimg.com/app/openjs/static/images/qplus_screenshot.png" title="q+应用截图" class="showcase"><img alt="腾讯Q+" src="http://mat1.gtimg.com/app/openjs/static/images/qplus.jpg" width="160" height="95"/></a><a href="#" title="你的应用" class="showcase"><img alt="你的应用" src="http://mat1.gtimg.com/app/openjs/static/images/yourapp.jpg" width="160" height="95"/></a></div> </div> <div class="bside"> <div class="snippetview" id="snippetview"> <iframe src="about:blank" id="snippetframe" frameBorder="0" width="100%" height="100%"></iframe> </div> </div> <script src="http://mat1.gtimg.com/app/appt/js/jquery-1.7.1.min.js"></script> <script src="http://mat1.gtimg.com/app/openjs/static/js/index_1.js"></script> <script type="text/javascript">var _gaq=_gaq||[];_gaq.push(["_setAccount","UA-30787688-1"]);_gaq.push(["_trackPageview"]);(function(){var b=document.createElement("script");b.type="text/javascript";b.async=true;b.src=("https:"==document.location.protocol?"https://ssl":"http://www")+".google-analytics.com/ga.js";var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(b,a)})();</script> </body> </html>

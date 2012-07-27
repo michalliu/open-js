@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>localstorage</title>
+<script src="//mat1.gtimg.com/app/openjs/openjs.js#debug=yes"></script>
+<script defer="defer">
+function save() {
+    var key = document.getElementById("key"),
+        value = document.getElementById("value"),
+        expires = document.getElementById("expires"),
+        result;
+
+    result = T.localStorage.set(key.value, value.value, parseInt(expires.value,10));
+
+    if (result) {
+        alert("保存成功");
+    } else {
+        alert("保存失败");
+    }
+}
+
+function get() {
+    var key = document.getElementById("key"),
+        result;
+    result = T.localStorage.get(key.value);
+    alert(result);
+}
+
+function del() {
+    var key = document.getElementById("key"),
+        result;
+
+    result = T.localStorage.del(key.value);
+
+    if (result) {
+        alert("删除成功");
+    } else {
+        alert("删除失败");
+    }
+}
+</script>
+</head>
+<body>
+<label>Key:</label><input id="key" type="text"/><br/>
+<label>Value:</label><input id="value" type="text"/><br/>
+<label>Expires:</label><input id="expires" type="text"/><br/>
+<input type="button" value="保存" onclick="save();"/>
+<input type="button" value="获取" onclick="get();"/>
+<input type="button" value="删除" onclick="del();"/>
+</body>
+</html>

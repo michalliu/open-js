@@ -1,0 +1,91 @@
+<!doctype html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="zh-CN"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="zh-CN"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js ie8 oldie" lang="zh-CN"> <![endif]-->
+<!--[if gt IE 8]><!--><html class="no-js" lang="zh-CN"> <!--<![endif]-->
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<title>请稍候</title>
+    <script src="//mat1.gtimg.com/app/openjs/openjs.js#autoboot=no&debug=yes"></script>
+</head>
+<body>
+<script>
+
+(function () {
+
+    var hashpos = location.href.lastIndexOf('#'),
+
+        search = location.search || '',
+    
+        returnto = search.match(/return_to=([^&^#]+)/),
+
+        appkey = search.match(/appkey=([^&^#]+)/);
+        
+    function jumpto(uri,timeout) { // 网址跳转
+
+        setTimeout(function () {
+
+            location.href = uri;
+
+        }, timeout * 1000);
+
+    }
+
+    if (!returnto) {
+
+        document.write('缺少return_to参数');
+
+        return;
+
+    } else if (!appkey) {
+
+        document.write('缺少appkey参数');
+
+        return;
+
+    } else if (hashpos == -1) {
+
+        document.write('获取授权信息失败');
+
+        return;
+    }
+
+    if (hashpos != -1) {
+    
+        try {
+
+            QQWB.bigtable.set("base","appkey",appkey[1]); // 设置appkey，未公开方法
+
+            QQWB.auth.logout(); // 先清除之前的授权信息
+    
+            QQWB._token.resolveResponse(location.href.slice(hashpos+1),false); // 解析并保存授权结果
+    
+        } catch (resolveResultException) {
+    
+            document.write('解析授权信息失败，' + resolveResultException); // 解析失败
+
+            return;
+        }
+    
+        if (QQWB.loginStatus()) {
+    
+            document.write('授权成功，页面跳转中，<a target="_self" href="' + returnto[1] +'">立即跳转</a>' );
+
+            jumpto(returnto[1],3);
+
+        } else {
+
+            document.write('授权失败，页面跳转中，<a target="_self" href="' + returnto[1] +'">立即跳转</a>' );
+
+            jumpto(returnto[1],3);
+    
+        }
+    
+    }
+
+}());
+</script>
+</body>
+</html>
+

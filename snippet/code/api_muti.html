@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>api > muti</title>
+<script src="//mat1.gtimg.com/app/openjs/openjs.js#debug=yes"></script>
+<script defer="defer">
+    T.init({appkey:800000006});
+    T.api("/user/info")
+     .success(function (response){
+          alert([response.data.nick,response.data.email]);
+      })
+     .error(function (code, message) {
+          alert(message);
+      })
+     .api("/statuses/home_timeline")
+     .success(function (response) {
+          alert(T.JSON.stringify(response).slice(0,200) + "...");
+      })
+     .error(function (code, message) {
+      });
+</script>
+</head>
+<body>
+<input type="button" value="登录授权" onclick="T.login();"/>
+<input type="button" value="登出" onclick="T.logout();"/>
+</body>
+</html>

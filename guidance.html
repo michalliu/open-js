@@ -1,0 +1,85 @@
+<!doctype html> <!--[if lt IE 7]><html class="no-js ie6 oldie" lang="zh-CN"><![endif]--> <!--[if IE 7]><html class="no-js ie7 oldie" lang="zh-CN"><![endif]--> <!--[if IE 8]><html class="no-js ie8 oldie" lang="zh-CN"><![endif]--> <!--[if gt IE 8]><!--><html class="no-js" lang="zh-CN"> <!--<![endif]--> <head> <meta charset="utf-8"> <title>openJS应用开发指南</title> <link href="http://mat1.gtimg.com/app/openjs/static/css/index.css" rel="stylesheet" type="text/css" media="all"/> <!--[if !IE]><link href="http://mat1.gtimg.com/app/openjs/static/css/webkitborder.css" rel="stylesheet" type="text/css" media="all"/><![endif]--> <script type="text/javascript">var _gaq=_gaq||[];_gaq.push(["_setAccount","UA-30787688-1"]);_gaq.push(["_trackPageview"]);(function(){var b=document.createElement("script");b.type="text/javascript";b.async=true;b.src=("https:"==document.location.protocol?"https://ssl":"http://www")+".google-analytics.com/ga.js";var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(b,a)})();</script> </head> <body> <div class="content"> <!--[if lt IE 7]><div class="reminder">浏览器太旧了，建议使用 <a target="_blank" href="http://www.google.com/chrome">chrome浏览器</a>。</div><![endif]--> <h2>OpenJS应用开发指南</h2> <p><a href="http://open.t.qq.com/open-js/doc/index.html">OpenJS</a> 适合开发<em>Javascript</em>驱动的网页应用程序，既可以单独使用，也可以结合服务器端程序使用。</p> <h2>开始之前</h2> <p>你需要 <a target="_blank" href="http://dev.open.t.qq.com/developer/">创建微博应用</a> ，请选择创建 <b>网页类型</b> 应用，创建应用时会要求填写 <b>应用网址</b> 。请留意，应用网址与AppKey是对应的，在随后的授权步骤中，如果检测到参数中的AppKey与应用网址不匹配就会阻止用户授权<sup><a target="_blank" href="http://mat1.gtimg.com/app/openjs/static/images/uri_explaination.jpg">[图]</a></sup>。</p> <h2>一般流程</h2> <p>成功获取AppKey后，就可以着手开发应用了。</p> <p>首先，需要在页面中引入OpenJS，请参考 <a href="http://open.t.qq.com/open-js/doc/index.html#开始使用">文档</a> ，如果有必要，可以 <a href="http://open.t.qq.com/open-js/doc/index.html#环境变量">设置环境变量</a> 。</p> <p>OpenJS加载后，须使用 <a href="http://open.t.qq.com/open-js/doc/index.html#init">T.init</a> 接口进行初始化，这个接口中除<em>AppKey</em>为必需参数外，其它参数均为可选，<em>pingback</em>为公共可选参数。<ol class="faq"><li class="first">若应用为域外应用 <em>callbackurl,autoclose,samewindow</em> 这三个参数决定授权窗口的行为，其中<em>callbackurl</em>决定授权窗口的回跳网址。<em>autoclose</em>决定授权页跳转后是否自动关闭。<em>samewindow</em>则决定授权窗口是否在同一窗口打开。</li><li class="last">若应用为域内应用， <em>showappinfo</em> 决定是否向用户展示应用信息，并询问用户获得授权。</li></ol>域内应用或域外应用的区别在于应用是否部署在qq.com或其子域下，OpenJS会自动检测当前应用的部署环境，启用相应参数。</p> <p>其次，使用 <a href="//open.t.qq.com/open-js/doc/index.html#login">login</a> , <a href="//open.t.qq.com/open-js/doc/index.html#logout">logout</a> , <a href="//open.t.qq.com/open-js/doc/index.html#loginStatus">loginStatus</a> 这组函数管理凭据，<em>login</em> 获取凭据，<em>logout</em> 注销凭据，<em>loginStatus</em> 检查是否有凭据或凭据是否有效。OpenJS的凭据信息保存在浏览器的Cookie里，Cookie域及路径由环境变量<em>cookieDomain，cookiePath</em>控制。<br/> </p> <p>其次，使用 <a href="//open.t.qq.com/open-js/doc/index.html#api">api</a> 调用腾讯微博 <a href="//wiki.open.t.qq.com/index.php/API%E6%96%87%E6%A1%A3">开放API</a> 接口。值得注意的是，此函数最后一个参数 <em>inOverride</em> 使开发者可以不使用OpenJS内置的凭据管理，自己维护凭据，直接调用开放接口。</p> <p>这样，一个应用的心脏部分就可以完成了。</p> <h2>应用案例</h2> <p>我们来详细解释如何实现一个最简单的应用 <a target="_blank" href="./guess/guess.html">猜猜看</a> 。</p> <p>首先，我们以同步的方式引入OpenJS，并开启调试模式。 <pre class="code">
+&lt;script src="http://mat1.gtimg.com/app/openjs/openjs.js#debug=yes"&gt;&lt;/script&gt;
+</pre> </p> <p>然后进行初始化，这里我们只指定AppKey，其它均为默认。 <pre class="code">
+T.init({appkey:100619194});
+</pre> </p> <p>然后我们定义两个函数，分别是登录和登出的动作。登录成功后，我们提示给用户一段文字，然后刷新网页。登录失败的话直接显示给用户。 <pre class="code">
+// 登录
+function login() {
+     T.login(function (loginstatus) {
+         document.body.innerHTML = "登录成功，正在跳转...";
+        setTimeout(function () {
+             location.reload();
+        }, 500);
+     },function (message) {
+         alert('登录失败，' + message.message);
+     });
+}
+</pre> 登出后直接刷新网页。 <pre class="code">
+// 登出
+function logout() {
+    T.logout(function () {location.reload()});
+}
+</pre> </p> <p>下面是应用的逻辑。<br/>第一部分，我们首先检查用户是否登录，若已登录则吧微博昵称显示出来，若未登录则显示登录菜单。<br/><br/>第二部分，若用户已登录，则调用 <em>/user/info</em> 这个接口，把听众数取到，并把结果显示给用户。 <pre class="code">
+// 主应用逻辑
+function main() {
+
+    var loginstatus = T.loginStatus(),
+        div = document.createElement('div'),
+        div2 = document.createElement('div'),
+
+        guess = T.template('guess'),
+        info = T.template('loginbar');
+
+// 第一部分
+if (loginstatus) {
+    info.add('欢迎，&lt;a href="http://t.qq.com/' + loginstatus.name +'"&gt;' + loginstatus.nick + '&lt;/a&gt;')
+        .add('，&lt;a href="#" onclick="logout();return false"&gt;登出&lt;/a&gt;')
+        .add('&lt;hr/&gt;')
+
+} else {
+
+    info.add('让我猜猜你有多少个听众吧，&lt;a href="#" onclick="login();return false;"&gt;点此登录&lt;/a&gt;')
+
+}
+
+div.innerHTML = info.render();
+
+document.body.appendChild(div);
+
+// 第二部分
+    if (loginstatus) {
+
+        T.api('/user/info', null, 'json', 'post')
+
+         .success(function (response) {
+             guess.add(['如果我猜的没错，你有',response.data.fansnum,'个听众了噢'].join(''));
+         })
+
+         .error(function () {
+             guess.add('你赢了，我什么也没猜出来');
+         })
+
+         .complete(function () {
+             div2.innerHTML = guess.render();
+             document.body.appendChild(div2);
+         });
+
+    }
+}
+</pre> </p> <p>最后，我们把主函数放在 <a href="http://open.t.qq.com/open-js/doc/index.html#ready">ready</a> 这个回调里执行。</p> <pre class="code">
+T.ready(main);
+</pre> <p>这样，我们就完成了这个简单的应用。</p> <h2>应用部署</h2> <p>OpenJS支持多种部署环境。 <ol class="faq"> <li class="first">若应用部署在自己的服务器，主域名非<em>qq.com</em>，授权的方式则采用授权窗口的方式。<a target="_blank" href="./guess/guess.html">查看演示</a> </li> <li>若应用部署在<em>qq.com</em>下，授权的方式则采用授权浮层。<a target="_blank" href="./guess/guess2.html">查看演示</a> </li> <li class="last">若应用部署在 <a target="_blank" href="http://app.t.qq.com/">腾讯微博应用频道</a> 下，则无需授权。因为授权信息会附加在应用的网址内，OpenJS会自动读取。例如，假如你的应用网址是 <pre class="code">http://app12345.app.com/sample.html</pre> 当你的应用在应用频道上线，并被用户打开时，实际访问网址会变成 <pre class="code">http://app12345.app.com/sample.html?wb_name=微博帐号&wb_nick=微博昵称#oauth2token=ACCESS_TOKEN</pre> 这样就达到应用频道内上线的应用使用OpenJS无需登录的效果，以下代码在应用频道可以实现发送微博。 <pre class="code">
+T.init({appkey:YOUR_APP_KEY});
+T.tokenReady(function () {
+    T.api('t/add',{
+            content: '微博内容',
+            clientip: '182.117.25.47'
+        },'json','post')
+     .success(function (response) {
+         alert('微博发表成功');
+     })
+     .error(function () {
+         alert('微博发表失败');
+     });
+});
+</pre> </li> </ol> </p> </div> </body> </html>

@@ -1,0 +1,27 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>template</title>
+<script src="//mat1.gtimg.com/app/openjs/openjs.js#debug=yes"></script>
+<script defer="defer">
+// 显示一个简单二维表格并隔行换色
+var table = T.template("mytable");
+table.add('<% for(var i=0,l=data.length; i<l; i++) {  %>')
+     .add('<% var name= data[i][0],score=data[i][1],highlight= i%2==0; %>')
+     .add('<tr style="background:<%=highlight ? \"red\" : \"green\" %>;">')
+     .add('<td><%=name%></td><td><%=score%></td>')
+     .add('</tr>')
+     .add('<% } %>')
+     .wrapTag('tbody','table')
+     .data('data',[["张三",90],["李四",85],["王五",80],["柳六",100]]);
+
+T.documentReady(function () {
+    document.body.innerHTML = table.render();
+});
+
+</script>
+</head>
+<body>
+</body>
+</html>

@@ -1,0 +1,16 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>trigger</title>
+<script src="//mat1.gtimg.com/app/openjs/openjs.js#debug=yes"></script>
+<script defer="defer">
+    T.bind("myEvent",function (myEventData) {
+        alert(myEventData);
+    });
+    T.trigger("myEvent","myData");
+</script>
+</head>
+<body>
+</body>
+</html>
