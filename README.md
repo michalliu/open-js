@@ -4,4 +4,4 @@ OpenJS是腾讯微博开放平台提供的Javascript库，开发者使用该库�
 
 在线文档
 -------------
-<http://open.t.qq.com/open-js/doc/index.html>
+<http://michalliu.github.com/open-js/index.html>
