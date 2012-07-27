@@ -122,13 +122,17 @@
 
                     comp,
 
+                    cname,
+
                     c;
 
-                comp = getComponentByName(that.componentName);
+                cname = that.componentName;
+
+                comp = getComponentByName(cname);
 
                 if (!comp.hasOwnProperty('create')) {
 
-                    msg = "创建" + that.componentName + "组件失败，未定义create方法";
+                    msg = "创建" + cname + "组件失败，未定义create方法";
 
                     _l.error(msg);
 
@@ -136,7 +140,18 @@
 
                 }
 
+                // 调用组件的create方法生成组件外观
                 c = comp.create(that.componentConfig);
+
+                // 允许设置父容器样式避免有些页面设置全局样式影响到组件内部展现，如line-height和text-align等
+                // 这种属性可以被所有子节点继承，有时候会造成显示问题
+                if (comp.rootStyle) {
+                    _d.setProperties(root, {
+                        style : comp.rootStyle
+                    });
+                } else {
+                    //TODO 目前什么也不做，或者设置恢复所有的样式为默认值
+                }
 
                 if (typeof c != "undefined" && (c.nodeType == 1 || c.nodeType == 11)) {
 
@@ -489,6 +504,8 @@
             idname: 'qqwb_share__', // HTML页面中的ID
 
             attributes: 'icon counter counter_pos cto_icon appkey content pic',
+
+            rootStyle: 'text-align:left;',
 
             create: function (cfg) {
 
