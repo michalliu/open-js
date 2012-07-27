@@ -280,9 +280,21 @@
     
                                    authorizing = false;
     
-                                   autoclose && awindow.close();
-    
-                                   awindow = null;
+                                   if (autoclose) {
+
+                                       setTimeout(function () {
+
+                                           awindow.close();
+
+                                           awindow = null;
+
+                                       }, 0);
+
+                                   } else {
+
+                                       awindow = null;
+
+                                   }
     
                                    return;
     
