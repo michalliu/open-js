@@ -1,0 +1,7 @@
+html{background:url(about:blank);}
+.aside{position:absolute;top:expression(documentElement.scrollTop);height:expression(documentElement.clientHeight);}
+.bside{position:absolute;top:expression(documentElement.scrollTop);}
+/* diff with <pre class=code></pre> at index.html*/
+div.code{position:absolute;height:0;}
+div.code textarea{height:expression(documentElement.clientHeight * 0.45);}
+#sandbox{height:380px;}

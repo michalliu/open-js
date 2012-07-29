@@ -1,0 +1,85 @@
+<!doctype html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+		<title>猜猜看</title>
+		<style>
+		    body{background:#ffc;}
+		</style>
+		<script src="guess2.js#debug=yes"></script>
+    	<script>
+
+            T.init({appkey:801124049});
+
+    	    function logout() {
+    		    T.logout(function () {location.reload()});
+    		}
+    
+        	function login() {
+    	    	T.login(function (loginstatus) {
+    				document.body.innerHTML = "登录成功，正在跳转...";
+    		    	setTimeout(function () {
+    				    location.reload();
+    		    	}, 500);
+    	    	},function (message) {
+    				alert('登录失败，' + message.message);
+    	    	});
+        	}
+
+	    	function main() {
+
+    			var loginstatus = T.loginStatus(),
+    			    div = document.createElement('div'),
+    			    div2 = document.createElement('div'),
+    
+    				guess = T.template('guess'),
+    			    info = T.template('loginbar');
+    
+    	    	if (loginstatus) {
+    				info.add('欢迎，<a href="http://t.qq.com/' + loginstatus.name +'">' + loginstatus.nick + '</a>')
+    				    .add('，<a href="#" onclick="logout();return false">登出</a>')
+    					.add('<hr/>')
+    
+    			} else {
+    
+    				info.add('让我猜猜你有多少个听众吧，<a href="#" onclick="login();return false;">点此登录</a>')
+    
+    			}
+    
+    			div.innerHTML = info.render();
+    
+    			document.body.appendChild(div);
+    
+    	    	if (loginstatus) {
+
+    	    		T.api('/user/info', null, 'json', 'post')
+
+    	    		 .success(function (response) {
+    	    			 guess.add(['如果我猜的没错，你有',response.data.fansnum,'个听众了噢'].join(''));
+    	    		 })
+
+    	    		 .error(function () {
+    	    			 guess.add('你赢了，我什么也没猜出来');
+    	    		 })
+
+    	    		 .complete(function () {
+    	    			 div2.innerHTML = guess.render();
+    	    			 document.body.appendChild(div2);
+    	    		 });
+    
+    	    	}
+	    	}
+    
+            T.ready(main);
+    	</script>
+	</head>
+    <!--[if lt IE 7 ]><body class="ie_6"><![endif]-->
+    <!--[if IE 7 ]><body class="ie_7"><![endif]-->
+    <!--[if IE 8 ]><body class="ie_8"><![endif]-->
+    <!--[if IE 9 ]><body class="ie_9"><![endif]-->
+    <!--[if (gt IE 9)|!(IE)]><!-->
+    <body>
+    <!--<![endif]-->
+	</body>
+</html>
+

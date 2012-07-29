@@ -136,26 +136,30 @@ if (QQWB.browser.feature.localstorage) { // implement html5 localstorge
     
             userData.expires = new Date(_.time.now() + 365 * 10 * 24 * 3600 * 1000).toUTCString();
     
-            document.body.appendChild(userData);
+			setTimeout(function () {
 
-			if (writeCache && writeCache.length > 0) {
+				document.body.appendChild(userData);
 
-				_.Array.forEach(writeCache, function (v) {
+				if (writeCache && writeCache.length > 0) {
 
-				    _.localStorage.set.apply(_.localStorage,v);
+					_.Array.forEach(writeCache, function (v) {
 
-				});
+						_.localStorage.set.apply(_.localStorage,v);
 
-			}
+					});
 
-			if (deleteCache && deleteCache.length > 0) {
+				}
 
-				_.Array.forEach(deleteCache, function (v) {
+				if (deleteCache && deleteCache.length > 0) {
 
-				    _.localStorage.del.apply(_.localStorage,v);
+					_.Array.forEach(deleteCache, function (v) {
 
-				});
-			}
+						_.localStorage.del.apply(_.localStorage,v);
+
+					});
+				}
+
+			},0);
         });
     
         _.extend("localStorage", {

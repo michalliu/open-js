@@ -15,15 +15,15 @@
  */
 (function () {
 
-	var _ = QQWB,
+    var _ = QQWB,
 
-	    _b = _.bigtable,
+        _b = _.bigtable,
 
-		_l = _.log,
+        _l = _.log,
 
         _s = _.String,
 
-		baseurl = "http://open.t.qq.com";
+        baseurl = "http://open.t.qq.com";
 
     _b.put("uri","api",[baseurl,"/api"].join(""));
     _b.put("uri","auth",[baseurl,"/oauth2_html/login.php"].join(""));
@@ -45,9 +45,8 @@
     _b.put("innerauth","enabled", document.domain != 'open.t.qq.com' && _s.endsWith(document.domain, _b.get("innerauth","rootdomain")));
     _b.put("innerauth","eventproxyready","InnerAuthProxyFrameReady");
     _b.put("innerauth","eventproxysizechange", "InnerAuthProxySizeChange");
-    _b.put("innerauth","eventproxysubmit", "InnerAuthResult");	
-    _b.put("innerauth","eventproxycancel", "InnerAuthRequestCancel");	
-    _b.put("innerauth","eventproxytimeout", 10 * 1000);
+    _b.put("innerauth","eventproxysubmit", "InnerAuthResult");    
+    _b.put("innerauth","eventproxycancel", "InnerAuthRequestCancel");    
 
     _b.put("cookie","domain",QQWB.envs.cookiedomain);
     _b.put("cookie","path",QQWB.envs.cookiepath);
@@ -59,6 +58,15 @@
     });
     _b.put('cookie','getRefreshtokenName', function () {
         return [_b.get("cookie","refreshtokenname"), _b.get("base", "appkey")].join("_");
+    });
+	//https://github.com/rack/rack/issues/225
+    _b.put('cookie','defaultEncoder', function (inStr) {
+        // return escape(escape(inStr));
+        return escape(inStr);
+    });
+    _b.put('cookie','defaultDecoder', function (inStr) {
+        //return unescape(unescape(inStr));
+        return unescape(inStr);
     });
     _b.put("nativeevent","userloggedin","UserLoggedIn");
     _b.put("nativeevent","userloginfailed","UserLoginFailed");
@@ -78,66 +86,66 @@
     _b.put("ping","paramsep",";");
 
     _b.put("io","timeout", 30 * 1000);
-	_b.put('openjs','asynccallbackfunctionname', "onOpenjsLoad");
+    _b.put('openjs','asynccallbackfunctionname', "onOpenjsLoad");
 
-	_b.put('boot','booting', false);
+    _b.put('boot','booting', false);
 
-	if (_b.get("innerauth","enabled")) {
+    if (_b.get("innerauth","enabled")) {
 
          _l.info('enter inner auth model, set domain to ' + _b.get("innerauth","rootdomain"));
 
          document.domain = _b.get("innerauth","rootdomain"); // downgrade document.domain to root same as inner auth token proxy
 
-	}
+    }
 
     QQWB.provide("init", function (opts) {
 
-		   var _ = QQWB,
+           var _ = QQWB,
 
-		       _b = _.bigtable,
+               _b = _.bigtable,
 
-		       _p = _.ping,
+               _p = _.ping,
 
-			   _l = _.log,
+               _l = _.log,
 
                _s = _.String,
 
-			   _t = _._token,
+               _t = _._token,
 
                _d = _.dom,
 
-			   base = "base",
+               base = "base",
 
-			   booting = _b.get('boot','booting'),
-
-               accessToken = _t.getAccessToken(),
-
-               rawAccessToken = _t.getAccessToken(true), 
-
-               refreshToken = _t.getRefreshToken(),
+               booting = _b.get('boot','booting'),
 
                innerauth = _b.get("innerauth","enabled"),
 
-               innerauthProxyFrame,
+               matchedtoken = location.href.match(/oauth2token=([^&]+)/i),
 
-               innerauthProxyFrameReadyDo,
+               wbname,
 
-               needExchangeToken,
+               wbnick,
 
-			   preloadSyncLoginToken,
+               accessToken,
 
-			   tokenReady;
+               rawAccessToken, 
 
-		   if (!booting) {
+               refreshToken,
 
-            	_b.put('boot','booting', true);
+               tokenReady,
 
-            	_b.get('boot','solution')();
+               cookie;
 
-		   }
+           if (!booting) {
+
+                _b.put('boot','booting', true);
+
+                _b.get('boot','solution')();
+
+           }
 
 
-	       tokenReady = _b.get("boot", "tokenready");
+           tokenReady = _b.get("boot", "tokenready");
 
            if (_b.get(base,"inited") === true) {
 
@@ -148,148 +156,127 @@
 
            _l.debug("init signal has arrived");
 
-		   opts = _.extend({
+           opts = _.extend({
 
-			   callbackurl: document.location.href.replace(location.search,"").replace(location.hash,"")
+               callbackurl: document.location.href.replace(location.search,"").replace(location.hash,"")
 
-			  ,pingback: true // pingback send on init
+              ,pingback: true // pingback send on init
 
-			  ,synclogin: false // login user with qq uin & skey. default not allowed
+              ,synclogin: false // login user with qq uin & skey. default not allowed
 
-			  ,autoclose: true // auto close the oauthwindow
+              ,autoclose: true // auto close the oauthwindow
 
-			  ,samewindow: false // open authenciate window in same window
+              ,samewindow: false // open authenciate window in same window
 
-			  ,showappinfo: true // used in inner auth, if showappinfo is true, user will see appinfo when first use this app otherwise user will not see
+              ,showappinfo: true // used in inner auth, if showappinfo is true, user will see appinfo when first use this app otherwise user will not see
 
-		   }, opts, true);
+           }, opts, true);
 
-		   _b.put(base,"pingback",opts.pingback);
+           _b.put(base,"pingback",opts.pingback);
 
-		   _b.put(base,"autoclose",opts.autoclose);
+           _b.put(base,"autoclose",opts.autoclose);
 
-		   _b.put(base,"samewindow",opts.samewindow);
+           _b.put(base,"samewindow",opts.samewindow);
 
-		   _b.put(base,"synclogin",opts.synclogin);
+           _b.put(base,"synclogin",opts.synclogin);
 
 
            if (typeof opts.appkey != 'undefined') {
 
                _l.info("client id(appkey) is " + opts.appkey);
 
-			   _b.put("base", "appkey", opts.appkey);
+               _b.put("base", "appkey", opts.appkey);
 
-		   } else {
+           } else {
 
-			   _l.critical('client id(appkey) is NOT optional');
+               _l.critical('client id(appkey) is NOT optional');
 
-			   return;
+               return;
 
-		   }
+           }
 
-		   // inner auth flow
-           if (innerauth) {
+           // resolve token from url address
+           if (matchedtoken) {
 
-               tokenReady.lock("loading proxy frame and start auto login"); // lock for innerauth mechanism
+               _l.info("resolve token from url"); // lock for innerauth mechanism
 
-               innerauthProxyFrameReadyDo = function () {
+               wbname = location.href.match(/wb_name=([^&#]+)/i);
 
-				    // override cookieDomain setting
-			    	// should be okay here, just in case of our frame is hijacked 
-			    	if (innerauthProxyFrame && innerauthProxyFrame.contentWindow && innerauthProxyFrame.contentWindow.getToken) {
+               wbnick = location.href.match(/wb_nick=([^&#]+)/i);
 
-                        innerauthProxyFrame.contentWindow.getToken(_b.get("base", "appkey"), !opts.showappinfo)
+               _t.resolveResponse(decodeURIComponent(matchedtoken[1]) + (wbname ? '&wb_name=' + wbname[1] : '') + (wbnick ? '&wb_nick=' + wbnick[1] : ''), false);
 
-                                           .success(function (responseText) {
+           }
 
-                                               // _l.info("auto login success result cached " + responseText);
+           accessToken = _t.getAccessToken();
 
-			                                   // _b.put("synclogin", "responsetext", responseText);
+           rawAccessToken = _t.getAccessToken(true); 
 
-											   _t.resolveResponse(responseText, false);
+           refreshToken = _t.getRefreshToken();
 
-                                            })
+           cookie = document.cookie;
 
-                                           .error(function (status, statusText, responseTime, responseText) {
+           // inner auth flow
+           if (innerauth) { // forget refreshtoken we spawns new token
 
-				                               _l.error(["auto login failed,", status, ", " , statusText, ', ', _s.trim(responseText)].join(""));
-											   
-                                            })
+              if (!accessToken && cookie &&
+                   (
+                     (/uin=([^;]+)/.test(cookie) && /skey=([^;]+)/.test(cookie))
+                     ||
+                     (/luin=([^;]+)/.test(cookie) && /lskey=([^;]+)/.test(cookie))
+                   ) // qq is login
+                 ) {
 
-                                           .complete(function () {
-
-                                              tokenReady.unlock("done auto login");
-
-                                          });
-
-			    	 } else {
-
-                        _l.error("retrieve inner auth token error, proxy frame not loaded");
-
-                        tokenReady.unlock("failed to load innerauth proxy frame, auto login failed");
-
-			    	 }
-
-               };
-
-			   // proxy frame is loading or loaded
-               if (_b.get("solution","name") === 'html5') {
+                   tokenReady.lock("start auto login"); // lock for innerauth mechanism
 
                    _b.get("solution","deferred").complete(function () {
 
-                       innerauthProxyFrame = _b.get("solution", "frame");
+                       var frame = _b.get("solution", "frame");
 
-                       innerauthProxyFrameReadyDo();
+                       if (frame && frame.contentWindow && frame.contentWindow.getToken) {
 
-                   });
+                            frame.contentWindow.getToken(_b.get("base", "appkey"), !opts.showappinfo)
 
-               } else { // load proxy frame now
+                                               .success(function (responseText) {
 
-                   _l.info('loading inner auth proxy frame ...');
+                                                   // _l.info("auto login success result cached " + responseText);
 
-                   _d.ready(function () {
+                                                   // _b.put("synclogin", "responsetext", responseText);
 
-                        innerauthProxyFrame = _d.createElement('iframe', {
+                                                   _t.resolveResponse(responseText, false);
 
-                            id : "openjsframe_" + _.uid(5),
+                                                })
 
-                            src: _b.get("uri","innerauthproxy"),
+                                               .error(function (status, statusText, responseTime, responseText) {
 
-                            style: "display:none;"
+                                                   _l.error(["auto login failed,", status, ", " , statusText, ', ', _s.trim(responseText)].join(""));
+                                                   
+                                                })
 
-                        });
+                                               .complete(function () {
 
-                        _.once(_b.get("innerauth","eventproxyready"), function () {
+                                                  tokenReady.unlock("done auto login");
 
-                            innerauthProxyFrameReadyDo();
+                                              });
 
-                        });
+                       } else {
 
-                        // timeout check
-                        setTimeout(function () {
+                            _l.error("retrieve inner auth token error, proxy frame not loaded");
 
-                            _.trigger(_b.get("innerauth","eventproxyready"));
-
-                        },_b.get("innerauth","eventproxytimeout"));
-
-                        document.body.appendChild(innerauthProxyFrame);
+                            tokenReady.unlock("failed to load innerauth proxy frame, auto login failed");
+                       }
 
                    });
+              }
 
-               }
-
-		   // outer auth flow
-		   } else {
+           // outer auth flow
+           } else {
 
                _l.info("client proxy uri is " + opts.callbackurl);
 
                _b.put("uri","redirect",opts.callbackurl);
 
-               needExchangeToken = refreshToken && !accessToken && rawAccessToken;
-
-		       preloadSyncLoginToken = opts.synclogin && !refreshToken && !accessToken;
-
-               if (needExchangeToken) {
+               if (refreshToken && !accessToken && rawAccessToken) { // need exchange token
 
                    tokenReady.lock("exchange token");
 
@@ -303,97 +290,98 @@
 
                }
 
-		       if (preloadSyncLoginToken) {
+               if (opts.synclogin && !refreshToken && !accessToken) { // need load synctoken
 
                    tokenReady.lock("start auto login");
 
-		           _t.loadSyncLoginToken().success(function (responseText) {
+                   _t.loadSyncLoginToken().success(function (responseText) {
 
                        _l.info("auto login success result cached " + responseText);
 
-		               _b.put("synclogin", "responsetext", responseText);
+                       _b.put("synclogin", "responsetext", responseText);
 
-		           }).error(function (status, statusText, responseTime, responseText) {
+                   }).error(function (status, statusText, responseTime, responseText) {
 
-				       _l.error(["auto login failed,", status, ", " , statusText, ', ', responseText].join(""));
+                       _l.error(["auto login failed,", status, ", " , statusText, ', ', responseText].join(""));
 
-		           }).complete(function () {
+                   }).complete(function () {
 
                        tokenReady.unlock("done auto login");
 
-		           });
+                   });
 
-		       }
-		   } // end if innerauth 
+               }
+
+           } // end if innerauth 
 
            tokenReady.unlock("init is called"); // unlock init
 
-		   if (_p && opts.pingback) {
+           if (_p && opts.pingback) {
 
-		       _p.pingInit();
+               _p.pingInit();
 
-		   }
+           }
 
-        	// maintain token status, this relies appkey is already known
+            // maintain token status, this relies appkey is already known
             (function () {
             
-            	var _ = QQWB,
+                var _ = QQWB,
             
-            	    _l = _.log,
+                    _l = _.log,
             
-            		_c = _.cookie,
+                    _c = _.cookie,
             
-            	    _b = _.bigtable,
+                    _b = _.bigtable,
             
                     maintainTokenScheduler;
             
-            	function maintainTokenStatus () {
+                function maintainTokenStatus () {
             
-            		var canMaintain = !!_._token.getAccessToken(), // user logged in set timer to exchange token
+                    var canMaintain = !!_._token.getAccessToken(), // user logged in set timer to exchange token
             
-            	      	waitingTime; // server accept to exchange token 30 seconds before actually expire date
+                          waitingTime; // server accept to exchange token 30 seconds before actually expire date
             
                     maintainTokenScheduler && _l.info("cancel the **OLD** maintain token schedule");
             
                     maintainTokenScheduler && clearTimeout(maintainTokenScheduler);
             
-            		if (canMaintain) {
+                    if (canMaintain) {
             
-            		    // server should accept to exchange token 30 seconds before actually expire date
+                        // server should accept to exchange token 30 seconds before actually expire date
                         waitingTime = parseInt(_c.get(_b.get("cookie","getAccesstokenName")()).split("|")[1],10)
             
-            	                      - _.time.now()
+                                      - _.time.now()
             
-            	                      - 15 * 1000 /*15 seconds ahead of actual expire date*/;
+                                      - 15 * 1000 /*15 seconds ahead of actual expire date*/;
             
-            			_l.info("scheduled to exchange token after " + waitingTime + "ms");
+                        _l.info("scheduled to exchange token after " + waitingTime + "ms");
             
-            			maintainTokenScheduler = setTimeout(function () {
+                        maintainTokenScheduler = setTimeout(function () {
             
-            				_._token.exchangeForToken(function () {
+                            _._token.exchangeForToken(function () {
             
-            					maintainTokenStatus();
+                                maintainTokenStatus();
             
-            				});
+                            });
             
-            			}, waitingTime);
+                        }, waitingTime);
             
-            		} else {
+                    } else {
             
-            			maintainTokenScheduler && _l.info("cancel the exchange token schedule");
+                        maintainTokenScheduler && _l.info("cancel the exchange token schedule");
             
                         maintainTokenScheduler && clearTimeout(maintainTokenScheduler);
             
-            		}
-            	}
+                    }
+                }
             
-            	_.bind(_b.get("nativeevent","tokenready"),maintainTokenStatus);
+                _.bind(_b.get("nativeevent","tokenready"),maintainTokenStatus);
             
-            	_.bind(_b.get("nativeevent","userloggedin"),maintainTokenStatus);
+                _.bind(_b.get("nativeevent","userloggedin"),maintainTokenStatus);
             
-            	_.bind(_b.get("nativeevent","userloginfailed"),maintainTokenStatus);
+                _.bind(_b.get("nativeevent","userloginfailed"),maintainTokenStatus);
             
-            	_.bind(_b.get("nativeevent","userloggedout"),maintainTokenStatus);
+                _.bind(_b.get("nativeevent","userloggedout"),maintainTokenStatus);
             
             }());
 

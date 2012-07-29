@@ -87,7 +87,7 @@ QQWB.extend("Array",{
        }
     }
     /**
-     * Enumerate the array
+     * Enumerate the array, The enumerate will stop of handler returns false
      *
      * Note:
      * If handler executed and returned false,
@@ -97,16 +97,12 @@ QQWB.extend("Array",{
      * @param arr {Array} the array object
      *        handler {Function} the callback function
      */
-   ,each: function (arr, handler, context) {
-	   context = context || this;
-	   if (arr) {
-           for (var i=0,l=arr.length, v; i<l; i++) {
-			   v = handler.call(context, i, arr[i], arr);
-               if (false === v) {
-                   break;
-               }
+   ,each: function (arr, handler) {
+       for (var i=0,l=arr.length; i<l; i++) {
+           if (false === handler(i,arr[i])) {
+               break;
            }
-	   }
+       }
     }
     /**
      * Invokes _inFunc_ on each element of _inArray_.

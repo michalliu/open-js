@@ -84,8 +84,42 @@
 
         });
 
-    }
+    };
 
+	/**
+	 * send API Ajax request
+	 *
+	 * @param api {String} apiName
+	 * @param apiParams {Map} params Map of this api
+	 * @param dataType {String} json or xml or text
+	 * @param type {String} get or post
+	 */
+    window['apiAjax'] = function (api, apiParams, dataType, type) {
+    
+        var opts = {
+    
+                type: _s.trim(type.toUpperCase())
+    
+               ,url: _b.get("uri","api") + api
+    
+               ,data: _q.encode(apiParams)
+    
+               ,dataType: _s.trim(dataType.toLowerCase())
+    
+            };
+    
+        if (opts.type == "GET") {
+    
+            opts.url += (opts.data ? "?" + opts.data : "");
+    
+            delete opts.data;
+    
+        }
+    
+        return _i.apiAjax(opts);
+    
+    };
+    
     try {
 
         sameOrigin = appWindow.location.href;
@@ -151,32 +185,6 @@
             appWindow.postMessage("success", targetOrigin); 
     
        }
-    
-       function apiAjax (api, apiParams, dataType, type) {
-    
-           var opts = {
-    
-                   type: _s.trim(type.toUpperCase())
-    
-                  ,url: _b.get("uri","api") + api
-    
-                  ,data: _q.encode(apiParams)
-    
-                  ,dataType: _s.trim(dataType.toLowerCase())
-    
-               };
-    
-           if (opts.type == "GET") {
-    
-               opts.url += (opts.data ? "?" + opts.data : "");
-    
-               delete opts.data;
-    
-           }
-    
-           return _i.apiAjax(opts);
-    
-        }
     
     	messageHandler = function (e) {
     
