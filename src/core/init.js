@@ -23,21 +23,25 @@
 
         _s = _.String,
 
-        baseurl = "http://open.t.qq.com";
+        basehost = '://open.t.qq.com',
+        
+        baseurl = 'http' + basehost,
 
-    _b.put("uri","api",[baseurl,"/api"].join(""));
-    _b.put("uri","auth",[baseurl,"/oauth2_html/login.php"].join(""));
-    _b.put("uri","html5proxy",[baseurl,"/open-js/proxy/proxy_v2.html"].join(""));
+        securebaseurl = 'https' + basehost;
+
+    _b.put("uri","api",[securebaseurl,"/api"].join(""));
+    _b.put("uri","auth",[securebaseurl,"/cgi-bin/oauth2/authorize"].join(""));
+    _b.put("uri","html5proxy",[securebaseurl,"/open-js/proxy/proxy_v3.html"].join(""));
     _b.put("uri","innerauthproxy",[baseurl,"/open-js/proxy/proxy_v2.html"].join(""));
-    _b.put("uri","flashas3proxy",[baseurl,"/open-js/proxy/proxy_as3_v2.swf"].join(""));
+    _b.put("uri","flashas3proxy",[securebaseurl,"/open-js/proxy/proxy_as3_v2.swf"].join(""));
     _b.put("uri","exchangetoken",[baseurl,"/cgi-bin/exchange_token"].join(""));
     _b.put("uri","autotoken",[baseurl,"/cgi-bin/auto_token"].join(""));
     _b.put("uri","gettokenbypt",[baseurl,"/cgi-bin/oauth2/get_oauth2token_pt"].join(""));
     _b.put("uri","innerauth",[baseurl,"/cgi-bin/oauth2/inner_flow_page"].join(""));
 
     _b.put("oauthwindow","name","authClientProxy_ee5a0f93");
-    _b.put("oauthwindow","width","575");
-    _b.put("oauthwindow","height","465");
+    _b.put("oauthwindow","width","630");
+    _b.put("oauthwindow","height","480");
 
     _b.put("innerauth","layerid","openjslayer" + QQWB.uid(5));
     _b.put("innerauth","originaldomain",document.domain);
@@ -59,7 +63,7 @@
     _b.put('cookie','getRefreshtokenName', function () {
         return [_b.get("cookie","refreshtokenname"), _b.get("base", "appkey")].join("_");
     });
-	//https://github.com/rack/rack/issues/225
+    //https://github.com/rack/rack/issues/225
     _b.put('cookie','defaultEncoder', function (inStr) {
         // return escape(escape(inStr));
         return escape(inStr);
@@ -348,7 +352,7 @@
                     if (canMaintain) {
             
                         // server should accept to exchange token 30 seconds before actually expire date
-                        waitingTime = parseInt(_c.get(_b.get("cookie","getAccesstokenName")()).split("|")[1],10)
+                        waitingTime = parseInt(_c.get(_b.get("cookie","getAccesstokenName")()).split("|")[2],10)
             
                                       - _.time.now()
             
@@ -386,7 +390,7 @@
             }());
 
            // compat cookie with older versions
-           _t.compatOldVersion();
+           // _t.compatOldVersion();
 
            _b.put(base, "inited", true);
 
