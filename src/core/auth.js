@@ -510,6 +510,8 @@ QQWB.extend("auth",{
 
                access_token: accessToken
 
+              ,openid: user.openid
+
               ,name: user.name
 
               ,nick: user.nick
