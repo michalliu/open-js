@@ -12,7 +12,7 @@
  *           util.cookie
  *           common.JSON
  */
-
+/*jslint laxcomma:true*/
 QQWB.extend("_token",{
     /**
      * Save access token to cookie
@@ -24,23 +24,23 @@ QQWB.extend("_token",{
      * @param optNickname {String} nickname associate with accesstoken
      * @return {Object} QQWB object
      */
-    setAccessToken: function (accessToken, expireIn, optUsername, optNickname) {
+    setAccessToken: function (accessToken, openid, expireIn, optUsername, optNickname) {
 
-		var _ = QQWB,
+        var _ = QQWB,
 
-		    _b = _.bigtable,
+            _b = _.bigtable,
 
-		    _c = _.cookie,
+            _c = _.cookie,
 
-			_t = _.time,
+            _t = _.time,
 
-			user;
+            user;
 
         user = this.getTokenUser(true);
 
         _c.set(_b.get("cookie","getAccesstokenName")()
 
-                       ,[accessToken, _t.now() + expireIn * 1000, optUsername || (user && user.name) || "", optNickname || (user && user.nick) || ""].join("|")
+                       ,[accessToken, openid, _t.now() + expireIn * 1000, optUsername || (user && user.name) || "", optNickname || (user && user.nick) || ""].join("|")
 
                        ,_b.get("cookie","refreshtokenexpires")
 
@@ -63,21 +63,21 @@ QQWB.extend("_token",{
 
         var _ = QQWB,
 
-		    _b = _.bigtable,
+            _b = _.bigtable,
 
-		    _c = _.cookie,
+            _c = _.cookie,
 
-			_t = _.time,
+            _t = _.time,
 
-			token;
+            token;
 
         token = _c.get(_b.get("cookie","getAccesstokenName")());
 
          if (token) {
 
-             token = token.split("|",2);
+             token = token.split("|",3);
 
-             if (optRaw || parseInt(token[1],10) > _t.now()) {
+             if (optRaw || parseInt(token[2],10) > _t.now()) {
 
                  return token[0];
 
@@ -98,27 +98,29 @@ QQWB.extend("_token",{
 
         var _ = QQWB,
 
-		    _b = _.bigtable,
+            _b = _.bigtable,
 
-		    _c = _.cookie,
+            _c = _.cookie,
 
-			_t = _.time,
+            _t = _.time,
 
-			token;
+            token;
 
         token = _c.get(_b.get("cookie","getAccesstokenName")());
 
          if (token) {
 
-             token = token.split("|",4);
+             token = token.split("|",5);
 
-             if (optRaw || parseInt(token[1],10) > QQWB.time.now()) {
+             if (optRaw || parseInt(token[2],10) > QQWB.time.now()) {
 
                  return {
 
-                     name: token[2]
+                     openid: token[1]
 
-                    ,nick: token[3]
+                    ,name: token[3]
+
+                    ,nick: token[4]
 
                  };
 
@@ -138,9 +140,9 @@ QQWB.extend("_token",{
 
         var _ = QQWB,
 
-		    _b = _.bigtable,
+            _b = _.bigtable,
 
-		    _c = _.cookie;
+            _c = _.cookie;
 
         return _c.del(_b.get("cookie","getAccesstokenName")(),_b.get("cookie","path"),_b.get("cookie","domain"));
     }
@@ -155,9 +157,9 @@ QQWB.extend("_token",{
 
         var _ = QQWB,
 
-		    _b = _.bigtable,
+            _b = _.bigtable,
 
-		    _c = _.cookie;
+            _c = _.cookie;
 
         _c.set(_b.get("cookie","getRefreshtokenName")()
 
@@ -205,19 +207,19 @@ QQWB.extend("_token",{
      */
    ,exchangeForToken: function (optCallback) {
 
-	   var _ = QQWB,
+       var _ = QQWB,
 
-	       _b = _.bigtable,
+           _b = _.bigtable,
 
-		   _q = _.queryString,
+           _q = _.queryString,
 
-		   _l = _.log,
+           _l = _.log,
 
-		   _i = _.io,
+           _i = _.io,
 
-		   _s = _.String,
+           _s = _.String,
 
-		   appkey = _b.get("base", "appkey");
+           appkey = _b.get("base", "appkey");
 
        _i.jsonp({
 
@@ -255,7 +257,7 @@ QQWB.extend("_token",{
 
                !response.wb_nick && _l.warning("weibo nick not retrieved, will not update nick");
 
-               _._token.setAccessToken(response.access_token, parseInt(response.expires_in,10), response.wb_name, response.wb_nick);
+               _._token.setAccessToken(response.access_token, response.openid, parseInt(response.expires_in,10), response.wb_name, response.wb_nick);
 
                if (response.refresh_token) {
 
@@ -269,9 +271,9 @@ QQWB.extend("_token",{
 
                if (!_.loginStatus()) {
 
-		           _l.warn("thirdparty cookie needs to be enabled, please follow this instruction to set P3P header http://url.cn/0ZbFuL");
+                   _l.warn("thirdparty cookie needs to be enabled, please follow this instruction to set P3P header http://url.cn/0ZbFuL");
 
-			   }
+               }
 
                _l.info("exchange token succeed");
 
@@ -309,13 +311,13 @@ QQWB.extend("_token",{
 
     ,loadSyncLoginToken: function () {
 
-	   var _ = QQWB,
+       var _ = QQWB,
 
-	       _b = _.bigtable,
+           _b = _.bigtable,
 
-		   _q = _.queryString,
+           _q = _.queryString,
 
-		   _i = _.io;
+           _i = _.io;
 
         return _i.jsonp({
 
@@ -336,7 +338,7 @@ QQWB.extend("_token",{
                    })
 
            });
-	}
+    }
 
     /**
      * Auto resolve response from server
@@ -345,21 +347,21 @@ QQWB.extend("_token",{
      */
    ,resolveResponse: function (responseText, triggerAuthEvents) {
 
-	   var _ = QQWB,
+       var _ = QQWB,
 
-	       _b = _.bigtable,
+           _b = _.bigtable,
 
-		   _q = _.queryString,
+           _q = _.queryString,
 
-		   _l = _.log,
+           _l = _.log,
 
-		   _s = _.String,
+           _s = _.String,
 
            loginStatus,
 
            response = _s.isString(responseText) ? _q.decode(responseText) : responseText;
 
-		   _l.debug(["resolve response ", T.JSON.stringify(response)].join(""));
+           _l.debug(["resolve response ", T.JSON.stringify(response)].join(""));
 
        if (response.access_token) {
 
@@ -369,7 +371,7 @@ QQWB.extend("_token",{
 
            !response.wb_nick && _l.warning("weibo usernick not retrieved");
 
-           _._token.setAccessToken(response.access_token, parseInt(response.expires_in,10), response.wb_name, response.wb_nick);
+           _._token.setAccessToken(response.access_token, response.openid, parseInt(response.expires_in,10), response.wb_name, response.wb_nick);
 
            if (response.refresh_token) {
 
@@ -381,29 +383,29 @@ QQWB.extend("_token",{
 
            }
 
-		   if (triggerAuthEvents) {
+           if (triggerAuthEvents) {
 
                loginStatus = _.loginStatus();
 
-		       if (loginStatus) {
+               if (loginStatus) {
 
                    _l.info("user " + loginStatus.name || "unknown" + " logged in");
 
                    _.trigger(_b.get("nativeevent","userloggedin"),loginStatus);
 
-		       } else {
+               } else {
 
-		           _l.warn("thirdparty cookie needs to be enabled, please follow this instruction to set P3P header http://url.cn/0ZbFuL");
+                   _l.warn("thirdparty cookie needs to be enabled, please follow this instruction to set P3P header http://url.cn/0ZbFuL");
 
-		       }
+               }
 
-		   }
+           }
 
        } else if (response.error || response.errorMsg) {
 
            _l.error("login error occurred " + response.error);
 
-		   if (triggerAuthEvents) {
+           if (triggerAuthEvents) {
 
               response.error = response.error || response.errorMsg;
 
@@ -411,7 +413,7 @@ QQWB.extend("_token",{
 
               triggerAuthEvents && _.trigger(_b.get("nativeevent","userloginfailed"),response);
 
-		   }
+           }
 
        } else {
 
@@ -419,20 +421,20 @@ QQWB.extend("_token",{
 
            //throw new Error("confused server response " + responseText);
 
-		   if (triggerAuthEvents) {
+           if (triggerAuthEvents) {
 
-			   response = {};
+               response = {};
 
                response.message = response.error = "server error";
 
                triggerAuthEvents && _.trigger(_b.get("nativeevent","userloginfailed"),response);
-		   }
+           }
 
        }
 
-	   return _;
+       return _;
 
-   },
+   }//,
 
    /* the old version OpenJS use cookie name "QQWBToken" to save accesstoken, "QQWBRefreshToken" to save refresh token
     * the new version OpenJS (since 2.0) use cookie name "QQWBToken_APPID" to save accesstoken, "QQWBRefreshToken_appid" to save refresh token
@@ -440,6 +442,8 @@ QQWB.extend("_token",{
     * OpenJS version check is included
     * This function will be called on init
     */
+   // openjs 3.0 uses new token system,so it is not compatible with openjs old version (openjs 1.0, 1.5, 2.0) 
+   /*
    compatOldVersion: function () {
 
        var _ = QQWB,
@@ -501,6 +505,6 @@ QQWB.extend("_token",{
           }
 
       }
-   }
+   } */
 
 });
