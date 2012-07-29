@@ -19,43 +19,44 @@
  *           weibo.util
  */
 
+/*jslint laxcomma:true */
 // build server side proxy
 
 // boot library
 (function () {
 
-	var _ = QQWB,
+    var _ = QQWB,
 
-	    _j = _.JSON,
+        _j = _.JSON,
 
-		_a = _.Array,
+        _a = _.Array,
 
-		_s = _.String,
+        _s = _.String,
 
-		_b = _.bigtable,
+        _b = _.bigtable,
 
-		_q = _.queryString,
+        _q = _.queryString,
 
-		_l = _.log,
+        _l = _.log,
 
-		_i = _.io,
+        _i = _.io,
 
-	    messageHandler,
+        messageHandler,
 
         sameOrigin,
 
-		rootDomain = _b.get("innerauth","rootdomain"),
+        rootDomain = _b.get("innerauth","rootdomain"),
 
-		targetOrigin = "*", // we don't care who will handle the data
+        targetOrigin = "*", // we don't care who will handle the data
 
-		asyncCallbackName = _b.get('openjs','asynccallbackfunctionname'),
+        asyncCallbackName = _b.get('openjs','asynccallbackfunctionname'),
 
         appWindow; // the third-party application window
 
 
     document.domain = rootDomain;
 
-	appWindow = window.parent;
+    appWindow = window.parent;
 
     /*
      * getToken by uin&skey
@@ -86,14 +87,14 @@
 
     };
 
-	/**
-	 * send API Ajax request
-	 *
-	 * @param api {String} apiName
-	 * @param apiParams {Map} params Map of this api
-	 * @param dataType {String} json or xml or text
-	 * @param type {String} get or post
-	 */
+    /**
+     * send API Ajax request
+     *
+     * @param api {String} apiName
+     * @param apiParams {Map} params Map of this api
+     * @param dataType {String} json or xml or text
+     * @param type {String} get or post
+     */
     window['apiAjax'] = function (api, apiParams, dataType, type) {
     
         var opts = {
@@ -138,32 +139,32 @@
 
             appWindow.QQWB.trigger(_b.get("innerauth","eventproxyready"));
 
-		}
-		/*
-		 * if appWindow.QQWB not exists this main code will never excecute
-		 * for proxy OpenJS is always sync loaded
-		 else if (typeof appWindow[asyncCallbackName] == "function") {
+        }
+        /*
+         * if appWindow.QQWB not exists this main code will never excecute
+         * for proxy OpenJS is always sync loaded
+         else if (typeof appWindow[asyncCallbackName] == "function") {
 
             _l.info('[proxy] openjs async loading in app');
 
-			(function () {
+            (function () {
 
-				if (appWindow.QQWB) {
+                if (appWindow.QQWB) {
 
                     _l.info('[proxy] openjs async loaded in app');
 
                     appWindow.QQWB.trigger(_b.get("innerauth","eventproxyready"));
 
-					return;
-				}
+                    return;
+                }
 
-				setTimeout(arguments.callee, 200);
+                setTimeout(arguments.callee, 200);
 
-			}());
+            }());
 
-		} 
-		*/
-	   	else {
+        } 
+        */
+           else {
 
             _l.warning("[proxy] openjs not detected in app");
 
@@ -186,70 +187,70 @@
     
        }
     
-    	messageHandler = function (e) {
+        messageHandler = function (e) {
     
-    		// accept any origin, we do strict api check here to protect from XSS/CSRF attack
-    		var data,id,args,apiInterface;
+            // accept any origin, we do strict api check here to protect from XSS/CSRF attack
+            var data,id,args,apiInterface;
     
-    		try {
+            try {
     
-    			data = _j.fromString(e.data);
+                data = _j.fromString(e.data);
     
-    		} catch (jsonParseError) {}
+            } catch (jsonParseError) {}
     
-    		// check format
-    		if (data && data.id && data.data) {
+            // check format
+            if (data && data.id && data.data) {
     
-    			id = data.id, // message id related to the deferred object
+                id = data.id, // message id related to the deferred object
     
-    			args = data.data,
+                args = data.data,
     
-    			apiInterface = args[0];
+                apiInterface = args[0];
     
-    	    	if (args[2].toLowerCase() == "xml") {
-    	    		// if dataType is xml, the ajax will return a xml object, which can't call
-    	    		// postMessage directly (will raise an exception) , instead we request to tranfer
-    	    		// XML as String, then parse it back to XML object.
-    	    		// io.js will fall to response.text
-    	    		// api.js will detect that convert it back to xmlobject
-    	    		// @see io.js,api.js
-    	    		args[2] = "_xml_";
-    	    	}
+                if (args[2].toLowerCase() == "xml") {
+                    // if dataType is xml, the ajax will return a xml object, which can't call
+                    // postMessage directly (will raise an exception) , instead we request to tranfer
+                    // XML as String, then parse it back to XML object.
+                    // io.js will fall to response.text
+                    // api.js will detect that convert it back to xmlobject
+                    // @see io.js,api.js
+                    args[2] = "_xml_";
+                }
     
-    	    	if (!apiInterface) { // basic interface name validation
+                if (!apiInterface) { // basic interface name validation
     
-    	    		appWindow.postMessage(_j.stringify({
+                    appWindow.postMessage(_j.stringify({
     
-    	    			id: id
+                        id: id
     
-    	    		   ,data: [-1, "interface can not be empty"]
+                       ,data: [-1, "interface can not be empty"]
     
-    	    		}), targetOrigin);
+                    }), targetOrigin);
     
-    	    		_l.error("[proxy] interface cant not be empty");
+                    _l.error("[proxy] interface cant not be empty");
     
-    	    	} else {
+                } else {
     
-    	    		apiAjax.apply(this,args).complete(function () {
+                    apiAjax.apply(this,args).complete(function () {
     
-    	    			// can't stringify a xml object here
-    	    	    	appWindow.postMessage(_j.stringify({
+                        // can't stringify a xml object here
+                        appWindow.postMessage(_j.stringify({
     
-    	    	    		id: id
+                            id: id
     
-    	    	    	   ,data: _a.fromArguments(arguments)
+                           ,data: _a.fromArguments(arguments)
     
-    	    	    	}), targetOrigin);
+                        }), targetOrigin);
     
-    	    		});
+                    });
     
-    	        }
+                }
     
-    		} else {
+            } else {
     
-    			_l.warn("[proxy] ignore unexpected message " + e.data);
+                _l.warn("[proxy] ignore unexpected message " + e.data);
     
-    		}
+            }
     
         }; // end message handler
     
