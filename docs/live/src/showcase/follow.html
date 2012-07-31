@@ -1,0 +1,103 @@
+<!doctype html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="zh-CN"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="zh-CN"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js ie8 oldie" lang="zh-CN"> <![endif]-->
+<!--[if gt IE 8]><!--><html class="no-js" lang="zh-CN"> <!--<![endif]-->
+<head>
+	<meta charset="utf-8">
+	<title>收听按钮</title>
+    <style>
+        img{border:0;}
+        .green{color:green;}
+        #status{font-size:12px;}
+    </style>
+</head>
+<body>
+    <div>
+        <a href="#" onclick="return follow();"><img src="http://t0.qlogo.cn/mbloghead/cb16cd5ecf98d58e4f62/50"></img>api_weibo</a><span id="status">未知</span>
+    </div>
+
+<hr/>
+    <p>代码解析
+<pre>
+HTML部分：
+
+    &lt;a href="#" onclick="return follow();"&gt;&lt;img src="http://t0.qlogo.cn/mbloghead/cb16cd5ecf98d58e4f62/50"&gt;&lt;/img&gt;api_weibo&lt;/a&gt;&lt;span id="status"&gt;&lt;/span&gt;
+
+JS部分：
+
+    T.init({                                                                                 |    初始化
+        appkey: 800000006,                                                                   |    指定appkey
+        pingback: false                                                                      |    不向服务器发送报告
+    });                                                                                      |    
+                                                                                             |    
+    if(T.loginStatus()) {                                                                    |    如用户已登录，获取听众数等信息
+        T.task(                                                                              |    创建任务组
+            T.api('friends/check',{names: 'api_weibo', flag: 1}),                            |    检查是否已收听该用户
+            T.api('user/other_info',{name: 'api_weibo'})                                     |    获取该用户的基本信息
+          )                                                                                  |    
+         .success(function (ret0,ret1) {                                                     |    获取数据成功
+            var stat = T.find("#status")[0];                                                 |    
+            var isfollow = ret0[0].data.api_weibo;                                           |    
+            var fansnum = ret1[0].data.fansnum;                                              |    
+            stat.innerHTML = (isfollow ? "已收听" : "未收听") + '，听众' + fansnum + '人';   |    显示相应信息
+            if(isfollow)stat.className = 'green';                                            |    
+       });                                                                                   |    
+    }                                                                                        |    
+                                                                                             |    
+    function follow() {                                                                      |    点击收听按钮的操作                   
+        if (!T.loginStatus()) {                                                              |    如用户未登录
+            T.login(follow);                                                                 |    登录后再进行收听操 
+            return;                                                                          |                       
+        }                                                                                    |                       
+        T.api("friends/add",{name: 'api_weibo'},'json','post')                               |    发起收听请求
+        .success(function () {                                                               |                       
+            alert('收听成功');                                                               |    收听成功的提示
+        })                                                                                   |                       
+        .error(function (code,message) {                                                     |                       
+            alert('收听失败' + message);                                                     |    收听失败的提示
+        });                                                                                  |                       
+        return false;                                                                        |    阻止浏览器响应href
+    }                                                                                        |    
+</pre>
+    </p>
+<script src="//mat1.gtimg.com/app/openjs/openjs.js#debug=yes"></script>
+<script>
+
+    T.init({
+        appkey: 800000006,
+        pingback: false
+    });
+
+    if(T.loginStatus()) {
+        T.task(
+            T.api('friends/check',{names: 'api_weibo', flag: 1}),
+            T.api('user/other_info',{name: 'api_weibo'})
+          )
+         .success(function (ret0,ret1) {
+            var stat = T.find("#status")[0];
+            var isfollow = ret0[0].data.api_weibo;
+            var fansnum = ret1[0].data.fansnum;
+            stat.innerHTML = (isfollow ? "已收听" : "未收听") + '，听众' + fansnum + '人';
+            if(isfollow)stat.className = 'green';
+       });
+    }
+
+    function follow() {
+        if (!T.loginStatus()) {
+            T.login(follow);
+            return;
+        }
+        T.api("friends/add",{name: 'api_weibo'},'json','post')
+        .success(function () {
+            alert('收听成功');
+        })
+        .error(function (code,message) {
+            alert('收听失败' + message);
+        });
+        return false;
+    }
+</script>
+</body>
+</html>
+

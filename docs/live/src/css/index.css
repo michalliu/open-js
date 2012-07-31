@@ -57,3 +57,11 @@ ol.faq li.last{border-bottom:none;padding-bottom:0;}
 
 .collapsed ul{display:none;}
 .toc_section .comment{font-style:normal;font-size:10px;color:#666;}
+.showcase a{padding-left:10px;}
+
+.tinyfont{font-size:12px;}
+.smallfont{font-size:14px;}
+.mediumfont{font-size:16px;}
+.bigfont{font-size:18px;}
+.hugefont{font-size:20px;}
+.giantfont{font-size:24px;}
