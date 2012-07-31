@@ -46,7 +46,12 @@
 
 		         	<li>- <a hidefocus href="#ready">ready</a></li>
 
-                    <li>- <a hidefocus href="#component">component</a></li>
+                    <li class="collapsed"><cite>+</cite> <a hidefocus href="#component" class="sub_toc_title normalfont">component <span class="comment">组件</span>
+</a>                    <ul class="toc_section">
+		    	            <li>- <a hidefocus href="#微评论" class="tinyfont">微评论</a></li>
+		    	            <li>- <a hidefocus href="#一键转播" class="tinyfont">一键转播</a></li>
+                        </ul>
+                    </li>
                 </ul>
             </li>
 
@@ -804,19 +809,11 @@ T.documentReady(function () {
 		<p id="component" class="intro"><b class="header">component</b><span class="code">T.component(inComponentName)</span><br/>
         创建网站连接的腾讯微博组件，返回网站连接组件对象。</p>
 
-<pre class="code">
-<a class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("component.html")' href="#*component.html"></a>
-&lt;script&gt;
-    T.component("微评论").appkey('801126062').renderInto("body");
-&lt;/script&gt;
-</pre>
-
 		<div class="options">
-        <div class="argument">inComponentName<span class="opttype">String</span><div class="optdefault">默认值:无</div><p>组件名称，目前仅支持"微评论"。</p></div>
+        <div class="argument">inComponentName<span class="opttype">String</span><div class="optdefault">默认值:无</div><p>组件名称，目前支持"微评论"，"一键转播"。</p></div>
         </div>
-<br/>
-网站连接组件对象的公有方法<br/>
-<br/>
+<p>网站连接组件对象的公有方法</p>
+
 		<div class="options">
 		<div class="argument">dimension(width,height)<span class="opttype">Function</span><p>设置组件宽，高。</p></div>
             <div class="option">width <span class="desc">组件宽度</span></div>
@@ -831,17 +828,45 @@ T.documentReady(function () {
             <div class="option">inConfig <span class="desc">组件配置Map对象</span></div>
 		<div class="argument">renderInto(context)<span class="opttype">Function</span><p>在网站上渲染网站连接组件。</p></div>
             <div class="option">context <span class="desc">要渲染到的DOM节点或选择符<sup><a href="#find">[链]</a></sup>，默认使用选择符选中的第一个元素。</span></div>
-		<div class="argument">render()<span class="opttype">Function</span><p>在网站上渲染网站连接组件，渲染该组件到组件预先指定的id。</p></div>
+        <div class="argument">render()<span class="opttype">Function</span><p>在网站上渲染网站连接组件，渲染该组件到组件预先指定的id。使用此方法必须预先在页面中放置容器，并设置其id为该组件预先指定的id名称。<p>例如，js代码 T.component("微评论").render() ，要求您必须在页面上放置一个节点。如，&lt;div id="qqwb_comment__"&gt;&lt;/div&gt; 否则组件显示不出来。当然您也可以使用 renderInto 方法，明确指定一个节点。</p>
+<p>组件与节点id对照表如下：</p>
+<div class="option">微评论&nbsp;&nbsp;&nbsp;&nbsp; <span class="desc">qqwb_comment__</span></div><div class="option">一键转播 <span class="desc">qqwb_share__</span></div></p></div>
         </div>
 
-<br/>
-微评论组件的私有方法<br/>
-<br/>
+        <p id="微评论" class="intro"><b class="header">component</b><span class="code">T.component("微评论")</span><br/>
+        创建微评论组件，返回微评论组件对象。</p>
+
+<pre class="code">
+<a class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("component_comment.html")' href="#*component_comment.html"></a>
+&lt;script&gt;
+    T.component("微评论").appkey('801126062').renderInto("body");
+&lt;/script&gt;
+</pre>
+
 		<div class="options">
 		<div class="argument">appkey(inAppkey)<span class="opttype">Function</span><p>设置微评论组件的Appkey。</p></div>
             <div class="option">inAppkey <span class="desc">微评论组件的Appkey，如<em>801126062</em></span></div>
 		<div class="argument">colors(colors*)<span class="opttype">Function</span><p>自定义微评论组件的外观。</p></div>
             <div class="option">colors <span class="desc">微评论组件颜色设置，如blue,green,#06c等。最多4个，依次代表背景色，评论背景色，边框色，主字色</span></div>
+        </div>
+
+        <p id="一键转播" class="intro"><b class="header">component</b><span class="code">T.component("一键转播")</span><br/>
+        创建一键转播组件，返回一键转播组件对象。</p>
+
+<pre class="code">
+<a class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("component_share.html")' href="#*component_share.html"></a>
+&lt;script&gt;
+    T.component("一键转播").appkey(801194240).icon(1).showCounter('top').renderInto('body');
+&lt;/script&gt;
+</pre>
+
+		<div class="options">
+		<div class="argument">appkey(inAppkey)<span class="opttype">Function</span><p>设置一键转播组件的Appkey。</p></div>
+            <div class="option">inAppkey <span class="desc">一键转播组件的Appkey，如<em>801126062</em></span></div>
+		<div class="argument">icon(inIcon)<span class="opttype">Number<span class="vsep">|</span>String</span><p>定义一键转播组件所使用的按钮。</p></div>
+            <div class="option">inIcon <span class="desc">一键转播组件按钮外观，此参数可以为数字或字符串。若为数字，代表使用内置的转播按钮样式，有效的值为0,1,2，分别代表三种不同样式的转播按钮。其中<em>0,1</em>支持转播次数的显示，2不支持。若为字符串，则应该为转播图片的网址，不支持显示转播次数。</span></div>
+		<div class="argument">showCounter(inPosition)<span class="opttype">String</span><p>设置转播次数显示的位置。</p></div>
+            <div class="option">inPosition <span class="desc">转播次数的显示位置，接受的值为"left"或者"top"，且icon必须为0或1。</span></div>
         </div>
 
 
