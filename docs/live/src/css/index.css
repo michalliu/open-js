@@ -47,7 +47,7 @@ b.header{font-size:18px;line-height:35px;}
 ul.updatelist, ol.faq{font-weight:normal;font-size:14px;}
 ol.faq{padding-right:10px;}
 .sub_toc_title{font-weight:bold;color:#333;}
-.sub_toc_title cite{font-weight:normal;font-style:normal;font-family:monospace;font-size:8px;color:#333;}
+.sub_toc_title cite{font-weight:normal;font-style:normal;font-family:Courier,monospace;font-size:8px;color:#333;}
 a.sub_toc_title{text-decoration:none;}
 ol.faq li {padding-bottom:10px;padding-top:10px;border-bottom:1px solid #ccc;border-top:1px solid #fff;}
 ol.faq li.first{border-top:none;padding-top:0;}
