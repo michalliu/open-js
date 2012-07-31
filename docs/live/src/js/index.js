@@ -45,13 +45,14 @@ if (snippet) {
 $("li > a.sub_toc_title").click(function (e){
     var lable = $(this);
     var list = lable.next();
+    var cite = lable.parent().find('cite');
     if (list.is(":visible")) {
         list.slideUp(200, function () {
-            lable.find('cite').text('[+]');
+            cite.text(cite.text().replace('-','+'));
         });
     } else {
         list.slideDown(200, function () {
-            lable.find('cite').text('[-]');
+            cite.text(cite.text().replace('+','-'));
         });
     }
     return false;
