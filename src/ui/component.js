@@ -796,6 +796,76 @@
                 frag.appendChild(dshare_btn);
 
                 return frag;
+            },
+
+            methods: {
+
+                // appkey
+                appkey: function (appkey) { // this 指向组件instance
+
+                    _.extend(this.componentConfig, {
+
+                        appkey: appkey
+
+                    }, true);
+
+                    return this;
+
+                },
+
+                icon: function (ico) {
+
+                    if (typeof ico === 'number' || _s.isString(ico)) {
+
+                        if (typeof ico === 'number' && (ico < 0 || ico > 2)) {
+
+                            _l.warn("component set icon, default icon index must be 0,1,2, you gave " + ico);
+
+                        }
+
+                        _.extend(this.componentConfig, { "icon" : ico }, true);
+
+                    } else {
+
+                        _l.error("component set icon error, expect number or string, you gave " + (typeof ico));
+
+                    }
+
+                    return this;
+                },
+
+                showCounter: function (position) {
+
+                    var ico = this.componentConfig.icon;
+
+                    // position must be either left or top
+                    switch(position) {
+
+                        case 'left':
+
+                        case 'top':
+
+                        break;
+
+                        default:
+
+                        _l.warning("component showcounter, position must be either 'left' or 'top', you gave " + "'" + position + "'" );
+
+                        return this;
+                    }
+
+                    if (typeof ico === 'number' && (ico === 0 || ico === 1) ) {
+
+                        _.extend(this.componentConfig, {"counter":1, "counter_pos" : position }, true);
+
+                    } else { // icon index must be 1 or 2
+
+                        _l.warning("component showcounter, icon index must be either 0 or 1, you gave " + ico);
+
+                    }
+
+                    return this;
+                }
             }
     });
 
@@ -818,6 +888,8 @@
 
                 cfg = {},
 
+                autorender = false, // 是否应该自动渲染找到的预定义节点
+
                 e = document.getElementById(id);
 
             datakeys = _a.forEach(attrs, function (v,i) {
@@ -827,8 +899,6 @@
             });
 
             if (e) {
-
-                _l.debug(['try render component [', c.name, ' ', c.version,']'].join(''));
 
                 dataval = _.dom.getProperties(e, datakeys);
 
@@ -840,23 +910,37 @@
 
                         cfg[k] = v;
 
+                        if (!autorender && v !== null) { // 只要v有一次不为null，即组件指定的idname中有可读取的属性，就应该渲染该节点，否则不渲染
+
+                            autorender = true;
+
+                        }
                     }
 
                 });
 
                 _l.debug(['read configuration ', QQWB.JSON.stringify(cfg)].join(''));
 
-                try {
+                if (autorender) {
 
-                    _.component(c.name).config(cfg).render();
+                    _l.debug(['try render component [', c.name, ' ', c.version,']'].join(''));
 
-                } catch (componentRenderError) {
+                    try {
 
-                    _l.error(['render component [', c.name, c.version, '] error exception: ', componentRenderError].join(''));
+                        _.component(c.name).config(cfg).render();
 
+                    } catch (componentRenderError) {
+
+                        _l.error(['render component [', c.name, c.version, '] error exception: ', componentRenderError].join(''));
+
+                    }
+                    compFound++;
+
+                } else {
+
+                    _l.debug(['found dom element for [', c.name, ' ', c.version,'], but auto render will not start'].join(''));
                 }
 
-                compFound++;
             }
 
         }); // end forEach
