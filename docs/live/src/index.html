@@ -103,7 +103,7 @@
 
         </ul>
 
-		<a hidefocus class="toc_title" href="#应用案例">应用案例 <span class="version"> (演示代码)</span> <img src="http://mat1.gtimg.com/app/opent/images/wiki/resource/new.gif" alt="新"/> </a>
+		<a hidefocus class="toc_title" href="#应用案例">应用案例 <span class="tinyfont normalfont"> (演示代码)</span> <img src="http://mat1.gtimg.com/app/opent/images/wiki/resource/new.gif" alt="新"/> </a>
 
 <!--
 		<a class="toc_title" href="#网站连接">网站连接</a>
@@ -893,8 +893,11 @@ T.documentReady(function () {
                 <ol class="faq">
                     <li class="first">
                     <b>我在使用过程中遇到问题应该如何解决？</b><br/>
-                    请首先查阅 <a target="_blank" href="http://wiki.open.t.qq.com/index.php/%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98FAQ">接口常见问题</a>。如果仍未解决，可以加入OpenJS专属QQ群 <em class="red">221677647</em>。如果你认为遇到了bug或是浏览器兼容性问题，可以在 <a target="_blank" href="http://code.google.com/p/openjs-project/issues/list">问题跟踪系统</a> 中提交你的问题，我们的开发人员会尽快跟踪处理。
+                    请首先查阅 <a target="_blank" href="http://wiki.open.t.qq.com/index.php/%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98FAQ">接口常见问题</a>。如果仍未解决，可以加入OpenJS专属QQ群 <em class="red">221677647</em>。如果你认为遇到了bug或是浏览器兼容性问题，可以在 <a target="_blank" href="http://code.google.com/p/openjs-project/issues/list">问题跟踪系统</a> 中提交你的问题，我们的开发人员会尽快跟踪处理。注意，问题提交时，请务必注明浏览器类型和版本，以便快速定位问题，如果您不知道自己的浏览器类型和版本，可以打开 <a target="_blank" href="./snippet/code/browser.html">浏览器检测页面</a>，把检测结果复制给我们即可。
 					</li>
+					<li id="how_to_debug">
+                    <b>我怀疑遇到了bug，应该怎么调试？</b><br/>
+                    对于自带javascript控制台的浏览器，如(IE8,IE9,Firefox,Chrome)，开发者可以在 <a href="#环境变量">环境变量</a> 中设置debug为yes即可以在控制台中看到调试信息。对于不带控制台的浏览器（如IE6，腾讯TT，搜狗浏览器等），可以拖拽 <a href="javascript:(function (){if(window.QQWB){alert(QQWB.log.last())}else{alert('未检测到openjs')}}());">openjs调试信息输出工具</a> 到收藏栏，点击运行后即可看到相应的调试信息。
 					<li id="check_sign_error">
                     <b>check sign error？</b><br/>
                     check sign error是调用api时最常见的一个错误，造成这个错误的原因是被调用的接口需要鉴权，而当前没有获得用户授权，<a href="#loginstatus">T.loginStatus()</a> 返回undefined。要解决这个问题，请首先查阅 <a href="http://wiki.open.t.qq.com/index.php/API%E6%96%87%E6%A1%A3">API文档</a> 确定被调用接口是否需要鉴权。
