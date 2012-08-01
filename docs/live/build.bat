@@ -20,7 +20,9 @@ XCOPY ..\src\js .\static\js\ /S /Q /Y
 %node% %uglifyjs% -nc -v -o .\static\js\snippet.js .\static\js\snippet.js
 XCOPY ..\src\images .\static\images\ /S /Q /Y
 XCOPY ..\src\snippet .\snippet\ /S /Q /Y
+XCOPY ..\src\showcase .\showcase\ /S /Q /Y
 java -jar %htmlcompressor% --type html --compress-js -o .\snippet\snippet.html .\snippet\snippet.html
+java -jar %htmlcompressor% --type html --compress-js -o .\showcase\follow.html .\showcase\follow.html
 java -jar %htmlcompressor% --type html --compress-js -o .\index.html ..\src\index.html
 java -jar %htmlcompressor% --type html --compress-js -o .\guidance.html ..\src\guidance.html
 XCOPY ..\src\guess .\guess\ /S /Q /Y

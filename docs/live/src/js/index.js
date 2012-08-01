@@ -48,11 +48,11 @@ $("li > a.sub_toc_title").click(function (e){
     var cite = lable.parent().find('cite');
     if (list.is(":visible")) {
         list.slideUp(200, function () {
-            cite.text(cite.text().replace('-','+'));
+            cite.html(cite.html().replace('-','+'));
         });
     } else {
         list.slideDown(200, function () {
-            cite.text(cite.text().replace('+','-'));
+            cite.html(cite.html().replace('+','-'));
         });
     }
     return false;
