@@ -17,6 +17,7 @@
  *
  * @include core.dom
  *          core.event
+ *          core.browser
  */
 /*jslint laxcomma:true*/
 (function (){
@@ -24,6 +25,8 @@
    var _ = QQWB,
 
        _b = _.bigtable,
+
+       _br = _.browser,
 
        _l = _.log,
 
@@ -52,8 +55,6 @@
                        attrs = 'frameBorder="0" width="100%" height="100%" scrolling="no"',
 
                        layer = document.getElementById(layerid),
-
-                       _br = _.browser,
 
                        lastw, lasth, resize, cleanup;
 
@@ -202,11 +203,11 @@
                         ,redirect_uri: _b.get("uri","redirect")
     
                         ,scope: "all"
-    
-                        ,status: 0
+
+                        ,wap: _br.platform.mobile ? 2 : null
     
                     });
-    
+
                     props = ["width=" + width, "height=" + height, "left=" + x, "top=" + y].join(",");
     
                     if (samewindow) {
