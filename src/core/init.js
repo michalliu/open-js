@@ -208,7 +208,7 @@
 
            if (opts.callbackurl) {
 
-               opts.callbackurl = resolvePath(callbackurl);
+               opts.callbackurl = resolvePath(opts.callbackurl);
 
            }
 
