@@ -31,9 +31,9 @@
 
     _b.put("uri","api",[securebaseurl,"/api"].join(""));
     _b.put("uri","auth",[securebaseurl,"/cgi-bin/oauth2/authorize"].join(""));
-    _b.put("uri","html5proxy",[securebaseurl,"/open-js/proxy/proxy_v3.html"].join(""));
+    _b.put("uri","html5proxy",[securebaseurl,"/oauth2/openjs/proxy_v3.html"].join(""));
     _b.put("uri","innerauthproxy",[baseurl,"/open-js/proxy/proxy_v2.html"].join(""));
-    _b.put("uri","flashas3proxy",[securebaseurl,"/open-js/proxy/proxy_as3_v2.swf"].join(""));
+    _b.put("uri","flashas3proxy",[securebaseurl,"/oauth2/openjs/proxy_as3_v3.swf"].join(""));
     _b.put("uri","exchangetoken",[baseurl,"/cgi-bin/exchange_token"].join(""));
     _b.put("uri","autotoken",[baseurl,"/cgi-bin/auto_token"].join(""));
     _b.put("uri","gettokenbypt",[baseurl,"/cgi-bin/oauth2/get_oauth2token_pt"].join(""));
