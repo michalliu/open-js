@@ -13,6 +13,7 @@
  *           common.String
  *           core.log
  */
+/*jslint laxcomma:true*/
 (function () {
 
     var _ = QQWB,
@@ -154,11 +155,68 @@
                return;
            }
 
+           // resolve absolute path from a context 
+           function resolvePath(p) {
+               var dirpattern = /.*(?=\/.*$)/,
+                   abspattern = /^\/[^\/]/, // match '/a.js' but not match '//a.com/a.js'
+                   httpbasepattern = /^http/, // match 'http://a.com' or 'https://a.com'
+                   httpbasepattern2 = /^\/\//, // match url starts with '//a.com/a.js'
+                   loc = document.location,
+                   host = loc.host,
+                   protocol = loc.protocol.replace(':','') + ':',
+                   context;
+
+               if ( httpbasepattern2.test(p) || httpbasepattern.test(p) ) {
+                   // for http absolute url the context not specified
+                   context = '';
+               } else if (abspattern.test(p)) {
+                   // for absolute root path the context is current host
+                   context = protocol + host + '/';
+               } else {
+                   // for relative path the context is current location
+                   context = document.location.href;
+                   context = context.match(dirpattern);
+                   context = (context ? context[0] : '.') + '/';
+               }
+
+               // path like "//a.com/a.js" should resolve to "http(s)://a.com/a.js";
+               if(httpbasepattern2.test(p)) {
+                   p = protocol + p;
+               }
+
+               return context + normalize(p);
+           }
+
+           // normalize a url
+           function normalize(path, prevPath) {
+               // convert backslashes to forward slashes, remove double slashes
+               path = path.replace(/\\/g, '/')
+                          .replace(/\/\//g, '/')
+               // allow form of 'http://' double slashes
+                          .replace(/:\//, '://')
+               // replace any matches of "./"  with "/"
+                          .replace(/(^|[^\.])(\.\/)/g, "$1");
+
+               do {
+                   prevPath = path;
+               // replace any matches of "some/path/../" with "some/" recursively
+                   path = path.replace(/([\w,\-]*[\/]{1,})([\.]{2,}\/)/g, "");
+               }while(prevPath !== path);
+
+               return path;
+           }
+
+           if (opts.callbackurl) {
+
+               opts.callbackurl = resolvePath(callbackurl);
+
+           }
+
            _l.debug("init signal has arrived");
 
            opts = _.extend({
 
-               callbackurl: document.location.href.replace(location.search,"").replace(location.hash,"")
+               callbackurl: document.location.href.replace(location.hash,"")
 
               ,pingback: true // pingback send on init
 
