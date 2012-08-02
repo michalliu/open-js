@@ -253,11 +253,11 @@ QQWB.extend("_token",{
 
                !response.expires_in && _l.error("accesstoken expires_in not returned");
 
-               !response.wb_name && _l.warning("weibo username not retrieved, will not update username");
+               !response.name && _l.warning("weibo username not retrieved, will not update username");
 
-               !response.wb_nick && _l.warning("weibo nick not retrieved, will not update nick");
+               !response.nick && _l.warning("weibo nick not retrieved, will not update nick");
 
-               _._token.setAccessToken(response.access_token, response.openid, parseInt(response.expires_in,10), response.wb_name, response.wb_nick);
+               _._token.setAccessToken(response.access_token, response.openid, parseInt(response.expires_in,10), response.name, response.nick);
 
                if (response.refresh_token) {
 
@@ -367,11 +367,11 @@ QQWB.extend("_token",{
 
            !response.expires_in && _l.error("token expires_in not retrieved");
 
-           !response.wb_name && _l.warning("weibo username not retrieved");
+           !response.name && _l.warning("weibo username not retrieved");
 
-           !response.wb_nick && _l.warning("weibo usernick not retrieved");
+           !response.nick && _l.warning("weibo usernick not retrieved");
 
-           _._token.setAccessToken(response.access_token, response.openid, parseInt(response.expires_in,10), response.wb_name, response.wb_nick);
+           _._token.setAccessToken(response.access_token, response.openid, parseInt(response.expires_in,10), response.name, response.nick);
 
            if (response.refresh_token) {
 
