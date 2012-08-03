@@ -320,11 +320,11 @@ QQWB.extend("_token",{
 
           if(!response.expires_in) _l.error("token expires_in not retrieved");
 
-          if( !response.name) _l.warning("weibo username not retrieved");
+          if( !response.name && !response.wb_name) _l.warning("weibo username not retrieved");
 
-          if( !response.nick) _l.warning("weibo usernick not retrieved");
+          if( !response.nick && !response.wb_nick) _l.warning("weibo usernick not retrieved");
 
-           _._token.setAccessToken(response.access_token, response.openid, parseInt(response.expires_in,10), response.name, response.nick);
+           _._token.setAccessToken(response.access_token, response.openid, parseInt(response.expires_in,10), response.name || response.wb_name, response.nick || response.wb_nick);
 
            if (response.refresh_token) {
 
