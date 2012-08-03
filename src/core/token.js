@@ -229,17 +229,17 @@ QQWB.extend("_token",{
 
                ,data: _q.encode({
 
-                          response_type: "token"
+                          grant_type: "refresh_token"
 
                          ,client_id: appkey
 
-                         ,scope: "all"
+                         //,scope: "all"
 
-                         ,state: "1"
+                         //,state: "1"
 
                          ,refresh_token: this.getRefreshToken()
 
-                         ,access_token: this.getAccessToken(true)
+                         //,access_token: this.getAccessToken(true)
 
                       })
 
@@ -308,7 +308,7 @@ QQWB.extend("_token",{
        return _;
 
     }
-
+/*
     ,loadSyncLoginToken: function () {
 
        var _ = QQWB,
@@ -339,7 +339,7 @@ QQWB.extend("_token",{
 
            });
     }
-
+*/
     /**
      * Auto resolve response from server
      *
