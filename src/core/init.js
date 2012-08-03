@@ -55,8 +55,9 @@
 
     _b.put("cookie","domain",QQWB.envs.cookiedomain);
     _b.put("cookie","path",QQWB.envs.cookiepath);
-    _b.put("cookie","accesstokenname","QQWBToken");
-    _b.put("cookie","refreshtokenname","QQWBRefreshToken");
+    // cookie version 3
+    _b.put("cookie","accesstokenname","QQWBToken" + '3');
+    _b.put("cookie","refreshtokenname","QQWBRefreshToken" + '3');
     _b.put("cookie","refreshtokenexpires",7 * 24 * 3600);
     _b.put('cookie','getAccesstokenName', function () {
         return [_b.get("cookie","accesstokenname"), _b.get("base", "appkey")].join("_");
