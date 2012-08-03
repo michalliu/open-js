@@ -36,7 +36,7 @@ QQWB.extend("_token",{
 
             user;
 
-        user = this.getTokenUser(true);
+        user = this.getTokenUser();
 
         _c.set(_b.get("cookie","getAccesstokenName")()
 
@@ -85,10 +85,9 @@ QQWB.extend("_token",{
      * Get user infomation associated with access token
      *
      * @access public
-     * @param optRaw {Boolean} if set to true, will not consider about expiration
      * @return {Object|undefined} an user object associated with access token if available
      */
-   ,getTokenUser: function (optRaw) {
+   ,getTokenUser: function () {
 
         var _ = QQWB,
 
@@ -106,19 +105,16 @@ QQWB.extend("_token",{
 
              token = token.split("|",5);
 
-             if (optRaw || parseInt(token[2],10) > QQWB.time.now()) {
+             return {
 
-                 return {
+                 openid: token[1]
 
-                     openid: token[1]
+                ,name: token[3]
 
-                    ,name: token[3]
+                ,nick: token[4]
 
-                    ,nick: token[4]
+             };
 
-                 };
-
-             }
 
          }
 
