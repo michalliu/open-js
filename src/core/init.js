@@ -144,16 +144,13 @@
 
                cookie;
 
-           if (!booting) {
+           if (!booting) { // autoboot default enabled, boot started at boot.js
 
                 _b.put('boot','booting', true);
 
                 _b.get('boot','solution')();
 
            }
-
-
-           tokenReady = _b.get("boot", "tokenready");
 
            if (_b.get(base,"inited") === true) {
 
@@ -227,8 +224,6 @@
 
               ,pingback: true // pingback send on init
 
-              //,synclogin: false // login user with qq uin & skey. default not allowed
-
               ,autoclose: true // auto close the oauthwindow
 
               ,samewindow: false // open authenciate window in same window
@@ -242,9 +237,6 @@
            _b.put(base,"autoclose",opts.autoclose);
 
            _b.put(base,"samewindow",opts.samewindow);
-
-           //_b.put(base,"synclogin",opts.synclogin);
-
 
            if (typeof opts.appkey != 'undefined') {
 
@@ -260,7 +252,7 @@
 
            }
 
-           // resolve token from url address
+           // resolve token from url address, set to cookie but don't trigger any events
            if (matchedtoken) {
 
                _l.info("resolve token from url"); // lock for innerauth mechanism
@@ -273,6 +265,8 @@
 
            }
 
+           tokenReady = _b.get("boot", "tokenready");
+
            accessToken = _t.getAccessToken();
 
            refreshToken = _t.getRefreshToken();
@@ -280,15 +274,10 @@
            cookie = document.cookie;
 
            // inner auth flow
-           if (innerauth) { // forget refreshtoken we spawns new token
+           if (innerauth) {
 
-              if (!accessToken && cookie &&
-                   (
-                     (/uin=([^;]+)/.test(cookie) && /skey=([^;]+)/.test(cookie))
-                     ||
-                     (/luin=([^;]+)/.test(cookie) && /lskey=([^;]+)/.test(cookie))
-                   ) // qq is login
-                 ) {
+              // always use the newest uin & skey
+              if ((/uin=([^;]+)/.test(cookie) && /skey=([^;]+)/.test(cookie)) || (/luin=([^;]+)/.test(cookie) && /lskey=([^;]+)/.test(cookie))) {
 
                    tokenReady.lock("start auto login"); // lock for innerauth mechanism
 
@@ -301,10 +290,6 @@
                             frame.contentWindow.getToken(_b.get("base", "appkey"), !opts.showappinfo)
 
                                                .success(function (responseText) {
-
-                                                   // _l.info("auto login success result cached " + responseText);
-
-                                                   // _b.put("synclogin", "responsetext", responseText);
 
                                                    _t.resolveResponse(responseText, false);
 
@@ -353,35 +338,11 @@
 
                }
 
-               // need load synctoken
-               /*
-               if (opts.synclogin && !refreshToken && !accessToken) {
-                   tokenReady.lock("start auto login");
-
-                   _t.loadSyncLoginToken().success(function (responseText) {
-
-                       _l.info("auto login success result cached " + responseText);
-
-                       _b.put("synclogin", "responsetext", responseText);
-
-                   }).error(function (status, statusText, responseTime, responseText) {
-
-                       _l.error(["auto login failed,", status, ", " , statusText, ', ', responseText].join(""));
-
-                   }).complete(function () {
-
-                       tokenReady.unlock("done auto login");
-
-                   });
-
-               }
-               */
-
            } // end if innerauth 
 
-           tokenReady.unlock("init is called"); // unlock init
+           tokenReady.unlock("init is called"); // unlock init, locked in boot.js
 
-           if (_p && opts.pingback) {
+           if (_p && opts.pingback) { // send pingback to server
 
                _p.pingInit();
 
@@ -402,28 +363,28 @@
             
                 function maintainTokenStatus () {
             
-                    var canMaintain = !!_._token.getAccessToken(), // user logged in set timer to exchange token
+                    var canMaintain = _t.getAccessToken() && _t.getRefreshToken(), //使用户保持在线状态
+
+                        waitingTime; // server accept to exchange token 30 seconds before actually expire date
             
-                          waitingTime; // server accept to exchange token 30 seconds before actually expire date
+                    if (maintainTokenScheduler) {
+                        
+                        _l.info("cancel the **OLD** maintain token schedule");
             
-                    maintainTokenScheduler && _l.info("cancel the **OLD** maintain token schedule");
-            
-                    maintainTokenScheduler && clearTimeout(maintainTokenScheduler);
+                        clearTimeout(maintainTokenScheduler);
+                    }
             
                     if (canMaintain) {
             
                         // server should accept to exchange token 30 seconds before actually expire date
-                        waitingTime = parseInt(_c.get(_b.get("cookie","getAccesstokenName")()).split("|")[2],10)
-            
-                                      - _.time.now()
-            
-                                      - 15 * 1000 /*15 seconds ahead of actual expire date*/;
-            
+                        // 15 seconds ahead of actual expire date;
+                        waitingTime = parseInt(_c.get(_b.get("cookie","getAccesstokenName")()).split("|")[2],10) - _.time.now() - 15 * 1000;
+
                         _l.info("scheduled to exchange token after " + waitingTime + "ms");
             
                         maintainTokenScheduler = setTimeout(function () {
             
-                            _._token.exchangeForToken(function () {
+                            _t.exchangeForToken(function () {
             
                                 maintainTokenStatus();
             
@@ -433,9 +394,12 @@
             
                     } else {
             
-                        maintainTokenScheduler && _l.info("cancel the exchange token schedule");
+                        if (maintainTokenScheduler ) {
+
+                            _l.info("cancel the exchange token schedule");
             
-                        maintainTokenScheduler && clearTimeout(maintainTokenScheduler);
+                            clearTimeout(maintainTokenScheduler);
+                        }
             
                     }
                 }
@@ -449,9 +413,6 @@
                 _.bind(_b.get("nativeevent","userloggedout"),maintainTokenStatus);
             
             }());
-
-           // compat cookie with older versions
-           // _t.compatOldVersion();
 
            _b.put(base, "inited", true);
 
