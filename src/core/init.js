@@ -30,9 +30,20 @@
 
         securebaseurl = 'https' + basehost;
 
+    _b.put("innerauth","layerid","openjslayer" + QQWB.uid(5));
+    _b.put("innerauth","originaldomain",document.domain);
+    _b.put("innerauth","rootdomain","qq.com");
+    _b.put("innerauth","enabled", document.domain != 'open.t.qq.com' && _s.endsWith(document.domain, _b.get("innerauth","rootdomain")));
+    _b.put("innerauth","eventproxyready","InnerAuthProxyFrameReady");
+    _b.put("innerauth","eventproxysizechange", "InnerAuthProxySizeChange");
+    _b.put("innerauth","eventproxysubmit", "InnerAuthResult");    
+    _b.put("innerauth","eventproxycancel", "InnerAuthRequestCancel");    
+
     _b.put("uri","api",[securebaseurl,"/api"].join(""));
     _b.put("uri","auth",[securebaseurl,"/cgi-bin/oauth2/authorize"].join(""));
-    _b.put("uri","html5proxy",[securebaseurl,"/oauth2/openjs/proxy_v3.html"].join(""));
+    // proxy.html 工作在innerauth的情况下，协议必须同步即外部QQ页面是http 代理页也必须为http
+    // 域内授权页亦是如此
+    _b.put("uri","html5proxy",[_b.get("innerauth","enabled") ? (document.location.protocol.replace(':','') + basehost) : securebaseurl,"/oauth2/openjs/proxy_v3.html"].join(""));
     _b.put("uri","innerauthproxy",[baseurl,"/open-js/proxy/proxy_v2.html"].join(""));
     _b.put("uri","flashas3proxy",[securebaseurl,"/oauth2/openjs/proxy_as3_v3.swf"].join(""));
     _b.put("uri","exchangetoken",[securebaseurl,"/cgi-bin/oauth2/access_token"].join(""));
@@ -44,14 +55,6 @@
     _b.put("oauthwindow","width","630");
     _b.put("oauthwindow","height","480");
 
-    _b.put("innerauth","layerid","openjslayer" + QQWB.uid(5));
-    _b.put("innerauth","originaldomain",document.domain);
-    _b.put("innerauth","rootdomain","qq.com");
-    _b.put("innerauth","enabled", document.domain != 'open.t.qq.com' && _s.endsWith(document.domain, _b.get("innerauth","rootdomain")));
-    _b.put("innerauth","eventproxyready","InnerAuthProxyFrameReady");
-    _b.put("innerauth","eventproxysizechange", "InnerAuthProxySizeChange");
-    _b.put("innerauth","eventproxysubmit", "InnerAuthResult");    
-    _b.put("innerauth","eventproxycancel", "InnerAuthRequestCancel");    
 
     _b.put("cookie","domain",QQWB.envs.cookiedomain);
     _b.put("cookie","path",QQWB.envs.cookiepath);
