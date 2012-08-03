@@ -138,8 +138,6 @@
 
                accessToken,
 
-               rawAccessToken, 
-
                refreshToken,
 
                tokenReady,
@@ -277,8 +275,6 @@
 
            accessToken = _t.getAccessToken();
 
-           rawAccessToken = _t.getAccessToken(true); 
-
            refreshToken = _t.getRefreshToken();
 
            cookie = document.cookie;
@@ -343,7 +339,7 @@
 
                _b.put("uri","redirect",opts.callbackurl);
 
-               if (refreshToken && !accessToken && rawAccessToken) { // need exchange token
+               if (refreshToken && !accessToken) { // need exchange token
 
                    tokenReady.lock("exchange token");
 

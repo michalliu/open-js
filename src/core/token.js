@@ -42,7 +42,7 @@ QQWB.extend("_token",{
 
                        ,[accessToken, openid, _t.now() + expireIn * 1000, optUsername || (user && user.name) || "", optNickname || (user && user.nick) || ""].join("|")
 
-                       ,_b.get("cookie","refreshtokenexpires")
+                       ,expireIn
 
                        ,_b.get("cookie","path")
 
@@ -75,13 +75,7 @@ QQWB.extend("_token",{
 
          if (token) {
 
-             token = token.split("|",3);
-
-             if (optRaw || parseInt(token[2],10) > _t.now()) {
-
-                 return token[0];
-
-             }
+             return token.split("|",1)[0];
 
          }
 
@@ -233,13 +227,7 @@ QQWB.extend("_token",{
 
                          ,client_id: appkey
 
-                         //,scope: "all"
-
-                         //,state: "1"
-
                          ,refresh_token: this.getRefreshToken()
-
-                         //,access_token: this.getAccessToken(true)
 
                       })
 
