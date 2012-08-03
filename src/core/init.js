@@ -229,7 +229,7 @@
 
               ,pingback: true // pingback send on init
 
-              ,synclogin: false // login user with qq uin & skey. default not allowed
+              //,synclogin: false // login user with qq uin & skey. default not allowed
 
               ,autoclose: true // auto close the oauthwindow
 
@@ -245,7 +245,7 @@
 
            _b.put(base,"samewindow",opts.samewindow);
 
-           _b.put(base,"synclogin",opts.synclogin);
+           //_b.put(base,"synclogin",opts.synclogin);
 
 
            if (typeof opts.appkey != 'undefined') {
@@ -357,8 +357,9 @@
 
                }
 
-               if (opts.synclogin && !refreshToken && !accessToken) { // need load synctoken
-
+               // need load synctoken
+               /*
+               if (opts.synclogin && !refreshToken && !accessToken) {
                    tokenReady.lock("start auto login");
 
                    _t.loadSyncLoginToken().success(function (responseText) {
@@ -378,6 +379,7 @@
                    });
 
                }
+               */
 
            } // end if innerauth 
 
