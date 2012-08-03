@@ -35,7 +35,7 @@
     _b.put("uri","html5proxy",[securebaseurl,"/oauth2/openjs/proxy_v3.html"].join(""));
     _b.put("uri","innerauthproxy",[baseurl,"/open-js/proxy/proxy_v2.html"].join(""));
     _b.put("uri","flashas3proxy",[securebaseurl,"/oauth2/openjs/proxy_as3_v3.swf"].join(""));
-    _b.put("uri","exchangetoken",[baseurl,"/cgi-bin/exchange_token"].join(""));
+    _b.put("uri","exchangetoken",[securebaseurl,"/cgi-bin/oauth2/access_token"].join(""));
     _b.put("uri","autotoken",[baseurl,"/cgi-bin/auto_token"].join(""));
     _b.put("uri","gettokenbypt",[baseurl,"/cgi-bin/oauth2/get_oauth2token_pt"].join(""));
     _b.put("uri","innerauth",[baseurl,"/cgi-bin/oauth2/inner_flow_page"].join(""));
@@ -55,10 +55,14 @@
 
     _b.put("cookie","domain",QQWB.envs.cookiedomain);
     _b.put("cookie","path",QQWB.envs.cookiepath);
+
     // cookie version 3
     _b.put("cookie","accesstokenname","QQWBToken" + '3');
     _b.put("cookie","refreshtokenname","QQWBRefreshToken" + '3');
-    _b.put("cookie","refreshtokenexpires",7 * 24 * 3600);
+
+    // on new oauth2.0 refreshtoken expires after 90 days since issued
+    _b.put("cookie","refreshtokenexpires",30 * 24 * 3600);
+
     _b.put('cookie','getAccesstokenName', function () {
         return [_b.get("cookie","accesstokenname"), _b.get("base", "appkey")].join("_");
     });
