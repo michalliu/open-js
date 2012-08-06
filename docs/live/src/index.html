@@ -210,7 +210,7 @@
 		<div class="options">
 			<div class="argument">inInitOpts<span class="optrequired">必选</span><span class="opttype">Map</span></div>
 			<div class="option">appkey<span class="optrequired">必选</span><span class="opttype">String</span><div class="optdefault">默认值:无</div><p>开放平台appkey，据协议和平台的差异性有时又叫appid或client id。</p></div>
-			<div class="option">callbackurl<span class="opttype">String</span><div class="optdefault">默认值:当前页面网址</div><p>用户授权成功后的回跳页面地址，如不设置则为当前页面网址。回跳页面地址必须与appkey匹配<sup><a target="_blank" href="http://mat1.gtimg.com/app/openjs/static/images/uri_explaination.jpg">[链]</a></sup>，否则无法完成授权。建议开发者在服务器上部署一个带有提示性文字的html文件，并把callbackurl指向这个文件，以带来更好的用户体验。</p></div>
+            <div class="option">callbackurl<span class="opttype">String</span><div class="optdefault">默认值:当前页面网址</div><p>用户授权成功后的回跳页面地址，如不设置则为当前页面网址。回跳页面地址必须与appkey匹配<sup><a target="_blank" href="http://mat1.gtimg.com/app/openjs/static/images/uri_explaination.jpg">[链]</a></sup>，否则无法完成授权。建议开发者在服务器上部署一个带有提示性文字的html文件，并把callbackurl指向这个文件，以带来更好的用户体验。关于此参数的更多细节问题，请阅读 <a href="#faq9">FAQ</a></p></div>
             <div class="option">autoclose<span class="opttype">Boolean</span><div class="optdefault">默认值:true(自动关闭授权窗口)</div><p>默认自动关闭授权窗口，授权页面一旦回跳到开发者指定的<em>callbackurl</em>就立刻关闭授权窗口。为假则没有此操作，开发者需要自行关闭窗口 (调用浏览器的window.close接口)。</p></div>
             <div class="option">samewindow<span class="opttype">Boolean</span><div class="optdefault">默认值:false(弹新窗口授权)</div><p>默认为弹新窗口授权，否则在同一窗口完成授权(类似OAuth1.0的体验)，此方法用来解决某些浏览器安装了第三方弹窗屏蔽插件，造成无法授权的问题。</p><p>注意，在此情况下开发者必须自己处理授权返回的token，如果您不想编写代码，也可以使用我们提供的通用方案<sup><a target="_blank" href="http://mat1.gtimg.com/app/openjs/static/downloads/openjscallback.zip">[链]</a></sup>。</p><p>在一般情况下，开发者无须担心弹出的授权窗口被浏览器屏蔽，因为授权行为一般是由用户主动点击触发，浏览器不会进行屏蔽。</p>
 
@@ -248,7 +248,7 @@
 			<div class="argument">inInitOpts<span class="optrequired">必选</span><span class="opttype">Map</span></div>
 			<div class="option">appkey<span class="optrequired">必选</span><span class="opttype">String</span><div class="optdefault">默认值:无</div><p>开放平台appkey，据协议和平台的差异性有时又叫appid或client id。</p></div>
 			<div class="option light">showappinfo<span class="opttype">Boolean</span><div class="optdefault">默认值:true(显示应用信息)</div><p>若为真当用户首次使用你的应用时，将显示应用信息及授权按钮。为假则忽略授权步骤，直接获取用户的授权。</p></div>
-			<div class="option del">callbackurl<span class="opttype del">String</span><div class="optdefault del">默认值:当前页面网址</div><p>用户授权成功后的回跳页面地址，如不设置则为当前页面网址。回跳页面地址必须与appkey匹配<sup><a target="_blank" href="http://mat1.gtimg.com/app/openjs/static/images/uri_explaination.jpg">[链]</a></sup>，否则无法完成授权。</p></div>
+			<div class="option del">callbackurl<span class="opttype del">String</span><div class="optdefault del">默认值:当前页面网址</div><p>用户授权成功后的回跳页面地址，如不设置则为当前页面网址。回跳页面地址必须与appkey匹配<sup><a target="_blank" href="http://mat1.gtimg.com/app/openjs/static/images/uri_explaination.jpg">[链]</a></sup>，否则无法完成授权。关于此参数的更多细节问题，请阅读 <a href="#faq9">FAQ</a></p></div>
 			<div class="option del">autoclose<span class="opttype del">Boolean</span><div class="optdefault del">默认值:true(自动关闭授权窗口)</div><p>默认自动关闭授权窗口，否则需开发者自行关闭回跳页面窗口。</p></div>
             <div class="option del">samewindow<span class="opttype del">Boolean</span><div class="optdefault del">默认值:false(弹新窗口授权)</div><p>默认为弹新窗口授权，否则在同一窗口授权，在此情况下开发者须自己处理授权返回的token，或使用我们提供的通用方案<sup><a target="_blank" href="http://mat1.gtimg.com/app/openjs/static/downloads/openjscallback.zip">[链]</a></sup>。开发者无须担心弹出的授权窗口被浏览器屏蔽，因为授权行为一般是由用户主动点击触发，浏览器不会进行屏蔽。</p>
 </div>
@@ -891,38 +891,42 @@ T.documentReady(function () {
 		<h2 id="常见问题">常见问题</h2>
 		<div class="options">
                 <ol class="faq">
-                    <li class="first">
+                    <li class="first" id="faq1">
                     <b>我在使用过程中遇到问题应该如何解决？</b><br/>
                     请首先查阅 <a target="_blank" href="http://wiki.open.t.qq.com/index.php/%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98FAQ">接口常见问题</a>。如果仍未解决，可以加入OpenJS专属QQ群 <em class="red">221677647</em>。如果你认为遇到了bug或是浏览器兼容性问题，可以在 <a target="_blank" href="http://code.google.com/p/openjs-project/issues/list">问题跟踪系统</a> 中提交你的问题，我们的开发人员会尽快跟踪处理。注意，问题提交时，请务必注明浏览器类型和版本，以便快速定位问题，如果您不知道自己的浏览器类型和版本，可以打开 <a target="_blank" href="./snippet/code/browser.html">浏览器检测页面</a>，把检测结果复制给我们即可。
 					</li>
-					<li id="how_to_debug">
+					<li id="faq2">
                     <b>我怀疑遇到了bug，应该怎么调试？</b><br/>
                     对于自带javascript控制台的浏览器，如(IE8,IE9,Firefox,Chrome)，开发者可以在 <a href="#环境变量">环境变量</a> 中设置debug为yes即可以在控制台中看到调试信息。对于不带控制台的浏览器（如IE6，腾讯TT，搜狗浏览器等），可以拖拽 <a href="javascript:(function (){if(window.QQWB){alert(QQWB.log.last())}else{alert('未检测到openjs')}}());">openjs调试信息输出工具</a> 到收藏栏，点击运行后即可看到相应的调试信息。
-					<li id="check_sign_error">
+					<li id="faq3">
                     <b>check sign error？</b><br/>
                     check sign error是调用api时最常见的一个错误，造成这个错误的原因是被调用的接口需要鉴权，而当前没有获得用户授权，<a href="#loginstatus">T.loginStatus()</a> 返回undefined。要解决这个问题，请首先查阅 <a href="http://wiki.open.t.qq.com/index.php/API%E6%96%87%E6%A1%A3">API文档</a> 确定被调用接口是否需要鉴权。
                     <p>若接口不需要鉴权而出现了鉴权错误，请检查传入的appkey是否正确，若appkey不正确也会产生此错误。</p>
                     <p>若接口要求鉴权，而T.loginStatus()返回undefined，可以考虑使用 <a href="#login">T.login()</a> 获得用户授权后再调用接口，或调用 <a href="#api">T.api</a> 时声明accesstoken。</p>
 					</li>
-					<li id="fusion_api">
+					<li id="faq4">
                     <b>OpenJS与fusion api有什么关系？它与其它js库兼容吗？</b><br/>
                     OpenJS 和 Fusion api 没有关系，它们都是独立的js库。OpenJS可以与现有的js库或框架兼容，它会在使用者的网站上声明 <em>QQWB</em> 和 <em>T</em> 两个全局变量，它在运行过程中也会产生少量的带有特殊前缀的临时全局变量，不会影响其它js代码的执行。
 					</li>
-					<li id="fusion_api">
+					<li id="faq5">
                     <b>OpenJS是如何实现跨域数据提交的？</b><br/>
                     对于支持 <a target="_blank" href="https://developer.mozilla.org/en/DOM/window.postMessage">postMessage</a> 的浏览器，我们优先使用此方法，在其余浏览器我们采用flash提供的跨域机制完成数据传输(flashplayer要求支持ExternalInterface)，要查看浏览器是否支持这两种技术，请访问<a target="_blank" href="http://open.t.qq.com/open-js/doc/snippet/code/browser.html">此页面</a>。
 					</li>
-					<li id="iframe_problem">
+					<li id="faq6">
                     <b>用OpenJS开发的应用非嵌入的时候正常，用iframe嵌入到其它页面就不正常了，是不是OpenJS不支持iframe？</b><br/>
                     OpenJS自带的鉴权机制会利用cookie保存用户的授权信息，当您的应用嵌入到另外一个页面时，就会遇到 <a target="_blank" href="http://msdn.microsoft.com/en-us/library/ms537343(v=vs.85).aspx">第三方cookie</a> 的问题，简单来说就是被嵌入非同源的页面无法读取或写入cookie。开发者只需要按照 <a href="http://viralpatel.net/blogs/how-to-set-third-party-cookies-with-iframe/">这篇教程</a> 在程序中输出 <em>p3p header</em> 即可。一般情况下，在腾讯微博应用频道上线的应用都是以iframe嵌入的，会遇到这个问题。
 					</li>
-					<li id="authorization_information">
+					<li id="faq7">
                     <b>用户授权了应用，这个授权可以持续多久有效？</b><br/>
                     使用OpenJS自带的授权机制进行授权，用户的授权信息会保存cookie里，如果用户不主动清除cookie并且 <a href="#logout">T.logout()</a> 没有被调用（实际上也是清除cookie），授权是一直有效的，否则的话用户需要重新授权。
 					</li>
-					<li id="authorization_error">
+					<li id="faq8">
                     <b>授权出错，redirect_uri与注册的应用网址不匹配？</b><br/>
                     oauth2.0协议对外暴露了appid，为防止有人冒用其它人的appid让用户授权，非法获得用户的信任。我们要求授权后页面回跳的地址必须是该appid拥有者所指定的地址（应用网址），否则便阻止用户授权。<p>这可能会给开发者应用开发过程中的调试带来不便，我们建议在开发过程中采用配置HOSTS文件改变域名到IP映射的办法解决这个问题，或者也可以在开发阶段采用ip地址作为网址，应用提交审核或正式上线时再切换到域名。</p>
+					</li>
+					<li id="faq9">
+                    <b>弹出的授权窗口为什么不能自动关闭？</b><br/>
+                    首先，请确保 <a href="#init">T.init</a> 不是 <em>autoclose</em> 为false，如果autoclose为false，则代表授权窗口不会被自动关闭。其次，请检查callbackurl是否与调用页同域，不同域的情况下无法自动关闭窗口，也无法获取授权的token，默认情况下callbackurl为调用页的网址，不会出现此问题。<br/>另，所谓同域是指网址的协议相同，端口相同，以及域名相同。据开发者反馈，这里最常见的一个错误是应用网址是 <em>http://example.com/app.htm</em>而callbackurl为 <em>http://www.example.com/callback.htm</em>，开发者往往误认为 <em>example.com</em> 与 <em>www.example.com</em> 同域，但对于浏览器来说，他们不是同域的。
 					</li>
                     <!--
 					<li id="fusion_api">
@@ -930,7 +934,7 @@ T.documentReady(function () {
                     OpenJS可以与其它SDK结合使用，OpenJS可以接受OAuth2.0协议的AccessToken，通过URL地址栏传递Token，T.api函数可独立指定token
 					</li>
                     -->
-					<li id="什么是腾讯域内应用">
+					<li id="faq10">
                     <b>什么是腾讯域内应用？</b><br/>
                     腾讯域内应用，是指应用网址以<em>qq.com</em>结尾的应用，简称域内应用。<br/>OpenJS同时支持腾讯域内应用与域外应用的开发，两者的区别是授权画面不一样，域内应用采用浮层式的体验，域外应用采用弹窗的体验。<br/><p>注意，使用OpenJS开发的域内应用<em>document.domain</em>为<em>qq.com</em>。</p>
 					OpenJS完美支持域内应用与域外应用互相迁移，意味者开发者无需更改任何代码即可把域外的应用迁移到域内使用，反之亦可。
