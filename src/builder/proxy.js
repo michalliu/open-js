@@ -75,10 +75,10 @@
             type: 'post',
 
             data:['appkey=',appkey
-                 ,'&version=2.0'
+                 ,'&version=2.a'
                  ,'&response_type=', force ? 'token' : 'check'
                  ,'&seqid=', Math.floor(Math.random() * 10E5)
-                 ,'&appfrom=openjs2.0'
+                 ,'&appfrom=openjs' + T.version
                  ,'&g_tk=', safekey ? safekey[1] : ''].join(''),
 
             dataType: 'text'
