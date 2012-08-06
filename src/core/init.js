@@ -27,6 +27,8 @@
         basehost = '://open.t.qq.com',
         
         baseurl = 'http' + basehost,
+        
+        currprotocol = document.location.protocol.replace(':',''),
 
         securebaseurl = 'https' + basehost;
 
@@ -41,15 +43,16 @@
 
     _b.put("uri","api",[securebaseurl,"/api"].join(""));
     _b.put("uri","auth",[securebaseurl,"/cgi-bin/oauth2/authorize"].join(""));
-    // proxy.html 工作在innerauth的情况下，协议必须同步即外部QQ页面是http 代理页也必须为http
-    // 域内授权页亦是如此
-    _b.put("uri","html5proxy",[_b.get("innerauth","enabled") ? (document.location.protocol.replace(':','') + basehost) : securebaseurl,"/oauth2/openjs/proxy_v3.html"].join(""));
-    _b.put("uri","innerauthproxy",[baseurl,"/open-js/proxy/proxy_v2.html"].join(""));
+
+    // 工作在域内授权模式下，页面协议以外部页面的协议外住，默认是https
+    _b.put("uri","html5proxy",[_b.get("innerauth","enabled") ? (currprotocol + basehost) : securebaseurl,"/oauth2/openjs/proxy_v3.html"].join(""));
+    // 域内授权页协议以外部页面协议为主，默认为http协议
+    _b.put("uri","innerauth",[_b.get("innerauth","enabled") ? (currprotocol + basehost) : baseurl,"/cgi-bin/oauth2/inner_flow_page2"].join(""));
+
     _b.put("uri","flashas3proxy",[securebaseurl,"/oauth2/openjs/proxy_as3_v3.swf"].join(""));
     _b.put("uri","exchangetoken",[securebaseurl,"/cgi-bin/oauth2/access_token"].join(""));
     _b.put("uri","autotoken",[baseurl,"/cgi-bin/auto_token"].join(""));
     _b.put("uri","gettokenbypt",[baseurl,"/cgi-bin/oauth2/get_oauth2token_pt"].join(""));
-    _b.put("uri","innerauth",[baseurl,"/cgi-bin/oauth2/inner_flow_page"].join(""));
 
     _b.put("oauthwindow","name","authClientProxy_ee5a0f93");
     _b.put("oauthwindow","width","630");
