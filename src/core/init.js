@@ -136,7 +136,7 @@
 
                innerauth = _b.get("innerauth","enabled"),
 
-               matchedtoken = location.href.match(/oauth2token=([^&]+)/i),
+               matchedtoken = location.href.match(/oauth2atoken=([^&]+)/i),
 
                wbname,
 
