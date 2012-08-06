@@ -51,8 +51,7 @@
 
     _b.put("uri","flashas3proxy",[securebaseurl,"/oauth2/openjs/proxy_as3_v3.swf"].join(""));
     _b.put("uri","exchangetoken",[securebaseurl,"/cgi-bin/oauth2/access_token"].join(""));
-    _b.put("uri","autotoken",[baseurl,"/cgi-bin/auto_token"].join(""));
-    _b.put("uri","gettokenbypt",[baseurl,"/cgi-bin/oauth2/get_oauth2token_pt"].join(""));
+    _b.put("uri","gettokenbypt",[securebaseurl,"/cgi-bin/oauth2/get_oauth2token_pt"].join(""));
 
     _b.put("oauthwindow","name","authClientProxy_ee5a0f93");
     _b.put("oauthwindow","width","630");
