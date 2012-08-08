@@ -346,7 +346,7 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optOverride)
 
                      type: _s.trim(type.toUpperCase())
 
-                    ,url: _b.get("uri","api") + api
+                    ,url: _b.get("uri","apiforflash") + api
 
                     ,data: _q.encode(apiParams)
 

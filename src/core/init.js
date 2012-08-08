@@ -48,11 +48,13 @@
     // 工作在域外模式下，一直是https
     _b.put("uri","html5proxy",[_b.get("innerauth","enabled") ? currbaseurl : securebaseurl,"/oauth2/openjs/proxy_v3.html"].join(""));
 
-    // 代理页面内部接口以当前域为准
+    // 代理页面内部接口永远以当前域为准
     _b.put("uri","api",[currbaseurl,"/api"].join(""));
     _b.put("uri","exchangetoken",[currbaseurl,"/cgi-bin/oauth2/access_token"].join(""));
     _b.put("uri","gettokenbypt",[currbaseurl,"/cgi-bin/oauth2/get_oauth2token_pt"].join(""));
 
+    // flash方案的api定义与html5的区分开,flash的永远是https
+    _b.put("uri","apiforflash",[securebaseurl,"/api"].join(""));
     // 域外授权才会用到，固定为https
     _b.put("uri","auth",[securebaseurl,"/cgi-bin/oauth2/authorize"].join(""));
     _b.put("uri","flashas3proxy",[securebaseurl,"/oauth2/openjs/proxy_as3_v3.swf"].join(""));
