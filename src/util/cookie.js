@@ -42,23 +42,23 @@ if (QQWB.browser.feature.cookie) {
     
            }
     
-           domain = opt_domain ? "domain=" + opt_domain : "";
+           domain = opt_domain ? "; domain=" + opt_domain : "";
     
-           path = opt_path ? "path=" + opt_path : "";
+           path = opt_path ? "; path=" + opt_path : "";
     
            expire = "";
     
            if (opt_maxage === 0) {
     
-               expire = "expires=" + new Date(1970,1,1).toUTCString();
+               expire = "; expires=" + new Date(1970,1,1).toUTCString();
     
            } else if (opt_maxage > 0) {
     
-               expire = "expires=" + new Date(new Date().getTime() + opt_maxage * 1000).toUTCString();
+               expire = "; expires=" + new Date(new Date().getTime() + opt_maxage * 1000).toUTCString();
     
            }
     
-           document.cookie = [name + "=" + enc(value), expire, path, domain].join("; ");
+           document.cookie = enc(name) + '=' + escape(value) + expire + domain + path;
     
            return QQWB;
         }
