@@ -42,7 +42,7 @@ QQWB.extend("_token",{
 
                        ,[accessToken, openid, _t.now() + expireIn * 1000, optUsername || (user && user.name) || "", optNickname || (user && user.nick) || ""].join("|")
 
-                       ,expireIn
+                       ,expireIn || ''
 
                        ,_b.get("cookie","path")
 
@@ -235,7 +235,7 @@ QQWB.extend("_token",{
 
            if(response.access_token){
 
-              if( !response.expires_in ) _l.error("accesstoken expires_in not returned");
+              if( !response.expires_in ) _l.error("token expires_in not returned");
 
               if( !response.name ) _l.warning("weibo username not retrieved, will not update username");
 

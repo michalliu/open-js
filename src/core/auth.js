@@ -96,6 +96,9 @@
 
                        QQWB.once(_b.get("innerauth","eventproxysubmit"), function (responseText) {
 
+                           // 对域内授权来说，存储的cookie信息是session类型的，关闭浏览器即失效，accesstoken永远只对应当前已登录的QQ号
+                           responseText = responseText.replace(/expires_in=\d+/,'expires_in=');
+
                            QQWB._token.resolveResponse(responseText,true);
 
                            cleanup();
