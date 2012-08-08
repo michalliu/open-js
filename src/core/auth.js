@@ -336,13 +336,9 @@ QQWB.extend("auth",{
 
             innerauth = _b.get("innerauth","enabled"),
 
-            syncloginenabled = _b.get("base","synclogin"),
-
             loginStatus = _.auth.loginStatus(), 
 
             error,
-
-            syncloginResponseText,
 
             onLoginSessionComplete; // hander on this logon session complete
 
@@ -366,37 +362,6 @@ QQWB.extend("auth",{
             optSuccessHandler(loginStatus);
 
             return _;
-
-        }
-
-        // QQ loginstatus exhchange to oauth login status
-        // this is not innerauth logic
-        // if synclogin enabled use the cached synclogin result otherwise drop it
-        if (!innerauth && syncloginenabled) {
-
-            syncloginResponseText = _b.get("synclogin","responsetext");
-
-            if (syncloginResponseText) {
-
-                _l.debug("using prefetched token ...");
-
-                _t.resolveResponse(syncloginResponseText, false); // don't trigger any events
-
-                loginStatus = _.auth.loginStatus(); // update loginstatus after using preloaded sync login result
-
-                if (loginStatus) {
-
-                    _l.debug("synclogin succeed");
-
-                    optSuccessHandler && optSuccessHandler(loginStatus);
-
-                    return _;
-
-                }
-
-            }
-            
-            _l.debug("synclogin failed, fallback to login window");
 
         }
 
@@ -470,8 +435,6 @@ QQWB.extend("auth",{
 
            _t.clearRefreshToken();
 
-           _b.del("synclogin","responsetext");
-
            _l.info("user " + (loginStatus.name || "unknown") + " logged out");
 
        }
@@ -483,7 +446,7 @@ QQWB.extend("auth",{
            _c.del('lskey','/',rootDomain);
        }
 
-       optHandler && optHandler();
+       if (optHandler) optHandler();
 
        _.trigger(_b.get("nativeevent","userloggedout"));
 
@@ -521,7 +484,7 @@ QQWB.extend("auth",{
 
        }
 
-       optCallback && optCallback(status);
+       if(optCallback) optCallback(status);
 
        return status;
     }
