@@ -27,10 +27,13 @@
         basehost = '://open.t.qq.com',
         
         baseurl = 'http' + basehost,
-        
+
         currprotocol = document.location.protocol.replace(':',''),
 
-        securebaseurl = 'https' + basehost;
+        securebaseurl = 'https' + basehost,
+ 
+        currbaseurl = currprotocol + basehost;
+
 
     _b.put("innerauth","layerid","openjslayer" + QQWB.uid(5));
     _b.put("innerauth","originaldomain",document.domain);
@@ -41,17 +44,22 @@
     _b.put("innerauth","eventproxysubmit", "InnerAuthResult");    
     _b.put("innerauth","eventproxycancel", "InnerAuthRequestCancel");    
 
-    _b.put("uri","api",[securebaseurl,"/api"].join(""));
+    // 代理页面工作在域内授权模式下，页面协议以外部页面的协议为主
+    // 工作在域外模式下，一直是https
+    _b.put("uri","html5proxy",[_b.get("innerauth","enabled") ? currbaseurl : securebaseurl,"/oauth2/openjs/proxy_v3.html"].join(""));
+
+    // 代理页面内部接口以当前域为准
+    _b.put("uri","api",[currbaseurl,"/api"].join(""));
+    _b.put("uri","exchangetoken",[currbaseurl,"/cgi-bin/oauth2/access_token"].join(""));
+    _b.put("uri","gettokenbypt",[currbaseurl,"/cgi-bin/oauth2/get_oauth2token_pt"].join(""));
+
+    // 域外授权才会用到，固定为https
     _b.put("uri","auth",[securebaseurl,"/cgi-bin/oauth2/authorize"].join(""));
-
-    // 工作在域内授权模式下，页面协议以外部页面的协议为主，默认是https
-    _b.put("uri","html5proxy",[_b.get("innerauth","enabled") ? (currprotocol + basehost) : securebaseurl,"/oauth2/openjs/proxy_v3.html"].join(""));
-    // 域内授权页协议以外部页面协议为主，默认为http协议
-    _b.put("uri","innerauth",[_b.get("innerauth","enabled") ? (currprotocol + basehost) : baseurl,"/cgi-bin/oauth2/inner_flow_page?pagetype=2"].join(""));
-
     _b.put("uri","flashas3proxy",[securebaseurl,"/oauth2/openjs/proxy_as3_v3.swf"].join(""));
-    _b.put("uri","exchangetoken",[securebaseurl,"/cgi-bin/oauth2/access_token"].join(""));
-    _b.put("uri","gettokenbypt",[securebaseurl,"/cgi-bin/oauth2/get_oauth2token_pt"].join(""));
+
+    // 域内授权页协议以外部页面协议为主(被嵌入)
+    _b.put("uri","innerauth",[_b.get("innerauth","enabled") ? currbaseurl : baseurl,"/cgi-bin/oauth2/inner_flow_page?pagetype=2"].join(""));
+
 
     _b.put("oauthwindow","name","authClientProxy_ee5a0f93");
     _b.put("oauthwindow","width","630");
