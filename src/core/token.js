@@ -209,7 +209,13 @@ QQWB.extend("_token",{
 
            _s = _.String,
 
+           _to = _._token,
+
+           refreshToken = _to.getRefreshToken,
+
            appkey = _b.get("base", "appkey");
+
+       if (refreshToken) return _l.error("can't exhange for new token, refresh token does not exists");
 
        _i.jsonp({
 
@@ -223,8 +229,7 @@ QQWB.extend("_token",{
 
                          ,client_id: appkey
 
-                         ,refresh_token: this.getRefreshToken()
-
+                         ,refresh_token: refreshToken
                       })
 
        }).success(function (response) {
@@ -241,11 +246,11 @@ QQWB.extend("_token",{
 
               if( !response.nick ) _l.warning("weibo nick not retrieved, will not update nick");
 
-               _._token.setAccessToken(response.access_token, response.openid, parseInt(response.expires_in,10), response.name, response.nick);
+               _to.setAccessToken(response.access_token, response.openid, parseInt(response.expires_in,10), response.name, response.nick);
 
                if (response.refresh_token) {
 
-                    _._token.setRefreshToken(response.refresh_token);
+                    _to.setRefreshToken(response.refresh_token);
 
                } else {
 
@@ -310,6 +315,8 @@ QQWB.extend("_token",{
 
            _s = _.String,
 
+           _to = _._token,
+
            loginStatus,
 
            response = _s.isString(responseText) ? _q.decode(responseText) : responseText;
@@ -324,11 +331,11 @@ QQWB.extend("_token",{
 
           if( !response.nick && !response.wb_nick) _l.warning("weibo usernick not retrieved");
 
-           _._token.setAccessToken(response.access_token, response.openid, parseInt(response.expires_in,10), response.name || response.wb_name, response.nick || response.wb_nick);
+           _to.setAccessToken(response.access_token, response.openid, parseInt(response.expires_in,10), response.name || response.wb_name, response.nick || response.wb_nick);
 
            if (response.refresh_token) {
 
-               _._token.setRefreshToken(response.refresh_token);
+               _to.setRefreshToken(response.refresh_token);
 
            } else {
 
