@@ -11,7 +11,7 @@
  *           core.browser
  * @includes util.bigtable
  */
-
+/*jslint laxcomma:true*/
 if (QQWB.browser.feature.cookie) {
 
     QQWB.extend("cookie", {
