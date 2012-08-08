@@ -21,14 +21,14 @@
               ua = navigator.userAgent,
 
            //rmsie = /(msie) ([\w.]+)/,
-		   
+           
           ropera = /(opera)(?:.*version)?[ \/]([\w.]+)/,
 
          rwebkit = /(webkit)[ \/]([\w.]+)/,
 
         rmozilla = /(mozilla)(?:.*? rv:([\w.]+))?/,
 
-	    // http://detectmobilebrowsers.com/
+        // http://detectmobilebrowsers.com/
         rmobileplatform = /android.+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od|ad)|iris|kindle|lge |maemo|midp|mmp|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i,
 
         browserFeatures = {}, // keep browser features
@@ -44,13 +44,13 @@
                  if (cookieEnabled && QQWB.browser.webkit) {
 
                      // resolve older webkit bug
-					 
+                     
                      var cookiename = "COOKIE_TEST_" + QQWB.uid();
 
                      document.cookie = cookiename + "=" + 1 +"; domain=; path=;";
 
                      if (document.cookie.indexOf(cookiename) < 0) {
-						 
+                         
                          cookieEnabled = false;
 
                      } else {
@@ -64,20 +64,20 @@
                  !cookieEnabled && QQWB.log.warn("This browser doesn't support cookie or cookie isn't enabled");
 
                  return cookieEnabled;
-			 }
+             }
 
-			 // code borrowed from http://code.google.com/p/swfobject
+             // code borrowed from http://code.google.com/p/swfobject
             ,"flash": function () { 
 
-		      	 var desc,
+                   var desc,
 
-		             enabled,
+                     enabled,
 
-					 flashAX,
+                     flashAX,
 
-					 playerversion,
+                     playerversion,
 
-					 ret;// major,minor,build
+                     ret;// major,minor,build
 
                  if (typeof navigator.plugins != "undefined" && typeof navigator.plugins["Shockwave Flash"] == "object") {
 
@@ -89,60 +89,60 @@
 
                                   && navigator.mimeTypes["application/x-shockwave-flash"].enabledPlugin;
 
-					if (desc && enabled) {
+                    if (desc && enabled) {
 
-						desc = desc.replace(/^.*\s+(\S+\s+\S+$)/, "$1");
+                        desc = desc.replace(/^.*\s+(\S+\s+\S+$)/, "$1");
 
-						playerversion = [];
+                        playerversion = [];
 
-						playerversion[0] = parseInt(desc.replace(/^(.*)\..*$/, "$1"), 10);
+                        playerversion[0] = parseInt(desc.replace(/^(.*)\..*$/, "$1"), 10);
 
-				        playerversion[1] = parseInt(desc.replace(/^.*\.(.*)\s.*$/, "$1"), 10);
+                        playerversion[1] = parseInt(desc.replace(/^.*\.(.*)\s.*$/, "$1"), 10);
 
-				        playerversion[2] = /[a-zA-Z]/.test(desc) ? parseInt(desc.replace(/^.*[a-zA-Z]+(.*)$/, "$1"), 10) : 0;
+                        playerversion[2] = /[a-zA-Z]/.test(desc) ? parseInt(desc.replace(/^.*[a-zA-Z]+(.*)$/, "$1"), 10) : 0;
 
-					}
+                    }
 
                  } else if (typeof window.ActiveXObject != "undefined") {
                      try {
 
                          flashAX = new ActiveXObject("ShockwaveFlash.ShockwaveFlash");
 
-					 } catch (ex) {
-					 
-					 }
+                     } catch (ex) {
+                     
+                     }
 
                      if (flashAX) {
 
                          desc = flashAX.getVariable("$version");
 
-					     if (desc) {
+                         if (desc) {
 
                              desc = desc.split(" ")[1].split(",");
 
                              playerversion = [parseInt(desc[0], 10), parseInt(desc[1], 10), parseInt(desc[2], 10)];
 
-					     } else {
+                         } else {
 
-					    	 playerversion = [0, 0, 0];
+                             playerversion = [0, 0, 0];
 
-					     }
+                         }
                      }
                  }
 
-				 if (playerversion) {
+                 if (playerversion) {
 
-					 ret = { version : playerversion.join(".")};
+                     ret = { version : playerversion.join(".")};
 
-					 if ( playerversion[0] >= 9 ) { // detect if flash player too old
+                     if ( playerversion[0] >= 9 ) { // detect if flash player too old
 
-						 ret["externalinterface"] = true;
+                         ret["externalinterface"] = true;
 
-					 }
+                     }
 
-					 return ret;
+                     return ret;
 
-				 }
+                 }
 
              }
 
@@ -155,7 +155,7 @@
             ,"postmessage": function () {
 
                 // ie8 support postmessage but it does not work with window.opener
-				
+                
                 return !!window.postMessage && ((QQWB.browser.msie && parseInt(QQWB.browser.version,10) < 8) ? false : true); 
 
              }
@@ -191,7 +191,7 @@
                 for (var i = 0, l = browserPrefixes.length; i < l; i++) {
 
                     if (window[browserPrefixes[i].toLowerCase() + "IndexedDB"]) {
-						
+                        
                         return true;
 
                     }
@@ -249,10 +249,10 @@
 
         ua = ua.toLowerCase();
 
-		var ie, uamatch;
+        var ie, uamatch;
 
-		// http://stackoverflow.com/questions/4169160/javascript-ie-detection-why-not-use-simple-conditional-comments
-		// a more reliable way
+        // http://stackoverflow.com/questions/4169160/javascript-ie-detection-why-not-use-simple-conditional-comments
+        // a more reliable way
         ie = (function(){
         
             var undef,
@@ -269,11 +269,11 @@
         
         }());
 
-		if ( ie ) {
+        if ( ie ) {
 
             return { browser: "msie", version: ie };
 
-		}
+        }
 
         uamatch = rwebkit.exec( ua ) ||
                     ropera.exec( ua ) ||
@@ -288,16 +288,16 @@
     // now we only support little features
     // please visit http://www.modernizr.com for full feature test
     function featureTest () {
-		
-		var featureName,
+        
+        var featureName,
 
-		    result;
+            result;
 
         for (featureName in featureTests) {
 
             if (featureTests.hasOwnProperty(featureName)) {
 
-				result = featureTests[featureName](); // run the test
+                result = featureTests[featureName](); // run the test
 
                 if (result) {
 
@@ -309,13 +309,13 @@
     }
 
 
-	function detectOS() {
+    function detectOS() {
 
-		var appversion = navigator.appVersion,
+        var appversion = navigator.appVersion,
 
-		    os = {},
+            os = {},
 
-		    osName = "unknown";
+            osName = "unknown";
 
         if (appversion.indexOf("Win")!=-1) { osName="windows"};
 
@@ -325,13 +325,13 @@
 
         if (appversion.indexOf("Linux")!=-1) { osName="linux"};
 
-		os[osName] = true;
+        os[osName] = true;
 
-		os.name = osName;
+        os.name = osName;
 
-		return os;
+        return os;
 
-	}
+    }
 
     function detectRendererMode() {
 
@@ -349,28 +349,28 @@
 
     QQWB.bigtable.put("browser", 'detectviewportsize', function () {
 
-		var el = window,
+        var el = window,
 
             attr = 'inner',
 
-		    mode = document.compatMode;
+            mode = document.compatMode;
 
-		if ( !('innerWidth' in el) ) {
+        if ( !('innerWidth' in el) ) {
 
-			attr = 'client';
+            attr = 'client';
 
-			el = mode == "BackCompat" ? document.body : document.documentElement;
+            el = mode == "BackCompat" ? document.body : document.documentElement;
 
-		}
+        }
 
         // el(document.body) may not exists in quirks mode yet
         if (el) {
 
-		    return { width: el[attr+'Width'], height: el[attr+'Height'] };
+            return { width: el[attr+'Width'], height: el[attr+'Height'] };
 
         }
 
-		return { width: 0, height: 0};
+        return { width: 0, height: 0};
 
     });
 
@@ -388,7 +388,7 @@
 
         window.addEventListener('resize', function () {
 
-	        QQWB.extend('browser.viewport', detectViewportSize(),true);
+            QQWB.extend('browser.viewport', detectViewportSize(),true);
 
         },false);
 
@@ -396,7 +396,7 @@
 
         window.attachEvent('onresize', function () {
 
-	        QQWB.extend('browser.viewport', detectViewportSize(),true);
+            QQWB.extend('browser.viewport', detectViewportSize(),true);
 
         });
 
@@ -410,7 +410,7 @@
 
     QQWB.browser[browserMatch.browser] = true;
 
-	QQWB.browser.engine = browserMatch.browser;
+    QQWB.browser.engine = browserMatch.browser;
 
     featureTest();
 
@@ -431,9 +431,9 @@
 
     }
 
-	QQWB.extend('browser.os', detectOS());
+    QQWB.extend('browser.os', detectOS());
 
-	QQWB.extend('browser.rendererMode', detectRendererMode());
+    QQWB.extend('browser.rendererMode', detectRendererMode());
 
     QQWB.extend('browser.viewport', detectViewportSize());
 
