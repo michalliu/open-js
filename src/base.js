@@ -19,7 +19,7 @@
 
         name: "OpenJS"
 
-	   ,version: "2.0"
+	   ,version: "3.0"
 
        ,debug: false
 
@@ -131,7 +131,7 @@
 			env = {},
 
 			knownEnvs = {
-				'debug': {'type':tpBol, 'default':false},
+				'debug': {'type':tpBol, 'default': twb.debug},
 				'loglevel': {'type':tpNum, 'default':0},
 				'cookiedomain': {'type':tpStr, 'default':''},
 				'cookiepath': {'type':tpStr, 'default':'/'},
