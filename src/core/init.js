@@ -100,7 +100,7 @@
     _b.put("ping","paramorder",["ftime","sIp","iQQ","sBiz","sOp","iSta","iTy","iFlow"]);
     _b.put("ping","paramsep",";");
 
-    _b.put("io","timeout", 30 * 1000);
+    _b.put("io","timeout", 15 * 1000);
     _b.put('openjs','asynccallbackfunctionname', "onOpenjsLoad");
 
     _b.put('boot','booting', false);
