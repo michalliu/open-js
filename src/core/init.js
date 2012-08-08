@@ -44,10 +44,10 @@
     _b.put("uri","api",[securebaseurl,"/api"].join(""));
     _b.put("uri","auth",[securebaseurl,"/cgi-bin/oauth2/authorize"].join(""));
 
-    // 工作在域内授权模式下，页面协议以外部页面的协议外住，默认是https
+    // 工作在域内授权模式下，页面协议以外部页面的协议为主，默认是https
     _b.put("uri","html5proxy",[_b.get("innerauth","enabled") ? (currprotocol + basehost) : securebaseurl,"/oauth2/openjs/proxy_v3.html"].join(""));
     // 域内授权页协议以外部页面协议为主，默认为http协议
-    _b.put("uri","innerauth",[_b.get("innerauth","enabled") ? (currprotocol + basehost) : baseurl,"/cgi-bin/oauth2/inner_flow_page2"].join(""));
+    _b.put("uri","innerauth",[_b.get("innerauth","enabled") ? (currprotocol + basehost) : baseurl,"/cgi-bin/oauth2/inner_flow_page?pagetype=2"].join(""));
 
     _b.put("uri","flashas3proxy",[securebaseurl,"/oauth2/openjs/proxy_as3_v3.swf"].join(""));
     _b.put("uri","exchangetoken",[securebaseurl,"/cgi-bin/oauth2/access_token"].join(""));
