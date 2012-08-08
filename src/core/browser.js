@@ -11,7 +11,7 @@
  *           log
  *           util.bigtable
  */
-
+/*jslint laxcomma:true*/
 (function (){
 
     var browserMatch, // ua regexp match result
@@ -61,7 +61,7 @@
 
                  }
 
-                 !cookieEnabled && QQWB.log.warn("This browser doesn't support cookie or cookie isn't enabled");
+                 if(!cookieEnabled) QQWB.log.warn("This browser doesn't support cookie or cookie isn't enabled");
 
                  return cookieEnabled;
              }
@@ -83,11 +83,7 @@
 
                     desc = navigator.plugins["Shockwave Flash"].description; // plug in exists;
 
-                    enabled = typeof navigator.mimeTypes != "undefined"
-
-                                  && navigator.mimeTypes["application/x-shockwave-flash"]
-
-                                  && navigator.mimeTypes["application/x-shockwave-flash"].enabledPlugin;
+                    enabled = typeof navigator.mimeTypes != "undefined" && navigator.mimeTypes["application/x-shockwave-flash"] && navigator.mimeTypes["application/x-shockwave-flash"].enabledPlugin;
 
                     if (desc && enabled) {
 
@@ -136,7 +132,7 @@
 
                      if ( playerversion[0] >= 9 ) { // detect if flash player too old
 
-                         ret["externalinterface"] = true;
+                         ret.externalinterface = true;
 
                      }
 
@@ -260,10 +256,7 @@
                 div = document.createElement('div'),
                 all = div.getElementsByTagName('i');
         
-            while (
-                div.innerHTML = '<!--[if gt IE ' + (++v) + ']><i></i><![endif]-->',
-                all[0]
-            );
+            while (div.innerHTML = '<!--[if gt IE ' + (++v) + ']><i></i><![endif]-->', all[0]);
         
             return v > 4 ? v : undef;
         
@@ -317,13 +310,13 @@
 
             osName = "unknown";
 
-        if (appversion.indexOf("Win")!=-1) { osName="windows"};
+        if (appversion.indexOf("Win")!=-1)  osName="windows";
 
-        if (appversion.indexOf("Mac")!=-1) { osName="mac"};
+        if (appversion.indexOf("Mac")!=-1)  osName="mac";
 
-        if (appversion.indexOf("X11")!=-1) { osName="unix"};
+        if (appversion.indexOf("X11")!=-1)  osName="unix";
 
-        if (appversion.indexOf("Linux")!=-1) { osName="linux"};
+        if (appversion.indexOf("Linux")!=-1)  osName="linux";
 
         os[osName] = true;
 
