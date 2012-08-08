@@ -40,7 +40,7 @@
  *           util.deferred
  *           weibo.util
  */
-
+/*jslint laxcomma:true*/
 QQWB.provide("api", function (api, apiParams, optDataType, optType, optOverride) {
 
     var _ = QQWB,
@@ -125,15 +125,15 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optOverride)
 
     }
 
-    apiParams["oauth_consumer_key"] = appkey;
+    apiParams.oauth_consumer_key = appkey;
 
-    apiParams["access_token"] = actoken;
+    apiParams.access_token = actoken;
 
-    apiParams["oauth_version"] = "2.a";
+    apiParams.oauth_version = "2.a";
 
-    apiParams["openid"] = openid;
+    apiParams.openid = openid;
 
-    apiParams["format"] = format;
+    apiParams.format = format;
 
 
     if (!appkey) {
