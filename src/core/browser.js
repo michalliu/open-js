@@ -39,31 +39,16 @@
 
              "cookie": function () {
 
-                 var cookieEnabled = navigator.cookieEnabled;
+                 if (navigator.cookieEnabled) return true;
 
-                 if (cookieEnabled && QQWB.browser.webkit) {
+                 document.cookie = "cookietest=1";
 
-                     // resolve older webkit bug
-                     
-                     var cookiename = "COOKIE_TEST_" + QQWB.uid();
+                 var ret = document.cookie.indexOf("cookietest=") != -1;
 
-                     document.cookie = cookiename + "=" + 1 +"; domain=; path=;";
+                 document.cookie = "cookietest=1; expires=Thu, 01-Jan-1970 00:00:01 GMT";
 
-                     if (document.cookie.indexOf(cookiename) < 0) {
-                         
-                         cookieEnabled = false;
+                 return ret;
 
-                     } else {
-
-                         document.cookie = cookiename + "=" +"; expires=" + new Date(1970,1,1).toUTCString() + "; domain=; path=;";
-
-                     }
-
-                 }
-
-                 if(!cookieEnabled) QQWB.log.warn("This browser doesn't support cookie or cookie isn't enabled");
-
-                 return cookieEnabled;
              }
 
              // code borrowed from http://code.google.com/p/swfobject

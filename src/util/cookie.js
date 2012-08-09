@@ -50,7 +50,7 @@ if (QQWB.browser.feature.cookie) {
     
            if (opt_maxage === 0) {
     
-               expire = "; expires=" + new Date(1970,1,1).toUTCString();
+               expire = "; expires=Thu, 01-Jan-1970 00:00:01 GMT";
     
            } else if (opt_maxage > 0) {
     
@@ -119,6 +119,6 @@ if (QQWB.browser.feature.cookie) {
 
 } else {
 
-    QQWB.log.debug("cookie isn't support or be enabled");
+    QQWB.log.warn("This browser doesn't support cookie or cookie isn't enabled," + navigator.userAgent);
 
 }
