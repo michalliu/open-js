@@ -21,8 +21,7 @@
 
        ,version: "3.0"
 
-       ,debug: false
-
+       ,debug: true
         /**
          * Rollback window's T to its original value
          *
@@ -168,11 +167,11 @@
 
         strTrim = String.prototype.trim ? function (str) {
 
-            return str ? "" : String.prototype.trim.call(str);
+            return !str ? "" : String.prototype.trim.call(str);
 
         } : function (str) {
 
-            return str ? "" : str.toString().replace(/^\s+/,"").replace(/\s+$/,"");
+            return !str ? "" : str.toString().replace(/^\s+/,"").replace(/\s+$/,"");
 
         };
 
