@@ -21,7 +21,7 @@
 
        ,version: "3.0"
 
-       ,debug: true
+       ,debug: false
         /**
          * Rollback window's T to its original value
          *
