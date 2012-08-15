@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>OpenJS Tests</title>
+  <link rel="stylesheet" href="../tools/qunit/qunit/qunit.css">
+  <style>
+      .reminder{width:100%;text-align:center;background:#ff9;border:1px solid #fc0;color:#333;line-height:20px;margin:10px 0px;font-size:12px;}
+  </style>
+</head>
+<body>
+  <div class='reminder'><b>提示：</b>运行过程中需要多次弹出授权窗口，这是正常情况，请暂时关闭弹窗拦截软件。</div>
+  <div id="qunit"></div>
+  <script src="../tools/qunit/qunit/qunit.js"></script>
+  <script src="../build/openjs.js#debug=no&logLevel=20&cookieDomain=&cookiePath=&autoboot=false"></script>
+  <script>
+      QUnit.config.requireExpects = true;
+  </script>
+  <script src="./tests.js"></script>
+</body>
+</html>
