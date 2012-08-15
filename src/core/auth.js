@@ -284,6 +284,8 @@
     
                                    authorizing = false;
     
+                                   awindow.opener = null;
+
                                    if (autoclose) awindow.close(); 
 
                                    awindow = null;
