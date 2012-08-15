@@ -15,7 +15,7 @@
 <body>
     <div class="aside">
 
-		<a hidefocus class="toc_title" href="#" lang="en">OpenJS <span class="version"> (2.0)</span></a>
+		<a hidefocus class="toc_title" href="#" lang="en">OpenJS <span class="version"> (3.0 Beta)</span></a>
 
 		<a hidefocus class="toc_title" href="#开始使用">开始使用</a>
 
@@ -142,24 +142,24 @@
         </p>
 
 		<h2 id="开始使用">开始使用</h2>
-		<p>在页面中引用OpenJS的方式分同步引用和异步引用两种。若用同步引用的方式，为优化网站性能，建议将OpenJS放置在页面底部加载<sup><a target="_blank" href="http://developer.yahoo.com/performance/rules.html#js_bottom">[链]</a></sup>。若用异步引用的方式，开发者须进行异步编程。开发者可根据自己的项目情况，自由选择。</p>
+		<p>在页面中引用OpenJS的方式分同步加载和异步加载两种。若用同步加载的方式，为优化网站性能，建议将OpenJS放置在页面底部加载<sup><a target="_blank" href="http://developer.yahoo.com/performance/rules.html#js_bottom">[链]</a></sup>。若用异步加载的方式，开发者须进行异步编程。开发者可根据自己的项目情况，自由选择。</p>
 		<ul>
-			<li>同步引用
+			<li>同步加载
 <pre class="code">
 <a class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("sync_reference.html")' href="#*sync_reference.html"></a>
 &lt;script src="//mat1.gtimg.com/app/openjs/openjs.js"&gt;&lt;/script&gt;
 &lt;script&gt;
-    // 同步引用，无需回调函数
+    // 同步加载，无需回调函数
     // 你的代码
 &lt;/script&gt;
 </pre>
 		    </li>
-			<li>异步引用
+			<li>异步加载
 <pre class="code">
 <a class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("async_reference.html")' href="#*async_reference.html"></a>
 &lt;script&gt;
-    // 异步引用需定义回调函数 <a id="onOpenjsLoad" href="#onOpenjsLoad">onOpenjsLoad</a>
-    window['onOpenjsLoad'] = function () {
+    // 异步加载需定义回调函数 <a id="onOpenjsLoad" href="#onOpenjsLoad">onOpenjsLoad</a>
+    window.onOpenjsLoad = function () {
         alert("openJS加载成功");
     }
 
@@ -939,6 +939,16 @@ T.documentReady(function () {
                     腾讯域内应用，是指应用网址以<em>qq.com</em>结尾的应用，简称域内应用。<br/>OpenJS同时支持腾讯域内应用与域外应用的开发，两者的区别是授权画面不一样，域内应用采用浮层式的体验，域外应用采用弹窗的体验。<br/><p>注意，使用OpenJS开发的域内应用<em>document.domain</em>为<em>qq.com</em>。</p>
 					OpenJS完美支持域内应用与域外应用互相迁移，意味者开发者无需更改任何代码即可把域外的应用迁移到域内使用，反之亦可。
 					</li>
+					<li id="faq11">
+                    <b>弹窗授权被浏览器拦截了怎么办？</b><br/>
+                    浏览器不会拦截用户点击触发的弹窗，因此开发者只需把 <a href="#login">T.login</a> 放置在用户的点击事件中触发即可。例如:<br/>
+<pre class='code'>
+<a class="run" onmouseover='this.style.backgroundPosition="0px 0px";' onmousedown='this.style.backgroundPosition="-51px 0px";' onmouseup='this.style.backgroundPosition="-26px 0px";' onmouseout='this.style.backgroundPosition="-26px 0px";' onclick='showSnippet("login.html")' href="#*login.html"></a>
+$("#someid").click(function () {
+    T.login();
+});
+</pre>
+                    </li>
                 </ol>
         </div>
 
