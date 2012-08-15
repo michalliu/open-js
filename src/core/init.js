@@ -357,7 +357,7 @@
 
            tokenReady.unlock("init is called"); // unlock init, locked in boot.js
 
-           if (_p && opts.pingback) { // send pingback to server
+           if (_p && opts.pingback && currprotocol.indexOf('https') !== 0) { // 判断是否可以发送pingback，https的话强制不发送，会触发浏览器不安全提示
 
                _p.pingInit();
 
