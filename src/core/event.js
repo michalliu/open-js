@@ -109,7 +109,7 @@ QQWB.extend("",{
 
             handlers = _b.get("eventhandler",name),
 
-            i;
+            i, l;
 
         if (handlers) {
 

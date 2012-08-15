@@ -76,7 +76,7 @@ if (QQWB.browser.feature.cookie) {
     
            name = name + "=";
     
-           cookies = (document.cookie || "").split(/\s*;\s*/);
+           var cookies = (document.cookie || "").split(/\s*;\s*/);
     
            for (var i=0,l=cookies.length; i<l; i++) {
     
