@@ -64,7 +64,7 @@
      * @param appkey {String} appkey
      * @param force {Boolean} if true force to retrieve a token regardless whether uin had been authorize this appkey
      */
-    window["getToken"] = function (appkey,force) {
+    window.getToken = function (appkey,force) {
 
         var safekey = document.cookie.match(/skey=([^;]+)/) || document.cookie.match(/lskey=([^;]+)/);
 
@@ -75,10 +75,10 @@
             type: 'post',
 
             data:['appkey=',appkey
-                 ,'&version=2.0'
+                 ,'&version=2.a'
                  ,'&response_type=', force ? 'token' : 'check'
                  ,'&seqid=', Math.floor(Math.random() * 10E5)
-                 ,'&appfrom=openjs2.0'
+                 ,'&appfrom=openjs' + T.version
                  ,'&g_tk=', safekey ? safekey[1] : ''].join(''),
 
             dataType: 'text'
@@ -95,7 +95,7 @@
      * @param dataType {String} json or xml or text
      * @param type {String} get or post
      */
-    window['apiAjax'] = function (api, apiParams, dataType, type) {
+    window.apiAjax = function (api, apiParams, dataType, type) {
     
         var opts = {
     
@@ -179,7 +179,7 @@
     // post a message to the parent window indicate that server frame(itself) was successfully loaded
     if ( appWindow && appWindow.postMessage) {
 
-        _l.info("[proxy] message proxy is running");
+        _l.info("[proxy] message proxy is running properly");
 
        if (window != appWindow) { // iframe
     

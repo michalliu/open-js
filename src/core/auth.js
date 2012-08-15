@@ -17,6 +17,7 @@
  *
  * @include core.dom
  *          core.event
+ *          core.browser
  */
 /*jslint laxcomma:true*/
 (function (){
@@ -24,6 +25,8 @@
    var _ = QQWB,
 
        _b = _.bigtable,
+
+       _br = _.browser,
 
        _l = _.log,
 
@@ -52,8 +55,6 @@
                        attrs = 'frameBorder="0" width="100%" height="100%" scrolling="no"',
 
                        layer = document.getElementById(layerid),
-
-                       _br = _.browser,
 
                        lastw, lasth, resize, cleanup;
 
@@ -94,6 +95,9 @@
                        };
 
                        QQWB.once(_b.get("innerauth","eventproxysubmit"), function (responseText) {
+
+                           // 对域内授权来说，存储的cookie信息是session类型的，关闭浏览器即失效，accesstoken永远只对应当前已登录的QQ号
+                           responseText = responseText.replace(/expires_in=\d+/,'expires_in=');
 
                            QQWB._token.resolveResponse(responseText,true);
 
@@ -202,11 +206,11 @@
                         ,redirect_uri: _b.get("uri","redirect")
     
                         ,scope: "all"
-    
-                        ,status: 0
+
+                        ,wap: _br.platform.mobile ? 2 : null
     
                     });
-    
+
                     props = ["width=" + width, "height=" + height, "left=" + x, "top=" + y].join(",");
     
                     if (samewindow) {
@@ -280,22 +284,10 @@
     
                                    authorizing = false;
     
-                                   if (autoclose) {
+                                   if (autoclose) awindow.close(); 
 
-                                       setTimeout(function () {
+                                   awindow = null;
 
-                                           awindow.close();
-
-                                           awindow = null;
-
-                                       }, 0);
-
-                                   } else {
-
-                                       awindow = null;
-
-                                   }
-    
                                    return;
     
                                }
@@ -310,7 +302,7 @@
     
                 } else {
     
-                    awindow && awindow.focus();
+                    if (awindow) awindow.focus();
     
                 }
                 
@@ -335,13 +327,9 @@ QQWB.extend("auth",{
 
             innerauth = _b.get("innerauth","enabled"),
 
-            syncloginenabled = _b.get("base","synclogin"),
-
             loginStatus = _.auth.loginStatus(), 
 
             error,
-
-            syncloginResponseText,
 
             onLoginSessionComplete; // hander on this logon session complete
 
@@ -365,37 +353,6 @@ QQWB.extend("auth",{
             optSuccessHandler(loginStatus);
 
             return _;
-
-        }
-
-        // QQ loginstatus exhchange to oauth login status
-        // this is not innerauth logic
-        // if synclogin enabled use the cached synclogin result otherwise drop it
-        if (!innerauth && syncloginenabled) {
-
-            syncloginResponseText = _b.get("synclogin","responsetext");
-
-            if (syncloginResponseText) {
-
-                _l.debug("using prefetched token ...");
-
-                _t.resolveResponse(syncloginResponseText, false); // don't trigger any events
-
-                loginStatus = _.auth.loginStatus(); // update loginstatus after using preloaded sync login result
-
-                if (loginStatus) {
-
-                    _l.debug("synclogin succeed");
-
-                    optSuccessHandler && optSuccessHandler(loginStatus);
-
-                    return _;
-
-                }
-
-            }
-            
-            _l.debug("synclogin failed, fallback to login window");
 
         }
 
@@ -469,8 +426,6 @@ QQWB.extend("auth",{
 
            _t.clearRefreshToken();
 
-           _b.del("synclogin","responsetext");
-
            _l.info("user " + (loginStatus.name || "unknown") + " logged out");
 
        }
@@ -482,7 +437,7 @@ QQWB.extend("auth",{
            _c.del('lskey','/',rootDomain);
        }
 
-       optHandler && optHandler();
+       if (optHandler) optHandler();
 
        _.trigger(_b.get("nativeevent","userloggedout"));
 
@@ -520,7 +475,7 @@ QQWB.extend("auth",{
 
        }
 
-       optCallback && optCallback(status);
+       if(optCallback) optCallback(status);
 
        return status;
     }

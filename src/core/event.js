@@ -9,7 +9,7 @@
  * @module event
  * @requires base
  */
-
+/*jslint laxcomma:true*/
 QQWB.extend("",{
     /**
      * Bind handler with an event name
@@ -21,60 +21,60 @@ QQWB.extend("",{
 
         name = name.toLowerCase();
 
-	    var _ = QQWB,
+        var _ = QQWB,
 
-	        _b = _.bigtable,
+            _b = _.bigtable,
 
-	        handlers = _b.get("eventhandler",name);
+            handlers = _b.get("eventhandler",name);
 
-	    if (handlers) {
-	        
+        if (handlers) {
+            
             if (!QQWB.Array.inArray(handlers,handler)) {
 
-	     	   handlers.push(handler);
+                handlers.push(handler);
 
             }
 
-	    } else {
+        } else {
 
-	        _b.put("eventhandler", name, [handler]);
+            _b.put("eventhandler", name, [handler]);
 
-	    }
+        }
 
-	    return _;
+        return _;
     }
 
     /**
      * Bind handler with an event name
-	 * This handler will removed after event happens
+     * This handler will removed after event happens
      *
      * @param name {String} event name to bind
      * @param handler {Function} the handler for this event
      */
    ,once: function (name, handler) {
 
-		name = name.toLowerCase();
+        name = name.toLowerCase();
 
-		var _ = QQWB,
+        var _ = QQWB,
 
-		    handlerWrapper;
+            handlerWrapper;
 
-		handlerWrapper = function () {
+        handlerWrapper = function () {
 
-			var ret = handler.apply(QQWB, arguments);
+            var ret = handler.apply(QQWB, arguments);
 
             _.unbind(name, handlerWrapper);
 
-			handlerWrapper = null;
+            handlerWrapper = null;
 
-			return ret;
+            return ret;
 
-		}
+        };
 
         _.bind(name, handlerWrapper);
 
-    	return _;
-	}
+        return _;
+    }
 
     /**
      * Unbind handler from event
@@ -103,39 +103,39 @@ QQWB.extend("",{
 
         name = name.toLowerCase();
 
-	    var _ = QQWB,
+        var _ = QQWB,
 
-	        _b = _.bigtable,
+            _b = _.bigtable,
 
-	        handlers = _b.get("eventhandler",name),
+            handlers = _b.get("eventhandler",name),
 
-	        i;
+            i, l;
 
-	    if (handlers) {
+        if (handlers) {
 
-	        if (handler) {
+            if (handler) {
 
-	     	   for (i=0,l=handlers.length; i<l; i++) {
+                for (i=0,l=handlers.length; i<l; i++) {
 
-	     		   if (handler === handlers[i]) {
+                    if (handler === handlers[i]) {
 
-					   handler = null;
+                       handler = null;
 
-	     			   handlers.splice(i,1);
+                        handlers.splice(i,1);
 
-	     		   }
+                    }
 
-	     	   }
+                }
 
-	        } else {
+            } else {
 
-	     	   _b.del("eventhandler",name);
+                _b.del("eventhandler",name);
 
-	        }
+            }
 
-	    }
+        }
 
-	    return !_b.get("eventhandler",name);
+        return !_b.get("eventhandler",name);
     }
 
     /**
@@ -152,31 +152,31 @@ QQWB.extend("",{
 
         name = name.toLowerCase();
 
-	    var _ = QQWB,
+        var _ = QQWB,
 
-	        _a = _.Array,
+            _a = _.Array,
 
-	        _b = _.bigtable,
+            _b = _.bigtable,
 
-	        handlers = _b.get("eventhandler",name);
+            handlers = _b.get("eventhandler",name);
 
-		data = _a.fromArguments(arguments).slice(1);
+        data = _a.fromArguments(arguments).slice(1);
 
-	    if (handlers) {
+        if (handlers) {
 
-	        return _a.forEach(handlers, function (handler, i) {
+            return _a.forEach(handlers, function (handler, i) {
 
-			   if (handler) {
+               if (handler) {
 
-				   return handler.apply(_, data);
+                   return handler.apply(_, data);
 
-			   }
+               }
 
-			   return;
+               return;
 
-	        });
-	    }
+            });
+        }
 
-	    return;
+        return;
     }
 });

@@ -10,18 +10,16 @@
  * @requires base
  *           core.init
  */
-
+/*jslint laxcomma:true*/
 QQWB.extend("ping", {
 
    pingWith: function (params, order) {
 
-	   function baseParam () {
+       function baseParam () {
 
-	       var qq = QQWB.cookie.get("uin",null),
+           var qq = (QQWB.cookie.get("uin",null) || '0').match(/\d+/)[0],
 
-		       qq = (qq || '0').match(/\d+/)[0],
-
-	           flowid = "";
+               flowid = "";
 
            return {
                sIp:"" // ip
@@ -31,143 +29,143 @@ QQWB.extend("ping", {
               ,iSta:""  // state
               ,iTy:1183 // system id
               ,iFlow: flowid// unquie id
-	          ,iFrom: "" // op from
-	          ,iPubFrom: "" // op from
-	          ,sUrl: "" // op url
-	          ,iUrlType: "" // url type
-	          ,iPos:"" // op position
-	          ,sText:"" // some text
-	          ,iBak1: ""
-	          ,iBak2: ""
-	          ,sBak1: ""
-	          ,sBak2: QQWB.uid()
+              ,iFrom: "" // op from
+              ,iPubFrom: "" // op from
+              ,sUrl: "" // op url
+              ,iUrlType: "" // url type
+              ,iPos:"" // op position
+              ,sText:"" // some text
+              ,iBak1: ""
+              ,iBak2: ""
+              ,sBak1: ""
+              ,sBak2: QQWB.uid()
            };
-	   } 
+       } 
 
-	   params = QQWB.extend(baseParam(), params, true);
+       params = QQWB.extend(baseParam(), params, true);
 
-	   QQWBPingTransport_18035d19 = new Image(1,1);
+       QQWBPingTransport_18035d19 = new Image(1,1);
 
-	   QQWBPingTransport_18035d19.src = [QQWB.bigtable.get("ping","urlbase"),
-	                                    "?",
-	                                    QQWB.queryString.encode(params, null, null, order)].join("");
+       QQWBPingTransport_18035d19.src = [QQWB.bigtable.get("ping","urlbase"),
+                                        "?",
+                                        QQWB.queryString.encode(params, null, null, order)].join("");
     }
 
-	// ping when appkey initilizing, success or unsuccess
+    // ping when appkey initilizing, success or unsuccess
    ,pingInit: function () {
 
-	   function getClientInfo () {
+       function getClientInfo () {
 
-		  var clientInfo = 1000000,
+          var clientInfo = 1000000,
 
-		      feature = 0;
+              feature = 0;
 
-    	  if (QQWB.browser.msie) {
+          if (QQWB.browser.msie) {
 
-			  clientInfo += 100;
+              clientInfo += 100;
 
           } else if(QQWB.browser.opera) {
 
-			  clientInfo += 200;
+              clientInfo += 200;
 
           } else if(QQWB.browser.webkit) {
 
-			  clientInfo += 300;
+              clientInfo += 300;
 
           } else if(QQWB.browser.mozilla) {
 
-			  clientInfo += 400;
+              clientInfo += 400;
 
-    	  } else {
+          } else {
 
-			  clientInfo += 500;
+              clientInfo += 500;
 
-    	  }
+          }
     
-    	  if (QQWB.browser.feature.postmessage) {
+          if (QQWB.browser.feature.postmessage) {
 
-			  feature += 1;
-
-    	  }
-
-    	  if (QQWB.browser.feature.flash) {
-
-			  feature += 2;
+              feature += 1;
 
           }
 
-    	  if (QQWB.browser.feature.cookie) {
+          if (QQWB.browser.feature.flash) {
 
-			  feature += 4;
+              feature += 2;
 
           }
 
-		  clientInfo += feature;
+          if (QQWB.browser.feature.cookie) {
 
-		  if (QQWB.bigtable.get("innerauth","enabled")) {
+              feature += 4;
 
-		      clientInfo += 10000;
+          }
 
-		  }
+          clientInfo += feature;
 
-		  return clientInfo;
+          if (QQWB.bigtable.get("innerauth","enabled")) {
 
-	   }
+              clientInfo += 10000;
 
-	   function getAppInfo () {
+          }
 
-		   var appInfo = 1000000;
+          return clientInfo;
 
-		   if (QQWB.browser.platform.mobile) {
+       }
 
-			   appInfo += 100;
+       function getAppInfo () {
 
-		   } else /*if (QQWB.browser.platform.pc)*/{
+           var appInfo = 1000000;
 
-			   appInfo += 200;
+           if (QQWB.browser.platform.mobile) {
 
-		   }
+               appInfo += 100;
 
-		   if (QQWB.browser.os.windows) {
+           } else /*if (QQWB.browser.platform.pc)*/{
 
-			   appInfo += 10;
+               appInfo += 200;
 
-		   } else if (QQWB.browser.os.mac) {
+           }
 
-			   appInfo += 20;
+           if (QQWB.browser.os.windows) {
 
-		   } else if (QQWB.browser.os.linux) {
+               appInfo += 10;
 
-			   appInfo += 30;
+           } else if (QQWB.browser.os.mac) {
 
-		   } else if (QQWB.browser.os.unix) {
+               appInfo += 20;
 
-			   appInfo += 40;
+           } else if (QQWB.browser.os.linux) {
 
-		   } else /*if (QQWB.browser.os.unknown)*/{
+               appInfo += 30;
 
-			   appInfo += 50;
+           } else if (QQWB.browser.os.unix) {
 
-		   }
+               appInfo += 40;
 
-		   return appInfo;
-	   }
+           } else /*if (QQWB.browser.os.unknown)*/{
 
-	   return QQWB.ping.pingWith({
+               appInfo += 50;
 
-		    sOp: "init"
+           }
 
-		   ,iFrom: QQWB.version.replace(/\./g,"")
+           return appInfo;
+       }
 
-		   ,iPubFrom: getAppInfo()
+       return QQWB.ping.pingWith({
 
-		   ,sUrl: [document.title,document.location.href].join(QQWB.bigtable.get("ping","paramsep"))
+            sOp: "init"
 
-		   ,sText: QQWB.bigtable.get("base", "appkey")
+           ,iFrom: QQWB.version.replace(/\./g,"")
 
-		   ,iBak1: getClientInfo()
+           ,iPubFrom: getAppInfo()
 
-	   }, QQWB.bigtable.get("ping","paramorder").concat("iFrom","iPubFrom","sUrl","iUrlType","iPos","sText","iBak1","iBak2","sBak1","sBak2"));
+           ,sUrl: [document.title,document.location.href].join(QQWB.bigtable.get("ping","paramsep"))
+
+           ,sText: QQWB.bigtable.get("base", "appkey")
+
+           ,iBak1: getClientInfo()
+
+       }, QQWB.bigtable.get("ping","paramorder").concat("iFrom","iPubFrom","sUrl","iUrlType","iPos","sText","iBak1","iBak2","sBak1","sBak2"));
 
     }
 

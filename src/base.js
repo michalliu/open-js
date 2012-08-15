@@ -7,7 +7,7 @@
  * @version 1.0
  * @module base
  */
-
+/*jslint laxcomma:true*/
 (function () {
 
     var 
@@ -19,10 +19,9 @@
 
         name: "OpenJS"
 
-	   ,version: "2.0"
+       ,version: "3.0"
 
        ,debug: false
-
         /**
          * Rollback window's T to its original value
          *
@@ -91,169 +90,169 @@
          * Generate a random id
          *
          * @access public
-		 * @param inOptLength {Number} optional uid length
+         * @param inOptLength {Number} optional uid length
          * @return {String} The ramdom ID
          */
        ,uid: function (inOptLength) {
-		   var rand;
-		   inOptLength = inOptLength || 6;
+           var rand;
+           inOptLength = inOptLength || 6;
            rand = Math.random().toString(16).substr(2);
            if (rand.length > inOptLength) {
                rand = rand.substr(0,inOptLength);
            } else if (rand.length < inOptLength) {
                for (var i=0,l=inOptLength-rand.length;i<l;i++) {
-            	   rand += Math.random().toString(16).substr(2,1);
+                   rand += Math.random().toString(16).substr(2,1);
                }
            }
-		   return rand;
+           return rand;
        }
 
     };
 
-	(function detectEnvs () {
+    (function detectEnvs () {
 
-    	var i,l, s, sr, r, h, q, u, k, v, o, envk, envv, envc, // iter, length, script, scriptSrc, remainStr, hash, query, undefined, key, value, one, envkey, envval, envconfig
+        var scriptSrc, trailer, hash, query, udef, one, envKey, envValue, envConfig,     
+
+            tpBol = 'boolean',
+
+            tpNum = 'number',
+
+            tpStr = 'string',
+
+            ropenjs = /openjs\.js(.*)$/,
+
+            ropenjsproxy = /openjs\.proxy\.js(.*)$/,
+
+            matched,
+
+            env = {},
+
+            knownEnvs = {
+                'debug': {'type':tpBol, 'default': twb.debug},
+                'loglevel': {'type':tpNum, 'default':0},
+                'cookiedomain': {'type':tpStr, 'default':''},
+                'cookiepath': {'type':tpStr, 'default':'/'},
+                'crossdomainmethod': {'type':tpStr, 'default':'auto'},
+                'autoboot': {'type':tpBol, 'default':true}
+            },
+
+            str2Bool,
+
+            str2Num,
+
+            strTrim,
+
+            scripts = document.getElementsByTagName('script');
+        
+       var i,l;
     
-		    ie = !-[1,],
+        str2Bool = function str2Bool(str) {
+            str = strTrim(str).toLowerCase();
+            switch(str){
+                //case 'yes':
+                //case 'on':
+                //case 'true':
+                //return true;
+                case 'no':
+                case 'off':
+                case 'false':
+                return false;
+            }
+            return !!str;
+        };
 
-			tpBol = 'boolean',
+        str2Num = function str2Num (str,n) {
 
-			tpNum = 'number',
+            return parseInt(strTrim(str),n) || 0;
 
-			tpStr = 'string',
+        };
 
-			ropenjs = /openjs\.js(.*)$/,
+        strTrim = String.prototype.trim ? function (str) {
 
-			ropenjsproxy = /openjs\.proxy\.js(.*)$/,
+            return !str ? "" : String.prototype.trim.call(str);
 
-			matched,
+        } : function (str) {
 
-			env = {},
+            return !str ? "" : str.toString().replace(/^\s+/,"").replace(/\s+$/,"");
 
-			knownEnvs = {
-				'debug': {'type':tpBol, 'default':false},
-				'loglevel': {'type':tpNum, 'default':0},
-				'cookiedomain': {'type':tpStr, 'default':''},
-				'cookiepath': {'type':tpStr, 'default':'/'},
-				'crossdomainmethod': {'type':tpStr, 'default':'auto'},
-				'autoboot': {'type':tpBol, 'default':true}
-			},
+        };
 
-			str2Bool,
-
-			str2Num,
-
-			strTrim,
-
-    	    scripts = document.getElementsByTagName('script');
+        for (i=0, l=scripts.length; i<l && (one=scripts[i]); i++) {
     
-		str2Bool = function str2Bool(str) {
-			str = strTrim(str).toLowerCase();
-			switch(str){
-				//case 'yes':
-				//case 'on':
-				//case 'true':
-				//return true;
-				case 'no':
-				case 'off':
-				case 'false':
-				return false;
-			}
-			return !!str;
-		};
+            scriptSrc = one.getAttribute('src',4) || one.src;
 
-		str2Num = function str2Num (str,n) {
+            if (scriptSrc) {
 
-			return parseInt(strTrim(str),n) || 0;
+                matched = scriptSrc.match(ropenjs) || scriptSrc.match(ropenjsproxy);
 
-		};
+                if (matched) {
 
-		strTrim = String.prototype.trim ? function (str) {
+                    trailer = matched[1];
 
-			return str == null ? "" : String.prototype.trim.call(str);
+                    // @see firefox bug https://bugzilla.mozilla.org/show_bug.cgi?id=483304
+                    // SRC attribute is safe to read of script tag in firefox by real browser test
+                    hash = trailer.split('#').pop();
 
-		} : function (str) {
+                    query = trailer.indexOf('?') === 0 ? trailer.slice(1, trailer.indexOf('#') == -1 ? undef : trailer.indexOf('#')) : '';
 
-			return str == null ? "" : str.toString().replace(/^\s+/,"").replace(/\s+$/,"");
+                    break;
 
-		};
+                }
 
-    	for (i=0, l=scripts.length; i<l && (s=scripts[i]); i++) {
+            }
+
+        }
+
+        if (hash) {
+
+            hash = hash.split('&');
+
+            for (i=0,l=hash.length; i<l && (one=hash[i]); i++) {
+
+                one = one.split('=');
+
+                envKey = one[0].toLowerCase();
+                envValue = one.length > 1 ? one[1] : undef;
+
+                if (knownEnvs.hasOwnProperty(envKey)) {
+
+                    envConfig = knownEnvs[envKey];
+
+                    switch (envConfig.type) {
+                        case tpBol:
+                        envValue = str2Bool(envValue);
+                        break;
+                        case tpNum:
+                        envValue = str2Num(envValue,10);
+                        break;
+                        //case tpStr:
+                        default:
+                        envValue = strTrim(envValue);
+                    }
+
+                    env[envKey] = envValue;
+                }
+
+            }
+
+        }
+
+        // fill unsetted envs
+        for (var k in knownEnvs) {
+            if (knownEnvs.hasOwnProperty(k) && !env.hasOwnProperty(k)) {
+                env[k] = knownEnvs[k]['default'];
+            }
+        }
+
+        // fill with envs
+        twb.extend('envs',env);
+
+    }());
+
+    twb.debug = twb.envs.debug;
+
+    twb.provide = twb.create;
     
-			sr = ie ? s.getAttribute('src',4) : s.src;
-
-			if (sr) {
-
-				matched = sr.match(ropenjs) || sr.match(ropenjsproxy);
-
-				if (matched) {
-
-					r = matched[1];
-
-					// @see firefox bug https://bugzilla.mozilla.org/show_bug.cgi?id=483304
-					// SRC attribute is safe to read of script tag in firefox by real browser test
-			    	h = r.split('#').pop();
-
-			    	q = r.indexOf('?') == 0 ? r.slice(1, r.indexOf('#') == -1 ? u : r.indexOf('#')) : '';
-
-    		    	break;
-
-				}
-
-			}
-
-    	}
-
-		if (h) {
-
-			h = h.split('&');
-
-			for (i=0,l=h.length; i<l && (o=h[i]); i++) {
-
-				o = o.split('=');
-
-				envk = o[0].toLowerCase();
-				envv = o.length > 1 ? o[1] : u;
-
-				if (knownEnvs.hasOwnProperty(envk)) {
-
-					envc = knownEnvs[envk];
-
-					switch (envc.type) {
-						case tpBol:
-						envv = str2Bool(envv);
-						break;
-						case tpNum:
-						envv = str2Num(envv,10);
-						break;
-						case tpStr:
-						default:
-						envv = strTrim(envv);
-					}
-
-					env[envk] = envv;
-				}
-
-			}
-
-		}
-
-		// fill unsetted envs
-		for (var k in knownEnvs) {
-			if (knownEnvs.hasOwnProperty(k) && !env.hasOwnProperty(k)) {
-				env[k] = knownEnvs[k]['default'];
-			}
-		}
-
-		// fill with envs
-	    twb.extend('envs',env);
-
-	}());
-
-	twb.debug = twb.envs.debug;
-
-	twb.provide = twb.create;
-    
-	window.QQWB = window.T = twb;
+    window.QQWB = window.T = twb;
 
 }());

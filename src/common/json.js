@@ -11,6 +11,7 @@
  *           String
  *           JSON2
  */
+/*jslint laxcomma:true,evil:true*/
 QQWB.extend("JSON",{
     /**
      * Get JSON Object from string
@@ -54,7 +55,7 @@ QQWB.extend("JSON",{
      * @return {String} the stringified version of an object
      */
    ,stringify: function (source) {
-       return source == null ? "" : window.JSON.stringify(source);
+       return !source ? "" : window.JSON.stringify(source);
     }
 
     /**
@@ -77,7 +78,7 @@ QQWB.extend("JSON",{
      * @return {Object}
      */
    ,parse: function (source) {
-       return source == null ? {} : window.JSON.parse(source);
+       return !source ? {} : window.JSON.parse(source);
     }
 
 }, true/*overwrite toString method inherit from Object.prototype*/);

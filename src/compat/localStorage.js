@@ -12,7 +12,7 @@
  *           core.dom
  *           core.log
  */
-
+/*jslint laxcomma:true*/
 if (QQWB.browser.feature.localstorage) { // implement html5 localstorge
 
     QQWB.extend("localStorage", {
@@ -25,7 +25,7 @@ if (QQWB.browser.feature.localstorage) { // implement html5 localstorge
 
                 val;
 
-            if (!key || value == null) {
+            if (!key || !value) {
 
                 _.log.error(["[localstorage] save error, key or value is empty [" , key , "] value [" , value , "]"].join(''));
 
@@ -62,7 +62,7 @@ if (QQWB.browser.feature.localstorage) { // implement html5 localstorge
 
        ,get: function (key, defaultVal) {
 
-		   var _ = QQWB,
+           var _ = QQWB,
 
                temp;
 
@@ -76,7 +76,7 @@ if (QQWB.browser.feature.localstorage) { // implement html5 localstorge
 
            key = "k" + key;
 
-		   temp = localStorage[key];
+           temp = localStorage[key];
 
            if (temp && (temp = _.JSON.parse(temp)) && temp.value &&  _.time.secondsNow() < temp.expire) {
 
@@ -112,19 +112,19 @@ if (QQWB.browser.feature.localstorage) { // implement html5 localstorge
 
 } else if (QQWB.browser.feature.userdata) {
 
-	(function () {
+    (function () {
 
-    	var _ = QQWB,
+        var _ = QQWB,
     
-    	    userData,
+            userData,
     
             storeName = "QQWBLocalStorage";
     
         _.dom.ready(function () {
     
-			var writeCache = _.bigtable.get("localstorage", "writecache"),
+            var writeCache = _.bigtable.get("localstorage", "writecache"),
 
-			    deleteCache = _.bigtable.get("localstorage", "deletecache");
+                deleteCache = _.bigtable.get("localstorage", "deletecache");
 
             userData = document.createElement("input");
     
@@ -136,45 +136,45 @@ if (QQWB.browser.feature.localstorage) { // implement html5 localstorge
     
             userData.expires = new Date(_.time.now() + 365 * 10 * 24 * 3600 * 1000).toUTCString();
     
-			setTimeout(function () {
+            setTimeout(function () {
 
-				document.body.appendChild(userData);
+                document.body.appendChild(userData);
 
-				if (writeCache && writeCache.length > 0) {
+                if (writeCache && writeCache.length > 0) {
 
-					_.Array.forEach(writeCache, function (v) {
+                    _.Array.forEach(writeCache, function (v) {
 
-						_.localStorage.set.apply(_.localStorage,v);
+                        _.localStorage.set.apply(_.localStorage,v);
 
-					});
+                    });
 
-				}
+                }
 
-				if (deleteCache && deleteCache.length > 0) {
+                if (deleteCache && deleteCache.length > 0) {
 
-					_.Array.forEach(deleteCache, function (v) {
+                    _.Array.forEach(deleteCache, function (v) {
 
-						_.localStorage.del.apply(_.localStorage,v);
+                        _.localStorage.del.apply(_.localStorage,v);
 
-					});
-				}
+                    });
+                }
 
-			},0);
+            },0);
         });
     
         _.extend("localStorage", {
 
             set: function (key, value, expireInDays) {
 
-				var _ = QQWB,
+                var _ = QQWB,
 
-				    cache,
+                    cache,
 
-			    	expire,
+                    expire,
 
-			    	val;
+                    val;
 
-                if (!key || value == null) {
+                if (!key || !value) {
 
                     _.log.error(["[localstorage] save error, key or value is empty [" , key , "] value [" , value , "]"].join(''));
 
@@ -182,20 +182,20 @@ if (QQWB.browser.feature.localstorage) { // implement html5 localstorge
 
                 }
 
-				if (!userData) { // write to cache
+                if (!userData) { // write to cache
 
-				    cache = _.bigtable.get("localstorage", "writecache", []);
+                    cache = _.bigtable.get("localstorage", "writecache", []);
 
-					cache.push(_.Array.fromArguments(arguments));
+                    cache.push(_.Array.fromArguments(arguments));
 
-					_.log.warning("userdata is not ready, save operation to write cache, key " + key);
+                    _.log.warning("userdata is not ready, save operation to write cache, key " + key);
 
-					return -1; 
-				}
+                    return -1; 
+                }
 
                 key = "k" + key;
 
-				expire = _.time.secondsNow() + (expireInDays || 7) * 24 * 3600,
+                expire = _.time.secondsNow() + (expireInDays || 7) * 24 * 3600,
 
                 val = {
 
@@ -227,9 +227,9 @@ if (QQWB.browser.feature.localstorage) { // implement html5 localstorge
 
            ,get: function (key, defaultVal) {
 
-			   var _ = QQWB,
+               var _ = QQWB,
 
-			       temp;
+                   temp;
 
                if (!key) {
 
@@ -241,12 +241,12 @@ if (QQWB.browser.feature.localstorage) { // implement html5 localstorge
 
                key = "k" + key;
 
-			   if (!userData) {
+               if (!userData) {
 
                    _.log.error("[localStorage] can't get value for key " + key + ",userData is currently unavaiable");
 
-				   return defaultVal;
-			   }
+                   return defaultVal;
+               }
 
 
                userData.load(storeName);
@@ -264,9 +264,9 @@ if (QQWB.browser.feature.localstorage) { // implement html5 localstorge
 
            ,del: function (key) {
 
-			   var _ = QQWB,
+               var _ = QQWB,
 
-			       cache;
+                   cache;
 
                if (!key) {
 
@@ -300,23 +300,18 @@ if (QQWB.browser.feature.localstorage) { // implement html5 localstorge
 
        });
 
-	} ());
+    } ());
 
 
 } else {
 
-    QQWB.log.error("localStorage is not supported and no workaround");
+    QQWB.log.warn("localStorage is not supported and no workaround");
 
-    QQWB.extend("localStorage", {
-        set: function () {return;},
-        get: function () {return;},
-        del: function () {return;}
-    });
 }
 
 if (QQWB.localStorage) {
 
-	QQWB.localStorage.save = QQWB.localStorage.set;
+    QQWB.localStorage.save = QQWB.localStorage.set;
 
-	QQWB.localStorage.remove = QQWB.localStorage.del;
+    QQWB.localStorage.remove = QQWB.localStorage.del;
 }
