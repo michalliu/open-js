@@ -121,9 +121,9 @@
         </ul>
 -->
 
-		<a hidefocus class="toc_title" href="#历史更新">历史更新</a>
-
 		<a hidefocus class="toc_title" href="#常见问题">常见问题 <img src="http://mat1.gtimg.com/app/opent/images/wiki/resource/hot.gif" alt="新"/></a>
+
+		<a hidefocus class="toc_title" href="#历史更新">历史更新</a>
 
 		<a hidefocus class="toc_title" href="#成功案例">成功案例</a>
 
@@ -132,7 +132,7 @@
         <!--[if lt IE 7]> 
         <div class="reminder">您的浏览器太旧了，建议使用 <a target="_blank" href="http://www.google.com/chrome">chrome浏览器</a>。</div>
         <![endif]-->
-		<h2>OpenJS</h2>
+		<h2>OpenJS 3.0 Beta</h2>
 		<p>OpenJS是腾讯微博开放平台提供的Javascript库，开发者使用该库可以轻松完成腾讯微博用户授权，访问API接口，调用官方组件等功能，支持多种应用部署环境及无缝迁移。</p>
         <p>如果你需要实现网站与腾讯微博连接，或者开发微博应用，只需要在页面上引入OpenJS，就可以轻松实现这些功能。相比传统的接入方式，如OAuth1.0，Openid&Openkey等，它具有以下优势：
         <ul>
@@ -140,6 +140,16 @@
             <li>支持多种部署环境，如腾讯域内，微博应用频道，和第三方网站等。</li>
         </ul>
         </p>
+
+		<h2 id="历史更新">更新说明</h2>
+
+        <ul class="updatelist">
+            <li>授权流程微博开放平台标准的 <a href="http://wiki.open.t.qq.com/index.php/OAuth2.0%E9%89%B4%E6%9D%83">OAuth2.0</a> 协议，可靠性高，兼容性强。</li>
+            <li>与微博API服务器数据交互采用 <b>HTTPS</b> 加密，更加安全。</li>
+            <li>加强对手机应用的支持。</li>
+            <li>取消对synclogin的支持。</li>
+            <li>进一步加强接口的稳定性和兼容性。</li>
+        </ul>
 
 		<h2 id="开始使用">开始使用</h2>
 		<p>在页面中引用OpenJS的方式分同步加载和异步加载两种。若用同步加载的方式，为优化网站性能，建议将OpenJS放置在页面底部加载<sup><a target="_blank" href="http://developer.yahoo.com/performance/rules.html#js_bottom">[链]</a></sup>。若用异步加载的方式，开发者须进行异步编程。开发者可根据自己的项目情况，自由选择。</p>
@@ -237,23 +247,17 @@
 </pre>
 
 </div>
-			<div class="option">synclogin<span class="opttype">Boolean</span><div class="optdefault">默认值:false</div><p>默认为不使用QQ登录态授权。若该项为真，当<a href="#login">T.login</a>被调用时，首先尝试使用QQ登录态授权当前应用，如失败则弹新窗口授权）。</p></div>
-			<div class="option">pingback<span class="opttype">Boolean</span><div class="optdefault">默认值:true(发送报告)</div><p>向服务器发送技术报告，帮助我们更好的完善OpenJS。</p></div>
+            <div class="option">pingback<span class="opttype">Boolean</span><div class="optdefault">默认值:true(发送报告)</div><p>向服务器发送技术报告帮助我们更好的完善OpenJS。由于我们的技术报告接收服务器只支持http协议，因此如果您的应用采用https协议，为避免浏览器出现网页不安全的提示，此选项会被自动禁用。</p></div>
 		</div>
 
 <br/>
-若为腾讯域内应用<sup><a href="#什么是腾讯域内应用">[链]</a></sup>，<a href="#init">T.init</a> 参数表变化如下：<br/>
+若为腾讯域内应用<sup><a href="#什么是腾讯域内应用">[链]</a></sup>，<a href="#init">T.init</a> 参数表为：<br/>
 <br/>
 		<div class="options">
 			<div class="argument">inInitOpts<span class="optrequired">必选</span><span class="opttype">Map</span></div>
 			<div class="option">appkey<span class="optrequired">必选</span><span class="opttype">String</span><div class="optdefault">默认值:无</div><p>开放平台appkey，据协议和平台的差异性有时又叫appid或client id。</p></div>
 			<div class="option light">showappinfo<span class="opttype">Boolean</span><div class="optdefault">默认值:true(显示应用信息)</div><p>若为真当用户首次使用你的应用时，将显示应用信息及授权按钮。为假则忽略授权步骤，直接获取用户的授权。</p></div>
-			<div class="option del">callbackurl<span class="opttype del">String</span><div class="optdefault del">默认值:当前页面网址</div><p>用户授权成功后的回跳页面地址，如不设置则为当前页面网址。回跳页面地址必须与appkey匹配<sup><a target="_blank" href="http://mat1.gtimg.com/app/openjs/static/images/uri_explaination.jpg">[链]</a></sup>，否则无法完成授权。关于此参数的更多细节问题，请阅读 <a href="#faq9">FAQ</a></p></div>
-			<div class="option del">autoclose<span class="opttype del">Boolean</span><div class="optdefault del">默认值:true(自动关闭授权窗口)</div><p>默认自动关闭授权窗口，否则需开发者自行关闭回跳页面窗口。</p></div>
-            <div class="option del">samewindow<span class="opttype del">Boolean</span><div class="optdefault del">默认值:false(弹新窗口授权)</div><p>默认为弹新窗口授权，否则在同一窗口授权，在此情况下开发者须自己处理授权返回的token，或使用我们提供的通用方案<sup><a target="_blank" href="http://mat1.gtimg.com/app/openjs/static/downloads/openjscallback.zip">[链]</a></sup>。开发者无须担心弹出的授权窗口被浏览器屏蔽，因为授权行为一般是由用户主动点击触发，浏览器不会进行屏蔽。</p>
-</div>
-			<div class="option del">synclogin<span class="opttype del">Boolean</span><div class="optdefault del">默认值:false</div><p>默认为不使用QQ登录态授权。若该项为真，当<a href="#login">T.login</a>被调用时，首先尝试使用QQ登录态授权当前应用，如失败则弹新窗口授权）。</p></div>
-			<div class="option">pingback<span class="opttype">Boolean</span><div class="optdefault">默认值:true(发送报告)</div><p>向服务器发送技术报告，帮助我们更好的完善OpenJS。</p></div>
+            <div class="option">pingback<span class="opttype">Boolean</span><div class="optdefault">默认值:true(发送报告)</div><p>向服务器发送技术报告帮助我们更好的完善OpenJS。由于我们的技术报告接收服务器只支持http协议，因此如果您的应用采用https协议，为避免浏览器出现网页不安全的提示，此选项会被自动禁用。</p></div>
         </div>
 
 <p class="paragraph">§</p>
@@ -277,10 +281,11 @@
 					<div class="option">access_token <span class="desc">授权后获得的OAuth2.0 Accesstoken</span></div>
 					<div class="option">name <span class="desc">微博用户名</span></div>
 					<div class="option">nick <span class="desc">微博昵称</span></div>
+                    <div class="option">openid <span class="desc">微博用户的openid</span></div>
             </div>
 		<div class="argument">inFailHandler(inLoginError)<span class="opttype">Function</span><div class="optdefault">默认值:无</div><p>用户登录授权失败后要执行的函数。</p></div>
 			<div class="option">inLoginError<span class="opttype">Map</span><div class="optdefault">回调数据</div><p>包含的用户登录失败信息。</p>
-				<div class="option">message <span class="desc">失败原因描述</span></div>
+				<div class="option">message <span class="desc">失败原因描述，一般是拒绝授权</span></div>
             </div>
         </div>
 
@@ -340,7 +345,7 @@
 			<div class="argument">inParamMap<span class="opttype">Map</span><div class="optdefault">默认值:无</div><p>该API对应的参数列表，如{content:"test",clientip:"123.123.123.123"}，参数表中可忽略format字段，该字段由inDataType指定。</p></div>
 			<div class="argument">inDataType<span class="opttype">String</span><div class="optdefault">默认值:"json"</div><p>返回的数据格式，"json"或"xml"。</p></div>
 			<div class="argument">inType<span class="opttype">String</span><div class="optdefault">默认值:"get"</div><p>请求方法，"get"或"post"，建议调用写接口统一用"post"。</p></div>
-			<div class="argument">inOverride<span class="opttype">Map</span><div class="optdefault">默认值:无</div><p>覆盖当前使用的appkey和accessToken，此选项使T.api接口可以独立使用。</p><div class="option">appkey <span class="desc">使用此appkey发出api请求</span></div><div class="option">accesstoken <span class="desc">使用此accesstoken发出api请求。</span></div></div>
+			<div class="argument">inOverride<span class="opttype">Map</span><div class="optdefault">默认值:无</div><p>覆盖当前使用的appkey和accessToken，此选项使T.api接口可以独立使用。</p><div class="option">appkey <span class="desc">使用此appkey发出api请求</span></div><div class="option">accesstoken <span class="desc">使用此accesstoken发出api请求。</span></div><div class="option">openid <span class="desc">使用此openid发出api请求。</span></div></div>
         </div>
 
 <p class="paragraph">§</p>
@@ -878,6 +883,13 @@ T.documentReady(function () {
 		<h2 id="历史更新">历史更新</h2>
 
 		<div class="options">
+            <div class="argument">版本: <a target="_blank" href="http://mat1.gtimg.com/app/openjs/openjs.js">3.0</a><span class="opttype">2012.8</span><ul class="updatelist">
+                <li>授权流程微博开放平台标准的 <a href="http://wiki.open.t.qq.com/index.php/OAuth2.0%E9%89%B4%E6%9D%83">OAuth2.0</a> 协议，可靠性高，兼容性强。</li>
+                <li>与微博API服务器数据交互采用 <b>HTTPS</b> 加密，更加安全。</li>
+                <li>加强对手机应用的支持。</li>
+                <li>取消对synclogin的支持。</li>
+                <li>进一步加强接口的稳定性和兼容性。</li>
+            </ul></div>
             <div class="argument">版本: <a target="_blank" href="http://mat1.gtimg.com/app/openjs/v20.js">2.0</a><span class="optrequired">推荐使用</span><span class="opttype">2012.4</span><ul class="updatelist">
                     <li>增加<a href="#环境变量">环境变量</a>设置。</li>
                     <li>增加 <a href="#template">模版</a> 方法。</li>
