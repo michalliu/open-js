@@ -284,22 +284,10 @@
     
                                    authorizing = false;
     
-                                   if (autoclose) {
+                                   if (autoclose) awindow.close(); 
 
-                                       setTimeout(function () {
+                                   awindow = null;
 
-                                           awindow.close();
-
-                                           awindow = null;
-
-                                       }, 0);
-
-                                   } else {
-
-                                       awindow = null;
-
-                                   }
-    
                                    return;
     
                                }
@@ -314,7 +302,7 @@
     
                 } else {
     
-                    awindow && awindow.focus();
+                    if (awindow) awindow.focus();
     
                 }
                 
