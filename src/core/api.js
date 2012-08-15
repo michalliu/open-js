@@ -270,40 +270,60 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optOverride)
 
                             _l.warn("ignore data from origin " + e.origin);
 
-                        } else {
+                            return;
+
+                        }
+
+                        // 本函数本不应该处理此种信息，这是容错逻辑
+                        // proxy.html加载的时候会发送postMessage，内容是'sucess'
+                        // 这会导致JSON解析错误，字符串不能转换为JSON对象
+                        try {
 
                             data = _j.fromString(e.data);
 
-                            id = data.id;
+                        } catch (invalidJSONError) {
 
-                            response = data.data;
+                            _l.warn('[T.api] invalid JSON:' + e.data);
 
-                            defr = _b.get("api","resultdeferred" + id);
+                            return;
+                        }
 
-                            if (defr) {
+                        id = data.id;
 
-                                if (response[0] !== 200) {
+                        response = data.data;
 
-                                    defr.rejectWith(defr,response);
+                        if (!id || !response) {
 
-                                } else {
+                            _l.warn('[T.api] invalid data, id and data must exists:' + data);
 
-                                    if (response[5] == "_xml_") {
+                            return;
+                        }
 
-                                        response[3] = _x.fromString(response[3]);
+                        defr = _b.get("api","resultdeferred" + id);
 
-                                    }
+                        if (defr) {
 
-                                    defr.resolve(response[3]/* response body */, response[2]/* elpased time */, response[4]/*response header*/);
-                                }
+                            if (response[0] !== 200) {
 
-                                _b.del("api","resultdeferred" + id);
+                                defr.rejectWith(defr,response);
 
                             } else {
 
-                                _l.error("invalid api request id " + id);
+                                if (response[5] == "_xml_") {
 
+                                    response[3] = _x.fromString(response[3]);
+
+                                }
+
+                                defr.resolve(response[3]/* response body */, response[2]/* elpased time */, response[4]/*response header*/);
                             }
+
+                            _b.del("api","resultdeferred" + id);
+
+                        } else {
+
+                            _l.error("[T.api] invalid api request id " + id);
+
                         }
 
                     });
