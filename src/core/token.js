@@ -128,13 +128,24 @@ QQWB.extend("_token",{
      */
    ,clearAccessToken: function () {
 
-        var _ = QQWB,
+       var _ = QQWB,
 
-            _b = _.bigtable,
+           _c = _.cookie,
 
-            _c = _.cookie;
+           _b = _.bigtable,
 
-        return _c.del(_b.get("cookie","getAccesstokenName")(),_b.get("cookie","path"),_b.get("cookie","domain"));
+           name = _b.get("cookie","getAccesstokenName")(),
+
+           path = _b.get("cookie","path"),
+
+           domain = _b.get("cookie","domain");
+
+       _c.del(name,path,domain);
+
+       _c.del(name,'/',domain);
+
+       return _;
+
     }
 
     /**
@@ -185,8 +196,23 @@ QQWB.extend("_token",{
      */
    ,clearRefreshToken: function () {
 
-       return QQWB.cookie.del(QQWB.bigtable.get("cookie","getRefreshtokenName")(),QQWB.bigtable.get("cookie","path"),QQWB.bigtable.get("cookie","domain"));
+       var _ = QQWB,
 
+           _c = _.cookie,
+
+           _b = _.bigtable,
+
+           name = _b.get("cookie","getRefreshtokenName")(),
+
+           path = _b.get("cookie","path"),
+
+           domain = _b.get("cookie","domain");
+
+       _c.del(name,path,domain);
+
+       _c.del(name,'/',domain);
+
+       return _;
     }
 
     /**
