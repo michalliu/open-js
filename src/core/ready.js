@@ -25,9 +25,9 @@ QQWB.extend("",{
 
            _b = _.bigtable,
 
-           ready = _b.get("boot", "tokenready").isOpen();
+           ready = _b.get("boot", "tokenready");
 
-       if (ready) {
+       if (ready && ready.isOpen()) { // autoboot为false时ready可能为undefined
 
            if(handler) handler();
 
@@ -52,9 +52,9 @@ QQWB.extend("",{
 
            _b = _.bigtable,
 
-           ready = _b.get("boot", "everythingready").isOpen();
+           ready = _b.get("boot", "everythingready");
 
-       if (ready) {
+       if (ready && ready.isOpen()) {
 
            if(handler) handler();
 
