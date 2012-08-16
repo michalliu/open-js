@@ -174,6 +174,10 @@
                return;
            }
 
+           //TODO: 不应对queryString中的双斜杠进行替换操作
+           // 如http://xx.com?q=http://xx.com
+           // 不应被替换为
+           // 如http://xx.com?q=http:/xx.com
            // resolve absolute path from a context 
            function resolvePath(p) {
                var dirpattern = /.*(?=\/.*$)/,
