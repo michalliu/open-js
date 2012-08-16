@@ -503,7 +503,7 @@
 
             idname: 'qqwb_share__', // HTML页面中的ID
 
-            attributes: 'icon counter counter_pos cto_icon appkey content pic',
+            attributes: 'icon counter counter_pos cto_icon appkey content pic richcontent',
 
             rootStyle: 'text-align:left;',
 
@@ -525,6 +525,8 @@
                     share_pic = cfg.pic || "", // 转播的图片
 
                     share_content = cfg.content || "", // 默认的转播文字
+
+                    share_richcontent = cfg.richcontent || '', // 默认的rich化文字
 
                     temp;
 
@@ -556,6 +558,8 @@
                     share_counter = !!parseInt(cfg.counter,10);
 
                 }
+
+                share_richcontent = _s.splitby('|', share_richcontent);
 
                 // 显示数字的位置检查
                 if (cfg.counter_pos) {
@@ -619,6 +623,17 @@
                             title: share_content
 
                         });
+
+                    }
+
+                    if (share_richcontent.length > 0) {
+
+                        // 最多支持3行richcontent
+                        for (var i=0,l=share_richcontent.length;i<l && i<3; i++) {
+
+                            query['line' + (i + 1)] = share_richcontent[i];
+
+                        }
 
                     }
 
