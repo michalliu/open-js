@@ -8,8 +8,9 @@
  * @package core
  * @module ready
  * @requires base
+ *           boot
  */
-
+/*jslint laxcomma:true*/
 QQWB.extend("",{
    /**
     * Add callback funtions when the sdk is ready
@@ -20,15 +21,15 @@ QQWB.extend("",{
     */
    tokenReady: function (handler) {
 
-	   var _ = QQWB,
+       var _ = QQWB,
 
-	       _b = _.bigtable,
+           _b = _.bigtable,
 
-	       ready = _b.get("boot", "tokenready").isOpen();
+           ready = _b.get("boot", "tokenready").isOpen();
 
        if (ready) {
 
-           handler && handler();
+           if(handler) handler();
 
        } else {
 
@@ -47,15 +48,15 @@ QQWB.extend("",{
     */
    ,everythingReady: function (handler) {
 
-	   var _ = QQWB,
+       var _ = QQWB,
 
-	       _b = _.bigtable,
+           _b = _.bigtable,
 
-	       ready = _b.get("boot", "everythingready").isOpen();
+           ready = _b.get("boot", "everythingready").isOpen();
 
        if (ready) {
 
-           handler && handler();
+           if(handler) handler();
 
        } else {
 
