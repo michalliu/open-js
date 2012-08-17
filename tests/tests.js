@@ -1,6 +1,7 @@
 /*jslint laxcomma:true*/
 var syncedT,onOpenjsLoad;
 var confirmLayer;
+var appkey='801124054';
 function requireConfirm(msg, agree, refuse) {
     // 在大多数手机浏览器上如palm pre3
     // 如果不是用户真实点击触发的window.open会被默认拦截，导致我们的测试用例无法正常运行
@@ -81,7 +82,7 @@ asyncTest('异步加载', 3, function () {
 
 module('授权管理');
 asyncTest('登录与授权', function () {
-    T.init({appkey:801124054,callbackurl:'./callback.html'});
+    T.init({appkey:appkey,callbackurl:'./callback.html'});
     T.tokenReady(function () {
         if (!T.loginStatus()) {
             requireConfirm("授权管理测试模块将弹出授权窗口，请选择同意", function () {
@@ -116,7 +117,7 @@ asyncTest('登录与授权', function () {
 });
 
 asyncTest('登出',function () {
-    T.init({appkey:801124054,callbackurl:'./callback.html'});
+    T.init({appkey:appkey,callbackurl:'./callback.html'});
     T.tokenReady(function () {
         expect(2);
         if (T.loginStatus()) {
@@ -134,7 +135,7 @@ asyncTest('登出',function () {
 
 module('获取微博数据');
 asyncTest('广播大厅前20条，返回JSON对象，GET方式', function () {
-    T.init({appkey:801124054,callbackurl:'./callback.html'});
+    T.init({appkey:appkey,callbackurl:'./callback.html'});
     T.api('statuses/public_timeline',{reqnum:20})
      .success(function (data) {
          expect(3);
@@ -151,7 +152,7 @@ asyncTest('广播大厅前20条，返回JSON对象，GET方式', function () {
      });
 });
 asyncTest('广播大厅前20条，返回JSON对象，POST方式', function () {
-    T.init({appkey:801124054,callbackurl:'./callback.html'});
+    T.init({appkey:appkey,callbackurl:'./callback.html'});
     T.api('statuses/public_timeline',{reqnum:20},'json','post')
      .success(function (data) {
          expect(3);
@@ -168,7 +169,7 @@ asyncTest('广播大厅前20条，返回JSON对象，POST方式', function () {
      });
 });
 asyncTest('广播大厅前20条，XML格式', function () {
-    T.init({appkey:801124054,callbackurl:'./callback.html'});
+    T.init({appkey:appkey,callbackurl:'./callback.html'});
     T.api('statuses/public_timeline',{reqnum:20},'xml')
      .success(function (data) {
          expect(3);
@@ -185,7 +186,7 @@ asyncTest('广播大厅前20条，XML格式', function () {
      });
 });
 asyncTest('广播大厅前20条，纯文本格式', function () {
-    T.init({appkey:801124054,callbackurl:'./callback.html'});
+    T.init({appkey:appkey,callbackurl:'./callback.html'});
     T.api('statuses/public_timeline',{reqnum:20},'text')
      .success(function (data) {
          expect(3);
@@ -202,7 +203,7 @@ asyncTest('广播大厅前20条，纯文本格式', function () {
      });
 });
 asyncTest('用户资料', function () {
-    T.init({appkey:801124054,callbackurl:'./callback.html'});
+    T.init({appkey:appkey,callbackurl:'./callback.html'});
     var main = function () {
         T.api('user/info')
          .success(function (data) {
@@ -239,7 +240,7 @@ asyncTest('用户资料', function () {
 module("事件");
 asyncTest('tokenReady', function () {
     expect(1);
-    T.init({appkey:801124054,callbackurl:'./callback.html'});
+    T.init({appkey:appkey,callbackurl:'./callback.html'});
     T.tokenReady(function () {
         ok(true,'回调函数被调用');
         start();
@@ -254,7 +255,7 @@ asyncTest('documentReady', function () {
 });
 asyncTest('ready', function () {
     expect(1);
-    T.init({appkey:801124054,callbackurl:'./callback.html'});
+    T.init({appkey:appkey,callbackurl:'./callback.html'});
     T.ready(function () {
         ok(true,'回调函数被调用');
         start();
