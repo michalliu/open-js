@@ -1,4 +1,42 @@
+/*jslint laxcomma:true*/
 var syncedT,onOpenjsLoad;
+var confirmLayer;
+function requireConfirm(msg, agree, refuse) {
+    // 在大多数手机浏览器上如palm pre3
+    // 如果不是用户真实点击触发的window.open会被默认拦截，导致我们的测试用例无法正常运行
+    // 这里主要为了解决这个问题
+    if (!confirmLayer) {
+        confirmLayer = T.dom.createElement('div', {
+            id: 'confirmlayer',
+            style: ['position:absolute;top:0;left:0;padding:5px;overflow:hidden;z-index:999;visibility:hidden;font-size:24px;'
+                , (T.browser.msie && T.browser.version < 9) ? 'filter: progid:DXImageTransform.Microsoft.Gradient(GradientType=0, StartColorStr="#4c000000", EndColorStr="#4c000000");' : 'background-color:rgba(0,0,0,0.3);'].join(''),
+            
+            innerhtml: '<div style="text-align:center;color:yellow;font-weight:bold;padding-top:40px;"><p>' + msg + '</p><p><button style="width:120px;height:70px;font-size:24px;" id="agree"/>同意</button>' + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button style="width:120px;height:70px;font-size:24px;" id="refuse"/>不同意</button></p></div>'
+        });
+        document.body.appendChild(confirmLayer);
+    }
+    // 绑定事件
+    document.getElementById("agree").onclick = function () {
+        if (agree) agree();
+        confirmLayer.style.visibility="hidden";
+        return false;
+    };
+    document.getElementById("refuse").onclick = function () {
+        if (refuse) refuse();
+        confirmLayer.style.visibility="hidden";
+        return false;
+    };
+
+    // 调整位置，给reflow一点儿时间
+    setTimeout(function () {
+        var width = confirmLayer.clientWidth,
+            height = confirmLayer.clientHeight,
+            scrolledtop = document.documentElement.scrollTop || document.body.scrollTop;
+        confirmLayer.style.left = Math.max(0,(T.browser.viewport.width - width)) / 2 + 'px';
+        confirmLayer.style.top = scrolledtop + Math.max(0,(T.browser.viewport.height - height)) / 2 + 'px';
+        confirmLayer.style.visibility = "visible"; // show auth layer
+    },0);
+}
 module('加载');
 test('同步加载', 4, function () {
     ok(T,'T 已被赋值');
@@ -46,16 +84,22 @@ asyncTest('登录与授权', function () {
     T.init({appkey:801124054,callbackurl:'./callback.html'});
     T.tokenReady(function () {
         if (!T.loginStatus()) {
-            T.login(function (loginstatus) {
-                expect(4);
-                ok(loginstatus,'当前页面是未登录状态，调用T.login请求用户对应用授权，执行授权成功的回调函数');
-                ok(loginstatus.name,'微博名存在[' + loginstatus.name + ']');
-                ok(loginstatus.nick,'微博昵称存在[' + loginstatus.nick + ']');
-                ok(loginstatus.openid,'openid存在[' + loginstatus.openid + ']');
-                start();
-            },function (message) {
+            requireConfirm("授权管理测试模块将弹出授权窗口，请选择同意", function () {
+                T.login(function (loginstatus) {
+                    expect(4);
+                    ok(loginstatus,'当前页面是未登录状态，调用T.login请求用户对应用授权，执行授权成功的回调函数');
+                    ok(loginstatus.name,'微博名存在[' + loginstatus.name + ']');
+                    ok(loginstatus.nick,'微博昵称存在[' + loginstatus.nick + ']');
+                    ok(loginstatus.openid,'openid存在[' + loginstatus.openid + ']');
+                    start();
+                },function (message) {
+                    expect(1);
+                    ok(true,'当前页面是未登录状态，调用T.login请求用户对应用授权，但被用户拒绝，执行授权失败的回调函数');
+                    start();
+                });
+            }, function () {
                 expect(1);
-                ok(true,'当前页面是未登录状态，调用T.login请求用户对应用授权，但被用户拒绝，执行授权失败的回调函数');
+                ok(false,'您拒绝了弹出授权窗口，此项测试无法继续进行');
                 start();
             });
         } else {
@@ -71,8 +115,10 @@ asyncTest('登录与授权', function () {
     });
 });
 
-test('登出',2, function () {
+asyncTest('登出',function () {
+    T.init({appkey:801124054,callbackurl:'./callback.html'});
     T.tokenReady(function () {
+        expect(2);
         if (T.loginStatus()) {
             T.logout();
             ok(!T.loginStatus(),'当前页面是已登录状态，调用T.logout正常登出');
@@ -82,6 +128,7 @@ test('登出',2, function () {
         T.logout(function () {
             ok(true,'执行登出成功的回调函数');
         });
+        start();
     });
 });
 
@@ -177,7 +224,13 @@ asyncTest('用户资料', function () {
 
     T.tokenReady(function () {
         if (!T.loginStatus()) {
-            T.login(main, refuse);
+            requireConfirm("获取个人资料测试模块将弹出授权窗口，请选择同意", function () {
+                T.login(main, refuse);
+            }, function () {
+                expect(1);
+                ok(false,'您拒绝了弹出授权窗口，此项测试无法继续进行');
+                start();
+            });
         } else {
             main();
         }
