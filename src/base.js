@@ -111,7 +111,7 @@
 
     (function detectEnvs () {
 
-        var scriptSrc, trailer, hash, query, udef, one, envKey, envValue, envConfig,     
+        var scriptSrc, trailer, hash, query, undef, one, envKey, envValue, envConfig,     
 
             tpBol = 'boolean',
 
