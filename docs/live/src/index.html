@@ -220,7 +220,7 @@
 		<div class="options">
 			<div class="argument">inInitOpts<span class="optrequired">必选</span><span class="opttype">Map</span></div>
 			<div class="option">appkey<span class="optrequired">必选</span><span class="opttype">String</span><div class="optdefault">默认值:无</div><p>开放平台appkey，据协议和平台的差异性有时又叫appid或client id。</p></div>
-            <div class="option">callbackurl<span class="opttype">String</span><div class="optdefault">默认值:当前页面网址</div><p>用户授权成功后的回跳页面地址，如不设置则为当前页面网址。回跳页面地址必须与appkey匹配<sup><a target="_blank" href="http://mat1.gtimg.com/app/openjs/static/images/uri_explaination.jpg">[链]</a></sup>，否则无法完成授权。建议开发者在服务器上部署一个带有提示性文字的html文件，并把callbackurl指向这个文件，以带来更好的用户体验。关于此参数的更多细节问题，请阅读 <a href="#faq9">FAQ</a></p></div>
+            <div class="option" id="init!callbackurl">callbackurl<span class="opttype">String</span><div class="optdefault">默认值:当前页面网址</div><p>用户授权成功后的回跳页面地址，如不设置则为当前页面网址。回跳页面地址必须与appkey匹配<sup><a target="_blank" href="http://mat1.gtimg.com/app/openjs/static/images/uri_explaination.jpg">[链]</a></sup>，否则无法完成授权。建议开发者在服务器上部署一个带有提示性文字的html文件，并把callbackurl指向这个文件，以带来更好的用户体验。关于此参数的更多细节问题，请阅读 <a href="#faq9">FAQ</a></p></div>
             <div class="option">autoclose<span class="opttype">Boolean</span><div class="optdefault">默认值:true(自动关闭授权窗口)</div><p>默认自动关闭授权窗口，授权页面一旦回跳到开发者指定的<em>callbackurl</em>就立刻关闭授权窗口。为假则没有此操作，开发者需要自行关闭窗口 (调用浏览器的window.close接口)。</p></div>
             <div class="option">samewindow<span class="opttype">Boolean</span><div class="optdefault">默认值:false(弹新窗口授权)</div><p>默认为弹新窗口授权，否则在同一窗口完成授权(类似OAuth1.0的体验)，此方法用来解决某些浏览器安装了第三方弹窗屏蔽插件，造成无法授权的问题。</p><p>注意，在此情况下开发者必须自己处理授权返回的token，如果您不想编写代码，也可以使用我们提供的通用方案<sup><a target="_blank" href="http://mat1.gtimg.com/app/openjs/static/downloads/openjscallback.zip">[链]</a></sup>。</p><p>在一般情况下，开发者无须担心弹出的授权窗口被浏览器屏蔽，因为授权行为一般是由用户主动点击触发，浏览器不会进行屏蔽。</p>
 
@@ -938,7 +938,7 @@ T.documentReady(function () {
 					</li>
 					<li id="faq9">
                     <b>弹出的授权窗口为什么不能自动关闭？</b><br/>
-                    首先，请确保 <a href="#init">T.init</a> 不是 <em>autoclose</em> 为false，如果autoclose为false，则代表授权窗口不会被自动关闭。其次，请检查callbackurl是否与调用页同域，不同域的情况下无法自动关闭窗口，也无法获取授权的token，默认情况下callbackurl为调用页的网址，不会出现此问题。<br/>另，所谓同域是指网址的协议相同，端口相同，以及域名相同。据开发者反馈，这里最常见的一个错误是应用网址是 <em>http://example.com/app.htm</em>而callbackurl为 <em>http://www.example.com/callback.htm</em>，开发者往往误认为 <em>example.com</em> 与 <em>www.example.com</em> 同域，但对于浏览器来说，他们不是同域的。
+                    首先，请确保 <a href="#init">T.init</a> 不是 <em>autoclose</em> 为false，如果autoclose为false，则代表授权窗口不会被自动关闭。其次，请检查callbackurl是否与调用页同域，通常这种情况是由于应用页面设置了 <a href="http://msdn.microsoft.com/en-us/library/ie/ms533740(v=vs.85).aspx" target="_blank">document.domain</a> 属性而引起的，<a href="#init!callbackurl">callbackurl</a> 所指定的页面的 <em>document.domain</em> 属性必须于父页面保持一致，授权信息才能被获取到，授权窗口才能被自动关闭。默认情况下callbackurl为调用页的网址，不会出现此问题。<br/>另，所谓同域是指网址的协议相同，端口相同，以及域名相同。据开发者反馈，这里最常见的一个错误是应用网址是 <em>http://example.com/app.htm</em>而callbackurl为 <em>http://www.example.com/callback.htm</em>，开发者往往误认为 <em>example.com</em> 与 <em>www.example.com</em> 同域，但对于浏览器来说，他们不是同域的。
 					</li>
                     <!--
 					<li id="fusion_api">
@@ -960,6 +960,10 @@ $("#someid").click(function () {
     T.login();
 });
 </pre>
+                    </li>
+					<li id="faq12">
+                    <b>在chrome调试工具下报 "Unsafe Javascript attempt to access frame with URL ..." 的错误？</b><br/>
+                    OpenJS会主动探测自身所处的环境，因此会触发浏览器的沙箱安全规则，当有脚本试图访问沙箱以外的数据时，浏览器就会给出这个提示，实际上执行过程中并没有发生错误。
                     </li>
                 </ol>
         </div>
