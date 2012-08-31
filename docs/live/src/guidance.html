@@ -145,7 +145,7 @@ T.ready(main);
 			<li class="first">若应用部署在自己的服务器，主域名非<em>qq.com</em>，授权的方式则采用授权窗口的方式。<a target="_blank" href="./guess/guess.html">查看演示</a> </li>
 			<li>若应用部署在<em>qq.com</em>下，授权的方式则采用授权浮层。<a target="_blank" href="./guess/guess2.html">查看演示</a> </li>
 
-			<li class="last">若应用部署在 <a target="_blank" href="http://app.t.qq.com/">腾讯微博应用频道</a> 下，则无需授权。因为授权信息会附加在应用的网址内，OpenJS会自动读取。例如，假如你的应用网址是 <pre class="code">http://app12345.app.com/sample.html</pre> 当你的应用在应用频道上线，并被用户打开时，实际访问网址会变成 <pre class="code">http://app12345.app.com/sample.html?wb_name=微博帐号&wb_nick=微博昵称#oauth2token=ACCESS_TOKEN</pre> 这样就达到应用频道内上线的应用使用OpenJS无需登录的效果，以下代码在应用频道可以实现发送微博。
+			<li class="last">若应用部署在 <a target="_blank" href="http://app.t.qq.com/">腾讯微博应用频道</a> 下，则无需授权。因为授权信息会附加在应用的网址内，OpenJS会自动读取。例如，假如你的应用网址是 <pre class="code">http://app12345.app.com/sample.html</pre> 当你的应用在应用频道上线，并被用户打开时，实际访问网址会变成 <pre class="code">http://app12345.app.com/sample.html?name=微博帐号&amp;nick=微博昵称#oauth2atoken=ACCESS_TOKEN</pre> 这样就达到应用频道内上线的应用使用OpenJS无需登录的效果，以下代码在应用频道可以实现发送微博。
 <pre class="code">
 T.init({appkey:YOUR_APP_KEY});
 T.tokenReady(function () {
