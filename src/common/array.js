@@ -10,6 +10,7 @@
  * @requires base
  *           String
  */
+/*jslint laxcomma:true*/
 QQWB.extend("Array",{
     /**
      * Get whether an object is array
@@ -109,39 +110,39 @@ QQWB.extend("Array",{
      * Returns an array (map) of the return values from each invocation of _inFunc_.
      * If _inContext_ is specified, _inFunc_ is called with _inContext_ as _this_.
      * 
-	 */
+     */
    ,forEach: function(inArray, inFunc, inContext) {
-   		var result = [];
-   		if (inArray) {
-   			var context = inContext || this;
-   			for (var i=0, l=inArray.length, v; i<l; i++) {
-   				v = inFunc.call(context, inArray[i], i, inArray);
-   				if (v !== undefined) {
-   					result.push(v);
-   				}
-   			}
-   		}
-   		return result;
-   	}
-	/**
-	 * Get element from array
-	 *
-	 * Examples:
-	 *
-	 * get([1,2],-1)
-	 *
-	 * output
-	 *
-	 * 2
-	 *
-	 * @access public
-	 * @param arr {Array} the array object
-	 * @param index {Number} the index at array
-	 */
+           var result = [];
+           if (inArray) {
+               var context = inContext || this;
+               for (var i=0, l=inArray.length, v; i<l; i++) {
+                   v = inFunc.call(context, inArray[i], i, inArray);
+                   if (v !== undefined) {
+                       result.push(v);
+                   }
+               }
+           }
+           return result;
+       }
+    /**
+     * Get element from array
+     *
+     * Examples:
+     *
+     * get([1,2],-1)
+     *
+     * output
+     *
+     * 2
+     *
+     * @access public
+     * @param arr {Array} the array object
+     * @param index {Number} the index at array
+     */
    ,get: function (arr, index) {
-	   var l = arr.length;
-	   if (Math.abs(index) < l) {
-		   return index >= 0 ? arr[index] : arr[l+index]; 
-	   }
+       var l = arr.length;
+       if (Math.abs(index) < l) {
+           return index >= 0 ? arr[index] : arr[l+index]; 
+       }
     }
 });
