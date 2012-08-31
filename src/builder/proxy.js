@@ -66,7 +66,7 @@
      */
     window.getToken = function (appkey,force) {
 
-        var safekey = document.cookie.match(/skey=([^;]+)/) || document.cookie.match(/lskey=([^;]+)/);
+        var safekey = document.cookie.match(/;\sskey=([^;]+)/) || document.cookie.match(/^skey=([^;]+)/) || document.cookie.match(/;\slskey=([^;]+)/) || document.cookie.match(/^lskey=([^;]+)/);
 
         return  _i.ajax({
 
