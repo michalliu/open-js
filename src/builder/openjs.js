@@ -17,6 +17,7 @@
  *           util.bigtable
  *           compat.localStorage
  *           ui.component
+ *           ui.widget
  */
 
 (function () {
