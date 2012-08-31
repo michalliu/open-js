@@ -26,3 +26,7 @@ java -jar %htmlcompressor% --type html --compress-js -o .\showcase\follow.html .
 java -jar %htmlcompressor% --type html --compress-js -o .\index.html ..\src\index.html
 java -jar %htmlcompressor% --type html --compress-js -o .\guidance.html ..\src\guidance.html
 XCOPY ..\src\guess .\guess\ /S /Q /Y
+MKDIR build
+COPY ..\..\..\build\openjs.min.js .\build\openjs.js
+XCOPY ..\..\..\tests .\tests\ /S /Q /Y
+XCOPY ..\..\..\tools\qunit\qunit .\tools\qunit\qunit\ /S /Q /Y

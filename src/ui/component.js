@@ -503,7 +503,7 @@
 
             idname: 'qqwb_share__', // HTML页面中的ID
 
-            attributes: 'icon counter counter_pos cto_icon appkey content pic',
+            attributes: 'icon counter counter_pos cto_icon cto_ui appkey content richcontent pic',
 
             rootStyle: 'text-align:left;',
 
@@ -525,6 +525,23 @@
                     share_pic = cfg.pic || "", // 转播的图片
 
                     share_content = cfg.content || "", // 默认的转播文字
+
+                    share_richcontent = cfg.richcontent || '', // 默认的rich化文字，多行用|分割
+
+                    share_ctoui = cfg.cto_ui || '', // 定制化一键转播页面，不设置此参数 - 不定制。
+                    /**
+                     *
+                     *  值为0表示不显示 为1表示显示
+                     *
+                     * |--------------------------------|
+                     * |  位置 |  含义                  |
+                     * |--------------------------------|
+                     * |   0   |  是否显示告诉TA们      |
+                     * |--------------------------------|
+                     * |   1   |  是否显示同步到QZone   |
+                     * |--------------------------------
+                     *
+                     */
 
                     temp;
 
@@ -556,6 +573,8 @@
                     share_counter = !!parseInt(cfg.counter,10);
 
                 }
+
+                share_richcontent = _s.splitby('|', share_richcontent);
 
                 // 显示数字的位置检查
                 if (cfg.counter_pos) {
@@ -610,29 +629,32 @@
 
                         appkey: cfg.appkey
 
-                    };
+                    }, currentCount;
 
-                    if (share_content) {
+                    if (share_content) _.extend(query,{ title: share_content });
 
-                        _.extend(query,{
+                    if (share_pic) _.extend(query,{ pic: share_pic });
 
-                            title: share_content
+                    // 1 代表开启定制化，若为0表示开启定制化并隐藏全部的额外界面元素，不设置代表显示所有的界面元素
 
-                        });
+                    if (share_ctoui) _.extend(query,{ bm: '1' + share_ctoui });                     
 
-                    }
+                    if (share_richcontent.length > 0) {
 
-                    if (share_pic) {
+                        // 最多支持3行richcontent
+                        for (var i=0,l=share_richcontent.length;i<l && i<3; i++) {
 
-                        _.extend(query,{
+                            query['line' + (i + 1)] = share_richcontent[i];
 
-                            pic: share_pic
-
-                        });
+                        }
 
                     }
 
                     window.open(share_url + "&" + _q.encode(query),null,share_attrs);
+
+                    currentCount = parseInt(dshare_count.innerHTML,10);
+
+                    drawCounter(currentCount + 1); // 分享加1
 
                     return false;
 
@@ -770,7 +792,13 @@
 
                     }).success(function (response) {
 
-						if (response.ret === 0) {
+                        var currentCount = parseInt(dshare_count.innerHTML,10);
+
+                        // 只有当实际的转播数字大于所显示的数字时，才绘制到屏幕上
+                        // 若用户不停的点击转播按钮，但又未实际的转播出去，可能会导致
+                        // 显示的转播数字比实际的转播数字要大，而发生转播数字突然变小
+                        // 的情况
+						if (response.ret === 0 && response.count > currentCount) {
 
 							drawCounter(response.count);
 
