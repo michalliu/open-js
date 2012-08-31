@@ -1,12 +1,6 @@
 /**
  * Tencent weibo javascript library
  *
- * Use
- *
- * Example:
- *
- * T.man("/Statuses/home_timeline");
- *
  * @author michalliu
  * @version 1.0
  * @package ui
