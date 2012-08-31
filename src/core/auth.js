@@ -67,7 +67,7 @@
                            style: ['position:absolute;padding:5px;overflow:hidden;z-index:999;visibility:hidden;'
                                , (_br.msie && _br.version < 9) ? 'filter: progid:DXImageTransform.Microsoft.Gradient(GradientType=0, StartColorStr="#4c000000", EndColorStr="#4c000000");' : 'background-color:rgba(0,0,0,0.3);'].join(''),
 
-                           innerhtml: ['<iframe src="', url , '?appkey=', appkey, '" ', attrs, '></iframe>'].join('')
+                           innerhtml: ['<iframe src="', url , '&appkey=', appkey, '" ', attrs, '></iframe>'].join('')
 
                        });
 
