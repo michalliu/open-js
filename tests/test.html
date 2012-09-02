@@ -30,7 +30,6 @@
 <script src="../src/util/cookie.js"></script>
 <script src="../src/core/token.js"></script>
 <script src="../src/core/auth.js"></script>
-<script src="../src/ui/widget.js"></script>
 <script src="../src/.third-party/sizzle.js"></script>
 <script src="../src/core/dom.js"></script>
 <script src="../src/ui/component.js"></script>
@@ -39,16 +38,27 @@
 <script src="../src/util/door.js"></script>
 <script src="../src/core/boot.js"></script>
 <script src="../src/core/ready.js"></script>
+<script src="../src/ui/widget.js"></script>
 <script src="../src/builder/openjs.js"></script>
 <script>
 if (QQWB.name == "OpenJS" && parseInt(QQWB.version,10) >= 3) {
 	QQWB.widget.register({
 		name: "好友选择",
-		version: "1.0"
+		version: "1.0",
+		loginRequired:true,
+		main: function () {
+			var that = this;
+			this.getContainer().innerHTML = "hello world";
+			setTimeout(function () {
+				console.log(that);
+				that.close();
+			},1000);
+		}
 	});
 }
 </script>
 <script>
+	T.init({appkey:801203220});
 	T.widget("好友选择");
 </script>
 </head>
