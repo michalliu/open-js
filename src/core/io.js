@@ -17,6 +17,7 @@
  *           common.Object
  * @includes common.XML
  */
+/*jslint laxcomma:true*/
 (function () {
 
     var _ = QQWB,
@@ -212,7 +213,7 @@
 
                     clearTimeout(timer);
 
-                    complete && complete(500, "server error", _t.now() - start);
+                    if (complete) complete(500, "server error", _t.now() - start);
 
                     complete = null;
                 };
@@ -324,7 +325,7 @@
 
                                     xhr.abort();
 
-                                   complete && complete(-1, "aborted", _t.now() - start);
+                                   if (complete) complete(-1, "aborted", _t.now() - start);
 
                                    complete = null;
 
@@ -486,21 +487,21 @@
 
                             if (isAbort) {
 
-                                complete && complete(-1, "aborted", _t.now() - start);
+                                if (complete) complete(-1, "aborted", _t.now() - start);
                                 
                                 complete = null;
 
                             } else {
 
-                                status = this["httpStatus"];
+                                status = this.httpStatus;
 
-                                statusText = this["httpStatus"] == 200 ? "ok" : "";
+                                statusText = this.httpStatus == 200 ? "ok" : "";
 
                                 responseHeaders = ""; //as3 don't support that this should be filled at future
 
                                 responses = {}; // internal object
 
-                                responses.text = this["httpResponseText"];
+                                responses.text = this.httpResponseText;
                     
                                 if (cfg.dataType.toLowerCase() == "json") { // parse to json object
 
@@ -591,19 +592,19 @@
         
         if (/httpStatus/i.test(srcEvt.type)) { // this is a http status code response, cache it
 
-            cb["httpStatus"] = srcEvt.status
+            cb.httpStatus = srcEvt.status;
 
             cb.readyState++;
 
         } else if (/error/i.test(srcEvt.type)) { // possible io_Error or security error
 
-            cb["httpError"] = srcEvt.type
+            cb.httpError = srcEvt.type;
 
             cb.readyState++;
 
         } else if (/complete/i.test(srcEvt.type)) {
 
-            cb["httpResponseText"] = srcEvt.target.data
+            cb.httpResponseText = srcEvt.target.data;
 
             cb.readyState++;
         }
