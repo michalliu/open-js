@@ -309,8 +309,6 @@
 
                         xml;
                 
-                    try {
-
                         if (xhrcallback && (isAbort || xhr.readyState === 4)) {
                             
                             xhrcallback = null;
@@ -372,42 +370,44 @@
 
                                  }
                 
-                                 if (cfg.dataType.toLowerCase() == "json") { /// parse to json object
+                                 try {
 
-                                     response = _.JSON.fromString(responses.text);
+                                     if (cfg.dataType.toLowerCase() == "json") { /// parse to json object
 
-                                 } else if (cfg.dataType.toLowerCase() == "xml") { // parse to xml object
+                                         response = _.JSON.fromString(responses.text);
 
-                                     response = responses.xml;
+                                     } else if (cfg.dataType.toLowerCase() == "xml") { // parse to xml object
 
-                                 } else {
+                                         response = responses.xml;
 
-                                     response = responses.text;
+                                     } else {
 
+                                         response = responses.text;
+
+                                     }
+
+                                 } catch (ex) {
+
+                                    clearTimeout(timer);
+
+                                    _l.error("caught exception " + [ex.type, ex.message].join(" ") + " in ioajax");
+
+                                    complete(-2, "exception " + ex, _t.now() - start);
+
+                                    return;
                                  }
-                
+                    
                              }
                 
                             //if (response) { // in case of server returns empty body sometimes
                            
-                                complete(status, statusText, _t.now() - start, response, responses.text, responseHeaders, cfg.dataType);
+                              complete(status, statusText, _t.now() - start, response, responses.text, responseHeaders, cfg.dataType);
 
-                               complete = null;
+                              complete = null;
 
                             //}
                         }
 
-                    } catch (ex /*firefoxOrInvalidJSONFormatParserException*/) {
-
-                       clearTimeout(timer);
-
-                        _l.error("caught exception " + [ex.type, ex.message].join(" ") + " in ioajax");
-
-                        complete(-2, "exception " + ex, _t.now() - start);
-
-                       complete = null;
-
-                    }
 
                 };
                 
@@ -901,7 +901,7 @@ QQWB.extend("io", {
 
                 } catch (ex) {
 
-                    _l.error("caught exception " + [ex.type, ex.message].join(" ") + " in ioajax");
+                    _l.error("caught exception " + [ex.type, ex.message].join(" ") + " in jsonp");
 
                     deferred.reject(-2, "exception " + ex, timeCost);
 
