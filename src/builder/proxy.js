@@ -123,124 +123,124 @@
     
     };
 
-if (inframe) {    
-
-    try {
-
-        sameOrigin = appWindow.location.href;
-
-    } catch (SecurityError) {
-
-    }
-
-    if (sameOrigin) {
-
-        _l.info('[proxy] app running at same origin');
-
-        if (appWindow.QQWB && appWindow.QQWB.name === 'OpenJS') {
-
-            _l.info('[proxy] openjs detected in app');
-
-            appWindow.QQWB.trigger(_b.get("innerauth","eventproxyready"));
-
-        } else {
-
-            _l.warning("[proxy] openjs not detected in app");
-
+    if (inframe) {    
+    
+        try {
+    
+            sameOrigin = appWindow.location.href;
+    
+        } catch (SecurityError) {
+    
         }
-
-    } else {
-
-        _l.info('[proxy] app running at external auth mode');
-
-    }
-
-    // post a message to the parent window indicate that server frame(itself) was successfully loaded
-    if ( appWindow && appWindow.postMessage) {
-
-        _l.info("[proxy] message proxy is running properly");
-
-        appWindow.postMessage("success", targetOrigin); 
     
-        messageHandler = function (e) {
+        if (sameOrigin) {
     
-            // accept any origin, we do strict api check here to protect from XSS/CSRF attack
-            var data,id,args,apiInterface;
+            _l.info('[proxy] app running at same origin');
     
-            try {
+            if (appWindow.QQWB && appWindow.QQWB.name === 'OpenJS') {
     
-                data = _j.fromString(e.data);
+                _l.info('[proxy] openjs detected in app');
     
-            } catch (jsonParseError) {}
-    
-            // check format
-            if (data && data.id && data.data) {
-    
-                id = data.id, // message id related to the deferred object
-    
-                args = data.data,
-    
-                apiInterface = args[0];
-    
-                if (args[2].toLowerCase() == "xml") {
-                    // if dataType is xml, the ajax will return a xml object, which can't call
-                    // postMessage directly (will raise an exception) , instead we request to tranfer
-                    // XML as String, then parse it back to XML object.
-                    // io.js will fall to response.text
-                    // api.js will detect that convert it back to xmlobject
-                    // @see io.js,api.js
-                    args[2] = "_xml_";
-                }
-    
-                if (!apiInterface) { // basic interface name validation
-    
-                    appWindow.postMessage(_j.stringify({
-    
-                        id: id
-    
-                       ,data: [-1, "interface can not be empty"]
-    
-                    }), targetOrigin);
-    
-                    _l.error("[proxy] interface cant not be empty");
-    
-                } else {
-    
-                    apiAjax.apply(this,args).complete(function () {
-    
-                        // can't stringify a xml object here
-                        appWindow.postMessage(_j.stringify({
-    
-                            id: id
-    
-                           ,data: _a.fromArguments(arguments)
-    
-                        }), targetOrigin);
-    
-                    });
-    
-                }
+                appWindow.QQWB.trigger(_b.get("innerauth","eventproxyready"));
     
             } else {
     
-                _l.warn("[proxy] ignore unexpected message " + e.data);
+                _l.warning("[proxy] openjs not detected in app");
     
             }
     
-        }; // end message handler
+        } else {
     
-        if (window.addEventListener) {
-    
-            window.addEventListener("message", messageHandler, false);
-    
-        } else if (window.attachEvent) {
-    
-            window.attachEvent("onmessage", messageHandler);
+            _l.info('[proxy] app running at external auth mode');
     
         }
-
+    
+        // post a message to the parent window indicate that server frame(itself) was successfully loaded
+        if ( appWindow && appWindow.postMessage) {
+    
+            _l.info("[proxy] message proxy is running properly");
+    
+            appWindow.postMessage("success", targetOrigin); 
+        
+            messageHandler = function (e) {
+        
+                // accept any origin, we do strict api check here to protect from XSS/CSRF attack
+                var data,id,args,apiInterface;
+        
+                try {
+        
+                    data = _j.fromString(e.data);
+        
+                } catch (jsonParseError) {}
+        
+                // check format
+                if (data && data.id && data.data) {
+        
+                    id = data.id, // message id related to the deferred object
+        
+                    args = data.data,
+        
+                    apiInterface = args[0];
+        
+                    if (args[2].toLowerCase() == "xml") {
+                        // if dataType is xml, the ajax will return a xml object, which can't call
+                        // postMessage directly (will raise an exception) , instead we request to tranfer
+                        // XML as String, then parse it back to XML object.
+                        // io.js will fall to response.text
+                        // api.js will detect that convert it back to xmlobject
+                        // @see io.js,api.js
+                        args[2] = "_xml_";
+                    }
+        
+                    if (!apiInterface) { // basic interface name validation
+        
+                        appWindow.postMessage(_j.stringify({
+        
+                            id: id
+        
+                           ,data: [-1, "interface can not be empty"]
+        
+                        }), targetOrigin);
+        
+                        _l.error("[proxy] interface cant not be empty");
+        
+                    } else {
+        
+                        apiAjax.apply(this,args).complete(function () {
+        
+                            // can't stringify a xml object here
+                            appWindow.postMessage(_j.stringify({
+        
+                                id: id
+        
+                               ,data: _a.fromArguments(arguments)
+        
+                            }), targetOrigin);
+        
+                        });
+        
+                    }
+        
+                } else {
+        
+                    _l.warn("[proxy] ignore unexpected message " + e.data);
+        
+                }
+        
+            }; // end message handler
+        
+            if (window.addEventListener) {
+        
+                window.addEventListener("message", messageHandler, false);
+        
+            } else if (window.attachEvent) {
+        
+                window.attachEvent("onmessage", messageHandler);
+        
+            }
+    
+        }
+    
     }
-
-}
 
 }());
