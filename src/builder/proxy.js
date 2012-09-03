@@ -51,12 +51,14 @@
 
         asyncCallbackName = _b.get('openjs','asynccallbackfunctionname'),
 
-        appWindow; // the third-party application window
+        appWindow, inframe; // the third-party application window
 
 
     document.domain = rootDomain;
 
     appWindow = window.parent;
+
+    inframe = window != appWindow;
 
     /*
      * getToken by uin&skey
@@ -120,7 +122,9 @@
         return _i.apiAjax(opts);
     
     };
-    
+
+if (inframe) {    
+
     try {
 
         sameOrigin = appWindow.location.href;
@@ -181,11 +185,7 @@
 
         _l.info("[proxy] message proxy is running properly");
 
-       if (window != appWindow) { // iframe
-    
-            appWindow.postMessage("success", targetOrigin); 
-    
-       }
+        appWindow.postMessage("success", targetOrigin); 
     
         messageHandler = function (e) {
     
@@ -266,5 +266,6 @@
 
     }
 
+}
 
 }());
