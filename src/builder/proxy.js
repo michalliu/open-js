@@ -144,30 +144,6 @@ if (inframe) {
             appWindow.QQWB.trigger(_b.get("innerauth","eventproxyready"));
 
         }
-        /*
-         * if appWindow.QQWB not exists this main code will never excecute
-         * for proxy OpenJS is always sync loaded
-         else if (typeof appWindow[asyncCallbackName] == "function") {
-
-            _l.info('[proxy] openjs async loading in app');
-
-            (function () {
-
-                if (appWindow.QQWB) {
-
-                    _l.info('[proxy] openjs async loaded in app');
-
-                    appWindow.QQWB.trigger(_b.get("innerauth","eventproxyready"));
-
-                    return;
-                }
-
-                setTimeout(arguments.callee, 200);
-
-            }());
-
-        } 
-        */
            else {
 
             _l.warning("[proxy] openjs not detected in app");
