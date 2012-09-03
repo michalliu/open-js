@@ -137,14 +137,13 @@ if (inframe) {
 
         _l.info('[proxy] app running at same origin');
 
-        if (appWindow.QQWB) {
+        if (appWindow.QQWB && appWindow.QQWB.name === 'OpenJS') {
 
-            _l.info('[proxy] openjs used in app');
+            _l.info('[proxy] openjs detected in app');
 
             appWindow.QQWB.trigger(_b.get("innerauth","eventproxyready"));
 
-        }
-           else {
+        } else {
 
             _l.warning("[proxy] openjs not detected in app");
 
