@@ -378,7 +378,7 @@
 
                                      } else if (cfg.dataType.toLowerCase() == "xml") { // parse to xml object
 
-                                         response = responses.xml;
+                                         response = responses.xml || _.XML.fromString(responses.text);
 
                                      } else {
 
