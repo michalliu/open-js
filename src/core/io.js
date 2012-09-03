@@ -477,8 +477,6 @@
 
                        xml;
                
-                    try{
-                    
                         if (callback) {
                     
                             callback = null; // to avoid memory leak in IE
@@ -503,40 +501,43 @@
 
                                 responses.text = this.httpResponseText;
                     
-                                if (cfg.dataType.toLowerCase() == "json") { // parse to json object
+                                try {
 
-                                    response = QQWB.JSON.fromString(responses.text);
+                                    if (cfg.dataType.toLowerCase() == "json") { // parse to json object
 
-                                } else if (cfg.dataType.toLowerCase() == "xml"){ // parse to xml object
+                                        response = QQWB.JSON.fromString(responses.text);
 
-                                    response = QQWB.XML.fromString(responses.text);
+                                    } else if (cfg.dataType.toLowerCase() == "xml"){ // parse to xml object
 
-                                } else {
+                                        response = QQWB.XML.fromString(responses.text);
 
-                                    response = responses.text;
+                                    } else {
+
+                                        response = responses.text;
+                                    }
+
+                                } catch (ex) {
+
+                                   clearTimeout(timer);
+
+                                   _l.error("caught exception " + [ex.type, ex.message].join(" ") + " in ioas3");
+
+                                   complete(-2, "exception " + ex, _t.now() - start);
+
+                                   return;
+
                                 }
+
                             }
                     
                             //if (response) { // when server returns empty body sometimes, response will never called
 
-                             complete(status, statusText, _t.now() - start, response, responses.text, responseHeaders, cfg.dataType);
+                                complete(status, statusText, _t.now() - start, response, responses.text, responseHeaders, cfg.dataType);
 
-                            complete = null;
+                                complete = null;
 
                             //}
                         }
-
-                     } catch (ex /*firefoxOrInvalidJSONFormatParserException*/) {
-
-                        clearTimeout(timer);
-
-                        _l.error("caught exception " + [ex.type, ex.message].join(" ") + " in ioas3");
-
-                        complete(-2, "exception " + ex, _t.now() - start);
-
-                        complete = null;
-
-                     }
 
                }; // end callback
                
