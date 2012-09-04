@@ -341,16 +341,16 @@ def build(modulenames, targetfile, logFile=False):
         packer = JavaScriptPacker()
         open(minifiedfile,"w+").write(packer.pack(finalSource))
 
-    log.info("utf-8 to ascii")
-    minifiedUtf8 = open(minifiedfile,"r").read();
-    # remove bom
-    minifiedUtf8 = minifiedUtf8.decode('utf-8-sig')
-    # non-ascii to ascii repsentation
-    minifiedUtf8 = re.sub(ur'[^\u0000-\u0127]',lambda matched : matched.group().encode('unicode_escape'),minifiedUtf8)
-    # encode to ascii
-    minifiedAscii = minifiedUtf8.encode('ascii')
-    # save ascii
-    open(minifiedfile,"w+").write(minifiedAscii)
+    #log.info("utf-8 to ascii")
+    #minifiedUtf8 = open(minifiedfile,"r").read();
+    ## remove bom
+    #minifiedUtf8 = minifiedUtf8.decode('utf-8-sig')
+    ## non-ascii to ascii repsentation
+    #minifiedUtf8 = re.sub(ur'[^\u0000-\u0127]',lambda matched : matched.group().encode('unicode_escape'),minifiedUtf8)
+    ## encode to ascii
+    #minifiedAscii = minifiedUtf8.encode('ascii')
+    ## save ascii
+    #open(minifiedfile,"w+").write(minifiedAscii)
 
 ##
 ##
