@@ -6,6 +6,7 @@
 <head>
 	<meta charset="utf-8">
 	<title>标题</title>
+	<style>body{background:greenyellow;}</style>
 	<script src="../src/base.js"></script>
 	<script>T.debug=true;</script>
 <script src="../src/core/event.js"></script>
@@ -45,14 +46,25 @@ if (QQWB.name == "OpenJS" && parseInt(QQWB.version,10) >= 3) {
 	QQWB.widget.register({
 		name: "好友选择",
 		version: "1.0",
-		loginRequired:true,
+		loginRequired:false,
 		main: function () {
 			var that = this;
-			this.getContainer().innerHTML = "hello world";
+			this.setDimension(400,400);
+			/*
+			this.setDimension(400,400);
+			this.setContentDimension(400,400);
 			setTimeout(function () {
-				console.log(that);
-				that.close();
-			},1000);
+				that.setContentHeight(600);
+			}, 1000);
+			*/
+			this.onCloseButtonClicked(function () {
+				alert('关闭被点击');
+				return false;
+			});
+			setTimeout(function () {
+				that.setContentWidth(600);
+			}, 1000);
+			this.getContainer().innerHTML = "hello world";
 		}
 	});
 }
