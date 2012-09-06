@@ -158,7 +158,9 @@
 
                 script = document.createElement("script");
 
-                script.async = "async";
+				script.type = 'text/' + (cfg.type || 'javascript');
+
+                script.async = false;
 
                 if (cfg.charset) {
 
@@ -183,7 +185,7 @@
 
                         if (head && script.parentNode) {
 
-                            head.removeChild(script);
+                            //head.removeChild(script);
 
                         }
 
