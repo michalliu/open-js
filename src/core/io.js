@@ -113,6 +113,8 @@
 
             newurl;
 
+        if (!data) return url;
+
         if (queryMark == -1) {
 
             newurl = [url, '?', data];
