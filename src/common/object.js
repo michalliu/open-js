@@ -11,51 +11,59 @@
  */
 QQWB.extend("Object",{
 
-	create: function () {
+    create: function () {
 
-		if (Object.create) {
+        if (Object.create) {
 
-			return Object.create;
+            return Object.create;
 
-		} else {
+        } else {
 
-			return function (proto, properties) {
+            return function (proto, properties) {
 
-				var F = function () {};
+                var F = function () {};
 
-				F.prototype = proto;
+                F.prototype = proto;
 
-				return new F();
-			}
-		}
+                return new F();
+            }
+        }
 
-	}(),
+    }(),
 
-	// closure-library
-	forEach: function (obj, f, opt_obj, followproto) {
+    // closure-library
+    forEach: function (obj, f, opt_obj, followproto) {
 
-		for (var key in obj) {
+        for (var key in obj) {
 
-			if (followproto) {
+            if (followproto) {
 
-			    f.call(opt_obj, obj[key], key, obj);
+                f.call(opt_obj, obj[key], key, obj);
 
-			} else {
+            } else {
 
-				if (obj.hasOwnProperty(key)) {
+                if (obj.hasOwnProperty(key)) {
 
-			        f.call(opt_obj, obj[key], key, obj);
+                    f.call(opt_obj, obj[key], key, obj);
 
-				}
-			}
-		}
+                }
+            }
+        }
 
-	},
+    },
 
-	isObject: function (test) {
+    isObject: function (test) {
 
-		return Object.prototype.toString.call(test) == "[object Object]";
+        return Object.prototype.toString.call(test) == "[object Object]";
 
-	}
+    },
+
+    isEmptyObject: function( obj ) {
+        var name;
+        for ( name in obj ) {
+            return false;
+        }
+        return true;
+    }
 
 });
