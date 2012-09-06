@@ -16,6 +16,8 @@
  *           common.String
  *           common.Object
  * @includes common.XML
+ *           common.Array
+ *           core.browser
  */
 /*jslint laxcomma:true*/
 (function () {
@@ -39,6 +41,8 @@
         buildUrlWithData,
 
         ioscript,
+
+        iostyle,
 
         ioajax,
 
@@ -64,7 +68,10 @@
 
                 jsonp: _.jsonp,
 
-                script: _.script
+                script: _.script,
+
+                loadStyle: _.loadStyle
+
         });
 
     };
@@ -158,7 +165,7 @@
 
                 script = document.createElement("script");
 
-				script.type = 'text/' + (cfg.type || 'javascript');
+                script.type = 'text/javascript';
 
                 script.async = false;
 
@@ -238,6 +245,169 @@
         };
     }; // ioscript
 
+    iostyle = function (cfg) {
+
+        var stylesheet;
+
+        return {
+
+            send: function (complete) {
+
+                var start = _t.now(),
+
+                    head = document.head || document.getElementsByTagName("head")[0] || document.documentElement,
+
+                    timer = setTimeout(function () {
+
+                        _l.error("load style " + cfg.url + " timeout");
+
+                        // @see ITEF Standard http://en.wikipedia.org/wiki/List_of_HTTP_status_codes
+                        complete(599, "timeout",  _t.now() - start);
+
+                        complete = null; // avoid execute again
+
+						if (checkStyleTimer) clearTimeout(checkStyleTimer);
+
+                    }, iotimeout), checkStyleTimer, stylesheetfound;
+
+                stylesheet = document.createElement('link');
+
+                stylesheet.rel = 'stylesheet';
+
+                stylesheet.type = 'text/css';
+
+                if (cfg.charset) {
+
+                    stylesheet.charset = cfg.charset;
+
+                }
+
+                stylesheet.href = cfg.url;
+
+                // For Non-IE browser we use timer to check if stylesheet is loaded
+                function checkStyleSheet() {
+
+					function styleSheetMatch(actual, origin) {
+						
+						return actual.lastIndexOf(origin.replace('../','').replace('./','')) !== -1;
+
+					}
+
+                    QQWB.Array.each(document.styleSheets, function (i, v) {
+
+                        var href = v.href;
+
+                        if (href && styleSheetMatch(href, cfg.url) ) {
+
+                            var t;
+
+                            clearTimeout(timer);
+
+                            checkStyleTimer = null;
+
+                            if (head && stylesheet.parentNode) {
+
+                                 //head.removeChild(stylesheet);
+
+                            }
+
+                            if (complete) {
+
+                                t = _t.now() - start;
+
+	                            if (!v.cssRules) {
+	
+	                                complete(404, "no css rules", t);
+	
+	                            } else {
+	
+	                                complete(200, "success", t);
+	
+	                            }
+	
+                                complete = null;
+
+                            }
+
+							stylesheetfound = true;
+
+                            stylesheet = null;
+
+                            return false;
+
+                        }
+
+                    });
+
+					if (stylesheetfound) return;
+
+                    checkStyleTimer = setTimeout(checkStyleSheet, 50);
+
+                }
+
+                if (!QQWB.browser.msie) {
+
+                    checkStyleSheet();
+
+                }
+
+                // IE and abort only
+                stylesheet.onreadystatechange = function (e, isAbort) {
+
+                    if (isAbort || /loaded|complete/.test(stylesheet.readyState)) {
+
+                        var t;
+
+                        clearTimeout(timer);
+
+						if (checkStyleTimer) clearTimeout(checkStyleTimer) ;
+
+                        stylesheet.onreadystatechange = null;
+
+                        if (head && stylesheet.parentNode) {
+
+                            //head.removeChild(stylesheet);
+
+                        }
+
+                        stylesheet = null;
+
+                        if (complete) {
+
+                            t = _t.now() - start;
+
+                            if (isAbort) {
+
+                                complete(-1, "aborted", t);
+
+                            } else {
+
+                                complete(200, "success", t);
+
+                            }
+
+                            complete = null;
+
+                        }
+
+                    }
+
+                };
+
+                head.insertBefore(stylesheet, head.firstChild);
+
+            },
+            abort: function () {
+
+                if (stylesheet) {
+
+                    stylesheet.onreadystatechange(0,1);
+
+                }
+
+            }
+        };
+    };// iostyle
     ioajax = function (cfg) {
 
         var xhrcallback;
@@ -796,7 +966,7 @@ QQWB.extend("io", {
 
            proto = getIoProto(),
 
-           deferred = QQWB.deferred.deferred(),
+           deferred = _.deferred.deferred(),
 
            default_opts = {
 
@@ -821,6 +991,58 @@ QQWB.extend("io", {
        default_opts = compatOpts(default_opts, "script");
 
        ioscript(default_opts).send(function (status, statusText, elapsedtime) {
+
+           if (status !== 200) {
+
+               deferred.reject(status, statusText, elapsedtime);
+
+           } else {
+
+               deferred.resolve(status, statusText, elapsedtime);
+
+           }
+
+       });
+
+       return deferred.promise(proto);
+
+    }
+    /**
+     *
+     * Dynamicly load style sheet
+     *
+     */
+    ,loadStyle: function (opts) {
+
+       var _ = QQWB,
+
+           _s = _.String,
+
+           proto = getIoProto(),
+
+           deferred = _.deferred.deferred(),
+
+           default_opts = {
+
+                cache: true,
+
+                type: "get"
+
+           };
+
+       QQWB.extend(default_opts, opts, true);
+
+       if (!default_opts.url) {
+
+           deferred.reject(-2, "invalid url", 0);
+
+           return deferred.promise(proto);
+
+       }
+
+       default_opts = compatOpts(default_opts, "loadStyle");
+
+       iostyle(default_opts).send(function (status, statusText, elapsedtime) {
 
            if (status !== 200) {
 
@@ -942,5 +1164,7 @@ QQWB.ajax = QQWB.io.ajax;
 QQWB.jsonp = QQWB.io.jsonp;
 
 QQWB.script = QQWB.io.script;
+
+QQWB.loadStyle = QQWB.io.loadStyle;
 
 }());
