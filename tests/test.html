@@ -72,6 +72,9 @@ if (QQWB.name == "OpenJS" && parseInt(QQWB.version,10) >= 3) {
 			},2000);
 			*/
 			that.ready();
+			// that.sendData('ha1');
+			// that.sendData('ha2');
+			that.sendFinalData('ha3');
 			that.setContentDimension(400,400);
 			that.getContainer().innerHTML = "hello world";
 		}
@@ -80,7 +83,18 @@ if (QQWB.name == "OpenJS" && parseInt(QQWB.version,10) >= 3) {
 </script>
 <script>
 	T.init({appkey:801203220});
-	T.widget("好友选择");
+	T.widget("好友选择").onCancel(function () {
+		alert('关闭好友选择器');
+	}).onError(function (message) {
+		alert('错误' + message);
+	}).onClose(function () {
+		alert('关闭被点击');
+		return true;
+	}).onData(function (a) {
+		alert('recieved ' + a);
+	}).onExit(function (data) {
+		alert(data);
+	});
 </script>
 </head>
 <body>

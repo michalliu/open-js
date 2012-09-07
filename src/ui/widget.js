@@ -196,7 +196,7 @@
 		}
 	};
 
-	_.provide('widget', function (name, config, version) {
+	_.provide('widget', function (name, version) {
 
 		var manifest;
 
@@ -209,9 +209,39 @@
 			}
 		});
 
+		var cancelAction; // 提供用户点击取消授权的回调，返回true则关闭组件，返回false，不关闭
+		var closeAction; // 提供用户点击关闭按钮后的回调
+		var dataAction; // 提供插件通知进度的回调
+		var exitAction;
+		var errormsg;
+		// 最终返回给使用者的defer对象
+		var deferResult = _.deferred.deferred();
+		var result = deferResult.promise({
+			onCancel: function (fn) {
+				cancelAction = fn;
+				return result;
+			},
+			onClose: function (fn) {
+				closeAction = fn;
+				return result;
+			},
+			onData: function (fn) {
+				dataAction = fn;
+				return result;
+			},
+			onExit: function (fn) {
+				exitAction = fn;
+				return result;
+			},
+			onError: deferResult.fail
+		});
+
+		// 未找到插件配置文件
 		if (!manifest) {
-			_l.error('找不到名为[' + name + ']，版本为['+ version+ ']的挂件，挂件未注册');
-			return;
+			errormsg = '找不到名为[' + name + ']' + (version ? ('版本为['+ version+ ']') : '') + '的插件，插件未注册';
+			_l.error(errormsg);
+			deferResult.reject(errormsg); // 执行onError,fail
+			return result;
 		}
 
 		if (manifest.loginRequired) { // 需要操心登录态
@@ -219,31 +249,37 @@
 				var loginstatus = _.loginStatus();
 				var loginid = 'openjs_widget_login_' + _.uid(5);
 				var logoutid = 'openjs_widget_logout_' + _.uid(5);
-				var widgetWindow, con;
+				var requestAuthorizeWindow, con;
 				if (!loginstatus) {
 					// 授权确认层
-					widgetWindow = new WidgetWindow(420,210);
-					con = widgetWindow.getContainer();
+					requestAuthorizeWindow = new WidgetWindow(420,210);
+					con = requestAuthorizeWindow.getContainer();
 					con.innerHTML = '<p style="text-align:center;">' + manifest.name + ' 需要您的腾讯微博授权 </p><div style="width:210px;margin:0 auto;"><div style="display:block;width:85px;height:25px;background:url(./images/btns.png) no-repeat -11px -4px;cursor:hand;cursor:pointer;font-size:12px;text-align:center;line-height:25px;color:white;" href="#" id="' + loginid + '">授 权</div><div style="display:block;width:85px;height:25px;background:url(./images/btns.png) no-repeat -100px -4px;cursor:hand;cursor:pointer;font-size:12px;text-align:center;line-height:25px;margin-top:-25px;margin-left:125px;color:gray;" href="#" id="' + logoutid + '">取 消</div></div>';
-					widgetWindow.show();
+					requestAuthorizeWindow.onCloseButtonClicked(function () {
+						if (closeAction && typeof closeAction == 'function' && false === closeAction()) return false;
+						return true;
+					});
+					requestAuthorizeWindow.show();
 					_.find('#' + loginid)[0].onclick = function () {
 						var innerauthenabled = _.bigtable.get('innerauth','enabled');
 						if (innerauthenabled) {
 							// 不要挡住浮层授权窗
-							widgetWindow.setBottomMost();
+							requestAuthorizeWindow.setBottomMost();
 						}
 						_.login(function () {
 							// 移除当前授权提示窗
-							widgetWindow._remove();
+							requestAuthorizeWindow._remove();
 							// 恢复原来的z轴层级
-							widgetWindow.restorezIndex();
+							requestAuthorizeWindow.restorezIndex();
 							// 初始化widget
 							initWidget();
 						});
 						return false;
 					};
 					_.find('#' + logoutid)[0].onclick = function () {
-						widgetWindow._remove();
+						// 执行指定的cancelAction
+						if (cancelAction && typeof cancelAction == 'function' && false === cancelAction()) return false;
+						requestAuthorizeWindow._remove();
 						return false;
 					};
 					return;
@@ -256,21 +292,34 @@
 		}
 
 		function initWidget() {
-			var widgetWindow, undef, jqueryReady, jqueryObject;
-			widgetWindow = new WidgetWindow(320,130);
-			widgetWindow.getContainer().style.background='url(./images/loading.gif) no-repeat 50% 50%';
+			var instanceWindow, undef, jqueryReady, jqueryObject;
+			instanceWindow = new WidgetWindow(320,130);
+			instanceWindow.getContainer().style.background='url(./images/loading.gif) no-repeat 50% 50%';
 			// 由组件通知已准备好绘制，隐藏loading动画
-			widgetWindow.ready = function () {
-				widgetWindow.getContainer().style.background='';
+			instanceWindow.ready = function () {
+				instanceWindow.getContainer().style.background='';
+			};
+			// 由组件通知进度事件，用户接收
+			instanceWindow.sendData = function () {
+				if (dataAction && typeof dataAction == 'function') {
+					dataAction.apply(window,arguments);
+				}
+			};
+			// 由组件通知结束事件，用户接收
+			instanceWindow.sendFinalData = function () {
+				if (exitAction && typeof exitAction == 'function') {
+					exitAction.apply(window,arguments);
+				}
 			};
 			// 显示loading
-			widgetWindow.show();
+			instanceWindow.show();
 
 			function executeMain() {
 				// 屏蔽掉组件不应该访问的内部方法
-				manifest.main.call(widgetWindow, jqueryObject);
+				manifest.main.call(instanceWindow, jqueryObject);
 				// 插件未调用show，帮它调用一下
-				if (!widgetWindow.isVisible()) widgetWindow.show();
+				if (!instanceWindow.isVisible()) instanceWindow.show();
+				deferResult.resolve(); // 执行success,complete
 			}
 
 			if (manifest.css || manifest.jquery) {
@@ -286,12 +335,16 @@
 					(manifest.jquery ? _.script({url: "./js/jquery-1.8.1.js"}) : 1),
 					(jqueryReady ? jqueryReady : 1)
 				).success(executeMain).error(function (code, message) {
-					_l.error('挂件[' + manifest.name + '存在错误]，请检查manifest中css,jquery的设置，详细错误信息：' + message);
+					errormsg = '插件[' + manifest.name + '存在错误]，请检查manifest中css,jquery的设置，详细错误信息：' + message;
+					_l.error(errormsg);
+					deferResult.reject(errormsg); // 执行onError,fail
 				});
 			} else {
 				executeMain();
 			}
 		}
+
+		return result;
 
 	});
 
@@ -300,7 +353,7 @@
 
 		register: function (manifest) {
 
-			var msg = '定义挂件出错,';
+			var msg = '定义插件出错,';
 
 			if (!manifest.hasOwnProperty('name')) {
 
