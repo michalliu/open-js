@@ -19,7 +19,8 @@
  *           common.Array
  *           core.browser
  */
-/*jslint laxcomma:true*/
+/*jslint laxcomma:true,browser:true*/
+/*global QQWB*/
 (function () {
 
     var _ = QQWB,
@@ -38,8 +39,6 @@
 
         iotimeout = _b.get("io", "timeout"),
 
-        buildUrlWithData,
-
         ioscript,
 
         iostyle,
@@ -50,13 +49,13 @@
         
         ioas3tktcounter = 0,
         
-        apiAjax,
-
         apiResponder,
 
         getIoProto,
 
         compatOpts,
+
+		joinUrlWithData,
 
         ajaxResponder;
 
@@ -92,19 +91,19 @@
 
             } else {
 
-                _l.warn('[' + logName + '] ignored invalid params data ' + default_opts.data);
+                _l.warn('[' + logName + '] ignored invalid params data ' + opts.data);
 
             }
 
         }
 
-        if (_s.trim(opts.type).toUpperCase() == "GET") {
+        if (_s.trim(opts.type).toUpperCase() === "GET") {
 
             opts.url = joinUrlWithData(opts.url, opts.data);
 
         }
 
-        if (_s.trim(opts.type).toUpperCase() == "GET" && !opts.cache) {
+        if (_s.trim(opts.type).toUpperCase() === "GET" && !opts.cache) {
 
            opts.url = joinUrlWithData(opts.url, "nocache=openjs" + QQWB.uid(5));
 
@@ -122,11 +121,11 @@
 
         if (!data) return url;
 
-        if (queryMark == -1) {
+        if (queryMark === -1) {
 
             newurl = [url, '?', data];
 
-        } else if (queryMark == url.length - 1) {
+        } else if (queryMark === url.length - 1) {
 
             newurl = [url, data];
             
@@ -220,7 +219,7 @@
                 };
 
                 // ie 678 and opera not support script onerror(not tested)
-                script.onerror = function (e) { 
+                script.onerror = function () {
 
                     clearTimeout(timer);
 
@@ -266,7 +265,7 @@
 
                         complete = null; // avoid execute again
 
-						if (checkStyleTimer) clearTimeout(checkStyleTimer);
+                        if (checkStyleTimer) clearTimeout(checkStyleTimer);
 
                     }, iotimeout), checkStyleTimer, stylesheetfound;
 
@@ -287,11 +286,11 @@
                 // For Non-IE browser we use timer to check if stylesheet is loaded
                 function checkStyleSheet() {
 
-					function styleSheetMatch(actual, origin) {
-						
-						return actual.lastIndexOf(origin.replace('../','').replace('./','')) !== -1;
+                    function styleSheetMatch(actual, origin) {
+                        
+                        return actual.lastIndexOf(origin.replace('../','').replace('./','')) !== -1;
 
-					}
+                    }
 
                     QQWB.Array.each(document.styleSheets, function (i, v) {
 
@@ -315,22 +314,22 @@
 
                                 t = _t.now() - start;
 
-								//TODO: 使用cssRules是否存在判断样式表是否加载成功有问题
-	                            if (false && !v.cssRules) {
-	
-	                                complete(404, "no css rules", t);
-	
-	                            } else {
-	
-	                                complete(200, "success", t);
-	
-	                            }
-	
+                                //TODO: 使用cssRules是否存在判断样式表是否加载成功有问题
+                                if (false && !v.cssRules) {
+    
+                                    complete(404, "no css rules", t);
+    
+                                } else {
+    
+                                    complete(200, "success", t);
+    
+                                }
+    
                                 complete = null;
 
                             }
 
-							stylesheetfound = true;
+                            stylesheetfound = true;
 
                             stylesheet = null;
 
@@ -340,7 +339,7 @@
 
                     });
 
-					if (stylesheetfound) return;
+                    if (stylesheetfound) return;
 
                     checkStyleTimer = setTimeout(checkStyleSheet, 50);
 
@@ -361,7 +360,7 @@
 
                         clearTimeout(timer);
 
-						if (checkStyleTimer) clearTimeout(checkStyleTimer) ;
+                        if (checkStyleTimer) clearTimeout(checkStyleTimer) ;
 
                         stylesheet.onreadystatechange = null;
 
@@ -450,7 +449,7 @@
                 
                 try {
 
-                    if (cfg.type.toUpperCase() == "POST") {
+                    if (cfg.type.toUpperCase() === "POST") {
 
                         xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
 
@@ -547,11 +546,11 @@
                 
                                  try {
 
-                                     if (cfg.dataType.toLowerCase() == "json") { /// parse to json object
+                                     if (cfg.dataType.toLowerCase() === "json") { /// parse to json object
 
                                          response = _.JSON.fromString(responses.text);
 
-                                     } else if (cfg.dataType.toLowerCase() == "xml") { // parse to xml object
+                                     } else if (cfg.dataType.toLowerCase() === "xml") { // parse to xml object
 
                                          response = responses.xml || _.XML.fromString(responses.text);
 
@@ -648,10 +647,8 @@
 
                        responses,
 
-                       response,
+                       response;
 
-                       xml;
-               
                         if (callback) {
                     
                             callback = null; // to avoid memory leak in IE
@@ -668,7 +665,7 @@
 
                                 status = this.httpStatus;
 
-                                statusText = this.httpStatus == 200 ? "ok" : "";
+                                statusText = this.httpStatus === 200 ? "ok" : "";
 
                                 responseHeaders = ""; //as3 don't support that this should be filled at future
 
@@ -678,11 +675,11 @@
                     
                                 try {
 
-                                    if (cfg.dataType.toLowerCase() == "json") { // parse to json object
+                                    if (cfg.dataType.toLowerCase() === "json") { // parse to json object
 
                                         response = QQWB.JSON.fromString(responses.text);
 
-                                    } else if (cfg.dataType.toLowerCase() == "xml"){ // parse to xml object
+                                    } else if (cfg.dataType.toLowerCase() === "xml"){ // parse to xml object
 
                                         response = QQWB.XML.fromString(responses.text);
 
@@ -785,7 +782,7 @@
             cb.readyState++;
         }
         
-        if (cb.readyState == 2) {
+        if (cb.readyState === 2) {
 
             cb.call(cb);
 
@@ -807,9 +804,9 @@
 
                 deferred.reject(status, statusText, elapsedtime, "");
 
-            } else if ( typeof (retcode = QQWB.weibo.util.parseRetCode(responseText)) == "number" && 0 !== retcode ) { // api error
+            } else if ( typeof (retcode = QQWB.weibo.util.parseRetCode(responseText)) === "number" && 0 !== retcode ) { // api error
 
-                errorcode = QQWB.weibo.util.parseErrorCode(responseText); 
+                errorcode = QQWB.weibo.util.parseErrorCode(responseText);
 
                 // error code over than 1000000 and less than 2000000 represent logic error
                   status = 1000000 + retcode * 1000 + 500 + (errorcode ? errorcode : 0);
@@ -828,7 +825,7 @@
 
     ajaxResponder = function (deferred) {
 
-        return function (status ,statusText ,elapsedtime ,parsedResponse ,responseText ,responseHeaders ,dataType) {
+        return function (status ,statusText ,elapsedtime ,parsedResponse ,responseText/*,responseHeaders,dataType*/) {
 
             if (status !== 200) {
 
@@ -905,7 +902,7 @@ QQWB.extend("io", {
 
         default_opts.dataType = _s.trim(default_opts.dataType);
 
-        if (default_opts.type.toUpperCase() == "GET" && default_opts.data) {
+        if (default_opts.type.toUpperCase() === "GET" && default_opts.data) {
 
             default_opts.url = joinUrlWithData(default_opts.url, default_opts.data);
 
@@ -922,7 +919,7 @@ QQWB.extend("io", {
     }
     /**
      * Ajax request sender
-     * 
+     *
      * @access public
      * @param opts {Object} ajax settings
      * @return {Object} deferred object
@@ -937,11 +934,11 @@ QQWB.extend("io", {
      * Ajax request sender
      *
      * Note:
-     * 
-     * same as ajax, the only difference is when ajax success, 
+     *
+     * same as ajax, the only difference is when ajax success,
      * it only pass one response object as argument, this is the
      * function to expose to our root namespace
-     * 
+     *
      * @access public
      * @param opts {Object} ajax settings
      * @return {Object} deferred object
@@ -962,8 +959,6 @@ QQWB.extend("io", {
    ,script: function (opts) {
 
        var _ = QQWB,
-
-           _s = _.String,
 
            proto = getIoProto(),
 
@@ -1016,8 +1011,6 @@ QQWB.extend("io", {
     ,loadStyle: function (opts) {
 
        var _ = QQWB,
-
-           _s = _.String,
 
            proto = getIoProto(),
 
@@ -1139,7 +1132,7 @@ QQWB.extend("io", {
 
             deferred.resolve(response, timeCost);
 
-            window[callbackName] = _oldcallback; 
+            window[callbackName] = _oldcallback;
             
         };
 
