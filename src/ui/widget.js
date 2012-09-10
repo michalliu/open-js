@@ -37,7 +37,7 @@
 		}
 	};
 
-	var cdnhost = 'http://mat1.gtimg.com/app/openjs/widget/static/';
+	var basehost = 'http://mat1.gtimg.com/app/openjs/widget/static/base';
 
 	function WidgetWindow(width, height) {
 		var wrapperContainer, contentContainer, closeBtn, that=this;
@@ -54,7 +54,7 @@
 
 		wrapperContainer = _d.createElement('div', {
 			style:'width:100%;height:100%;background:#f5f5f5;',
-			innerHTML:'<div style="width:100%;height:7px;font-size:0;background:#C1DEA9 url(' + cdnhost +'/images/line.png) no-repeat;"></div><div style="width:118px;height:29px;top:27px;left:27px;position:absolute;background:url(' + cdnhost + '/images/logo.png) no-repeat;"></div>'
+			innerHTML:'<div style="width:100%;height:7px;font-size:0;background:#C1DEA9 url(' + basehost +'/images/line.png) no-repeat;"></div><div style="width:118px;height:29px;top:27px;left:27px;position:absolute;background:url(' + basehost + '/images/logo.png) no-repeat;"></div>'
 		});
 
 		contentContainer = _d.createElement('div',{
@@ -62,7 +62,7 @@
 		});
 
 		closeBtn = _d.createElement('a', {
-			style: 'width:15px;height:15px;top:24px;right:18px;position:absolute;background:url(' + cdnhost + '/images/close.png) no-repeat;display:block;',
+			style: 'width:15px;height:15px;top:24px;right:18px;position:absolute;background:url(' + basehost + '/images/close.png) no-repeat;display:block;',
 			href: '#',
 			onclick: function () {
 				var closeHandler = that.closeHandler;
@@ -257,7 +257,7 @@
 					// 授权确认层
 					requestAuthorizeWindow = new WidgetWindow(420,210);
 					con = requestAuthorizeWindow.getContainer();
-					con.innerHTML = '<p style="text-align:center;">' + manifest.name + ' 需要您的腾讯微博授权 </p><div style="width:210px;margin:0 auto;"><div style="display:block;width:85px;height:25px;background:url(' + cdnhost + 'images/btns.png) no-repeat -11px -4px;cursor:hand;cursor:pointer;font-size:12px;text-align:center;line-height:25px;color:white;" href="#" id="' + loginid + '">授 权</div><div style="display:block;width:85px;height:25px;background:url(' + cdnhost + 'images/btns.png) no-repeat -100px -4px;cursor:hand;cursor:pointer;font-size:12px;text-align:center;line-height:25px;margin-top:-25px;margin-left:125px;color:gray;" href="#" id="' + logoutid + '">取 消</div></div>';
+					con.innerHTML = '<p style="text-align:center;">' + manifest.name + ' 需要您的腾讯微博授权 </p><div style="width:210px;margin:0 auto;"><div style="display:block;width:85px;height:25px;background:url(' + basehost + '/images/btns.png) no-repeat -11px -4px;cursor:hand;cursor:pointer;font-size:12px;text-align:center;line-height:25px;color:white;" href="#" id="' + loginid + '">授 权</div><div style="display:block;width:85px;height:25px;background:url(' + basehost + '/images/btns.png) no-repeat -100px -4px;cursor:hand;cursor:pointer;font-size:12px;text-align:center;line-height:25px;margin-top:-25px;margin-left:125px;color:gray;" href="#" id="' + logoutid + '">取 消</div></div>';
 					requestAuthorizeWindow.onCloseButtonClicked(function () {
 						if (closeAction && typeof closeAction === 'function' && false === closeAction()) return false;
 						return true;
@@ -297,7 +297,7 @@
 		function initWidget() {
 			var instanceWindow, jqueryReady, jqueryObject;
 			instanceWindow = new WidgetWindow(320,130);
-			instanceWindow.getContainer().style.background='url(' + cdnhost + 'images/loading.gif) no-repeat 50% 50%';
+			instanceWindow.getContainer().style.background='url(' + basehost + '/images/loading.gif) no-repeat 50% 50%';
 			// 由组件通知已准备好绘制，隐藏loading动画
 			instanceWindow.ready = function () {
 				instanceWindow.getContainer().style.background='';
@@ -335,7 +335,7 @@
 				}
 				_.task(
 					(manifest.css ? _.loadStyle({url: manifest.css}): 1),
-					(manifest.jquery ? _.script({url: cdnhost + "js/jquery-1.8.1.min.js"}) : 1),
+					(manifest.jquery ? _.script({url: basehost + "/js/jquery-1.8.1.min.js"}) : 1),
 					(jqueryReady ? jqueryReady : 1)
 				).success(executeMain).error(function (code, message) {
 					errormsg = '插件[' + manifest.name + '存在错误]，请检查manifest中css,jquery的设置，详细错误信息：' + message;
