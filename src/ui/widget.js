@@ -12,6 +12,7 @@
  *           common.Array
  *           util.deferred
  */
+/*global QQWB,window,document*/
 (function () {
 
 	var _ = QQWB,
@@ -36,6 +37,8 @@
 		}
 	};
 
+	var cdnhost = 'http://mat1.gtimg.com/app/openjs/widget/static/';
+
 	function WidgetWindow(width, height) {
 		var wrapperContainer, contentContainer, closeBtn, that=this;
 		this._width = width || widgetWindowConfig.defaultWidth;
@@ -51,7 +54,7 @@
 
 		wrapperContainer = _d.createElement('div', {
 			style:'width:100%;height:100%;background:#f5f5f5;',
-			innerHTML:'<div style="width:100%;height:7px;font-size:0;background:#C1DEA9 url(./images/line.png) no-repeat;"></div><div style="width:118px;height:29px;top:27px;left:27px;position:absolute;background:url(./images/logo.png) no-repeat;"></div>'
+			innerHTML:'<div style="width:100%;height:7px;font-size:0;background:#C1DEA9 url(' + cdnhost +'/images/line.png) no-repeat;"></div><div style="width:118px;height:29px;top:27px;left:27px;position:absolute;background:url(' + cdnhost + '/images/logo.png) no-repeat;"></div>'
 		});
 
 		contentContainer = _d.createElement('div',{
@@ -59,11 +62,11 @@
 		});
 
 		closeBtn = _d.createElement('a', {
-			style: 'width:15px;height:15px;top:24px;right:18px;position:absolute;background:url(./images/close.png) no-repeat;display:block;',
+			style: 'width:15px;height:15px;top:24px;right:18px;position:absolute;background:url(' + cdnhost + '/images/close.png) no-repeat;display:block;',
 			href: '#',
 			onclick: function () {
 				var closeHandler = that.closeHandler;
-				if (closeHandler && typeof closeHandler == 'function' && closeHandler() === false) {
+				if (closeHandler && typeof closeHandler === 'function' && closeHandler() === false) {
 					return false;
 				}
 				that.close();
@@ -115,7 +118,7 @@
 			var h = this._height;
             var offsettop = document.documentElement.scrollTop || document.body.scrollTop;
 			contentContainer.style.width = w -  widgetWindowConfig.margin.left - widgetWindowConfig.margin.right + 'px';
-			contentContainer.style.height = (h - widgetWindowConfig.margin.top - widgetWindowConfig.margin.bottom) + 'px'; 
+			contentContainer.style.height = (h - widgetWindowConfig.margin.top - widgetWindowConfig.margin.bottom) + 'px';
 			contentContainer.style.left = widgetWindowConfig.padding + widgetWindowConfig.margin.left + 'px';
 			contentContainer.style.top = widgetWindowConfig.padding + widgetWindowConfig.margin.top + 'px';
 			widgetContainer.style.width = w + 'px';
@@ -171,7 +174,7 @@
 		getContentDimension: function () {
 			return {
 				width: this._width -  widgetWindowConfig.margin.left - widgetWindowConfig.margin.right,
-				height: this._height - widgetWindowConfig.margin.top - widgetWindowConfig.margin.bottom 
+				height: this._height - widgetWindowConfig.margin.top - widgetWindowConfig.margin.bottom
 			};
 		},
 		close: function () {
@@ -254,9 +257,9 @@
 					// 授权确认层
 					requestAuthorizeWindow = new WidgetWindow(420,210);
 					con = requestAuthorizeWindow.getContainer();
-					con.innerHTML = '<p style="text-align:center;">' + manifest.name + ' 需要您的腾讯微博授权 </p><div style="width:210px;margin:0 auto;"><div style="display:block;width:85px;height:25px;background:url(./images/btns.png) no-repeat -11px -4px;cursor:hand;cursor:pointer;font-size:12px;text-align:center;line-height:25px;color:white;" href="#" id="' + loginid + '">授 权</div><div style="display:block;width:85px;height:25px;background:url(./images/btns.png) no-repeat -100px -4px;cursor:hand;cursor:pointer;font-size:12px;text-align:center;line-height:25px;margin-top:-25px;margin-left:125px;color:gray;" href="#" id="' + logoutid + '">取 消</div></div>';
+					con.innerHTML = '<p style="text-align:center;">' + manifest.name + ' 需要您的腾讯微博授权 </p><div style="width:210px;margin:0 auto;"><div style="display:block;width:85px;height:25px;background:url(' + cdnhost + 'images/btns.png) no-repeat -11px -4px;cursor:hand;cursor:pointer;font-size:12px;text-align:center;line-height:25px;color:white;" href="#" id="' + loginid + '">授 权</div><div style="display:block;width:85px;height:25px;background:url(' + cdnhost + 'images/btns.png) no-repeat -100px -4px;cursor:hand;cursor:pointer;font-size:12px;text-align:center;line-height:25px;margin-top:-25px;margin-left:125px;color:gray;" href="#" id="' + logoutid + '">取 消</div></div>';
 					requestAuthorizeWindow.onCloseButtonClicked(function () {
-						if (closeAction && typeof closeAction == 'function' && false === closeAction()) return false;
+						if (closeAction && typeof closeAction === 'function' && false === closeAction()) return false;
 						return true;
 					});
 					requestAuthorizeWindow.show();
@@ -278,7 +281,7 @@
 					};
 					_.find('#' + logoutid)[0].onclick = function () {
 						// 执行指定的cancelAction
-						if (cancelAction && typeof cancelAction == 'function' && false === cancelAction()) return false;
+						if (cancelAction && typeof cancelAction === 'function' && false === cancelAction()) return false;
 						requestAuthorizeWindow._remove();
 						return false;
 					};
@@ -292,22 +295,22 @@
 		}
 
 		function initWidget() {
-			var instanceWindow, undef, jqueryReady, jqueryObject;
+			var instanceWindow, jqueryReady, jqueryObject;
 			instanceWindow = new WidgetWindow(320,130);
-			instanceWindow.getContainer().style.background='url(./images/loading.gif) no-repeat 50% 50%';
+			instanceWindow.getContainer().style.background='url(' + cdnhost + 'images/loading.gif) no-repeat 50% 50%';
 			// 由组件通知已准备好绘制，隐藏loading动画
 			instanceWindow.ready = function () {
 				instanceWindow.getContainer().style.background='';
 			};
 			// 由组件通知进度事件，用户接收
 			instanceWindow.sendData = function () {
-				if (dataAction && typeof dataAction == 'function') {
+				if (dataAction && typeof dataAction === 'function') {
 					dataAction.apply(window,arguments);
 				}
 			};
 			// 由组件通知结束事件，用户接收
 			instanceWindow.sendFinalData = function () {
-				if (exitAction && typeof exitAction == 'function') {
+				if (exitAction && typeof exitAction === 'function') {
 					exitAction.apply(window,arguments);
 				}
 			};
@@ -332,7 +335,7 @@
 				}
 				_.task(
 					(manifest.css ? _.loadStyle({url: manifest.css}): 1),
-					(manifest.jquery ? _.script({url: "./js/jquery-1.8.1.js"}) : 1),
+					(manifest.jquery ? _.script({url: cdnhost + "js/jquery-1.8.1.min.js"}) : 1),
 					(jqueryReady ? jqueryReady : 1)
 				).success(executeMain).error(function (code, message) {
 					errormsg = '插件[' + manifest.name + '存在错误]，请检查manifest中css,jquery的设置，详细错误信息：' + message;
@@ -385,7 +388,7 @@
 		 */
 		all: function () {
 
-			return _.Array.forEach(manifests, function (v, i) {
+			return _.Array.forEach(manifests, function (v) {
 
 				return [v.name,v.version].join(',');
 
