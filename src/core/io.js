@@ -55,7 +55,7 @@
 
         compatOpts,
 
-		joinUrlWithData,
+        joinUrlWithData,
 
         ajaxResponder;
 
@@ -179,6 +179,8 @@
                 script.onload = script.onreadystatechange = function (e, isAbort) {
 
                     // finished anyway
+                    // TODO: script实际上不存在但服务器返回404页面时（有html内容）
+                    // script.readyState仍会是complete
                     if (isAbort || !script.readyState || /loaded|complete/.test(script.readyState)) {
 
                         // done timer
