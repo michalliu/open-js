@@ -335,7 +335,7 @@
 				}
 				_.task(
 					(manifest.css ? _.loadStyle({url: manifest.css}): 1),
-					(manifest.jquery ? _.script({url: basehost + "/js/jquery-1.8.1.min.js"}) : 1),
+					(manifest.jquery ? _.script({url: basehost + "/js/jquery.js"}) : 1),
 					(jqueryReady ? jqueryReady : 1)
 				).success(executeMain).error(function (code, message) {
 					errormsg = '插件[' + manifest.name + ']存在错误，请联系插件作者检查manifest中css,jquery的设置，详细错误信息：' + message;
