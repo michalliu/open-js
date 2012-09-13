@@ -13,6 +13,7 @@
  *           common.JSON
  */
 /*jslint laxcomma:true*/
+/*global QQWB*/
 QQWB.extend("_token",{
     /**
      * Save access token to cookie
@@ -56,18 +57,15 @@ QQWB.extend("_token",{
      * Get access token saved before
      *
      * @access public
-     * @param optRaw {Boolean} if set to true, will not consider about accesstoken expiration
      * @return {String|undefined} a string represent access token if available
      */
-   ,getAccessToken: function (optRaw) {
+   ,getAccessToken: function () {
 
         var _ = QQWB,
 
             _b = _.bigtable,
 
             _c = _.cookie,
-
-            _t = _.time,
 
             token;
 
@@ -94,8 +92,6 @@ QQWB.extend("_token",{
             _b = _.bigtable,
 
             _c = _.cookie,
-
-            _t = _.time,
 
             token;
 
@@ -237,11 +233,9 @@ QQWB.extend("_token",{
 
            _to = _._token,
 
-           refreshToken = _to.getRefreshToken,
+           refreshToken = _to.getRefreshToken(),
 
            appkey = _b.get("base", "appkey");
-
-       if (refreshToken) return _l.error("can't exhange for new token, refresh token does not exists");
 
        _i.jsonp({
 
@@ -347,7 +341,7 @@ QQWB.extend("_token",{
 
            response = _s.isString(responseText) ? _q.decode(responseText) : responseText;
 
-           _l.debug(["resolve response ", T.JSON.stringify(response)].join(""));
+           _l.debug(["resolve response ", _.JSON.stringify(response)].join(""));
 
        if (response.access_token) {
 
