@@ -257,7 +257,7 @@
 					// 授权确认层
 					requestAuthorizeWindow = new WidgetWindow(420,210);
 					con = requestAuthorizeWindow.getContainer();
-					con.innerHTML = '<p style="text-align:center;">' + manifest.name + ' 需要您的腾讯微博授权 </p><div style="width:210px;margin:0 auto;"><div style="display:block;width:85px;height:25px;background:url(' + basehost + '/images/btns.png) no-repeat -11px -4px;cursor:hand;cursor:pointer;font-size:12px;text-align:center;line-height:25px;color:white;" href="#" id="' + loginid + '">授 权</div><div style="display:block;width:85px;height:25px;background:url(' + basehost + '/images/btns.png) no-repeat -100px -4px;cursor:hand;cursor:pointer;font-size:12px;text-align:center;line-height:25px;margin-top:-25px;margin-left:125px;color:gray;" href="#" id="' + logoutid + '">取 消</div></div>';
+					con.innerHTML = '<div style="text-align:center;font-family:MicrosoftYaHei,SimSun;font-size:14px;margin:20px 0px;">' + manifest.name + ' 需要您的腾讯微博授权 </div><div style="width:210px;margin:0 auto;"><div style="display:block;width:85px;height:25px;background:url(' + basehost + '/images/btns.png) no-repeat -11px -4px;cursor:hand;cursor:pointer;font-size:12px;text-align:center;line-height:25px;color:white;" href="#" id="' + loginid + '">授 权</div><div style="display:block;width:85px;height:25px;background:url(' + basehost + '/images/btns.png) no-repeat -100px -4px;cursor:hand;cursor:pointer;font-size:12px;text-align:center;line-height:25px;margin-top:-25px;margin-left:125px;color:gray;" href="#" id="' + logoutid + '">取 消</div></div>';
 					requestAuthorizeWindow.onCloseButtonClicked(function () {
 						if (closeAction && typeof closeAction === 'function' && false === closeAction()) return false;
 						return true;
