@@ -1,4 +1,5 @@
 /*jslint laxcomma:true*/
+/*global ok,test,asyncTest,module,strictEqual,deepEqual,equal,notEqual,start,expect,document,setTimeout,T,QQWB*/
 var syncedT,onOpenjsLoad;
 var confirmLayer;
 var appkey='801124054';
@@ -93,7 +94,7 @@ asyncTest('登录与授权', function () {
                     ok(loginstatus.nick,'微博昵称存在[' + loginstatus.nick + ']');
                     ok(loginstatus.openid,'openid存在[' + loginstatus.openid + ']');
                     start();
-                },function (message) {
+                },function () {
                     expect(1);
                     ok(true,'当前页面是未登录状态，调用T.login请求用户对应用授权，但被用户拒绝，执行授权失败的回调函数');
                     start();
@@ -217,7 +218,7 @@ asyncTest('用户资料', function () {
          .complete(function () {
              start();
          });
-    }, refuse = function (message) {
+    }, refuse = function () {
         expect(1);
         ok(false,'您拒绝了授权，无法获取资料');
         start();
@@ -275,7 +276,7 @@ test('bind,trigger', function () {
 test('unbind', function () {
     expect(1);// 已解除绑定，不应该有输出
     ok(true,'');
-    var handler = function (arg0,arg1) {
+    var handler = function () {
         ok(false,'不能解除绑定');
     };
     T.bind("TEST_EVT_1", handler);
