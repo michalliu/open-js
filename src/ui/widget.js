@@ -215,7 +215,7 @@
 		var cancelAction; // 提供用户点击取消授权的回调，返回true则关闭组件，返回false，不关闭
 		var closeAction; // 提供用户点击关闭按钮后的回调
 		var dataAction; // 提供插件通知进度的回调
-		var exitAction;
+		var successAction;
 		var errormsg;
 		// 最终返回给使用者的defer对象
 		var deferResult = _.deferred.deferred();
@@ -232,8 +232,8 @@
 				dataAction = fn;
 				return result;
 			},
-			onExit: function (fn) {
-				exitAction = fn;
+			onSuccess: function (fn) {
+				successAction = fn;
 				return result;
 			},
 			onError: deferResult.fail
@@ -310,8 +310,8 @@
 			};
 			// 由组件通知结束事件，用户接收
 			instanceWindow.sendFinalData = function () {
-				if (exitAction && typeof exitAction === 'function') {
-					exitAction.apply(window,arguments);
+				if (successAction && typeof successAction === 'function') {
+					successAction.apply(window,arguments);
 				}
 			};
 			// 显示loading
