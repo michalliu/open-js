@@ -13,15 +13,21 @@ if (QQWB.name === "OpenJS" && parseInt(QQWB.version,10) >= 3) {
 			var bodyobj = that.getContainer();
 
 			var AtFriends;
-			
 
 			T.api('/friends/idollist_s',{'reqnum':200})
 			.success(function(data){
-				new AtFriends({   //耦合点
-					idollist : data.data.info,
-					bodyopt : bodyobj,
-					sendres : that.sendFinalData
-				});
+				if(data.data !== null) {
+					new AtFriends({   //耦合点
+						idollist : data.data.info,
+						bodyopt : bodyobj,
+						sendres : that.sendFinalData
+					});
+				}else{
+					bodyobj.innerHTML = '<div style="font-size:14px;color:#555;padding:40px 0 0 40px">您还没有收听的好友！</div>';
+					that.setContentDimension(500,200);
+					that.ready();
+					return;
+				}
 				that.setContentDimension(574,364);
 				that.ready();
 			});
@@ -41,10 +47,10 @@ if (QQWB.name === "OpenJS" && parseInt(QQWB.version,10) >= 3) {
 				//this.searchPool = {};  //搜索池
 				this.showallData = []; //展示的所有数据
 				this.selectData = {};
-				this.dataPool = {};
 				this.cNum = 0;
 				this.keyval = '';
 				this.delflag = false; //显示删除按钮，false表示不显示
+				this.returnData = {};
 				
 				this.init();
 			};
@@ -76,7 +82,7 @@ if (QQWB.name === "OpenJS" && parseInt(QQWB.version,10) >= 3) {
 				//构造DOM结构
 				buildBody : function() {
 					var self = this;
-					var html = '<div class="QQT_atfriends" id="QQT_atfriends" style="padding:20px;"><div class="topCons clearfix"><div class="atTab"><a href="javascript:;" class="current" id="QQT_tab1">全部</a><a href="javascript:;" id="QQT_tab2">已选(<span id="QQT_cnum">0</span>)</a></div><div class="searchWrap"><div class="atSearch"><label for="atSearch" id="QQT_atLabel" style="display:block;">输入名字/帐号</label><input id="QQT_atSearch" type="text" class="inputTxt" maxlength="12"><span class="atbtnIcon"><input type="button" class="btnSearch" id="QQT_valsearch" /><a class="del" title="清空" id="QQT_clearclear"></a></span></div></div></div><div class="selectItemWrap clearfix" ><ul class="clearfix" id="QQT_ulist"></ul><ul class="clearfix" id="QQT_selectulist" style="display:none"></ul><ul class="clearfix" id="QQT_searchulist" style="display:none"></ul></div><div class="butWrap"><a class="okBut" id="QQT_okbtn"><span class="text">确认</span></a></div></div>';
+					var html = '<div class="QQT_atfriends" id="QQT_atfriends" style="padding:20px;"><div class="topCons clearfix"><div class="atTab"><a href="javascript:;" class="current" id="QQT_tab1">全部</a><a href="javascript:;" id="QQT_tab2">已选(<span id="QQT_cnum">0</span>)</a></div><div class="searchWrap"><div class="atSearch"><label for="atSearch" id="QQT_atLabel" style="display:block;">输入名字/帐号</label><input id="QQT_atSearch" type="text" class="inputTxt" maxlength="12"><span class="atbtnIcon"><input type="button" class="btnSearch" id="QQT_valsearch" /><a class="del" title="清空" id="QQT_clearclear"></a></span></div></div></div><div class="selectItemWrap clearfix" ><ul class="clearfix" id="QQT_ulist"></ul><ul class="clearfix" id="QQT_selectulist" style="display:none"></ul><ul class="clearfix" id="QQT_searchulist" style="display:none"></ul></div><div class="butWrap"><a class="noneBtn" id="QQT_okbtn"><span class="text">确认</span></a></div></div>';
 					self.thatbody.innerHTML = html;
 				},
 
@@ -93,21 +99,30 @@ if (QQWB.name === "OpenJS" && parseInt(QQWB.version,10) >= 3) {
 					self.itemWrap.live('click', function(){
 						var data = {};
 						var itemDom;
-						data.flag = ($(this).attr('data-QQTflag') - 0);
+						var flag;
+						flag = ($(this).attr('data-QQTflag') - 0);
 						data.name = $(this).attr('data-QQTname');
-						if(self.clickChoose(data)) {
+						data.nick = $(this).attr('data-QQTnick');
+						data.head = $(this).attr('data-QQThead');
+						data.cvip = $(this).attr('data-QQTcvip');
+						if(self.clickChoose(flag, data)) {
 							self.cnumdom.empty().html(self.cNum);
-							data.flag = 1 === data.flag ? 0 : 1;
+							flag = 1 === flag ? 0 : 1;
 							itemDom = $(".itemWrap[data-QQTname="+data.name+"]");
-							if(data.flag) {
+							if(flag) {
 								itemDom.addClass('selected');
 								itemDom.attr('data-QQTflag', 1);
 							}
-							if(!data.flag && $(this).hasClass('selected')) {
+							if(!flag && $(this).hasClass('selected')) {
 								itemDom.removeClass('selected');
 								itemDom.attr('data-QQTflag', 0);
 							}
-							$(this).attr('data-QQTflag', data.flag);
+							$(this).attr('data-QQTflag', flag);
+						}
+						if( $.isEmptyObject(self.selectData) ) {
+							self.okbtn.removeClass('okBut').addClass('noneBtn');
+						}else{
+							self.okbtn.removeClass('noneBtn').addClass('okBut');
 						}
 					});
 
@@ -117,7 +132,11 @@ if (QQWB.name === "OpenJS" && parseInt(QQWB.version,10) >= 3) {
 						self.tab1.removeClass('current');
 						self.tab2.addClass('current');
 						self.selectulist.empty().show();
-						self.showChoose();
+						if( $.isEmptyObject(self.selectData) ) {
+							self.selectulist.append('<div style="font-size:14px;color:#555;padding:20px 0 0 40px">您还没有选择好友！</div>');
+						}else{
+							self.showChoose();
+						}
 					});
 
 					self.tab1.bind('click', function() {
@@ -179,7 +198,7 @@ if (QQWB.name === "OpenJS" && parseInt(QQWB.version,10) >= 3) {
 
 					self.okbtn.bind('click', function() {
 						if(!$.isEmptyObject(self.selectData)) {
-							self.sentData(self.selectData);
+							self.sentData(self.returnData);
 							that.close();
 						}
 					});
@@ -191,24 +210,21 @@ if (QQWB.name === "OpenJS" && parseInt(QQWB.version,10) >= 3) {
 					if(!($.isEmptyObject(self.fullData))) {
 						for(i in self.fullData) {
 							if (self.fullData.hasOwnProperty(i)) {
-								var name = self.fullData[i].name;
 								var data = self.fullData[i];
-								//self.searchPool[name] = data.nick;//放入搜索池。要重新构思
-								self.dataPool[name] = [name, data.nick, data.head, data.isvip];
 								data.cvip = 1 === data.isvip ? 'textIco' : ' ';
 								var html = self.buildItem(data, '', 0);
 								self.showallData.push(html);
 							}
 						}
+						self.showallData = self.showallData.join('');
+						self.pushNode('QQT_ulist');
+						self.showallData = [];
 					}
-					self.showallData = self.showallData.join('');
-					self.pushNode('QQT_ulist');
-					self.showallData = [];
 				},
 
 				//构造Item
 				buildItem : function(data, classname, flag) {
-					return '<li class="item"><div class="itemWrap QQT_itemWrap '+classname+'" data-QQTname="'+data.name+'" data-QQTflag="'+flag+'"><div class="itemL"><span class="avatar"><img src="'+data.head+'/50" onerror="javascript:this.src=\'http://mat1.gtimg.com/www/mb/img/p1/head_normal_50.png\'"/></span></div><div class="itemR"><p class="ucardTit"><span class="textU">'+data.name+'</span><a class="'+data.cvip+'" title="腾讯认证"></a></p><p class="ucardCon"><span class="textName">@'+data.nick+'</span></p><p class="ucardCon"><i class="iconFlag"></i></p></div></div></li>';
+					return '<li class="item"><div class="itemWrap QQT_itemWrap '+classname+'" data-QQTname="'+data.name+'" data-QQTnick="'+data.nick+'" data-QQThead="'+data.head+'" data-QQTcvip="'+data.cvip+'" data-QQTflag="'+flag+'"><div class="itemL"><span class="avatar"><img src="'+data.head+'/50" onerror="javascript:this.src=\'http://mat1.gtimg.com/www/mb/img/p1/head_normal_50.png\'"/></span></div><div class="itemR"><p class="ucardTit"><span class="textU">'+data.nick+'</span><a class="'+data.cvip+'" title="腾讯认证"></a></p><p class="ucardCon"><span class="textName">@'+data.name+'</span></p><p class="ucardCon"><i class="iconFlag"></i></p></div></div></li>';
 				},
 
 				//push节点
@@ -218,16 +234,22 @@ if (QQWB.name === "OpenJS" && parseInt(QQWB.version,10) >= 3) {
 				},
 
 				//点击选择节点
-				clickChoose : function(data) {
+				clickChoose : function(flag, data) {
 					var self = this;
 					var name = data.name;
-					if(data.flag === 1) {
+					var tmp = {};
+					if(flag === 1) {
 						delete self.selectData[name];
+						delete self.returnData[name];
 						self.cNum--;
 						return true;
 					}
-					if(data.flag === 0) {
-						self.selectData[name] = name;
+					if(flag === 0) {
+						self.selectData[name] = data;
+						tmp.name = data.name;
+						tmp.nick = data.nick;
+						tmp.head = data.head;
+						self.returnData[name] = tmp;
 						self.cNum++;
 						return true;
 					}
@@ -236,17 +258,10 @@ if (QQWB.name === "OpenJS" && parseInt(QQWB.version,10) >= 3) {
 				//切换到已选tab
 				showChoose : function() {
 					var self = this;
-					var data = {};
-					var temp = {};
 					var i;
 					for(i in self.selectData) {
 						if (self.selectData.hasOwnProperty(i)) {
-							temp = self.dataPool[self.selectData[i]];
-							data.name = temp[0];
-							data.nick = temp[1];
-							data.head = temp[2];
-							data.cvip = temp[3];
-							self.showallData.push(self.buildItem(data, 'selected', 1));
+							self.showallData.push(self.buildItem(self.selectData[i], 'selected', 1));
 						}
 					}
 					self.showallData = self.showallData.join('');
@@ -282,11 +297,11 @@ if (QQWB.name === "OpenJS" && parseInt(QQWB.version,10) >= 3) {
 							for(i in hadc) {
 								if (hadc.hasOwnProperty(i)) {
 									tempname = hadc[i].name;
-									if(tempname && (self.dataPool[tempname] !== undefined)) {
-										data.name = self.dataPool[tempname][0];
-										data.nick = self.dataPool[tempname][1];
-										data.head = self.dataPool[tempname][2];
-										data.cvip = self.dataPool[tempname][3];
+									if(tempname) {
+										data.name = hadc[i].name;
+										data.nick = hadc[i].nick;
+										data.head = hadc[i].head;
+										data.cvip = '';
 									
 										if(tempname in self.selectData) {
 											self.showallData.push(self.buildItem(data, 'selected', 1));
