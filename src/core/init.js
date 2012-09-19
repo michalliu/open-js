@@ -50,7 +50,7 @@
 
     // 代理页面内部接口永远以当前域为准
     _b.put("uri","api",[currbaseurl,"/api"].join(""));
-    _b.put("uri","exchangetoken",[currbaseurl,"/cgi-bin/oauth2/access_token"].join(""));
+    _b.put("uri","exchangetoken",[securebaseurl,"/cgi-bin/oauth2/access_token"].join(""));
     _b.put("uri","gettokenbypt",[currbaseurl,"/cgi-bin/oauth2/get_oauth2token_pt"].join(""));
 
     // flash方案的api定义与html5的区分开,flash的永远是https
