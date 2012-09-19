@@ -317,6 +317,7 @@
                                 t = _t.now() - start;
 
                                 //TODO: 使用cssRules是否存在判断样式表是否加载成功有问题
+                                //TODO: 访问cssRules属性会导致firefox抛异常,FirefoxSecurityException
                                 if (false && !v.cssRules) {
     
                                     complete(404, "no css rules", t);
