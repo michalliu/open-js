@@ -2,7 +2,8 @@
 /*global ok,test,asyncTest,module,strictEqual,deepEqual,equal,notEqual,start,expect,document,setTimeout,T,QQWB*/
 var syncedT,onOpenjsLoad;
 var confirmLayer;
-var appkey='801124054';
+var appkey='801124054'; // matched open.t.qq.com
+var appkey='801203220'; // matched openjs.org
 function requireConfirm(msg, agree, refuse) {
     // 在大多数手机浏览器上如palm pre3
     // 如果不是用户真实点击触发的window.open会被默认拦截，导致我们的测试用例无法正常运行
@@ -132,6 +133,29 @@ asyncTest('登出',function () {
         });
         start();
     });
+});
+
+module('凭据管理');
+asyncTest('交换token', function () {
+    T.init({appkey:appkey,callbackurl:'./callback.html'});
+	var refreshToken = T._token.getRefreshToken();
+	if (refreshToken) {
+		T._token.exchangeForToken(function () {
+			var refreshTokenExchanged = T._token.getRefreshToken();
+			expect(2);
+			ok(true,'交换token回调函数被执行');
+			notEqual(refreshToken,refreshTokenExchanged,'凭refreshtoken交换accesstoken成功');
+			start();
+		});
+	} else {
+		//TODO: 报错时服务器不支持jsonp的回调，等待服务器支持
+		T._token.exchangeForToken(function () {
+			expect(2);
+			ok(true,'交换token回调函数被执行');
+			ok(true,'因refreshtoken不存在，交换token失败');
+			start();
+		});
+	}
 });
 
 module('获取微博数据');
