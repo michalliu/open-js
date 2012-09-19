@@ -156,6 +156,11 @@ asyncTest('交换token', function () {
 			start();
 		});
 	}
+	setTimeout(function () {
+		expect(2); // script error
+		ok(false, '交换token请求发出后，超过5秒未接收到成功或者失败的返回，请求可能已经失败');
+		start();
+	}, 5 * 1000);
 });
 
 module('获取微博数据');
