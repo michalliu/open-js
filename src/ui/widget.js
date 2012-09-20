@@ -48,6 +48,11 @@
 		this._containerIsVisible = false;
 		this._hasParent = !!inElement; // 嵌入到已知的domElement
 
+		// 如果给定的节点是document.body,我们在新创建的标签中渲染，而不污染body本身的样式
+		if (inElement && inElement.nodeName === 'BODY') {
+			inElement = _d.createElement('div');
+		}
+
 		this._widgetContainer = inElement || _d.createElement('div', {
 			id: this._wid,
 			style: 'position:absolute;padding:'+ widgetWindowConfig.padding +'px;overflow:hidden;z-index:' + this._wzIndex + ';'+ ((_br.msie && _br.version < 9) ? 'filter: progid:DXImageTransform.Microsoft.Gradient(GradientType=0, StartColorStr="#4c000000", EndColorStr="#4c000000");' : 'background-color:rgba(0,0,0,.3);') + 'border-radius:' + widgetWindowConfig.borderRadius + 'px;'
@@ -183,6 +188,7 @@
 		_remove: function () {
 			var container = this._widgetContainer;
 			// document.body不能被移除，理论上可以，但要防止这种情况，只移除wrapper
+			// widgetWindow里面已经对document.body做了保护，出于历史原因保留这段代码
 			if (container.nodeName === 'BODY') {
 				document.body.removeChild(this.getContainer().parentNode);
 				container.removeAttribute('id');
