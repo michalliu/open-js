@@ -266,7 +266,8 @@
 		var cancelAction; // 提供用户点击取消授权的回调，返回true则关闭组件，返回false，不关闭
 		var closeAction; // 提供用户点击关闭按钮后的回调
 		var dataAction; // 提供插件通知进度的回调
-		var successAction;
+		var successAction; // 提供插件通知成功的回调
+		var errorAction; // 提供插件通知出错的回调
 		var errormsg;
 
 		// 最终返回给使用者的defer对象
@@ -288,7 +289,10 @@
 				successAction = fn;
 				return result;
 			},
-			onError: deferResult.fail,
+			onError: function (fn) {
+				errorAction = fn;
+				return result;
+			},
 			show: function (element) {
 				var selectedElement;
 				if (!element) {
@@ -325,10 +329,16 @@
 					dataAction.apply(window,arguments);
 				}
 			};
-			// 由组件通知结束事件，用户接收
-			instanceWindow.sendFinalData = function () {
+			// 由组件通知成功事件，用户接收
+			instanceWindow.sendSuccessData = function () {
 				if (successAction && typeof successAction === 'function') {
 					successAction.apply(window,arguments);
+				}
+			};
+			// 由组件通知失败事件，用户接收
+			instanceWindow.sendErrorData = function () {
+				if (errorAction && typeof errorAction === 'function') {
+					errorAction.apply(window,arguments);
 				}
 			};
 			// 显示loading
@@ -357,7 +367,10 @@
 				).success(executeMain).error(function (code, message) {
 					errormsg = '插件[' + name + ']' + (version ? ('版本为['+ version+ ']') : '') +  ']存在错误，请联系插件作者检查manifest中css,jquery的设置，详细错误信息：' + message;
 					_l.error(errormsg);
-					deferResult.reject(errormsg); // 执行onError,fail
+					deferResult.reject(errormsg); // 执行fail
+					if (errorAction && typeof errorAction === 'function') { // 执行onError
+						errorAction.apply(window,[errormsg]);
+					}
 				});
 			} else {
 				executeMain();
@@ -429,7 +442,10 @@
 		if (!manifest) {
 			errormsg = '找不到名为[' + name + ']' + (version ? ('版本为['+ version+ ']') : '') + '的插件，插件未注册';
 			_l.error(errormsg);
-			deferResult.reject(errormsg); // 执行onError,fail
+			deferResult.reject(errormsg); // 执行fail
+			if (errorAction && typeof errorAction === 'function') { // 执行onError
+				errorAction.apply(window,[errormsg]);
+			}
 			return result;
 		}
 
