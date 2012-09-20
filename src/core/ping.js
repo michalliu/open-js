@@ -11,13 +11,16 @@
  *           core.init
  */
 /*jslint laxcomma:true*/
+/*global QQWB,QQWBPingTransport_18035d19,Image,document*/
 QQWB.extend("ping", {
 
    pingWith: function (params, order) {
 
        function baseParam () {
 
-           var qq = (QQWB.cookie.get("uin",null) || '0').match(/\d+/)[0],
+           var uinmatch = (QQWB.cookie.get("uin",null) || '0').match(/\d+/),
+
+               qq = uinmatch ? uinmatch[0] : '0',
 
                flowid = "";
 
@@ -40,10 +43,11 @@ QQWB.extend("ping", {
               ,sBak1: ""
               ,sBak2: QQWB.uid()
            };
-       } 
+       }
 
        params = QQWB.extend(baseParam(), params, true);
 
+		// 必须设置为全局变量，否则上报可能会失败
        QQWBPingTransport_18035d19 = new Image(1,1);
 
        QQWBPingTransport_18035d19.src = [QQWB.bigtable.get("ping","urlbase"),
