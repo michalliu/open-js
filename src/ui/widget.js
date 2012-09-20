@@ -39,7 +39,7 @@
 
 	var basehost = 'http://mat1.gtimg.com/app/openjs/widget/static/base';
 
-	function WidgetWindow(width, height, inElement) {
+	function WidgetWindow(width, height, inElement, style) {
 		var wrapperContainer, closeBtn, that=this;
 		this._width = width || widgetWindowConfig.defaultWidth;
 		this._height = height || widgetWindowConfig.defaultHeight;
@@ -64,13 +64,13 @@
 			inElement.style.overflow = 'hidden'; // 让子元素可以正常定位
 
 			wrapperContainer = _d.createElement('div', {
-				style:'width:100%;height:100%;background:#f5f5f5;'
+				style:'width:100%;height:100%;'+ (style ? style : 'background:#f5f5f5;')
 			});
 
 		} else {
 
 			wrapperContainer = _d.createElement('div', {
-				style:'width:100%;height:100%;background:#f5f5f5;',
+				style:'width:100%;height:100%;' + (style ? style : 'background:#f5f5f5;'),
 				innerHTML:'<div style="width:100%;height:7px;font-size:0;background:#C1DEA9 url(' + basehost +'/images/line.png) no-repeat;"></div><div style="width:118px;height:29px;top:27px;left:27px;position:absolute;background:url(' + basehost + '/images/logo.png) no-repeat;"></div>'
 			});
 
@@ -303,7 +303,11 @@
 		// inElement 绘制到指定的元素
 		function initWidget(inElement) {
 			var instanceWindow, jqueryReady, jqueryObject;
-			instanceWindow = new WidgetWindow(320,130,inElement);// inElement 指定组件绘制到指定的元素
+			if (!inElement) {
+				instanceWindow = new WidgetWindow(320,130,inElement);// inElement 指定组件绘制到指定的元素
+			} else { // loading图样式改变
+				instanceWindow = new WidgetWindow(160,32,inElement, "background:white;");// inElement 指定组件绘制到指定的元素
+			}
 			instanceWindow.getContainer().style.background='url(' + basehost + '/images/loading.gif) no-repeat 50% 50%';
 			// 由组件通知已准备好绘制，隐藏loading动画
 			instanceWindow.ready = function () {
@@ -407,7 +411,9 @@
 	
 			} else {// 插件自己管理
 	
-				_.documentReady(initWidget);
+				_.documentReady(function () {
+					initWidget(inElement);
+				});
 	
 			}
 
