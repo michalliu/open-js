@@ -20,6 +20,7 @@
  *          core.browser
  */
 /*jslint laxcomma:true*/
+/*global QQWB,document,window,setTimeout*/
 (function (){
 
    var _ = QQWB,
@@ -33,8 +34,6 @@
        _t = _._token,
 
        _c = _.cookie,
-
-       _s = _.String,
 
        oAuthWindow,
 
@@ -235,6 +234,8 @@
                             response,
     
                             mark,
+
+                            errormsg,
     
                             _q = _.queryString;
     
@@ -270,11 +271,11 @@
                                 response = null;
                             }
     
-                            if (response && response != "about:blank") { // window.open url firstly is about:blank
+                            if (response && response !== "about:blank") { // window.open url firstly is about:blank
                                
                                mark = response.lastIndexOf('#');
     
-                               response = mark == -1 ? "" : response.slice(mark+1);
+                               response = mark === -1 ? "" : response.slice(mark+1);
     
                                if (response) { // hash must be exists
     
@@ -284,7 +285,7 @@
     
                                    authorizing = false;
     
-                                   if (autoclose) awindow.close(); 
+                                   if (autoclose) awindow.close();
 
                                    awindow = null;
 
@@ -327,7 +328,7 @@ QQWB.extend("auth",{
 
             innerauth = _b.get("innerauth","enabled"),
 
-            loginStatus = _.auth.loginStatus(), 
+            loginStatus = _.auth.loginStatus(),
 
             error,
 
