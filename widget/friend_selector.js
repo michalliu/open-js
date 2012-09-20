@@ -20,7 +20,7 @@ if (QQWB.name === "OpenJS" && parseInt(QQWB.version,10) >= 3) {
 					new AtFriends({   //耦合点
 						idollist : data.data.info,
 						bodyopt : bodyobj,
-						sendres : that.sendFinalData
+						sendres : that.sendSuccessData
 					});
 				}else{
 					bodyobj.innerHTML = '<div style="font-size:14px;color:#555;padding:40px 0 0 40px">您还没有收听的好友！</div>';
