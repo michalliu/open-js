@@ -142,7 +142,7 @@
 
                        } else if(window.attachEvent) {
 
-                              window.attachEvent('onresize', resize);
+                           window.attachEvent('onresize', resize);
 
                        }
 
