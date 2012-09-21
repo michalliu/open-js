@@ -19,6 +19,7 @@ def usage():
         +"-y --yes      dont ask for confirmation\n"\
         +"-l --log      generate log file\n"\
         +"-m --module   build with specific modules\n\n"\
+        +"-s --standalone   build specified directory or file\n\n"\
         +"sample:\n"\
         +"browser,test,load were implied core.browser core.test core.load\n"\
         +"python build.py -c -m browser,base,test,load\n"\
@@ -277,6 +278,38 @@ class Source(object):
                 if line:
                     self.requires.add(line.groups()[0])
                     self.includes.add(line.groups()[0])
+
+def minifyfile(source, directory):
+    basename = os.path.basename(source)
+    base,ext = os.path.splitext(basename)
+    target = os.path.join(directory,''.join([base,'.min',ext]))
+    # 暂只支持js
+    if (source.endswith('.js')):
+        nodejs = os.path.join(_CWD, "tools", "node.exe")
+        uglifyjs = os.path.join(_CWD, "tools", "UglifyJS", "bin" ,"uglifyjs")
+        opts = "--ascii -nc -v -o %s" % target
+        success = os.system("%s %s %s %s" % (nodejs, uglifyjs, opts, source))
+        if success !=0:
+            # pack javascript through python
+            log.info("Packing through javascript packer")
+            packer = JavaScriptPacker()
+            open(target,"w+").write(packer.pack(open(source,'r').read()))
+    elif (source.endswith('.css')):
+        #TODO 后续支持css和html
+        log.error('not support minify file with extension %s' % ext)
+    else:
+        log.error('not support minify file with extension %s' % ext)
+
+def minify(source,savedir):
+    source = os.path.join(_CWD,source)
+    target = os.path.join(_CWD,savedir)
+
+    if os.path.isfile(source):
+        minifyfile(source, target)
+    elif os.path.isdir(source):
+        for root, dirs, files in os.walk(source):
+            for name in files:
+                minifyfile(os.path.join(root,name), target)
 
 def build(modulenames, targetfile, logFile=False):
 
@@ -876,7 +909,7 @@ def main(argv):
     savedFileName="all.js" #默认目标文件名
 
     try:
-        opts,args = getopt.getopt(argv, "hqyl:m:",["help","quiet","yes","log=","module="])
+        opts,args = getopt.getopt(argv, "hqyl:m:s:",["help","quiet","yes","log=","module=","standalone="])
     except getopt.GetoptError,err:
         log.error(str(err))
         usage()
@@ -895,6 +928,11 @@ def main(argv):
             opt = arg.split(",")
             for m in opt:
                 modules.add(m)
+        elif opt in ("-s","--standalone"):
+            opt = arg.split(",")
+            for src in opt:
+                minify(src,savedDirectory)
+            return
 
     if len(args) > 0:
         savedFileName = args[0]
