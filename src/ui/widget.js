@@ -311,12 +311,17 @@
 
 		// 初始化组件
 		// inElement 绘制到指定的元素
-		function initWidget(inElement) {
+		function initWidget(inElement, width, height) {
 			var instanceWindow, jqueryReady, jqueryObject;
-			if (!inElement) {
-				instanceWindow = new WidgetWindow(320,130,inElement);// inElement 指定组件绘制到指定的元素
-			} else { // loading图样式改变
-				instanceWindow = new WidgetWindow(160,32,inElement, "background:white;");// inElement 指定组件绘制到指定的元素
+			if (!inElement) { // 弹出层的方式初始化组件
+				width = width || 320; // 与授权窗的大小保持，美观一些
+				height = height || 130;
+				instanceWindow = new WidgetWindow(width,height,inElement);// inElement 指定组件绘制到指定的元素
+			} else { // 绘制组件到指定的节点
+				width = width || 160; // 为展示loading图
+				height = height || 30;
+				// loading图样式改变
+				instanceWindow = new WidgetWindow(width,height,inElement, "background:white;");// inElement 指定组件绘制到指定的元素
 			}
 			instanceWindow.getContainer().style.background='url(' + basehost + '/images/loading.gif) no-repeat 50% 50%';
 			// 由组件通知已准备好绘制，隐藏loading动画
@@ -412,7 +417,7 @@
 								// 恢复原来的z轴层级
 								requestAuthorizeWindow.restorezIndex(); // 在指定元素绘制时不做操作
 								// 初始化widget
-								initWidget(inElement); // 绘制到指定元素
+								initWidget(inElement, manifest.width, manifest.height); // 绘制到指定元素
 							});
 							return false;
 						};
@@ -425,13 +430,13 @@
 						return;
 					}
 					//
-					initWidget(inElement); // 绘制到指定元素
+					initWidget(inElement, manifest.width, manifest.height); // 绘制到指定元素
 				});
 	
 			} else {// 插件自己管理
 	
 				_.documentReady(function () {
-					initWidget(inElement);
+					initWidget(inElement, manifest.width, manifest.height);
 				});
 	
 			}
