@@ -4,6 +4,8 @@ if (QQWB.name === "OpenJS" && parseInt(QQWB.version,10) >= 3) {
 	QQWB.widget.register({
 		name: "帐号连接",
 		version: "1.0",
+		width: 91,
+		height: 22,
 		main: function () {
 			var that = this,
 				container = that.getContainer();
@@ -31,7 +33,7 @@ if (QQWB.name === "OpenJS" && parseInt(QQWB.version,10) >= 3) {
 			setTimeout(function () {
 				container.appendChild(connectButton);
 				that.ready();
-			}, 1000);
+			}, 2000);
 		}
 	});
 }
