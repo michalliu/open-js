@@ -310,7 +310,10 @@
 
                                                .success(function (responseText) {
 
-                                                   _t.resolveResponse(responseText, false);
+												// 对域内授权来说，我们不需要expires_in和refresh_token，需把授权信息设置为session类型的
+												responseText = responseText.replace(/expires_in=\d+/,'expires_in=').replace(/refresh_token=\w+/,'refresh_token=');
+
+                                                _t.resolveResponse(responseText, false);
 
                                                 })
 
@@ -382,24 +385,23 @@
             
                 function maintainTokenStatus () {
             
-                    var canMaintain = _t.getAccessToken() && _t.getRefreshToken(), //使用户保持在线状态
+                    var canMaintain = _t.getRefreshToken(), //使用户保持在线状态
 
                         waitingTime; // server accept to exchange token 30 seconds before actually expire date
             
                     if (maintainTokenScheduler) {
                         
-                        _l.info("cancel the **OLD** maintain token schedule");
+                        _l.debug("cancel the **OLD** maintain token schedule");
             
                         clearTimeout(maintainTokenScheduler);
                     }
             
                     if (canMaintain) {
             
-                        // server should accept to exchange token 30 seconds before actually expire date
-                        // 15 seconds ahead of actual expire date;
+						// 比token实际过期时间提前15秒交换token，以保证token的连续可用性
                         waitingTime = parseInt(_c.get(_b.get("cookie","getAccesstokenName")()).split("|")[2],10) - _.time.now() - 15 * 1000;
 
-                        _l.info("scheduled to exchange token after " + waitingTime + "ms");
+                        _l.debug("scheduled to exchange token after " + waitingTime + "ms");
             
                         maintainTokenScheduler = setTimeout(function () {
             
@@ -415,7 +417,7 @@
             
                         if (maintainTokenScheduler ) {
 
-                            _l.info("cancel the exchange token schedule");
+                            _l.debug("cancel the exchange token schedule");
             
                             clearTimeout(maintainTokenScheduler);
                         }
