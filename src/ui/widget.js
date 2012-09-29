@@ -173,7 +173,7 @@
 		show: function () {
 			var container = this._widgetContainer;
 			this._reflow();
-			container.style.display = "block";
+			container.style.display = 'block';
 			this._repaint();
 			if (_.find('#' + this._wid).length < 1) {
 				document.body.appendChild(container);
@@ -182,7 +182,7 @@
 		},
 		hide: function () {
 			var container = this._widgetContainer;
-			container.style.display = "none";
+			container.style.display = 'none';
 			this._containerIsVisible = false;
 		},
 		_remove: function () {
@@ -321,7 +321,7 @@
 				width = width || 160; // 为展示loading图
 				height = height || 30;
 				// loading图样式改变
-				instanceWindow = new WidgetWindow(width,height,inElement, "background:white;");// inElement 指定组件绘制到指定的元素
+				instanceWindow = new WidgetWindow(width,height,inElement, 'background:white;');// inElement 指定组件绘制到指定的元素
 			}
 			instanceWindow.getContainer().style.background='url(' + basehost + '/images/loading.gif) no-repeat 50% 50%';
 			// 由组件通知已准备好绘制，隐藏loading动画
@@ -367,7 +367,7 @@
 				}
 				_.task(
 					(manifest.css ? _.loadStyle({url: manifest.css}): 1),
-					(manifest.jquery ? _.script({url: basehost + "/js/jquery.js"}) : 1),
+					(manifest.jquery ? _.script({url: basehost + '/js/jquery.js'}) : 1),
 					(jqueryReady ? jqueryReady : 1)
 				).success(executeMain).error(function (code, message) {
 					errormsg = '插件[' + name + ']' + (version ? ('版本为['+ version+ ']') : '') +  ']存在错误，请联系插件作者检查manifest中css,jquery的设置，详细错误信息：' + message;
