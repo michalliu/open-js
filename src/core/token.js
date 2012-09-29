@@ -39,11 +39,14 @@ QQWB.extend("_token",{
 
         user = this.getTokenUser();
 
+		// 如果expireIn为0，那么把cookie设置为session类型
+		if (!expireIn) expireIn = null;
+
         _c.set(_b.get("cookie","getAccesstokenName")()
 
-                       ,[accessToken, openid, _t.now() + expireIn * 1000, optUsername || (user && user.name) || "", optNickname || (user && user.nick) || ""].join("|")
+                       ,[accessToken, openid, _t.now() + 7 * 24 * 3600 * 1000, optUsername || (user && user.name) || "", optNickname || (user && user.nick) || ""].join("|")
 
-                       ,expireIn || ''
+                       ,expireIn
 
                        ,_b.get("cookie","path")
 
@@ -260,13 +263,13 @@ QQWB.extend("_token",{
 
            if(response.access_token){
 
-              if( !response.expires_in ) _l.error("token expires_in not returned");
+              if( !response.expires_in ) _l.info("[exchangetoken] token expires_in not retrieved");
 
-              if( !response.name ) _l.warning("weibo username not retrieved, will not update username");
+              if( !response.name && !response.wb_name ) _l.info("[exchangetoken] weibo username not retrieved, will not update username");
 
-              if( !response.nick ) _l.warning("weibo nick not retrieved, will not update nick");
+              if( !response.nick && !response.wb_nick ) _l.info("[exchangetoken] weibo nick not retrieved, will not update nick");
 
-               _to.setAccessToken(response.access_token, response.openid, parseInt(response.expires_in,10), response.name, response.nick);
+               _to.setAccessToken(response.access_token, response.openid || '', response.expires_in ? parseInt(response.expires_in,10) : 0, response.name || response.wb_name || '', response.nick || response.wb_nick || '');
 
                if (response.refresh_token) {
 
@@ -274,13 +277,13 @@ QQWB.extend("_token",{
 
                } else {
 
-                   _l.warning("refresh token not retrieved");
+                   _l.warning("[exchangetoken] refresh token not retrieved");
 
                }
 
                if (!_.loginStatus()) {
 
-                   _l.warn("thirdparty cookie needs to be enabled, please follow this instruction to set P3P header http://url.cn/0ZbFuL");
+                   _l.warn("[exchangetoken] thirdparty cookie needs to be enabled, please follow this instruction to set P3P header http://url.cn/0ZbFuL");
 
                }
 
@@ -292,7 +295,7 @@ QQWB.extend("_token",{
 
            } else {
 
-               _l.error("unexpected result returned from server " + _response + " while exchanging for new accesstoken");
+               _l.error("[exchangetoken] unexpected result returned from server " + _response + " while exchanging for new accesstoken");
 
            }
 
@@ -345,13 +348,13 @@ QQWB.extend("_token",{
 
        if (response.access_token) {
 
-          if(!response.expires_in) _l.error("token expires_in not retrieved");
+          if( !response.expires_in ) _l.info("token expires_in not retrieved or disabled");
 
-          if( !response.name && !response.wb_name) _l.warning("weibo username not retrieved");
+          if( !response.name && !response.wb_name ) _l.info("weibo username not retrieved");
 
-          if( !response.nick && !response.wb_nick) _l.warning("weibo usernick not retrieved");
+          if( !response.nick && !response.wb_nick ) _l.info("weibo usernick not retrieved");
 
-           _to.setAccessToken(response.access_token, response.openid, parseInt(response.expires_in,10), response.name || response.wb_name, response.nick || response.wb_nick);
+          _to.setAccessToken(response.access_token, response.openid || '', response.expires_in ? parseInt(response.expires_in,10) : 0, response.name || response.wb_name || '', response.nick || response.wb_nick || '');
 
            if (response.refresh_token) {
 
@@ -359,7 +362,7 @@ QQWB.extend("_token",{
 
            } else {
 
-               _l.error("refresh token not retrieved");
+               _l.info("refresh token not retrieved or disabled");
 
            }
 

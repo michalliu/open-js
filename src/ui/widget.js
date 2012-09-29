@@ -250,7 +250,7 @@
 		}
 	};
 
-	_.provide('widget', function (name, version) {
+	_.provide('widget', function (name, inOpts, version) {
 
 		var manifest;
 
@@ -323,6 +323,10 @@
 				// loading图样式改变
 				instanceWindow = new WidgetWindow(width,height,inElement, 'background:white;');// inElement 指定组件绘制到指定的元素
 			}
+			// 获取用户自定义的参数
+			instanceWindow.getParams = function () {
+				return inOpts || {};
+			};
 			instanceWindow.getContainer().style.background='url(' + basehost + '/images/loading.gif) no-repeat 50% 50%';
 			// 由组件通知已准备好绘制，隐藏loading动画
 			instanceWindow.ready = function () {
