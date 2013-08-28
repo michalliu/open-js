@@ -1,12 +1,11 @@
 /* See license.txt for terms of usage */
 
-FBL.ns( /** @scope ns-gui */ function() { with (FBL) {
+FBL.ns(function() { with (FBL) {
 // ************************************************************************************************
 
 // ************************************************************************************************
 // Controller
 
-/**@namespace*/
 FBL.Controller = {
         
     controllers: null,
@@ -74,7 +73,6 @@ FBL.Controller = {
 // ************************************************************************************************
 // PanelBar
 
-/**@namespace*/
 FBL.PanelBar = 
 {
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -227,6 +225,7 @@ FBL.PanelBar =
 // Button
 
 /**
+ *
  * options.element
  * options.caption
  * options.title
@@ -239,9 +238,6 @@ FBL.PanelBar =
  * options.onUnpress
  * options.onClick
  * 
- * @class
- * @extends FBL.Controller 
- *  
  */
 
 FBL.Button = function(options)
@@ -278,7 +274,6 @@ FBL.Button = function(options)
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
 Button.prototype = extend(Controller,
-/**@extend FBL.Button.prototype*/
 {
     type: "normal",
     caption: "caption",
@@ -419,17 +414,12 @@ Button.prototype = extend(Controller,
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-/**
- * @class
- * @extends FBL.Button 
- */
 FBL.IconButton = function()
 {
     Button.apply(this, arguments);
 };
 
-IconButton.prototype = extend(Button.prototype,
-/**@extend FBL.IconButton.prototype*/ 
+IconButton.prototype = extend(Button.prototype, 
 {
     baseClassName: "fbIconButton",
     pressedClassName: "fbIconPressed"
@@ -440,7 +430,7 @@ IconButton.prototype = extend(Button.prototype,
 // Menu
 
 var menuItemProps = {"class": "$item.className", type: "$item.type", value: "$item.value",
-        _command: "$item.command"};
+        command: "$item.command"};
 
 if (isIE6)
     menuItemProps.href = "javascript:void(0)";
@@ -552,8 +542,6 @@ var MenuPlate = domplate(Firebug.Rep,
             
             item.className = className;
             
-            item.label = $STR(item.label);
-            
             result.push(item);
         }
         
@@ -578,11 +566,6 @@ var MenuPlate = domplate(Firebug.Rep,
  * item.selected
  * item.command
  * item.child
- * 
- * 
- * @class
- * @extends FBL.Controller
- *   
  */
 FBL.Menu = function(options)
 {
@@ -631,7 +614,6 @@ var menuMap = {};
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
 Menu.prototype =  extend(Controller,
-/**@extend FBL.Menu.prototype*/
 {
     destroy: function()
     {
@@ -850,19 +832,8 @@ Menu.prototype =  extend(Controller,
                 target.setAttribute("selected", "true");
             }            
             
-            var handler = null;
-             
-            // target.command can be a function or a string. 
-            var cmd = target.command;
-            
-            // If it is a function it will be used as the handler
-            if (isFunction(cmd))
-                handler = cmd;
-            // If it is a string it the property of the current menu object 
-            // will be used as the handler
-            else if (typeof cmd == "string")
-                handler = this[cmd];
-            
+            var cmd = target.getAttribute("command");
+            var handler = this[cmd];
             var closeMenu = true;
             
             if (handler)
@@ -927,42 +898,37 @@ Menu.prototype =  extend(Controller,
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-append(Menu,
-/**@extend FBL.Menu*/
+Menu.register = function(object)
 {
-    register: function(object)
-    {
-        menuMap[object.id] = object;
-    },
-    
-    check: function(element)
-    {
-        setClass(element, "fbMenuChecked");
-        element.setAttribute("checked", "true");
-    },
-    
-    uncheck: function(element)
-    {
-        removeClass(element, "fbMenuChecked");
-        element.setAttribute("checked", "");
-    },
-    
-    disable: function(element)
-    {
-        setClass(element, "fbMenuDisabled");
-    },
-    
-    enable: function(element)
-    {
-        removeClass(element, "fbMenuDisabled");
-    }
-});
+    menuMap[object.id] = object;
+};
+
+Menu.check = function(element)
+{
+    setClass(element, "fbMenuChecked");
+    element.setAttribute("checked", "true");
+};
+
+Menu.uncheck = function(element)
+{
+    removeClass(element, "fbMenuChecked");
+    element.setAttribute("checked", "");
+};
+
+Menu.disable = function(element)
+{
+    setClass(element, "fbMenuDisabled");
+};
+
+Menu.enable = function(element)
+{
+    removeClass(element, "fbMenuDisabled");
+};
 
 
 //************************************************************************************************
 // Status Bar
 
-/**@class*/
 function StatusBar(){};
 
 StatusBar.prototype = extend(Controller, {

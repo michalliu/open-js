@@ -122,13 +122,17 @@
 
                     comp,
 
+                    cname,
+
                     c;
 
-                comp = getComponentByName(that.componentName);
+                cname = that.componentName;
+
+                comp = getComponentByName(cname);
 
                 if (!comp.hasOwnProperty('create')) {
 
-                    msg = "创建" + that.componentName + "组件失败，未定义create方法";
+                    msg = "创建" + cname + "组件失败，未定义create方法";
 
                     _l.error(msg);
 
@@ -136,7 +140,18 @@
 
                 }
 
+                // 调用组件的create方法生成组件外观
                 c = comp.create(that.componentConfig);
+
+                // 允许设置父容器样式避免有些页面设置全局样式影响到组件内部展现，如line-height和text-align等
+                // 这种属性可以被所有子节点继承，有时候会造成显示问题
+                if (comp.rootStyle) {
+                    _d.setProperties(root, {
+                        style : comp.rootStyle
+                    });
+                } else {
+                    //TODO 目前什么也不做，或者设置恢复所有的样式为默认值
+                }
 
                 if (typeof c != "undefined" && (c.nodeType == 1 || c.nodeType == 11)) {
 
@@ -488,7 +503,9 @@
 
             idname: 'qqwb_share__', // HTML页面中的ID
 
-            attributes: 'icon counter counter_pos cto_icon appkey content pic',
+            attributes: 'icon counter counter_pos cto_icon appkey content pic richcontent',
+
+            rootStyle: 'text-align:left;',
 
             create: function (cfg) {
 
@@ -508,6 +525,8 @@
                     share_pic = cfg.pic || "", // 转播的图片
 
                     share_content = cfg.content || "", // 默认的转播文字
+
+                    share_richcontent = cfg.richcontent || '', // 默认的rich化文字
 
                     temp;
 
@@ -539,6 +558,8 @@
                     share_counter = !!parseInt(cfg.counter,10);
 
                 }
+
+                share_richcontent = _s.splitby('|', share_richcontent);
 
                 // 显示数字的位置检查
                 if (cfg.counter_pos) {
@@ -602,6 +623,17 @@
                             title: share_content
 
                         });
+
+                    }
+
+                    if (share_richcontent.length > 0) {
+
+                        // 最多支持3行richcontent
+                        for (var i=0,l=share_richcontent.length;i<l && i<3; i++) {
+
+                            query['line' + (i + 1)] = share_richcontent[i];
+
+                        }
 
                     }
 
@@ -779,6 +811,76 @@
                 frag.appendChild(dshare_btn);
 
                 return frag;
+            },
+
+            methods: {
+
+                // appkey
+                appkey: function (appkey) { // this 指向组件instance
+
+                    _.extend(this.componentConfig, {
+
+                        appkey: appkey
+
+                    }, true);
+
+                    return this;
+
+                },
+
+                icon: function (ico) {
+
+                    if (typeof ico === 'number' || _s.isString(ico)) {
+
+                        if (typeof ico === 'number' && (ico < 0 || ico > 2)) {
+
+                            _l.warn("component set icon, default icon index must be 0,1,2, you gave " + ico);
+
+                        }
+
+                        _.extend(this.componentConfig, { "icon" : ico }, true);
+
+                    } else {
+
+                        _l.error("component set icon error, expect number or string, you gave " + (typeof ico));
+
+                    }
+
+                    return this;
+                },
+
+                showCounter: function (position) {
+
+                    var ico = this.componentConfig.icon;
+
+                    // position must be either left or top
+                    switch(position) {
+
+                        case 'left':
+
+                        case 'top':
+
+                        break;
+
+                        default:
+
+                        _l.warning("component showcounter, position must be either 'left' or 'top', you gave " + "'" + position + "'" );
+
+                        return this;
+                    }
+
+                    if (typeof ico === 'number' && (ico === 0 || ico === 1) ) {
+
+                        _.extend(this.componentConfig, {"counter":1, "counter_pos" : position }, true);
+
+                    } else { // icon index must be 1 or 2
+
+                        _l.warning("component showcounter, icon index must be either 0 or 1, you gave " + ico);
+
+                    }
+
+                    return this;
+                }
             }
     });
 
@@ -801,6 +903,8 @@
 
                 cfg = {},
 
+                autorender = false, // 是否应该自动渲染找到的预定义节点
+
                 e = document.getElementById(id);
 
             datakeys = _a.forEach(attrs, function (v,i) {
@@ -810,8 +914,6 @@
             });
 
             if (e) {
-
-                _l.debug(['try render component [', c.name, ' ', c.version,']'].join(''));
 
                 dataval = _.dom.getProperties(e, datakeys);
 
@@ -823,23 +925,37 @@
 
                         cfg[k] = v;
 
+                        if (!autorender && v !== null) { // 只要v有一次不为null，即组件指定的idname中有可读取的属性，就应该渲染该节点，否则不渲染
+
+                            autorender = true;
+
+                        }
                     }
 
                 });
 
                 _l.debug(['read configuration ', QQWB.JSON.stringify(cfg)].join(''));
 
-                try {
+                if (autorender) {
 
-                    _.component(c.name).config(cfg).render();
+                    _l.debug(['try render component [', c.name, ' ', c.version,']'].join(''));
 
-                } catch (componentRenderError) {
+                    try {
 
-                    _l.error(['render component [', c.name, c.version, '] error exception: ', componentRenderError].join(''));
+                        _.component(c.name).config(cfg).render();
 
+                    } catch (componentRenderError) {
+
+                        _l.error(['render component [', c.name, c.version, '] error exception: ', componentRenderError].join(''));
+
+                    }
+                    compFound++;
+
+                } else {
+
+                    _l.debug(['found dom element for [', c.name, ' ', c.version,'], but auto render will not start'].join(''));
                 }
 
-                compFound++;
             }
 
         }); // end forEach

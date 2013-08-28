@@ -1,6 +1,6 @@
 /* See license.txt for terms of usage */
 
-FBL.ns( /**@scope ns-chrome*/ function() { with (FBL) {
+FBL.ns(function() { with (FBL) {
 // ************************************************************************************************
 
 // ************************************************************************************************
@@ -91,7 +91,6 @@ var WindowDefaultOptions =
 // ************************************************************************************************
 // FirebugChrome
 
-/**@namespace*/
 FBL.FirebugChrome = 
 {
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -188,11 +187,7 @@ var createChromeWindow = function(options)
                 
         formatNode = function(node)
         {
-            if (!Env.isDebugMode)
-            {
-                node.firebugIgnore = true;
-            }
-            
+            node.firebugIgnore = true;
             node.style.border = "0";
             node.style.visibility = "hidden";
             node.style.zIndex = "2147483647"; // MAX z-index = 2147483647
@@ -214,7 +209,7 @@ var createChromeWindow = function(options)
             var node = chrome.node = createGlobalElement("div"),
                 style = createGlobalElement("style"),
                 
-                css = FirebugChrome.Skin.CSS
+                css = FirebugChrome.injected.CSS
                         /*
                         .replace(/;/g, " !important;")
                         .replace(/!important\s!important/g, "!important")
@@ -291,7 +286,7 @@ var createChromeWindow = function(options)
             body.appendChild(node);
             
             // must set the id after appending to the document, otherwise will cause an
-            // strange error in IE, making the iframe load the page in which the bookmarklet
+            // strange error in IE, making the iframe load the page in which the bookmarlet
             // was created (like getfirebug.com), before loading the injected UI HTML,
             // generating an "Access Denied" error.
             node.id = options.id;
@@ -388,7 +383,7 @@ var createChromeWindow = function(options)
         if (/access/i.test(msg))
         {
             // Firebug Lite could not create a window for its Graphical User Interface due to
-            // a access restriction. This happens in some pages, when loading via bookmarklet.
+            // a access restriction. This happens in some pages, when loading via bookmarlet.
             // In such cases, the only way is to load the GUI in a "windowless mode".
             
             if (isChromeFrame)
@@ -464,12 +459,12 @@ var onChromeLoad = function onChromeLoad(chrome)
 
 var getChromeDivTemplate = function()
 {
-    return FirebugChrome.Skin.HTML;
+    return FirebugChrome.injected.HTML;
 };
 
 var getChromeTemplate = function(isPopup)
 {
-    var tpl = FirebugChrome.Skin; 
+    var tpl = FirebugChrome.injected; 
     var r = [], i = -1;
     
     r[++i] = '<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/DTD/strict.dtd">';
@@ -498,7 +493,6 @@ var getChromeTemplate = function(isPopup)
 // ************************************************************************************************
 // Chrome Class
     
-/**@class*/
 var Chrome = function Chrome(chrome)
 {
     var type = chrome.type;
@@ -523,16 +517,10 @@ var Chrome = function Chrome(chrome)
 // ************************************************************************************************
 // ChromeBase
 
-/**
- * @namespace
- * @extends FBL.Controller 
- * @extends FBL.PanelBar 
- **/
 var ChromeBase = {};
 append(ChromeBase, Controller); 
 append(ChromeBase, PanelBar);
 append(ChromeBase,
-/**@extend ns-chrome-ChromeBase*/
 {
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
     // inherited properties
@@ -689,7 +677,6 @@ append(ChromeBase,
             
         });
         
-        /**@private*/
         var firebugOptionsMenu =
         {
             id: "fbFirebugOptionsMenu",
@@ -728,6 +715,7 @@ append(ChromeBase,
                         checked: Firebug.showIconWhenHidden,
                         disabled: cookiesDisabled
                     },
+                    "-",
                     {
                         label: "Override Console Object",
                         type: "checkbox",
@@ -749,13 +737,7 @@ append(ChromeBase,
                         checked: Firebug.disableWhenFirebugActive,
                         disabled: cookiesDisabled
                     },
-                    {
-                        label: "Disable XHR Listener",
-                        type: "checkbox",
-                        value: "disableXHRListener",
-                        checked: Firebug.disableXHRListener,
-                        disabled: cookiesDisabled
-                    },
+                    "-",
                     {
                         label: "Enable Trace Mode",
                         type: "checkbox",
@@ -772,7 +754,7 @@ append(ChromeBase,
                     },
                     "-",
                     {
-                        label: "Reset All Firebug Options",
+                        label: "Restore Options",
                         command: "restorePrefs",
                         disabled: cookiesDisabled
                     }
@@ -800,7 +782,7 @@ append(ChromeBase,
                 Firebug.restorePrefs();
                 
                 if(Firebug.saveCookies)
-                    Firebug.savePrefs();
+                    Firebug.savePrefs()
                 else
                     Firebug.erasePrefs();
                 
@@ -895,13 +877,7 @@ append(ChromeBase,
     initialize: function()
     {
         // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-        if (Env.bookmarkletOutdated)
-            Firebug.Console.logFormatted([
-                  "A new bookmarklet version is available. " +
-                  "Please visit http://getfirebug.com/firebuglite#Install and update it."
-                ], Firebug.context, "warn");
-        
-        // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+        // TODO: console2 - remove "&& !Firebug.Console2" when console2 is finished
         if (Firebug.Console)
             Firebug.Console.flush();
         
@@ -1036,25 +1012,15 @@ append(ChromeBase,
 
         var onPanelMouseDown = function onPanelMouseDown(event)
         {
-            //console.log("onPanelMouseDown", event.target || event.srcElement, event);
-            
             var target = event.target || event.srcElement;
             
             if (FBL.isLeftClick(event))
             {
                 var editable = FBL.getAncestorByClass(target, "editable");
-                
-                // if an editable element has been clicked then start editing
                 if (editable)
                 {
                     Firebug.Editor.startEditing(editable);
                     FBL.cancelEvent(event);
-                }
-                // if any other element has been clicked then stop editing
-                else
-                {
-                    if (!hasClass(target, "textEditorInner"))
-                        Firebug.Editor.stopEditing();
                 }
             }
             else if (FBL.isMiddleClick(event) && Firebug.getRepNode(target))
@@ -1062,7 +1028,7 @@ append(ChromeBase,
                 // Prevent auto-scroll when middle-clicking a rep object
                 FBL.cancelEvent(event);
             }
-        };
+        }
         
         Firebug.getElementPanel = function(element)
         {
@@ -1080,75 +1046,7 @@ append(ChromeBase,
             return panel;
         };
         
-        
-        
-        // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-        
-        // TODO: xxxpedro port to Firebug
-        
-        // Improved window key code event listener. Only one "keydown" event will be attached
-        // to the window, and the onKeyCodeListen() function will delegate which listeners
-        // should be called according to the event.keyCode fired.
-        var onKeyCodeListenersMap = [];
-        var onKeyCodeListen = function(event)
-        {
-            for (var keyCode in onKeyCodeListenersMap)
-            {
-                var listeners = onKeyCodeListenersMap[keyCode];
-                
-                for (var i = 0, listener; listener = listeners[i]; i++)
-                {
-                    var filter = listener.filter || FBL.noKeyModifiers;
-        
-                    if (event.keyCode == keyCode && (!filter || filter(event)))
-                    {
-                        listener.listener();
-                        FBL.cancelEvent(event, true);
-                        return false;
-                    }
-                }
-            }
-        };
-        
-        addEvent(Firebug.chrome.document, "keydown", onKeyCodeListen);
 
-        /**
-         * @name keyCodeListen
-         * @memberOf FBL.FirebugChrome
-         */
-        Firebug.chrome.keyCodeListen = function(key, filter, listener, capture)
-        {
-            var keyCode = KeyEvent["DOM_VK_"+key];
-            
-            if (!onKeyCodeListenersMap[keyCode])
-                onKeyCodeListenersMap[keyCode] = [];
-            
-            onKeyCodeListenersMap[keyCode].push({
-                filter: filter,
-                listener: listener
-            });
-    
-            return keyCode;
-        };
-        
-        /**
-         * @name keyIgnore
-         * @memberOf FBL.FirebugChrome
-         */
-        Firebug.chrome.keyIgnore = function(keyCode)
-        {
-            onKeyCodeListenersMap[keyCode] = null;
-            delete onKeyCodeListenersMap[keyCode];
-        };
-        
-        // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-        
-        /**/
-        // move to shutdown 
-        //removeEvent(Firebug.chrome.document, "keydown", listener[0]);
-
-
-        /*
         Firebug.chrome.keyCodeListen = function(key, filter, listener, capture)
         {
             if (!filter)
@@ -1175,7 +1073,7 @@ append(ChromeBase,
         {
             removeEvent(Firebug.chrome.document, "keydown", listener[0]);
         };
-        /**/
+
         
         
         this.addController(
@@ -1231,14 +1129,8 @@ append(ChromeBase,
         restoreTextSelection($("fbPanelBar2"));
         
         // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-        // shutdown inherited classes
-        Controller.shutdown.call(this);
-        PanelBar.shutdown.call(this);
+        // Remove the interface elements cache
         
-        // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-        // Remove the interface elements cache (this must happen after calling 
-        // the shutdown method of all dependent components to avoid errors)
-
         fbTop = null;
         fbContent = null;
         fbContentStyle = null;
@@ -1275,6 +1167,12 @@ append(ChromeBase,
         
         topHeight = null;
         topPartialHeight = null;
+        
+        
+        // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+        // shutdown inherited classes
+        Controller.shutdown.call(this);
+        PanelBar.shutdown.call(this);
     },
     
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -1335,7 +1233,7 @@ append(ChromeBase,
             // TODO: xxxpedro innerHTML
             panel = newPanelMap[name]; 
             if (panel.options.innerHTMLSync)
-                panel.panelNode.innerHTML = oldPanelMap[name].panelNode.innerHTML;
+                panel.contentNode.innerHTML = oldPanelMap[name].contentNode.innerHTML;
         }
         
         Firebug.chrome = newChrome;
@@ -1407,7 +1305,7 @@ append(ChromeBase,
         {
             sideWidthValue = Math.max(sideWidthValue - 6, 0);
             
-            var sideWidth = sideWidthValue + "px";
+            var sideWidth = sideWidthValue + "px"
             
             fbPanelBox2Style.width = sideWidth;
             
@@ -1576,12 +1474,7 @@ append(ChromeBase,
 // ************************************************************************************************
 // ChromeFrameBase
 
-/**
- * @namespace
- * @extends ns-chrome-ChromeBase 
- */ 
 var ChromeFrameBase = extend(ChromeBase,
-/**@extend ns-chrome-ChromeFrameBase*/
 {
     create: function()
     {
@@ -1691,10 +1584,7 @@ var ChromeFrameBase = extend(ChromeBase,
                 node.style.display = "block";
             
             var main = $("fbChrome");
-            
-            // IE6 throws an error when setting this property! why?
-            //main.style.display = "table";
-            main.style.display = "";
+            main.style.display = "block";
             
             var self = this;
             setTimeout(function(){
@@ -1748,21 +1638,14 @@ var ChromeFrameBase = extend(ChromeBase,
     
     deactivate: function()
     {
-        // if it is running as a Chrome extension, dispatch a message to the extension signaling
+        Firebug.shutdown();
+        
+        // if it is running as a Chrome extension, dispatch a message to the extension signaling 
         // that Firebug should be deactivated for the current tab
         if (Env.isChromeExtension)
         {
             localStorage.removeItem("Firebug");
-            Firebug.GoogleChrome.dispatch("FB_deactivate");
-
-            // xxxpedro problem here regarding Chrome extension. We can't deactivate the whole
-            // app, otherwise it won't be able to be reactivated without reloading the page.
-            // but we need to stop listening global keys, otherwise the key activation won't work.
-            Firebug.chrome.close();
-        }
-        else
-        {
-            Firebug.shutdown();
+            chromeExtensionDispatch("FB_deactivate");
         }
     },
     
@@ -1799,12 +1682,7 @@ var ChromeFrameBase = extend(ChromeBase,
 // ************************************************************************************************
 // ChromeMini
 
-/**
- * @namespace
- * @extends FBL.Controller
- */  
-var ChromeMini = extend(Controller,
-/**@extend ns-chrome-ChromeMini*/ 
+var ChromeMini = extend(Controller, 
 {
     create: function(chrome)
     {
@@ -1902,19 +1780,13 @@ var ChromeMini = extend(Controller,
 // ************************************************************************************************
 // ChromePopupBase
 
-/**
- * @namespace
- * @extends ns-chrome-ChromeBase
- */  
-var ChromePopupBase = extend(ChromeBase,
-/**@extend ns-chrome-ChromePopupBase*/
-{
+var ChromePopupBase = extend(ChromeBase, {
     
     initialize: function()
     {
         setClass(this.document.body, "FirebugPopup");
         
-        ChromeBase.initialize.call(this);
+        ChromeBase.initialize.call(this)
         
         this.addController(
             [Firebug.chrome.window, "resize", this.resize],
@@ -1981,12 +1853,8 @@ var ChromePopupBase = extend(ChromeBase,
                     
                     try
                     {
-                        // exposes the FBL to the global namespace when in debug mode
-                        if (Env.isDebugMode)
-                        {
-                            window.FBL = FBL;
-                        }
-                        
+                        var persistDelay = new Date().getTime() - persistTimeStart;
+                
                         window.Firebug = Firebug;
                         window.opener.Firebug = Firebug;
                 
@@ -1995,13 +1863,8 @@ var ChromePopupBase = extend(ChromeBase,
                 
                         registerConsole();
                 
-                        // the delay time should be calculated right after registering the 
-                        // console, once right after the console registration, call log messages
-                        // will be properly handled
-                        var persistDelay = new Date().getTime() - persistTimeStart;
-                
                         var chrome = Firebug.chrome;
-                        addEvent(Firebug.browser.window, "unload", chrome.persist);
+                        addEvent(Firebug.browser.window, "unload", chrome.persist)
                 
                         FBL.cacheDocument();
                         Firebug.Inspector.create();
@@ -2009,12 +1872,8 @@ var ChromePopupBase = extend(ChromeBase,
                         var htmlPanel = chrome.getPanel("HTML");
                         htmlPanel.createUI();
                         
-                        Firebug.Console.logFormatted(
-                            ["Firebug could not capture console calls during " +
-                            persistDelay + "ms"],
-                            Firebug.context,
-                            "info"
-                        );
+                        Firebug.Console.info("Firebug could not capture console calls during " + 
+                                persistDelay + "ms");
                     }
                     catch(pE)
                     {
@@ -2098,13 +1957,6 @@ var onGlobalKeyDown = function onGlobalKeyDown(event)
     {
         Firebug.chrome.toggle(false, ctrlKey);
         cancelEvent(event, true);
-
-        // TODO: xxxpedro replace with a better solution. we're doing this
-        // to allow reactivating with the F12 key after being deactivated
-        if (Env.isChromeExtension)
-        {
-            Firebug.GoogleChrome.dispatch("FB_enableIcon");
-        }
     }
     else if (keyCode == 67 /* C */ && ctrlKey && shiftKey)
     {
@@ -2122,8 +1974,8 @@ var onMiniIconClick = function onMiniIconClick(event)
 {
     Firebug.chrome.toggle(false, event.ctrlKey);
     cancelEvent(event, true);
-};
-
+}
+    
 
 // ************************************************************************************************
 // Horizontal Splitter Handling

@@ -208,7 +208,7 @@ Firebug.Editor = extend(Firebug.Module,
     saveEditAndNotifyListeners: function(currentTarget, value, previousValue)
     {
         currentEditor.saveEdit(currentTarget, value, previousValue);
-        //dispatch(this.fbListeners, "onSaveEdit", [currentPanel, currentEditor, currentTarget, value, previousValue]);
+        dispatch(this.fbListeners, "onSaveEdit", [currentPanel, currentEditor, currentTarget, value, previousValue]);
     },
 
     setEditTarget: function(element)
@@ -478,35 +478,6 @@ Firebug.BaseEditor = extend(Firebug.MeasureBox,
 // ************************************************************************************************
 // InlineEditor
 
-// basic inline editor attributes
-var inlineEditorAttributes = {
-    "class": "textEditorInner",
-    
-    type: "text", 
-    spellcheck: "false",
-    
-    onkeypress: "$onKeyPress",
-    
-    onoverflow: "$onOverflow",
-    oncontextmenu: "$onContextMenu"
-};
-
-// IE does not support the oninput event, so we're using the onkeydown to signalize
-// the relevant keyboard events, and the onpropertychange to actually handle the
-// input event, which should happen after the onkeydown event is fired and after the 
-// value of the input is updated, but before the onkeyup and before the input (with the 
-// new value) is rendered
-if (isIE)
-{
-    inlineEditorAttributes.onpropertychange = "$onInput";
-    inlineEditorAttributes.onkeydown = "$onKeyDown";
-}
-// for other browsers we use the oninput event
-else
-{
-    inlineEditorAttributes.oninput = "$onInput";
-}
-
 Firebug.InlineEditor = function(doc)
 {
     this.initializeInline(doc);
@@ -525,8 +496,12 @@ Firebug.InlineEditor.prototype = domplate(Firebug.BaseEditor,
             ),
             DIV({"class": "textEditorInner1"},
                 DIV({"class": "textEditorInner2"},
-                    INPUT(
-                        inlineEditorAttributes
+                    INPUT({"class": "textEditorInner", type: "text",
+                        /*oninput: "$onInput", */
+                        onkeypress: "$onKeyPress",
+                        onkeyup: "$onKeyUp",
+                        onoverflow: "$onOverflow",
+                        oncontextmenu: "$onContextMenu"}
                     )
                 )
             ),
@@ -569,7 +544,8 @@ Firebug.InlineEditor.prototype = domplate(Firebug.BaseEditor,
         this.box = this.tag.append({}, doc.body, this);
         
         //this.input = this.box.childNodes[1].firstChild.firstChild;  // XXXjjb childNode[1] required
-        this.input = this.box.getElementsByTagName("input")[0];
+        
+        this.input = this.box.getElementsByTagName("input")[0];  // XXXjjb childNode[1] required
         
         if (isIElt8)
         {
@@ -674,7 +650,6 @@ Firebug.InlineEditor.prototype = domplate(Firebug.BaseEditor,
         
         if (isIE)
         {
-            // reset input style
             this.input.style.fontFamily = "Monospace";
             this.input.style.fontSize = "11px";
         }
@@ -695,19 +670,17 @@ Firebug.InlineEditor.prototype = domplate(Firebug.BaseEditor,
         // Display the editor after change its size and position to avoid flickering
         this.box.style.display = "block";
         
-        // we need to call input.focus() and input.select() with a timeout, 
-        // otherwise it won't work on all browsers due to timing issues 
         var self = this;
         setTimeout(function(){
             self.input.focus();
             self.input.select();
-        },0);
+        },0);        
     },
 
     hide: function()
     {
         this.box.className = this.originalClassName;
-        
+
         if (!this.fixedWidth)
         {
             this.stopMeasuring();
@@ -720,9 +693,7 @@ Firebug.InlineEditor.prototype = domplate(Firebug.BaseEditor,
 
         if (this.box.parentNode)
         {
-            ///setSelectionRange(this.input, 0, 0);
-            this.input.blur();
-            
+            setSelectionRange(this.input, 0, 0);
             this.box.parentNode.removeChild(this.box);
         }
 
@@ -794,19 +765,8 @@ Firebug.InlineEditor.prototype = domplate(Firebug.BaseEditor,
     {
         //console.log("completeValue");
         
-        var selectRangeCallback = this.getAutoCompleter().complete(currentPanel.context, this.input, true, amt < 0); 
-        
-        if (selectRangeCallback)
-        {
+        if (this.getAutoCompleter().complete(currentPanel.context, this.input, true, amt < 0))
             Firebug.Editor.update(true);
-            
-            // We need to select the editor text after calling update in Safari/Chrome,
-            // otherwise the text won't be selected
-            if (isSafari)
-                setTimeout(selectRangeCallback,0);
-            else
-                selectRangeCallback();
-        }
         else
             this.incrementValue(amt);
     },
@@ -817,11 +777,10 @@ Firebug.InlineEditor.prototype = domplate(Firebug.BaseEditor,
         
         // TODO: xxxpedro editor
         if (isIE)
-            var start = getInputSelectionStart(this.input), end = start;
+            var start = getInputCaretPosition(this.input), end = start;
         else
             var start = this.input.selectionStart, end = this.input.selectionEnd;
 
-        //debugger;
         var range = this.getAutoCompleteRange(value, start);
         if (!range || range.type != "int")
             range = {start: 0, end: value.length-1};
@@ -852,9 +811,19 @@ Firebug.InlineEditor.prototype = domplate(Firebug.BaseEditor,
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
+    onKeyUp: function(event)
+    {
+        // IE and Safari won't fire the onkeypress event for special keys like insert/delete,
+        // up/down arrows and others. So, we must listen for the onkeyup event too, and
+        // call the onKeyPress handler manually
+        if (isIE || isSafari)
+        {
+            this.onKeyPress(event);
+        }
+    },
+    
     onKeyPress: function(event)
     {
-        //console.log("onKeyPress", event);
         if (event.keyCode == 27 && !this.completeAsYouType)
         {
             var reverted = this.getAutoCompleter().revert(this.input);
@@ -875,6 +844,12 @@ Firebug.InlineEditor.prototype = domplate(Firebug.BaseEditor,
             {
                 // If the user backspaces, don't autocomplete after the upcoming input event
                 this.ignoreNextInput = event.keyCode == 8;
+                
+                // TODO: xxxpedro IE and oninput                
+                var self = this;
+                setTimeout(function(){
+                    self.onInput();
+                },0)
             }
         }
     },
@@ -884,54 +859,20 @@ Firebug.InlineEditor.prototype = domplate(Firebug.BaseEditor,
         this.updateLayout(false, false, 3);
     },
 
-    onKeyDown: function(event)
+    onInput: function()
     {
-        //console.log("onKeyDown", event.keyCode);
-        if (event.keyCode > 46 || event.keyCode == 32 || event.keyCode == 8)
-        {
-            this.keyDownPressed = true;
-        }
-    },
-    
-    onInput: function(event)
-    {
-        //debugger;
-        
-        // skip not relevant onpropertychange calls on IE
-        if (isIE)
-        {
-            if (event.propertyName != "value" || !isVisible(this.input) || !this.keyDownPressed) 
-                return;
-            
-            this.keyDownPressed = false;
-        }
-        
-        //console.log("onInput", event);
-        //console.trace();
-        
-        var selectRangeCallback;
-        
+        //console.log("onInput");
         if (this.ignoreNextInput)
         {
             this.ignoreNextInput = false;
             this.getAutoCompleter().reset();
         }
         else if (this.completeAsYouType)
-            selectRangeCallback = this.getAutoCompleter().complete(currentPanel.context, this.input, false);
+            this.getAutoCompleter().complete(currentPanel.context, this.input, false);
         else
             this.getAutoCompleter().reset();
 
         Firebug.Editor.update();
-        
-        if (selectRangeCallback)
-        {
-            // We need to select the editor text after calling update in Safari/Chrome,
-            // otherwise the text won't be selected
-            if (isSafari)
-                setTimeout(selectRangeCallback,0);
-            else
-                selectRangeCallback();
-        }
     },
 
     onContextMenu: function(event)
@@ -1035,7 +976,7 @@ Firebug.InlineEditor.prototype = domplate(Firebug.BaseEditor,
             }
 
             this.expander.style.width = approxTextWidth + "px";
-            this.expander.style.height = Math.max(this.textSize.height-3,0) + "px";
+            this.expander.style.height = (this.textSize.height-3) + "px";
         }
 
         if (forceAll)
@@ -1089,17 +1030,16 @@ Firebug.AutoCompleter = function(getExprOffset, getRange, evaluator, selectMode,
 
     this.complete = function(context, textBox, cycle, reverse)
     {
-        //console.log("complete", context, textBox, cycle, reverse);
         // TODO: xxxpedro important port to firebug (variable leak)
         //var value = lastValue = textBox.value;
         var value = textBox.value;
         
         //var offset = textBox.selectionStart;
-        var offset = getInputSelectionStart(textBox);
+        var offset = getInputCaretPosition(textBox);
         
         // The result of selectionStart() in Safari/Chrome is 1 unit less than the result
-        // in Firefox. Therefore, we need to manually adjust the value here.
-        if (isSafari && !cycle && offset >= 0) offset++;
+        // in Firebug. Therefore, we need to manually adjust the value here.
+        //if (isSafari && offset >= 0) offset++;
         
         if (!selectMode && originalOffset != -1)
             offset = originalOffset;
@@ -1283,7 +1223,6 @@ Firebug.AutoCompleter = function(getExprOffset, getRange, evaluator, selectMode,
         // we must select the range with a timeout, otherwise the text won't
         // be properly selected (because after this function executes, the editor's
         // input will be resized to fit the whole text)
-        /*
         setTimeout(function(){
             if (selectMode)
                 setSelectionRange(textBox, offset, offsetEnd);
@@ -1291,25 +1230,8 @@ Firebug.AutoCompleter = function(getExprOffset, getRange, evaluator, selectMode,
                 setSelectionRange(textBox, offsetEnd, offsetEnd);
         },0);
                 
+
         return true;
-        /**/
-        
-        // The editor text should be selected only after calling the editor.update() 
-        // in Safari/Chrome, otherwise the text won't be selected. So, we're returning
-        // a function to be called later (in the proper time for all browsers).
-        //
-        // TODO: xxxpedro see if we can move the editor.update() calls to here, and avoid
-        // returning a closure. the complete() function seems to be called only twice in
-        // editor.js. See if this function is called anywhere else (like css.js for example).
-        return function(){
-            //console.log("autocomplete ", textBox, offset, offsetEnd);
-            
-            if (selectMode)
-                setSelectionRange(textBox, offset, offsetEnd);
-            else
-                setSelectionRange(textBox, offsetEnd, offsetEnd);
-        };
-        /**/
     };
 };
 

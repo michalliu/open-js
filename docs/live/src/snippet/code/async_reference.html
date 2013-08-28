@@ -9,15 +9,15 @@
 var timer;
 
 // 回调
-window['onOpenjsLoad'] = function (ref) {
+window.onOpenjsLoad = function (ref) {
 	if (ref) {
 		clearTimeout(timer);
 		alert("openjs加载成功");
 	} else {
 		alert("openJS加载失败");
 	}
-	window['onOpenjsLoad'] = null;
-}
+	window.onOpenjsLoad = null;
+};
 
 timer = setTimeout(onOpenjsLoad, 10 * 1000);
 

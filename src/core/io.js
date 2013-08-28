@@ -19,41 +19,41 @@
  */
 (function () {
 
-	var _ = QQWB,
+    var _ = QQWB,
 
-	    _b = _.bigtable,
+        _b = _.bigtable,
 
         _s = _.String,
 
         _q = _.queryString,
 
-		_l = _.log,
+        _l = _.log,
 
         _o = _.Object,
 
-		_t = _.time,
+        _t = _.time,
 
-	    iotimeout = _b.get("io", "timeout"),
+        iotimeout = _b.get("io", "timeout"),
 
         buildUrlWithData,
 
-		ioscript,
+        ioscript,
 
-		ioajax,
+        ioajax,
 
-		ioas3,
-		
-		ioas3tktcounter = 0,
-		
-		apiAjax,
+        ioas3,
+        
+        ioas3tktcounter = 0,
+        
+        apiAjax,
 
-		apiResponder,
+        apiResponder,
 
         getIoProto,
 
         compatOpts,
 
-		ajaxResponder;
+        ajaxResponder;
 
     getIoProto = function () {
 
@@ -90,11 +90,11 @@
 
         }
 
-		if (_s.trim(opts.type).toUpperCase() == "GET") {
+        if (_s.trim(opts.type).toUpperCase() == "GET") {
 
             opts.url = joinUrlWithData(opts.url, opts.data);
 
-		}
+        }
 
         if (_s.trim(opts.type).toUpperCase() == "GET" && !opts.cache) {
 
@@ -130,28 +130,28 @@
 
     };
 
-	ioscript = function (cfg) {
+    ioscript = function (cfg) {
 
         var script;
 
-		return {
+        return {
 
-			send: function (complete) {
+            send: function (complete) {
 
-				var start = _t.now(),
+                var start = _t.now(),
 
                     head = document.head || document.getElementsByTagName("head")[0] || document.documentElement,
 
-			        timer = setTimeout(function () {
+                    timer = setTimeout(function () {
 
-			            _l.error("load script " + cfg.url + " timeout");
+                        _l.error("load script " + cfg.url + " timeout");
 
-			            // @see ITEF Standard http://en.wikipedia.org/wiki/List_of_HTTP_status_codes
-			            complete(599, "timeout",  _t.now() - start);
+                        // @see ITEF Standard http://en.wikipedia.org/wiki/List_of_HTTP_status_codes
+                        complete(599, "timeout",  _t.now() - start);
 
-						complete = null; // avoid execute again
+                        complete = null; // avoid execute again
 
-			        }, iotimeout);
+                    }, iotimeout);
 
                 script = document.createElement("script");
 
@@ -167,15 +167,15 @@
 
                 script.onload = script.onreadystatechange = function (e, isAbort) {
 
-					// finished anyway
+                    // finished anyway
                     if (isAbort || !script.readyState || /loaded|complete/.test(script.readyState)) {
 
-						// done timer
-						var t;
+                        // done timer
+                        var t;
 
-				        clearTimeout(timer);
+                        clearTimeout(timer);
 
-						// clean up things
+                        // clean up things
                         script.onload = script.onreadystatechange = null;
 
                         if (head && script.parentNode) {
@@ -186,42 +186,42 @@
 
                         script = null;
 
-						// has callback
-						if (complete) {
+                        // has callback
+                        if (complete) {
 
-							t = _t.now() - start;
+                            t = _t.now() - start;
 
-							if (isAbort) {
+                            if (isAbort) {
 
                                 complete(-1, "aborted", t);
 
-							} else {
+                            } else {
 
                                 complete(200, "success", t);
 
-							}
+                            }
 
-						    complete = null;
+                            complete = null;
 
-						}
+                        }
                     }
                 };
 
                 // ie 678 and opera not support script onerror(not tested)
                 script.onerror = function (e) { 
 
-				    clearTimeout(timer);
+                    clearTimeout(timer);
 
                     complete && complete(500, "server error", _t.now() - start);
 
-				    complete = null;
+                    complete = null;
                 };
 
                 head.insertBefore(script, head.firstChild);
 
-			},
+            },
 
-			abort: function () {
+            abort: function () {
 
                if (script) {
 
@@ -229,30 +229,30 @@
 
                }
 
-			}
-		};
-	}; // ioscript
+            }
+        };
+    }; // ioscript
 
-	ioajax = function (cfg) {
+    ioajax = function (cfg) {
 
-	    var xhrcallback;
+        var xhrcallback;
 
-		return {
+        return {
 
-			send: function (complete) {
+            send: function (complete) {
 
-				var start = _t.now(),
+                var start = _t.now(),
 
-	                xhr = window.XMLHttpRequest ? new window.XMLHttpRequest() : new window.ActiveXObject("Microsoft.XMLHTTP"),
+                    xhr = window.XMLHttpRequest ? new window.XMLHttpRequest() : new window.ActiveXObject("Microsoft.XMLHTTP"),
 
-				    timer = setTimeout(function () {
+                    timer = setTimeout(function () {
 
                          _l.error("ajax timeout, url " + cfg.url);
 
                          //@see ITEF Standard http://en.wikipedia.org/wiki/List_of_HTTP_status_codes
                          complete(599,"timeout",  _t.now() - start);
 
-						 complete = null;
+                         complete = null;
 
                      }, iotimeout);
                 
@@ -284,96 +284,96 @@
 
                     xhr.setRequestHeader("X-Requested-From","openjs" + _.version);
 
-				} catch (ex) {
+                } catch (ex) {
 
-					_l.warning("set header error " + ex);
+                    _l.warning("set header error " + ex);
 
-			   	}
+                   }
                 
                 // http://www.w3.org/TR/XMLHttpRequest/#the-send-method
                 xhr.send(cfg.data || null);
                 
-				// xhr callback
+                // xhr callback
                 xhrcallback = function (x, isAbort) {
 
                     var status,
 
-                 	    statusText,
+                         statusText,
 
-                 	    responseHeaders,
+                         responseHeaders,
 
-                 	    responses,
+                         responses,
 
                         response,
 
-						xml;
+                        xml;
                 
                     try {
 
                         if (xhrcallback && (isAbort || xhr.readyState === 4)) {
-                 		   
-                 		   xhrcallback = null;
+                            
+                            xhrcallback = null;
                 
-						   // abort ajax request
-                 		   if (isAbort) {
+                           // abort ajax request
+                            if (isAbort) {
 
-							   // can abort
-                 			   if (xhr.readyState !== 4) {
+                               // can abort
+                                if (xhr.readyState !== 4) {
 
                                    clearTimeout(timer);
 
-                 				   xhr.abort();
+                                    xhr.abort();
 
-								   complete && complete(-1, "aborted", _t.now() - start);
+                                   complete && complete(-1, "aborted", _t.now() - start);
 
-								   complete = null;
+                                   complete = null;
 
-							   } else {
+                               } else {
 
-								   _l.debug("abort ajax failed, already finish");
+                                   _l.debug("abort ajax failed, already finish");
 
-							   }
+                               }
 
-                 		    } else {
+                             } else {
 
                                 clearTimeout(timer);
 
-                 				status = xhr.status;
+                                 status = xhr.status;
 
-                 				responseHeaders = xhr.getAllResponseHeaders() || "";
+                                 responseHeaders = xhr.getAllResponseHeaders() || "";
 
-								// a collection
-                 				responses = {};
+                                // a collection
+                                 responses = {};
 
-                 				xml = xhr.responseXML;
+                                 xml = xhr.responseXML;
                 
-                 				if (xml && xml.documentElement) {
+                                 if (xml && xml.documentElement) {
 
-                 				    responses.xml = xml;
+                                     responses.xml = xml;
 
-                 				}
+                                 }
                 
-                 				responses.text = xhr.responseText;
+                                 responses.text = xhr.responseText;
                 
-                 				try {
+                                 try {
 
-                 				    statusText = xhr.statusText;
+                                     statusText = xhr.statusText;
 
-                 				} catch (webkitException) {
+                                 } catch (webkitException) {
 
-                 					statusText = "";
+                                     statusText = "";
 
-                 				}
+                                 }
                 
-                 				if (status === 1223) {
+                                 if (status === 1223) {
 
-                 				    status = 204;
+                                     status = 204;
 
-                 				}
+                                 }
                 
                                  if (cfg.dataType.toLowerCase() == "json") { /// parse to json object
 
-                 					response = _.JSON.fromString(responses.text);
+                                     response = _.JSON.fromString(responses.text);
 
                                  } else if (cfg.dataType.toLowerCase() == "xml") { // parse to xml object
 
@@ -385,32 +385,32 @@
 
                                  }
                 
-                 	    	}
+                             }
                 
-                 		   //if (response) { // in case of server returns empty body sometimes
-						   
-                 	           complete(status, statusText, _t.now() - start, response, responses.text, responseHeaders, cfg.dataType);
+                            //if (response) { // in case of server returns empty body sometimes
+                           
+                                complete(status, statusText, _t.now() - start, response, responses.text, responseHeaders, cfg.dataType);
 
-							   complete = null;
+                               complete = null;
 
-                 		   //}
-                 	   }
+                            //}
+                        }
 
                     } catch (ex /*firefoxOrInvalidJSONFormatParserException*/) {
 
                        clearTimeout(timer);
 
-                 	   _l.error("caught exception " + [ex.type, ex.message].join(" ") + " in ioajax");
+                        _l.error("caught exception " + [ex.type, ex.message].join(" ") + " in ioajax");
 
-                 	   complete(-2, "exception " + ex, _t.now() - start);
+                        complete(-2, "exception " + ex, _t.now() - start);
 
-					   complete = null;
+                       complete = null;
 
                     }
 
                 };
                 
-				// register xhr handler
+                // register xhr handler
                 if (!cfg.async || xhr.readyState === 4) {
 
                     xhrcallback();
@@ -421,34 +421,34 @@
 
                 }
 
-			},
+            },
 
-			abort: function () {
+            abort: function () {
 
-			  if (xhrcallback) {
+              if (xhrcallback) {
 
-			      xhrcallback(0, 1);
+                  xhrcallback(0, 1);
 
-			  }
+              }
 
-			}
-		};
+            }
+        };
 
-	}; // ioajax
+    }; // ioajax
 
-	ioas3 = function (cfg) {
+    ioas3 = function (cfg) {
 
-	    var callback;
+        var callback;
 
-		return {
+        return {
 
-		   send: function (complete) {
+           send: function (complete) {
 
                var start = _t.now(),
-			       
-			       proxy = _b.get("solution", "flashmovie"),
+                   
+                   proxy = _b.get("solution", "flashmovie"),
 
-				   ticket = "as3callbacktkt" + (++ioas3tktcounter),
+                   ticket = "as3callbacktkt" + (++ioas3tktcounter),
 
                    timer = setTimeout(function () {
 
@@ -457,7 +457,7 @@
                          //@see ITEF Standard http://en.wikipedia.org/wiki/List_of_HTTP_status_codes
                          complete(599,"timeout",  _t.now() - start);
 
-						 complete = null;
+                         complete = null;
 
                      }, iotimeout);
 
@@ -466,15 +466,15 @@
 
                    var status,
 
-                	   statusText,
+                       statusText,
 
-                	   responseHeaders,
+                       responseHeaders,
 
-                	   responses,
+                       responses,
 
                        response,
 
-                	   xml;
+                       xml;
                
                     try{
                     
@@ -492,37 +492,37 @@
 
                             } else {
 
-                     		   status = this["httpStatus"];
+                                status = this["httpStatus"];
 
-                         	   statusText = this["httpStatus"] == 200 ? "ok" : "";
+                                statusText = this["httpStatus"] == 200 ? "ok" : "";
 
-                         	   responseHeaders = ""; //as3 don't support that this should be filled at future
+                                responseHeaders = ""; //as3 don't support that this should be filled at future
 
-                         	   responses = {}; // internal object
+                                responses = {}; // internal object
 
-                         	   responses.text = this["httpResponseText"];
+                                responses.text = this["httpResponseText"];
                     
-                         	   if (cfg.dataType.toLowerCase() == "json") { // parse to json object
+                                if (cfg.dataType.toLowerCase() == "json") { // parse to json object
 
-                         		   response = QQWB.JSON.fromString(responses.text);
+                                    response = QQWB.JSON.fromString(responses.text);
 
                                 } else if (cfg.dataType.toLowerCase() == "xml"){ // parse to xml object
 
-                         		   response = QQWB.XML.fromString(responses.text);
+                                    response = QQWB.XML.fromString(responses.text);
 
                                 } else {
 
-                         		   response = responses.text;
+                                    response = responses.text;
                                 }
                             }
                     
-                     	   //if (response) { // when server returns empty body sometimes, response will never called
+                            //if (response) { // when server returns empty body sometimes, response will never called
 
-                         	complete(status, statusText, _t.now() - start, response, responses.text, responseHeaders, cfg.dataType);
+                             complete(status, statusText, _t.now() - start, response, responses.text, responseHeaders, cfg.dataType);
 
-							complete = null;
+                            complete = null;
 
-                     	   //}
+                            //}
                         }
 
                      } catch (ex /*firefoxOrInvalidJSONFormatParserException*/) {
@@ -533,13 +533,13 @@
 
                         complete(-2, "exception " + ex, _t.now() - start);
 
-				        complete = null;
+                        complete = null;
 
                      }
 
                }; // end callback
                
-			   _b.put("io", ticket, callback);
+               _b.put("io", ticket, callback);
 
                if (proxy && proxy.httpRequest) {
                
@@ -551,37 +551,37 @@
                
                }
 
-		   }
+           }
 
-		  ,abort: function () {
+          ,abort: function () {
 
-			  if (callback) {
+              if (callback) {
 
-			      callback(0,1);
+                  callback(0,1);
 
-			  }
-		   }
-		};
-	}; // ioas3
+              }
+           }
+        };
+    }; // ioas3
 
-	
-	window.onFlashRequestComplete_8df046 = function (eventData) {
+    
+    window.onFlashRequestComplete_8df046 = function (eventData) {
 
-		var cb,
+        var cb,
 
-		    srcEvt;
+            srcEvt;
 
-		if (!eventData.ticket) {
+        if (!eventData.ticket) {
 
-			_l.error("ticket doesn't exists in response");
+            _l.error("ticket doesn't exists in response");
 
-			return;
+            return;
 
-		}
+        }
 
-		cb = _b.get("io", eventData.ticket);
+        cb = _b.get("io", eventData.ticket);
 
-		srcEvt = eventData.srcEvent;
+        srcEvt = eventData.srcEvent;
 
         if (!cb.readyState) {
 
@@ -615,43 +615,43 @@
             _b.del("io", eventData.ticket);
         }
         
-	}; // onFlashRequestComplete_8df046
+    }; // onFlashRequestComplete_8df046
 
-	apiResponder = function (deferred) {
+    apiResponder = function (deferred) {
 
-	    return function (status ,statusText ,elapsedtime ,parsedResponse ,responseText ,responseHeaders ,dataType) {
+        return function (status ,statusText ,elapsedtime ,parsedResponse ,responseText ,responseHeaders ,dataType) {
 
-	        var retcode,errorcode;
+            var retcode,errorcode;
 
             if (status !== 200) { // http error
 
-	            // error code over than 2000000 represent physicall error
-	      	    status = 2000000 + Math.abs((status ? status : 0));
+                // error code over than 2000000 represent physicall error
+                  status = 2000000 + Math.abs((status ? status : 0));
 
                 deferred.reject(status, statusText, elapsedtime, "");
 
-	        } else if ( typeof (retcode = QQWB.weibo.util.parseRetCode(responseText)) == "number" && 0 !== retcode ) { // api error
+            } else if ( typeof (retcode = QQWB.weibo.util.parseRetCode(responseText)) == "number" && 0 !== retcode ) { // api error
 
-	            errorcode = QQWB.weibo.util.parseErrorCode(responseText); 
+                errorcode = QQWB.weibo.util.parseErrorCode(responseText); 
 
-	            // error code over than 1000000 and less than 2000000 represent logic error
-	      	    status = 1000000 + retcode * 1000 + 500 + (errorcode ? errorcode : 0);
+                // error code over than 1000000 and less than 2000000 represent logic error
+                  status = 1000000 + retcode * 1000 + 500 + (errorcode ? errorcode : 0);
 
-	      	    deferred.reject(status,  QQWB.weibo.util.getErrorMessage(responseText), elapsedtime, responseText);
+                  deferred.reject(status,  QQWB.weibo.util.getErrorMessage(responseText), elapsedtime, responseText);
 
             } else {
 
-	      	    deferred.resolve(status, statusText, elapsedtime, parsedResponse, responseHeaders, dataType);
+                  deferred.resolve(status, statusText, elapsedtime, parsedResponse, responseHeaders, dataType);
 
             }
 
-	    };
+        };
 
     }; // apiResponder
 
-	ajaxResponder = function (deferred) {
+    ajaxResponder = function (deferred) {
 
-	    return function (status ,statusText ,elapsedtime ,parsedResponse ,responseText ,responseHeaders ,dataType) {
+        return function (status ,statusText ,elapsedtime ,parsedResponse ,responseText ,responseHeaders ,dataType) {
 
             if (status !== 200) {
 
@@ -663,18 +663,18 @@
 
             }
 
-	    };
+        };
 
    }; // ajaxResponder
 
 QQWB.extend("io", {
    /**
-	* Emulate AJAX request via flash
-	*
-	* @access public
-	* @param opts {Object} url configuration object
-	* @return {Object} promise object
-	*/
+    * Emulate AJAX request via flash
+    *
+    * @access public
+    * @param opts {Object} url configuration object
+    * @return {Object} promise object
+    */
   flashAjax: function (opts) {
 
        var deferred = QQWB.deferred.deferred(),
@@ -691,7 +691,7 @@ QQWB.extend("io", {
 
        ioas3(default_opts).send(apiResponder(deferred));
 
-	   return deferred.promise();
+       return deferred.promise();
    }
 
    ,ajaxWith: function (opts, responder, proto) {
@@ -718,7 +718,7 @@ QQWB.extend("io", {
 
             deferred.reject(-2, "invalid url", 0);
 
-		    return deferred.promise(proto);
+            return deferred.promise(proto);
 
         }
 
@@ -741,34 +741,34 @@ QQWB.extend("io", {
 
         ioajax(default_opts).send(responder(deferred));
 
-		return deferred.promise(proto);
+        return deferred.promise(proto);
     }
-	/**
-	 * Ajax request sender
-	 * 
-	 * @access public
-	 * @param opts {Object} ajax settings
-	 * @return {Object} deferred object
-	 */
+    /**
+     * Ajax request sender
+     * 
+     * @access public
+     * @param opts {Object} ajax settings
+     * @return {Object} deferred object
+     */
    ,apiAjax: function (opts) {
 
        return QQWB.io.ajaxWith(opts,apiResponder);
 
     }
 
-	/**
-	 * Ajax request sender
-	 *
-	 * Note:
-	 * 
-	 * same as ajax, the only difference is when ajax success, 
-	 * it only pass one response object as argument, this is the
-	 * function to expose to our root namespace
-	 * 
-	 * @access public
-	 * @param opts {Object} ajax settings
-	 * @return {Object} deferred object
-	 */
+    /**
+     * Ajax request sender
+     *
+     * Note:
+     * 
+     * same as ajax, the only difference is when ajax success, 
+     * it only pass one response object as argument, this is the
+     * function to expose to our root namespace
+     * 
+     * @access public
+     * @param opts {Object} ajax settings
+     * @return {Object} deferred object
+     */
    ,ajax: function (opts) {
 
        return QQWB.io.ajaxWith(opts, ajaxResponder, getIoProto());
@@ -808,7 +808,7 @@ QQWB.extend("io", {
 
            deferred.reject(-2, "invalid url", 0);
 
-		   return deferred.promise(proto);
+           return deferred.promise(proto);
 
        }
 
@@ -852,7 +852,7 @@ QQWB.extend("io", {
 
             _oldcallback = window.callbackName,
 
-			timeCost,
+            timeCost,
 
             default_opts = {
 
@@ -872,7 +872,7 @@ QQWB.extend("io", {
 
             deferred.reject(-2, "invalid url", 0);
 
-		    return deferred.promise(proto);
+            return deferred.promise(proto);
 
         }
 
@@ -884,9 +884,9 @@ QQWB.extend("io", {
 
             var response = data;
 
-			if (_s.isString(data)) {
+            if (_s.isString(data)) {
 
-		    	try {
+                try {
 
                     if (default_opts.dataType.toLowerCase() === "json") {
 
@@ -898,15 +898,15 @@ QQWB.extend("io", {
 
                     }
 
-		    	} catch (ex) {
+                } catch (ex) {
 
                     _l.error("caught exception " + [ex.type, ex.message].join(" ") + " in ioajax");
 
                     deferred.reject(-2, "exception " + ex, timeCost);
 
-		    	}
+                }
 
-			}
+            }
 
             deferred.resolve(response, timeCost);
 
@@ -922,7 +922,7 @@ QQWB.extend("io", {
 
             }
 
-			timeCost = elapsedtime;
+            timeCost = elapsedtime;
 
         });
 

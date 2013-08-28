@@ -14,6 +14,7 @@
  * @module String
  * @requires base
  */
+/*jslint laxcomma:true*/
 QQWB.extend("String",{
     _trimLeft: /^\s+/
    ,_trimRight: /\s+$/
@@ -36,7 +37,7 @@ QQWB.extend("String",{
      * @return {String}
      */
    ,ltrim: function (source) {
-       return source == null ? "" : source.toString().replace(this._trimLeft,"");
+       return !source ? "" : source.toString().replace(this._trimLeft,"");
     }
 
     /**
@@ -47,7 +48,7 @@ QQWB.extend("String",{
      * @return {String}
      */
    ,rtrim: function (source) {
-       return source == null ? "" : source.toString().replace(this._trimRight,"");
+       return !source ? "" : source.toString().replace(this._trimRight,"");
     }
 
     /**
@@ -58,9 +59,9 @@ QQWB.extend("String",{
      * @return {String}
      */
     ,trim: String.prototype.trim ? function (source) {
-            return source == null ? "" : String.prototype.trim.call(source);
+            return !source ? "" : String.prototype.trim.call(source);
         } : function (source) {
-            return source == null ? "" : source.toString().replace(this._trimLeft,"").replace(this._trimRight,"");
+            return !source ? "" : source.toString().replace(this._trimLeft,"").replace(this._trimRight,"");
         } 
 
 	/**
@@ -71,9 +72,9 @@ QQWB.extend("String",{
 	 * @return {Boolean}
 	 */
 	,startsWith: String.prototype.startsWith ? function (source, needle) {
-			return source == null ? false : String.prototype.startsWith.call(source, needle);
+			return !source ? false : String.prototype.startsWith.call(source, needle);
 		} : function (source, needle) {
-			return source == null ? false : source.toString().indexOf(needle) == 0;
+			return !source ? false : source.toString().indexOf(needle) === 0;
 		} 
 
 	/**
@@ -84,8 +85,45 @@ QQWB.extend("String",{
 	 * @return {Boolean}
 	 */
 	,endsWith: String.prototype.endsWith ? function (source, needle) {
-			return source == null ? false : String.prototype.endsWith.call(source, needle);
+			return !source ? false : String.prototype.endsWith.call(source, needle);
 		} : function (source, needle) {
-			return source == null ? false : source.toString().lastIndexOf(needle) >= 0 && source.toString().lastIndexOf(needle) + needle.length == source.length;
+			return !source ? false : source.toString().lastIndexOf(needle) >= 0 && source.toString().lastIndexOf(needle) + needle.length == source.length;
 		} 
+    /**
+     * 全部替换
+     *
+     * @param str {String} 原始字符串
+     * @param source {String} 要被替换的字符串
+     * @param target {String} 替换后的字符串
+     * @return {String}
+     */
+    ,replaceAll: function (str, source, target) {
+        var pre;
+        str = str || '';
+        do {
+            pre = str;
+            str = str.replace(source, target);
+        } while (pre != str);
+        return str;
+    }
+
+    /**
+     * 按照指定的分隔符把字符串分割成数组，支持转义
+     *
+     * @access public
+     * @param seprator {String} 分隔符，如 '|'
+     * @param str {String} 待分割的字符串
+     * @return {Array}
+     */
+    ,splitby: function(seprator, str) {
+        var _s = QQWB.String,
+            fake = '[****]';
+        str = _s.replaceAll(str, '\\' + seprator, fake);
+        str = str.split(seprator);
+        for (var i=0,l=str.length;i<l;i++) {
+            str[i] = _s.replaceAll(str[i],fake,'|');
+        }
+        return str;
+    }
+
 });

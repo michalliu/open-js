@@ -5,8 +5,6 @@ FBL.ns(function() { with (FBL) {
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-var ElementCache = Firebug.Lite.Cache.Element;
-
 var insertSliceSize = 18;
 var insertInterval = 40;
 
@@ -31,7 +29,7 @@ var ignoreVars =
 };
 
 if (Firebug.ignoreFirebugElements)
-    ignoreVars[Firebug.Lite.Cache.ID] = 1;
+    ignoreVars[cacheID] = 1;
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
@@ -53,6 +51,20 @@ var RowTag =
             TAG("$member.tag", {object: "$member.value"})
         )
     );
+
+// TODO: xxxpedro localization
+var oSTR =
+{
+    NoMembersWarning: "There are no properties to show for this object.",
+    EmptyStyleSheet: "There are no rules in this stylesheet.",
+    EmptyElementCSS: "This element has no style rules.",
+    AccessRestricted: "Access to restricted URI denied."
+};
+
+FBL.$STR = function(name)
+{
+    return oSTR.hasOwnProperty(name) ? oSTR[name] : name;
+};
 
 var WatchRowTag =
     TR({"class": "watchNewRow", level: 0},
@@ -774,8 +786,7 @@ Firebug.DOMBasePanel.prototype = extend(Firebug.Panel,
             if (state.propertyPath)
                 this.propertyPath = state.propertyPath;
 
-            var defaultObject = this.getDefaultSelection(this.context);
-            var selectObject = defaultObject; 
+            var selectObject = defaultObject = this.getDefaultSelection(this.context);
 
             if (state.firstSelection)
             {
@@ -1293,7 +1304,7 @@ var getMembers = function getMembers(object, level)  // we expect object to be u
             }
             else if (isFunction(val))
             {
-                if (isClassFunction(val) && !(name in domMembers))
+                if (isClassFunction(val))
                     addMember("userClass", userClasses, name, val, level);
                 else if (name in domMembers)
                     addMember("domFunction", domFuncs, name, val, level, domMembers[name]);
@@ -1314,7 +1325,7 @@ var getMembers = function getMembers(object, level)  // we expect object to be u
                 
                 var prefix = "";
 
-                if (name in domMembers && !(name in domConstantMap))
+                if (name in domMembers)
                     addMember("dom", domProps, (prefix+name), val, level, domMembers[name]);
                 else if (name in domConstantMap)
                     addMember("dom", domConstants, (prefix+name), val, level);
@@ -1585,9 +1596,9 @@ DOMSidePanel.prototype = extend(Firebug.DOMBasePanel.prototype,
 
         var object = target.repObject;
         
-        if (instanceOf(object, "Element"))
+        if (instanceOf(object, "Element") && object[cacheID])
         {
-            Firebug.HTML.selectTreeNode(ElementCache(object));
+            Firebug.HTML.selectTreeNode(object[cacheID]);
         }
         else
         {
@@ -1608,9 +1619,9 @@ DOMSidePanel.prototype = extend(Firebug.DOMBasePanel.prototype,
         
         if(!object) return;
         
-        if (instanceOf(object, "Element"))
+        if (instanceOf(object, "Element") && object[cacheID])
         {
-            Firebug.HTML.selectTreeNode(ElementCache(object));
+            Firebug.HTML.selectTreeNode(object[cacheID]);
         }
         else
         {
@@ -1660,7 +1671,7 @@ DOMSidePanel.prototype = extend(Firebug.DOMBasePanel.prototype,
         addEvent(this.panelNode, "click", this.onClick);
         
         // TODO: xxxpedro css2
-        var selection = ElementCache.get(FirebugChrome.selectedHTMLElementId);
+        var selection = documentCache[FirebugChrome.selectedHTMLElementId];
         if (selection)
             this.select(selection, true);
     },

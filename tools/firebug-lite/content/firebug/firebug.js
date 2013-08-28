@@ -1,10 +1,13 @@
 /* See license.txt for terms of usage */
 
-FBL.ns( /** @scope ns-firebug */ function() { with (FBL) {
+FBL.ns(function() { with (FBL) {
 // ************************************************************************************************
 
 // ************************************************************************************************
 // Globals
+
+FBL.cacheID = "firebug" + new Date().getTime();
+FBL.documentCache = {};
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 // Internals
@@ -20,15 +23,11 @@ var parentPanelMap = {};
 // ************************************************************************************************
 // Firebug
 
-/**
- * @namespace describe Firebug
- * @exports window.Firebug as Firebug 
- */
 window.Firebug = FBL.Firebug =  
 {
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-    version: "Firebug Lite 1.3.2",
-    revision: "$Revision: 9759 $",
+    version:  "Firebug Lite 1.3.0b2",
+    revision: "$Revision$",
     
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
     modules: modules,
@@ -85,8 +84,15 @@ window.Firebug = FBL.Firebug =
             }
         }
         
-        Firebug.Lite.Cache.Element.clear();
-        Firebug.Lite.Cache.StyleSheet.clear();
+        for(var name in documentCache)
+        {
+            documentCache[name].removeAttribute(cacheID);
+            documentCache[name] = null;
+            delete documentCache[name];
+        }
+        
+        documentCache = null;
+        delete FBL.documentCache;
         
         Firebug.browser = null;
         Firebug.context = null;
@@ -163,8 +169,6 @@ window.Firebug = FBL.Firebug =
                 {
                     FBTrace.sysout("firebug.getRep FAILS: ", exc.message || exc);
                     FBTrace.sysout("firebug.getRep reps["+i+"/"+reps.length+"]: Rep="+reps[i].className);
-                    // TODO: xxxpedro add trace to FBTrace logs like in Firebug
-                    //firebug.trace();
                 }
             }
         }
@@ -275,13 +279,13 @@ window.Firebug = FBL.Firebug =
                 if (type == "boolean" || type == "number")
                 {
                     json[++jl] = '":';
-                    json[++jl] = value;
+                    json[++jl] = value 
                     json[++jl] = ',';
                 }
                 else
                 {
                     json[++jl] = '":"';
-                    json[++jl] = value;
+                    json[++jl] = value 
                     json[++jl] = '",';
                 }
             }
@@ -303,7 +307,7 @@ Firebug.restorePrefs();
 
 if (!Env.Options.enablePersistent || 
      Env.Options.enablePersistent && Env.isChromeContext || 
-     Env.isDebugMode)
+     Env.isDevelopmentMode )
         Env.browser.window.Firebug = FBL.Firebug; 
 
 
@@ -312,64 +316,19 @@ if (!Env.Options.enablePersistent ||
 
 FBL.cacheDocument = function cacheDocument()
 {
-    var ElementCache = Firebug.Lite.Cache.Element;
     var els = Firebug.browser.document.getElementsByTagName("*");
     for (var i=0, l=els.length, el; i<l; i++)
     {
         el = els[i];
-        ElementCache(el);
+        el[cacheID] = i;
+        documentCache[i] = el;
     }
 };
-
-// ************************************************************************************************
-
-/**
- * @class
- *  
- * Support for listeners registration. This object also extended by Firebug.Module so,
- * all modules supports listening automatically. Notice that array of listeners
- * is created for each intance of a module within initialize method. Thus all derived
- * module classes must ensure that Firebug.Module.initialize method is called for the
- * super class.
- */
-Firebug.Listener = function()
-{
-    // The array is created when the first listeners is added.
-    // It can't be created here since derived objects would share
-    // the same array.
-    this.fbListeners = null;
-};
-
-Firebug.Listener.prototype =
-{
-    addListener: function(listener)
-    {
-        if (!this.fbListeners)
-            this.fbListeners = []; // delay the creation until the objects are created so 'this' causes new array for each module
-
-        this.fbListeners.push(listener);
-    },
-
-    removeListener: function(listener)
-    {
-        remove(this.fbListeners, listener);  // if this.fbListeners is null, remove is being called with no add
-    }
-};
-
-// ************************************************************************************************
-
 
 // ************************************************************************************************
 // Module
 
-/**
- * @module Base class for all modules. Every derived module object must be registered using
- * <code>Firebug.registerModule</code> method. There is always one instance of a module object
- * per browser window.
- * @extends Firebug.Listener 
- */
-Firebug.Module = extend(new Firebug.Listener(),
-/** @extend Firebug.Module */
+Firebug.Module =
 {
     /**
      * Called when the window is opened.
@@ -440,16 +399,11 @@ Firebug.Module = extend(new Firebug.Listener(),
     getObjectByURL: function(context, url)
     {
     }
-});
+};
 
 // ************************************************************************************************
 // Panel
 
-/**
- * @panel Base class for all panels. Every derived panel must define a constructor and
- * register with "Firebug.registerPanel" method. An instance of the panel
- * object is created by the framework for each browser tab where Firebug is activated.
- */
 Firebug.Panel =
 {
     name: "HelloWorld",
@@ -602,12 +556,12 @@ Firebug.Panel =
             // create SidePanel
         }
         
+        var contentNode = this.contentNode = createElement("div");
+        this.panelNode.appendChild(contentNode);
+        
         this.containerNode = this.panelNode.parentNode;
         
         if (FBTrace.DBG_INITIALIZE) FBTrace.sysout("Firebug.Panel.create", this.name);
-        
-        // xxxpedro contextMenu
-        this.onContextMenu = bind(this.onContextMenu, this);
         
         /*
         this.context = context;
@@ -642,6 +596,7 @@ Firebug.Panel =
         
         this.tabNode = null;
         this.panelNode = null;
+        this.contentNode = null;
         this.containerNode = null;
         
         this.toolButtonsNode = null;
@@ -688,27 +643,11 @@ Firebug.Panel =
         // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
         // restore persistent state
         this.containerNode.scrollTop = this.lastScrollTop;
-        
-        // xxxpedro contextMenu
-        addEvent(this.containerNode, "contextmenu", this.onContextMenu);
-        
-        
-        /// TODO: xxxpedro infoTip Hack
-        Firebug.chrome.currentPanel = 
-                Firebug.chrome.selectedPanel && Firebug.chrome.selectedPanel.sidePanelBar ?
-                Firebug.chrome.selectedPanel.sidePanelBar.selectedPanel : 
-                Firebug.chrome.selectedPanel;
-        
-        Firebug.showInfoTips = true;
-        Firebug.InfoTip.initializeBrowser(Firebug.chrome);
     },
     
     shutdown: function()
     {
         if (FBTrace.DBG_INITIALIZE) FBTrace.sysout("Firebug.Panel.shutdown", this.name);
-        
-        /// TODO: xxxpedro infoTip Hack
-        Firebug.InfoTip.uninitializeBrowser(Firebug.chrome);
         
         if (Firebug.chrome.largeCommandLineVisible)
             Firebug.chrome.hideLargeCommandLine();
@@ -725,9 +664,6 @@ Firebug.Panel =
         
         // store persistent state
         this.lastScrollTop = this.containerNode.scrollTop;
-        
-        // xxxpedro contextMenu
-        removeEvent(this.containerNode, "contextmenu", this.onContextMenu);
     },
 
     detach: function(oldChrome, newChrome)
@@ -814,7 +750,7 @@ Firebug.Panel =
             if (!this.context.browser) // XXXjjb this is bug. Somehow the panel context is not FirebugContext.
             {
                 if (FBTrace.DBG_ERRORS)
-                    FBTrace.sysout("firebug.Panel showToolbarButtons this.context has no browser, this:", this);
+                    FBTrace.sysout("firebug.Panel showToolbarButtons this.context has no browser, this:", this)
 
                 return;
             }
@@ -904,284 +840,29 @@ Firebug.Panel =
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-    search: function(text, reverse)
-    {
-    },
-
-    /**
-     * Retrieves the search options that this modules supports.
-     * This is used by the search UI to present the proper options.
-     */
-    getSearchOptionsMenuItems: function()
-    {
-        return [
-            Firebug.Search.searchOptionMenu("search.Case Sensitive", "searchCaseSensitive")
-        ];
-    },
-
-    /**
-     * Navigates to the next document whose match parameter returns true.
-     */
-    navigateToNextDocument: function(match, reverse)
-    {
-        // This is an approximation of the UI that is displayed by the location
-        // selector. This should be close enough, although it may be better
-        // to simply generate the sorted list within the module, rather than
-        // sorting within the UI.
-        var self = this;
-        function compare(a, b) {
-            var locA = self.getObjectDescription(a);
-            var locB = self.getObjectDescription(b);
-            if(locA.path > locB.path)
-                return 1;
-            if(locA.path < locB.path)
-                return -1;
-            if(locA.name > locB.name)
-                return 1;
-            if(locA.name < locB.name)
-                return -1;
-            return 0;
-        }
-        var allLocs = this.getLocationList().sort(compare);
-        for (var curPos = 0; curPos < allLocs.length && allLocs[curPos] != this.location; curPos++);
-
-        function transformIndex(index) {
-            if (reverse) {
-                // For the reverse case we need to implement wrap around.
-                var intermediate = curPos - index - 1;
-                return (intermediate < 0 ? allLocs.length : 0) + intermediate;
-            } else {
-                return (curPos + index + 1) % allLocs.length;
-            }
-        };
-
-        for (var next = 0; next < allLocs.length - 1; next++)
-        {
-            var object = allLocs[transformIndex(next)];
-
-            if (match(object))
-            {
-                this.navigate(object);
-                return object;
-            }
-        }
-    },
-
-    // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-
-    // Called when "Options" clicked. Return array of
-    // {label: 'name', nol10n: true,  type: "checkbox", checked: <value>, command:function to set <value>}
-    getOptionsMenuItems: function()
+    getDefaultSelection: function(context)
     {
         return null;
     },
-
-    /*
-     * Called by chrome.onContextMenu to build the context menu when this panel has focus.
-     * See also FirebugRep for a similar function also called by onContextMenu
-     * Extensions may monkey patch and chain off this call
-     * @param object: the 'realObject', a model value, eg a DOM property
-     * @param target: the HTML element clicked on.
-     * @return an array of menu items.
-     */
-    getContextMenuItems: function(object, target)
-    {
-        return [];
-    },
-
-    getBreakOnMenuItems: function()
-    {
-        return [];
-    },
-
-    getEditor: function(target, value)
-    {
-    },
-
-    // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-
-    getDefaultSelection: function()
-    {
-        return null;
-    },
-
-    browseObject: function(object)
-    {
-    },
-
-    getPopupObject: function(target)
-    {
-        return Firebug.getRepObject(target);
-    },
-
-    getTooltipObject: function(target)
-    {
-        return Firebug.getRepObject(target);
-    },
-
-    showInfoTip: function(infoTip, x, y)
-    {
-
-    },
-
-    getObjectPath: function(object)
-    {
-        return null;
-    },
-
-    // An array of objects that can be passed to getObjectLocation.
-    // The list of things a panel can show, eg sourceFiles.
-    // Only shown if panel.location defined and supportsObject true
-    getLocationList: function()
-    {
-        return null;
-    },
-
-    getDefaultLocation: function()
-    {
-        return null;
-    },
-
-    getObjectLocation: function(object)
-    {
-        return "";
-    },
-
-    // Text for the location list menu eg script panel source file list
-    // return.path: group/category label, return.name: item label
-    getObjectDescription: function(object)
-    {
-        var url = this.getObjectLocation(object);
-        return FBL.splitURLBase(url);
-    },
-
-    /*
-     *  UI signal that a tab needs attention, eg Script panel is currently stopped on a breakpoint
-     *  @param: show boolean, true turns on.
-     */
-    highlight: function(show)
-    {
-        var tab = this.getTab();
-        if (!tab)
-            return;
-
-        if (show)
-            tab.setAttribute("highlight", "true");
-        else
-            tab.removeAttribute("highlight");
-    },
-
-    getTab: function()
-    {
-        var chrome = Firebug.chrome;
-
-        var tab = chrome.$("fbPanelBar2").getTab(this.name);
-        if (!tab)
-            tab = chrome.$("fbPanelBar1").getTab(this.name);
-        return tab;
-    },
-
-    // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-    // Support for Break On Next
-
-    /**
-     * Called by the framework when the user clicks on the Break On Next button.
-     * @param {Boolean} armed Set to true if the Break On Next feature is
-     * to be armed for action and set to false if the Break On Next should be disarmed.
-     * If 'armed' is true, then the next call to shouldBreakOnNext should be |true|.
-     */
-    breakOnNext: function(armed)
-    {
-    },
-
-    /**
-     * Called when a panel is selected/displayed. The method should return true
-     * if the Break On Next feature is currently armed for this panel.
-     */
-    shouldBreakOnNext: function()
-    {
-        return false;
-    },
-
-    /**
-     * Returns labels for Break On Next tooltip (one for enabled and one for disabled state).
-     * @param {Boolean} enabled Set to true if the Break On Next feature is
-     * currently activated for this panel.
-     */
-    getBreakOnNextTooltip: function(enabled)
-    {
-        return null;
-    },
-
-    // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
     
-    // xxxpedro contextMenu
-    onContextMenu: function(event)
-    {
-        if (!this.getContextMenuItems)
-            return;
-        
-        cancelEvent(event, true);
+    // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-        var target = event.target || event.srcElement;
-        
-        var menu = this.getContextMenuItems(this.selection, target);
-        if (!menu) 
-            return;
-        
-        var contextMenu = new Menu(
-        {
-            id: "fbPanelContextMenu",
-            
-            items: menu
-        });
-        
-        contextMenu.show(event.clientX, event.clientY);
-        
-        return true;
-        
-        /*
-        // TODO: xxxpedro move code to somewhere. code to get cross-browser
-        // window to screen coordinates
-        var box = Firebug.browser.getElementPosition(Firebug.chrome.node);
-        
-        var screenY = 0;
-        
-        // Firefox
-        if (typeof window.mozInnerScreenY != "undefined")
-        {
-            screenY = window.mozInnerScreenY; 
-        }
-        // Chrome
-        else if (typeof window.innerHeight != "undefined")
-        {
-            screenY = window.outerHeight - window.innerHeight;
-        }
-        // IE
-        else if (typeof window.screenTop != "undefined")
-        {
-            screenY = window.screenTop;
-        }
-        
-        contextMenu.show(event.screenX-box.left, event.screenY-screenY-box.top);
-        /**/
+    search: function(text)
+    {
     }
-    
+
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 };
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-
-/**
+/*
  * MeasureBox
  * To get pixels size.width and size.height:
  * <ul><li>     this.startMeasuring(view); </li>
  *     <li>     var size = this.measureText(lineNoCharsSpacer); </li>
  *     <li>     this.stopMeasuring(); </li>
  * </ul>
- *  
- * @namespace
  */
 Firebug.MeasureBox =
 {
@@ -1266,30 +947,7 @@ if (FBL.domplate) Firebug.Rep = domplate(
 
         var re = /\[object (.*?)\]/;
         var m = re.exec(label);
-        
-        ///return m ? m[1] : label;
-        
-        // if the label is in the "[object TYPE]" format return its type
-        if (m)
-        {
-            return m[1];
-        }
-        // if it is IE we need to handle some special cases
-        else if (
-                // safeToString() fails to recognize some objects in IE
-                isIE && 
-                // safeToString() returns "[object]" for some objects like window.Image 
-                (label == "[object]" || 
-                // safeToString() returns undefined for some objects like window.clientInformation 
-                typeof object == "object" && typeof label == "undefined")
-            )
-        {
-            return "Object";
-        }
-        else
-        {
-            return label;
-        }
+        return m ? m[1] : label;
     },
 
     getTooltip: function(object)

@@ -230,11 +230,28 @@ Firebug.CommandLine = extend(Firebug.Module,
         
         _stack(command);
         
-        Firebug.Console.log(commandPrefix + " " + stripNewLines(command), Firebug.browser, "command", FirebugReps.Text);
+        // TODO: console2 - remove this when console2 is finished
+        if (Firebug.Console2)
+            Firebug.Console.log(commandPrefix + " " + stripNewLines(command), Firebug.browser, "command", FirebugReps.Text);
+        else
+            Firebug.Console.writeMessage(['<span>&gt;&gt;&gt;</span> ', escapeHTML(command)], "command");
         
         var result = this.evaluate(command);
         
-        Firebug.Console.log(result);
+        // avoid logging the console command twice, in case it is a console function
+        // that is being executed in the command line
+        if (result != Firebug.Console.LOG_COMMAND)
+        {
+            // TODO: console2 - remove this when console2 is finished
+            if (Firebug.Console2)
+                Firebug.Console.log(result);
+            else
+            {
+                var html = [];
+                Firebug.Reps.appendObject(result, html)
+                Firebug.Console.writeMessage(html, "command");
+            }
+        }
     },
     
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -380,17 +397,17 @@ Firebug.CommandLine = extend(Firebug.Module,
     
     onError: function(msg, href, lineNo)
     {
-        href = href || "";
+        var html = [];
         
         var lastSlash = href.lastIndexOf("/");
         var fileName = lastSlash == -1 ? href : href.substr(lastSlash+1);
-        var html = [
+        
+        html.push(
             '<span class="errorMessage">', msg, '</span>', 
             '<div class="objectBox-sourceLink">', fileName, ' (line ', lineNo, ')</div>'
-          ];
+          );
         
-        // TODO: xxxpedro ajust to Console2
-        //Firebug.Console.writeRow(html, "error");
+        Firebug.Console.writeRow(html, "error");
     },
     
     onKeyDown: function(e)
@@ -502,28 +519,9 @@ var CommandLineAPI =
     
     $1: null,
     
-    dir: function(o)
-    {
-        Firebug.Console.log(o, Firebug.context, "dir", Firebug.DOMPanel.DirTable);
-    },
+    dir: Firebug.Console.dir,
 
-    dirxml: function(o)
-    {
-        ///if (o instanceof Window)
-        if (instanceOf(o, "Window"))
-            o = o.document.documentElement;
-        ///else if (o instanceof Document)
-        else if (instanceOf(o, "Document"))
-            o = o.documentElement;
-
-        // TODO: xxxpedro html3
-        ///Firebug.Console.log(o, Firebug.context, "dirxml", Firebug.HTMLPanel.SoloElement);
-        var div = Firebug.Console.log(o, Firebug.context, "dirxml");
-        var html = [];
-        Firebug.Reps.appendNode(o, html);
-        div.innerHTML = html.join("");
-        
-    }
+    dirxml: Firebug.Console.dirxml
 };
 
 // ************************************************************************************************

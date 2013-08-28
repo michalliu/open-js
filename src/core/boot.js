@@ -25,43 +25,43 @@
 
 QQWB.bigtable.put('boot','solution', function () {
 
-	var _ = QQWB,
+    var _ = QQWB,
 
-	    _b = _.bigtable,
+        _b = _.bigtable,
 
-		_l = _.log,
+        _l = _.log,
 
-		_s = _.String,
+        _s = _.String,
 
-		_br = _.browser,
+        _br = _.browser,
 
-		tokenReady,
+        tokenReady,
 
-		everythingReady,
-		
-		proxyFrameImplementation,
+        everythingReady,
+        
+        proxyFrameImplementation,
 
-		flashAs3Implementation,
-		
-		setupHtml5Implementation,
+        flashAs3Implementation,
+        
+        setupHtml5Implementation,
 
-		setupInnerAuthImplementation,
+        setupInnerAuthImplementation,
 
-		setupFlashAs3Implementation,
+        setupFlashAs3Implementation,
 
-	    crossdomainImplementationError,
+        crossdomainImplementationError,
 
         implementationTimeout = 15,
 
-		crossdomainMethod;
+        crossdomainMethod;
 
-	tokenReady = _b.put("boot", "tokenready", QQWB.door.door(function (reason) {
+    tokenReady = _b.put("boot", "tokenready", QQWB.door.door(function (reason) {
 
-		_l.debug("tokenReady is locked" + (reason ? "," + reason : ""));
+        _l.debug("tokenReady is locked" + (reason ? "," + reason : ""));
 
     }, function (reason) {
 
-		_l.debug("tokenReady is unlocked" + (reason ? "," + reason : ""));
+        _l.debug("tokenReady is unlocked" + (reason ? "," + reason : ""));
 
         if (tokenReady.isOpen()) {
 
@@ -73,13 +73,13 @@ QQWB.bigtable.put('boot','solution', function () {
 
     }));
 
-	everythingReady = _b.put("boot", "everythingready", QQWB.door.door(function (reason) {
+    everythingReady = _b.put("boot", "everythingready", QQWB.door.door(function (reason) {
 
-		_l.debug("everythingReady is locked" + (reason ? "," + reason : ""));
+        _l.debug("everythingReady is locked" + (reason ? "," + reason : ""));
 
     }, function (reason) {
 
-		_l.debug("everythingReady is unlocked" + (reason ? "," + reason : ""));
+        _l.debug("everythingReady is unlocked" + (reason ? "," + reason : ""));
 
         if (everythingReady.isOpen()) {
 
@@ -97,11 +97,11 @@ QQWB.bigtable.put('boot','solution', function () {
 
     everythingReady.lock("wait token ready"); // token must be ready
 
-	if (!_b.get("document", "ready")) {
+    if (!_b.get("document", "ready")) {
 
         everythingReady.lock("wait document ready");
 
-	}
+    }
     
     _.bind(_b.get("nativeevent","tokenready"), function () {
 
@@ -109,40 +109,40 @@ QQWB.bigtable.put('boot','solution', function () {
 
     });
     
-	// post message implementation
-	proxyFrameImplementation = function (html5mode) {
+    // post message implementation
+    proxyFrameImplementation = function (html5mode) {
 
-		var _ = QQWB,
+        var _ = QQWB,
 
-		    _l = _.log,
+            _l = _.log,
 
-			_d = _.dom,
+            _d = _.dom,
 
-			_b = _.bigtable,
+            _b = _.bigtable,
 
-			p  = _b.get("uri","html5proxy"),
+            p  = _b.get("uri","html5proxy"),
 
-			sd =  _b.get("solution","deferred"),
-			
+            sd =  _b.get("solution","deferred"),
+            
             timer;
 
-		if (html5mode) {
+        if (html5mode) {
 
-			var messageHandler;
+            var messageHandler;
 
-	     	messageHandler = function (e) {
+             messageHandler = function (e) {
 
                  if (p.indexOf(e.origin) !== 0) {
 
-	                 _l.warn("ignore a message from " + e.origin);
+                     _l.warn("ignore a message from " + e.origin);
 
-	     		} else {
+                 } else {
 
-	     			if (e.data === "success") {
+                     if (e.data === "success") {
 
                          _l.info("proxy frame was successfully loaded for html5 solution");
 
-	     				sd.resolve();
+                         sd.resolve();
 
                          if (window.addEventListener) {
 
@@ -156,16 +156,16 @@ QQWB.bigtable.put('boot','solution', function () {
 
                          messageHandler = null;
 
-	     			} else {
+                     } else {
 
-	                     _l.warn("ignore wired message from " + e.origin);
+                         _l.warn("ignore wired message from " + e.origin);
 
-	     			}
+                     }
 
-	     		}
-	    	};
+                 }
+            };
 
-	    	if (window.addEventListener) {
+            if (window.addEventListener) {
 
                 window.addEventListener("message", messageHandler, false);
 
@@ -175,44 +175,57 @@ QQWB.bigtable.put('boot','solution', function () {
 
             }
 
-		} else {
+        } else {
 
-			_.once(_b.get("innerauth","eventproxyready"), function () {
+            _.once(_b.get("innerauth","eventproxyready"), function () {
 
                 _l.info("proxy frame was successfully loaded for inner auth");
 
-	     		sd.resolve();
+                 sd.resolve();
 
-			});
+            });
 
-		}
+        }
 
-		_d.ready(function () {
+        _d.ready(function () {
 
-			var proxyframe,
+            var proxyframe,
 
-			    id = "openjsframe_" + _.uid(5),
+                id = "openjsframe_" + _.uid(5),
 
-		    	onProxyLoad;
+                onProxyLoad;
 
-			_l.info ("loading proxy frame ...");
+            _l.info ("loading proxy frame ...");
 
-			//@see http://www.cnblogs.com/demix/archive/2009/09/16/1567906.html
-			//@see http://msdn.microsoft.com/en-us/library/ms535258(v=vs.85).aspx
-			//@see http://msdn.microsoft.com/en-us/library/cc197055%28VS.85%29.aspx
-			proxyframe = document.createElement("iframe");
+            //@see http://www.cnblogs.com/demix/archive/2009/09/16/1567906.html
+            //@see http://msdn.microsoft.com/en-us/library/ms535258(v=vs.85).aspx
+            //@see http://msdn.microsoft.com/en-us/library/cc197055%28VS.85%29.aspx
+            proxyframe = document.createElement("iframe");
 
-			proxyframe.id = id;
+            proxyframe.id = id;
 
-			proxyframe.src = p;
+            proxyframe.src = p;
 
-			proxyframe.style.display = "none";
+            proxyframe.style.display = "none";
 
-			onProxyLoad = function () {
+            onProxyLoad = function () {
 
                 timer && clearTimeout(timer);
 
-			}
+                setTimeout(function () {
+                    // should resolved here otherwise there's a problem
+                    if (!sd.isResolved()) {
+
+                        sd.reject(-6, "can't load proxy frame from path " + p + ",request timeout");
+
+                        _l.critical("proxy frame error");
+                    }
+
+                // frame onload means success or an error(404)
+                // if success we should give some time to make sure the success message is posted
+                }, 500);
+
+            };
 
             if (proxyframe.attachEvent){
 
@@ -225,120 +238,120 @@ QQWB.bigtable.put('boot','solution', function () {
             }
 
             // max wait 15 seconds to load proxy frame
-			timer = setTimeout (function () {
+            timer = setTimeout (function () {
 
-				if (!sd.isResolved()) {
+                if (!sd.isResolved()) {
 
-	                sd.reject(-6, "can't load proxy frame from path " + p + ",request timeout");
+                    sd.reject(-6, "can't load proxy frame from path " + p + ",request timeout");
 
-					_l.critical("proxy frame error");
-				}
+                    _l.critical("proxy frame error");
+                }
 
-			}, implementationTimeout * 1000);
+            }, implementationTimeout * 1000);
 
             // sometimes webkit will force to cancel the iframe load request
             // due the signal thread mode in javascript
             // we just to ensure the the frame will be loaded
             setTimeout(function () {
 
-			    document.body.appendChild(proxyframe);
+                document.body.appendChild(proxyframe);
 
             },0);
 
-			_b.put("solution", "frame", proxyframe);
+            _b.put("solution", "frame", proxyframe);
 
-		});
+        });
 
-	}; // end html5 and inner auth implementation
+    }; // end html5 and inner auth implementation
 
-	flashAs3Implementation = function () {
-		
-		var _ = QQWB,
+    flashAs3Implementation = function () {
+        
+        var _ = QQWB,
 
-		    _l = _.log,
+            _l = _.log,
 
-			_b = _.bigtable,
+            _b = _.bigtable,
 
-			_br = _.browser,
+            _br = _.browser,
 
-			_d = _.dom,
+            _d = _.dom,
 
-			_f = _.flash,
+            _f = _.flash,
 
-			sd =  _b.get("solution","deferred"),
+            sd =  _b.get("solution","deferred"),
 
-			p = _b.get("uri","flashas3proxy"),
+            p = _b.get("uri","flashas3proxy"),
 
-			timer,
+            timer,
 
-			undef;
+            undef;
 
-		_d.ready ( function () {
+        _d.ready ( function () {
 
-			var invisible,
+            var invisible,
 
-			    movie,
+                movie,
 
-				id = "openjsflash_" + _.uid(5),
+                id = "openjsflash_" + _.uid(5),
 
-			    jscallbackname = _b.get("solution","jscallbackname");
+                jscallbackname = _b.get("solution","jscallbackname");
 
-	        _l.info ("init flash as3 solution ...");
+            _l.info ("init flash as3 solution ...");
 
-			window[jscallbackname] = function () { // will be invoke when flash loaded
-				 
+            window[jscallbackname] = function () { // will be invoke when flash loaded
+                 
                  timer && clearTimeout(timer);
 
                  movie = window[id] || document.getElementById(id);
 
-				 if (!movie) {
+                 if (!movie) {
 
-				     _l.critical("proxy swf has unexpected error, os " + _br.os.name + "; browser engine " + _br.engine +"; version " + _br.version);
+                     _l.critical("proxy swf has unexpected error, os " + _br.os.name + "; browser engine " + _br.engine +"; version " + _br.version);
 
-				 } else {
+                 } else {
 
                      _l.info("flash solution initlized successfully");
 
-				     _b.put("solution", "flashmovie", movie);
+                     _b.put("solution", "flashmovie", movie);
 
                      sd.resolve();
 
-				 }
+                 }
 
-				 try {
+                 try {
 
-					 delete window[jscallbackname];
+                     delete window[jscallbackname];
 
-				 } catch (ex) {
+                 } catch (ex) {
 
-				     window[jscallbackname] = undef;
+                     window[jscallbackname] = undef;
 
-				 }
+                 }
 
-			}
+            };
 
-			invisible = document.createElement("div");
+            invisible = document.createElement("div");
 
-			invisible.style.width = "0px";
+            invisible.style.width = "0px";
 
-			invisible.style.height = "0px";
+            invisible.style.height = "0px";
 
             invisible.style.position = "absolute";
 
             invisible.style.top = "-9999px";
 
-			// logic borrowed from swfobject.js @see http://code.google.com/p/swfobject/
-		    timer =  setTimeout(function () {
+            // logic borrowed from swfobject.js @see http://code.google.com/p/swfobject/
+            timer =  setTimeout(function () {
             
                 if (!sd.isResolved()) {
             
                     sd.reject(-6, "can't load proxy swf from " + p + ",request timeout");
             
-					try {
+                    try {
 
-					    document.body.removeChild(invisible);
+                        document.body.removeChild(invisible);
 
-				    } catch (ex) {}
+                    } catch (ex) {}
                 }
             
             }, implementationTimeout * 1000);
@@ -346,61 +359,61 @@ QQWB.bigtable.put('boot','solution', function () {
             // ensure this invisible node will insert into dom, cause of the single thread mode in javascript
             setTimeout(function () {
 
-			    document.body.appendChild(invisible);
+                document.body.appendChild(invisible);
 
                 // the flash external interface calls when you set innerHTML to a div even that div doesn't append to DOM yet
-		    	if (_br.msie && _br.os.windows) {
+                if (_br.msie && _br.os.windows) {
 
-		    		invisible.innerHTML = ['<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" ', // classid IE only
-		    		                       'id="' + id + '" ',
-		    		                       'name="' + id + '">',
-		    		                       '<param name="movie" value="' + p + '"></param>', // IE only
+                    invisible.innerHTML = ['<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" ', // classid IE only
+                                           'id="' + id + '" ',
+                                           'name="' + id + '">',
+                                           '<param name="movie" value="' + p + '"></param>', // IE only
                                            '<param name="allowscriptaccess" value="always"></param>',
-		    		                       '</object>'
-		    		                      ].join("");
+                                           '</object>'
+                                          ].join("");
 
-		    	} else {
+                } else {
 
-		    		invisible.innerHTML = ['<object type= "application/x-shockwave-flash"',
-		    		                       'id="' + id + '" ',
-		    							   'data="' + p + '">',
+                    invisible.innerHTML = ['<object type= "application/x-shockwave-flash"',
+                                           'id="' + id + '" ',
+                                           'data="' + p + '">',
                                            '<param name="allowscriptaccess" value="always"></param>',
-		    		                       '</object>'
-		    		                      ].join("");
+                                           '</object>'
+                                          ].join("");
 
-		    	}
+                }
 
             },0);
 
-		});
+        });
 
-	}; // end flash external interface solution
+    }; // end flash external interface solution
 
 
-	setupHtml5Implementation = function () {
+    setupHtml5Implementation = function () {
 
-		// html5
+        // html5
         proxyFrameImplementation (true);
 
         _b.put("solution","name","html5");
 
-	};
-	
-	setupInnerAuthImplementation = function () {
+    };
+    
+    setupInnerAuthImplementation = function () {
 
         proxyFrameImplementation (false);
 
         _b.put("solution","name","innerauth");
 
-	};
+    };
 
-	setupFlashAs3Implementation = function () {
+    setupFlashAs3Implementation = function () {
 
         _l.info("flash player version " + _br.feature.flash.version);
 
         if (!_br.feature.flash.externalinterface) {
         
-        	_l.warn("flash player too old, openjs may not work properly");
+            _l.warn("flash player too old, openjs may not work properly");
 
         }
 
@@ -408,31 +421,31 @@ QQWB.bigtable.put('boot','solution', function () {
 
         _b.put("solution","name","as3");
 
-	}; // end setupFlashAs3Implementation
+    }; // end setupFlashAs3Implementation
 
-	crossdomainImplementationError = function (msg) {
+    crossdomainImplementationError = function (msg) {
 
         var sd =  _b.get("solution","deferred");
 
         sd.reject(-6, msg);
 
-	}; // crossdomainImplementationError
+    }; // crossdomainImplementationError
 
-	// don't need to cross domain
-	if (_b.get("innerauth","enabled")) {
+    // don't need to cross domain
+    if (_b.get("innerauth","enabled")) {
 
-        setupInnerAuthImplementation()
+        setupInnerAuthImplementation();
 
-		return;
+        return;
 
-	}
+    }
 
-	// cross domain implement
-	if (QQWB.envs.crossdomainmethod == 'auto') {
+    // cross domain implement
+    if (QQWB.envs.crossdomainmethod == 'auto') {
 
-		_l.debug("detect crossdomain method");
+        _l.debug("detect crossdomain method");
 
-		if (_br.feature.postmessage) {
+        if (_br.feature.postmessage) {
 
             setupHtml5Implementation();
 
@@ -444,53 +457,53 @@ QQWB.bigtable.put('boot','solution', function () {
 
             _l.critical("no solution available, switch to modern browser or install latest flash player, then refresh this page");
 
-			crossdomainImplementationError("no solution available, need a modern browser or install lastest flash player");
+            crossdomainImplementationError("no solution available, need a modern browser or install lastest flash player");
         }
 
-	} else {
+    } else {
 
-		_l.debug("load crossdomain method " + QQWB.envs.crossdomainmethod);
+        _l.debug("load crossdomain method " + QQWB.envs.crossdomainmethod);
 
         crossdomainMethod = _s.trim(QQWB.envs.crossdomainmethod.toLowerCase());
 
-		switch (crossdomainMethod) {
+        switch (crossdomainMethod) {
 
-			case "html5":
-			case "postmessage":
+            case "html5":
+            case "postmessage":
 
                 if (_br.feature.postmessage) {
 
                     setupHtml5Implementation();
 
-				} else {
+                } else {
 
                     _l.critical("can not setup crossdomain method " + QQWB.envs.crossdomainmethod + ", browser not support");
 
-		        	crossdomainImplementationError("postmessage solution can not be setted up");
-				}
+                    crossdomainImplementationError("postmessage solution can not be setted up");
+                }
 
-			break;
+            break;
 
-			case "flash":
+            case "flash":
 
-			case "as3":
+            case "as3":
 
-		    	if (_br.feature.flash) {
+                if (_br.feature.flash) {
 
                     setupFlashAs3Implementation();
 
-				} else {
+                } else {
 
                     _l.critical("can not setup crossdomain method " + QQWB.envs.crossdomainmethod + ", browser not support");
 
-		        	crossdomainImplementationError("flash as3 solution can not be setted up");
+                    crossdomainImplementationError("flash as3 solution can not be setted up");
 
-				}
+                }
 
-			break;
-		}
+            break;
+        }
 
-	}
+    }
 
 });
 
@@ -498,9 +511,9 @@ QQWB.bigtable.put('boot','solution', function () {
 
 if (QQWB.envs.autoboot) {
 
-	QQWB.bigtable.put('boot','booting', true);
+    QQWB.bigtable.put('boot','booting', true);
 
-	// boot
-	QQWB.bigtable.get('boot','solution')();
+    // boot
+    QQWB.bigtable.get('boot','solution')();
 
 }

@@ -7,11 +7,8 @@ FBL.ns(function() { with (FBL) {
 
 //const Cc = Components.classes;
 //const Ci = Components.interfaces;
-    
-var frameCounters = {};
-var traceRecursion = 0;
 
-Firebug.Console.injector =
+Firebug.Console2.injector =
 {
     install: function(context)
     {
@@ -30,7 +27,6 @@ Firebug.Console.injector =
             "dir",
             "dirxml",
             "group",
-            "groupCollapsed",
             "groupEnd",
             "time",
             "timeEnd",
@@ -56,12 +52,10 @@ Firebug.Console.injector =
             {
                 var name = properties[i];
                 c[name] = new Handler(name);
-                c.firebuglite = Firebug.version;
             }
         };
         
-        var consoleNS = (!isFirefox || isFirefox && !("console" in win)) ? "console" : "firebug";
-        var sandbox = new win.Function("arguments.callee.install(window." + consoleNS + "={})");
+        var sandbox = new win.Function("arguments.callee.install(window.consolex={})");
         sandbox.install = installer;
         sandbox();
     },
@@ -98,11 +92,11 @@ Firebug.Console.injector =
         this.attachConsoleInjector(context, win);
         this.addConsoleListener(context, win);
 
-        Firebug.Console.clearReloadWarning(context);
+        Firebug.Console2.clearReloadWarning(context);
 
         var attached =  this.isAttached(context, win);
         if (attached)
-            dispatch(Firebug.Console.fbListeners, "onConsoleInjected", [context, win]);
+            dispatch(Firebug.Console2.fbListeners, "onConsoleInjected", [context, win]);
 
         return attached;
     },
@@ -156,7 +150,7 @@ Firebug.Console.injector =
         var consoleForcer = "window.loadFirebugConsole();";
 
         if (context.stopped)
-            Firebug.Console.injector.evaluateConsoleScript(context);  // todo evaluate consoleForcer on stack
+            Firebug.Console2.injector.evaluateConsoleScript(context);  // todo evaluate consoleForcer on stack
         else
             Firebug.CommandLine.evaluateInWebPage(consoleForcer, context, win);
 
@@ -189,7 +183,7 @@ Firebug.Console.injector =
         }
 
         // We need the element to attach our event listener.
-        var element = Firebug.Console.getFirebugConsoleElement(context, win);
+        var element = Firebug.Console2.getFirebugConsoleElement(context, win);
         if (element)
             element.setAttribute("FirebugVersion", Firebug.version); // Initialize Firebug version.
         else
@@ -245,11 +239,11 @@ var FirebugConsoleHandler = function FirebugConsoleHandler(context, win)
                 FBTrace.sysout("FirebugConsoleHandler", this);
 
             var methodName = event.target.getAttribute("methodName");
-            Firebug.Console.log($STRF("console.MethodNotSupported", [methodName]));
+            Firebug.Console2.log($STRF("console.MethodNotSupported", [methodName]));
         }
     };
 
-    this.firebuglite = Firebug.version;    
+    this.firebug = Firebug.version;
 
     this.init = function()
     {
@@ -279,16 +273,15 @@ var FirebugConsoleHandler = function FirebugConsoleHandler(context, win)
 
     this.error = function()
     {
-        //TODO: xxxpedro console error
-        //if (arguments.length == 1)
-        //{
-        //    logAssert("error", arguments);  // add more info based on stack trace
-        //}
-        //else
-        //{
-            //Firebug.Errors.increaseCount(context);
+        if (arguments.length == 1)
+        {
+            logAssert("error", arguments);  // add more info based on stack trace
+        }
+        else
+        {
+            Firebug.Errors.increaseCount(context);
             logFormatted(arguments, "error", true);  // user already added info
-        //}
+        }
     };
 
     this.exception = function()
@@ -309,24 +302,17 @@ var FirebugConsoleHandler = function FirebugConsoleHandler(context, win)
 
     this.dir = function(o)
     {
-        Firebug.Console.log(o, context, "dir", Firebug.DOMPanel.DirTable);
+        Firebug.Console2.log(o, context, "dir", Firebug.DOMPanel.DirTable);
     };
 
     this.dirxml = function(o)
     {
-        ///if (o instanceof Window)
-        if (instanceOf(o, "Window"))
+        if (o instanceof Window)
             o = o.document.documentElement;
-        ///else if (o instanceof Document)
-        else if (instanceOf(o, "Document"))
+        else if (o instanceof Document)
             o = o.documentElement;
 
-        // TODO: xxxpedro html3
-        ///Firebug.Console.log(o, context, "dirxml", Firebug.HTMLPanel.SoloElement);
-        var div = Firebug.Console.log(o, context, "dirxml");
-        var html = [];
-        Firebug.Reps.appendNode(o, html);
-        div.innerHTML = html.join("");
+        Firebug.Console2.log(o, context, "dirxml", Firebug.HTMLPanel.SoloElement);
     };
 
     this.group = function()
@@ -334,34 +320,30 @@ var FirebugConsoleHandler = function FirebugConsoleHandler(context, win)
         //TODO: xxxpedro;
         //var sourceLink = getStackLink();
         var sourceLink = null;
-        Firebug.Console.openGroup(arguments, null, "group", null, false, sourceLink);
+        Firebug.Console2.openGroup(arguments, null, "group", null, false, sourceLink);
     };
 
     this.groupEnd = function()
     {
-        Firebug.Console.closeGroup(context);
+        Firebug.Console2.closeGroup(context);
     };
 
     this.groupCollapsed = function()
     {
         var sourceLink = getStackLink();
         // noThrottle true is probably ok, openGroups will likely be short strings.
-        var row = Firebug.Console.openGroup(arguments, null, "group", null, true, sourceLink);
+        var row = Firebug.Console2.openGroup(arguments, null, "group", null, true, sourceLink);
         removeClass(row, "opened");
     };
 
     this.profile = function(title)
     {
-        logFormatted(["console.profile() not supported."], "warn", true);
-        
-        //Firebug.Profiler.startProfiling(context, title);
+        Firebug.Profiler.startProfiling(context, title);
     };
 
     this.profileEnd = function()
     {
-        logFormatted(["console.profile() not supported."], "warn", true);
-        
-        //Firebug.Profiler.stopProfiling(context);
+        Firebug.Profiler.stopProfiling(context);
     };
 
     this.count = function(key)
@@ -371,19 +353,19 @@ var FirebugConsoleHandler = function FirebugConsoleHandler(context, win)
         //var frameId = FBL.getStackFrameId();
         if (frameId)
         {
-            if (!frameCounters)
-                frameCounters = {};
+            if (!context.frameCounters)
+                context.frameCounters = {};
 
             if (key != undefined)
                 frameId += key;
 
-            var frameCounter = frameCounters[frameId];
+            var frameCounter = context.frameCounters[frameId];
             if (!frameCounter)
             {
                 var logRow = logFormatted(["0"], null, true, true);
 
                 frameCounter = {logRow: logRow, count: 1};
-                frameCounters[frameId] = frameCounter;
+                context.frameCounters[frameId] = frameCounter;
             }
             else
                 ++frameCounter.count;
@@ -401,206 +383,6 @@ var FirebugConsoleHandler = function FirebugConsoleHandler(context, win)
         var getFuncName = function getFuncName (f)
         {
             if (f.getName instanceof Function)
-            {
-                return f.getName();
-            }
-            if (f.name) // in FireFox, Function objects have a name property...
-            {
-                return f.name;
-            }
-            
-            var name = f.toString().match(/function\s*([_$\w\d]*)/)[1];
-            return name || "anonymous";
-        };
-        
-        var wasVisited = function(fn)
-        {
-            for (var i=0, l=frames.length; i<l; i++)
-            {
-                if (frames[i].fn == fn)
-                {
-                    return true;
-                }
-            }
-            
-            return false;
-        };
-        
-        traceRecursion++;
-        
-        if (traceRecursion > 1)
-        {
-            traceRecursion--;
-            return;
-        }
-    
-        var frames = [];
-        
-        for (var fn = arguments.callee.caller.caller; fn; fn = fn.caller)
-        {
-            if (wasVisited(fn)) break;
-            
-            var args = [];
-            
-            for (var i = 0, l = fn.arguments.length; i < l; ++i)
-            {
-                args.push({value: fn.arguments[i]});
-            }
-
-            frames.push({fn: fn, name: getFuncName(fn), args: args});
-        }
-        
-        
-        // ****************************************************************************************
-        
-        try
-        {
-            (0)();
-        }
-        catch(e)
-        {
-            var result = e;
-            
-            var stack = 
-                result.stack || // Firefox / Google Chrome 
-                result.stacktrace || // Opera
-                "";
-            
-            stack = stack.replace(/\n\r|\r\n/g, "\n"); // normalize line breaks
-            var items = stack.split(/[\n\r]/);
-            
-            // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-            // Google Chrome
-            if (FBL.isSafari)
-            {
-                //var reChromeStackItem = /^\s+at\s+([^\(]+)\s\((.*)\)$/;
-                //var reChromeStackItem = /^\s+at\s+(.*)((?:http|https|ftp|file):\/\/.*)$/;
-                var reChromeStackItem = /^\s+at\s+(.*)((?:http|https|ftp|file):\/\/.*)$/;
-                
-                var reChromeStackItemName = /\s*\($/;
-                var reChromeStackItemValue = /^(.+)\:(\d+\:\d+)\)?$/;
-                
-                var framePos = 0;
-                for (var i=4, length=items.length; i<length; i++, framePos++)
-                {
-                    var frame = frames[framePos];
-                    var item = items[i];
-                    var match = item.match(reChromeStackItem);
-                    
-                    //Firebug.Console.log("["+ framePos +"]--------------------------");
-                    //Firebug.Console.log(item);
-                    //Firebug.Console.log("................");
-                    
-                    if (match)
-                    {
-                        var name = match[1];
-                        if (name)
-                        {
-                            name = name.replace(reChromeStackItemName, "");
-                            frame.name = name; 
-                        }
-                        
-                        //Firebug.Console.log("name: "+name);
-                        
-                        var value = match[2].match(reChromeStackItemValue);
-                        if (value)
-                        {
-                            frame.href = value[1];
-                            frame.lineNo = value[2];
-                            
-                            //Firebug.Console.log("url: "+value[1]);
-                            //Firebug.Console.log("line: "+value[2]);
-                        }
-                        //else
-                        //    Firebug.Console.log(match[2]);
-                        
-                    }                
-                }
-            }
-            /**/
-            
-            // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-            else if (FBL.isFirefox)
-            {
-                // Firefox
-                var reFirefoxStackItem = /^(.*)@(.*)$/;
-                var reFirefoxStackItemValue = /^(.+)\:(\d+)$/;
-                
-                var framePos = 0;
-                for (var i=2, length=items.length; i<length; i++, framePos++)
-                {
-                    var frame = frames[framePos] || {};
-                    var item = items[i];
-                    var match = item.match(reFirefoxStackItem);
-                    
-                    if (match)
-                    {
-                        var name = match[1];
-                        
-                        //Firebug.Console.logFormatted("name: "+name);
-                        
-                        var value = match[2].match(reFirefoxStackItemValue);
-                        if (value)
-                        {
-                            frame.href = value[1];
-                            frame.lineNo = value[2];
-                            
-                            //Firebug.Console.log("href: "+ value[1]);
-                            //Firebug.Console.log("line: " + value[2]);
-                        }
-                        //else
-                        //    Firebug.Console.logFormatted([match[2]]);
-                    }                
-                }
-            }
-            /**/
-            
-            // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-            /*
-            else if (FBL.isOpera)
-            {
-                // Opera
-                var reOperaStackItem = /^\s\s(?:\.\.\.\s\s)?Line\s(\d+)\sof\s(.+)$/;
-                var reOperaStackItemValue = /^linked\sscript\s(.+)$/;
-                
-                for (var i=0, length=items.length; i<length; i+=2)
-                {
-                    var item = items[i];
-                    
-                    var match = item.match(reOperaStackItem);
-                    
-                    if (match)
-                    {
-                        //Firebug.Console.log(match[1]);
-                        
-                        var value = match[2].match(reOperaStackItemValue);
-                        
-                        if (value)
-                        {
-                            //Firebug.Console.log(value[1]);
-                        }
-                        //else
-                        //    Firebug.Console.log(match[2]);
-                        
-                        //Firebug.Console.log("--------------------------");
-                    }                
-                }
-            }
-            /**/
-        }
-        
-        //console.log(stack);
-        //console.dir(frames);
-        Firebug.Console.log({frames: frames}, context, "stackTrace", FirebugReps.StackTrace);
-        
-        traceRecursion--;
-    };
-    
-    this.trace_ok = function()
-    {
-        var getFuncName = function getFuncName (f)
-        {
-            if (f.getName instanceof Function)
                 return f.getName();
             if (f.name) // in FireFox, Function objects have a name property...
                 return f.name;
@@ -611,37 +393,50 @@ var FirebugConsoleHandler = function FirebugConsoleHandler(context, win)
         
         var wasVisited = function(fn)
         {
-            for (var i=0, l=frames.length; i<l; i++)
+            for (var i=0, l=stack.length; i<l; i++)
             {
-                if (frames[i].fn == fn)
+                if (stack[i] == fn)
                     return true;
             }
             
             return false;
         };
     
-        var frames = [];
+        var stack = [];
+        
+        var traceLabel = "Stack Trace";
+        
+        this.group(traceLabel);
         
         for (var fn = arguments.callee.caller; fn; fn = fn.caller)
         {
             if (wasVisited(fn)) break;
             
-            var args = [];
+            stack.push(fn);
             
+            var html = [ getFuncName(fn), "(" ];
+
             for (var i = 0, l = fn.arguments.length; i < l; ++i)
             {
-                args.push({value: fn.arguments[i]});
+                if (i)
+                    html.push(", ");
+                
+                Firebug.Reps.appendObject(fn.arguments[i], html);
             }
 
-            frames.push({fn: fn, name: getFuncName(fn), args: args});
+            html.push(")");
+            //Firebug.Console.logRow(html, "stackTrace");
+            Firebug.Console.log(html, Firebug.browser, "stackTrace");
         }
         
-        Firebug.Console.log({frames: frames}, context, "stackTrace", FirebugReps.StackTrace);
+        this.groupEnd(traceLabel);
+        
+        return Firebug.Console.LOG_COMMAND; 
     };
     
     this.clear = function()
     {
-        Firebug.Console.clear(context);
+        Firebug.Console2.clear(context);
     };
 
     this.time = function(name, reset)
@@ -690,11 +485,11 @@ var FirebugConsoleHandler = function FirebugConsoleHandler(context, win)
         if (FBTrace.DBG_CONSOLE)
             FBTrace.sysout("consoleInjector.FirebugConsoleHandler evalutated default called", result);
 
-        Firebug.Console.log(result, context);
+        Firebug.Console2.log(result, context);
     };
     this.evaluateError = function(result, context)
     {
-        Firebug.Console.log(result, context, "errorMessage");
+        Firebug.Console2.log(result, context, "errorMessage");
     };
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -702,7 +497,7 @@ var FirebugConsoleHandler = function FirebugConsoleHandler(context, win)
     function logFormatted(args, className, linkToSource, noThrottle)
     {
         var sourceLink = linkToSource ? getStackLink() : null;
-        return Firebug.Console.logFormatted(args, context, className, noThrottle, sourceLink);
+        return Firebug.Console2.logFormatted(args, context, className, noThrottle, sourceLink);
     }
 
     function logAssert(category, args)
@@ -750,7 +545,7 @@ var FirebugConsoleHandler = function FirebugConsoleHandler(context, win)
                 objects.push(args[i]);
         }
 
-        var row = Firebug.Console.log(objects, context, "errorMessage", null, true); // noThrottle
+        var row = Firebug.Console2.log(objects, context, "errorMessage", null, true); // noThrottle
         row.scrollIntoView();
     }
 
@@ -809,18 +604,5 @@ var FirebugConsoleHandler = function FirebugConsoleHandler(context, win)
             return "Firebug failed to get stack trace with any frames";
     }
 }
-
-// ************************************************************************************************
-// Register console namespace
-
-FBL.registerConsole = function()
-{
-    //TODO: xxxpedro console options override
-    //if (Env.Options.overrideConsole)
-    var win = Env.browser.window;
-    Firebug.Console.injector.install(win);
-};
-
-registerConsole();
 
 }});

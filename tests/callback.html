@@ -1,0 +1,19 @@
+<!doctype html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="zh-CN"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="zh-CN"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js ie8 oldie" lang="zh-CN"> <![endif]-->
+<!--[if gt IE 8]><!--><html class="no-js" lang="zh-CN"> <!--<![endif]-->
+<head>
+	<meta charset="utf-8">
+	<title>closing</title>
+</head>
+<body>
+<script>
+    setTimeout(function () {
+        window.opener=null;
+        window.open('','_self');
+        window.close(); 
+    }, 1000);
+</script>
+</body>
+</html>

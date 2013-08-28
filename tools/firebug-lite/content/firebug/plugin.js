@@ -21,15 +21,8 @@ append(Firebug,
 {
     extend: function(fn)
     {
-        if (Firebug.chrome && Firebug.chrome.addPanel)
-        {
-            var namespace = ns(fn);
-            fn.call(namespace, FBL);
-        }
-        else
-        {
-            setTimeout(function(){Firebug.extend(fn);},100);
-        }
+        var namespace = ns(fn);
+        fn.call(namespace, FBL); 
     },
     
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -54,7 +47,6 @@ append(Firebug,
 
         for (var i = 0, panelType; panelType = arguments[i]; ++i)
         {
-            // TODO: xxxpedro investigate why Dev Panel throws an error
             if (panelType.prototype.name == "Dev") continue;
             
             panelTypeMap[panelType.prototype.name] = arguments[i];

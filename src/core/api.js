@@ -40,253 +40,293 @@
  *           util.deferred
  *           weibo.util
  */
-
+/*jslint laxcomma:true*/
 QQWB.provide("api", function (api, apiParams, optDataType, optType, optOverride) {
 
-	var _ = QQWB,
+    var _ = QQWB,
 
-	    _a = _.Array,
+        _a = _.Array,
 
-	    _s = _.String,
+        _s = _.String,
 
-		_j = _.JSON,
+        _j = _.JSON,
 
-		_x = _.XML,
+        _x = _.XML,
 
-	    _b = _.bigtable,
+        _b = _.bigtable,
 
-	    _l = _.log,
+        _l = _.log,
 
-		_q = _.queryString,
+        _q = _.queryString,
 
-		_i = _.io,
+        _i = _.io,
 
-		counter = _b.get("api","count",0),
+        counter = _b.get("api","count",0),
 
-		solution = _b.get("solution","deferred"),
+        solution = _b.get("solution","deferred"),
 
-		solutionName = _b.get("solution","name"),
+        solutionName = _b.get("solution","name"),
 
-		format = optDataType,
+        format = optDataType,
 
-		supportedFormats = {json:true,xml:true/*,text:true*/},
+        supportedFormats = {json:true,xml:true/*,text:true*/},
 
-    	deferred = _.deferred.deferred(),
+        deferred = _.deferred.deferred(),
 
-		proto = {"api": QQWB.api},
+        proto = {"api": QQWB.api},
 
-		obj = QQWB.Object.create(proto),
+        obj = QQWB.Object.create(proto),
 
-		promise = deferred.promise(obj),
+        promise = deferred.promise(obj),
 
-	    appkey,
+        appkey,
 
-		actoken,
+        actoken,
 
-		proxyFrame,
-		
-		onDataBack;
-	
-	api = _.weibo.util.compat(api);
+        openid,
 
-	apiParams = apiParams || {};
+        proxyFrame,
+        
+        onDataBack;
+    
+    api = _.weibo.util.compat(api);
+
+    apiParams = apiParams || {};
 
     optDataType = (optDataType || "json").toLowerCase();
 
     optType = optType || "GET";
 
-	optOverride = optOverride || {};
+    optOverride = optOverride || {};
 
-	appkey = optOverride.appkey || optOverride.clientid || _b.get("base", "appkey");
+    appkey = optOverride.appkey || optOverride.clientid || _b.get("base", "appkey");
 
-	actoken = optOverride.accesstoken || optOverride.token || _._token.getAccessToken();
+    actoken = optOverride.accesstoken || optOverride.token || _._token.getAccessToken();
 
-	if (!(format in supportedFormats)) {
+    if (optOverride.openid) {
 
-		format = "json";
+        openid = optOverride.openid;
 
-	}
+    } else {
 
-	apiParams["oauth_consumer_key"] = appkey;
+        openid = _._token.getTokenUser() || '';
 
-	apiParams["oauth_token"] = actoken;
+        if (openid) {
 
-	apiParams["oauth_version"] = "2.0";
+            openid = openid.openid;
 
-	apiParams["format"] = format;
+        }
 
+    }
 
-	if (!appkey) {
+    if (!(format in supportedFormats)) {
 
-		_l.error("appkey can not be empty");
+        format = "json";
 
-		deferred.reject(-1, "appkey cant not be empty",0);
+    }
 
-		return promise;
+    apiParams.oauth_consumer_key = appkey;
 
-	}
+    apiParams.access_token = actoken;
 
-	if (api == '/t/add_pic') {
+    apiParams.oauth_version = "2.a";
 
-		_l.error("/t/add_pic is not supported yet");
+    apiParams.openid = openid;
 
-		deferred.reject(-1, "暂不支持此接口，请使用 t/add_pic_url 代替",0);
-
-		return promise;
-
-	}
+    apiParams.format = format;
 
 
-	if (!actoken) { // some public api call doesn't need an accesstoken
+    if (!appkey) {
 
-		_l.warn("accesstoken is empty");
+        _l.error("appkey can not be empty");
 
-	}
+        deferred.reject(-1, "appkey cant not be empty",0);
 
-	// solution isn't ready
-	if (!solution.isResolved() && !solution.isRejected()) {
+        return promise;
 
-		_l.warning("api call cached, waiting solution ready ...");
+    }
 
-    	solution.promise().done(function () {
+    if (api == '/t/add_pic') {
 
-		    _l.info("invoking cached api call " + api + "...");
+        _l.error("/t/add_pic is not supported yet");
 
-			_.api(api, apiParams, optDataType, optType, optOverride)
+        deferred.reject(-1, "暂不支持此接口，请使用 t/add_pic_url 代替",0);
 
-			    .success(function () {
+        return promise;
 
-				    deferred.resolveWith(deferred,arguments);
+    }
 
-				 })
 
-			    .error(function (){
+    if (!actoken) { // some public api call doesn't need an accesstoken
 
-				    deferred.rejectWith(deferred,arguments);
+        _l.warn("accesstoken is empty");
 
-			     });
+    }
 
-		}).fail(function () {
+    // solution isn't ready
+    if (!solution.isResolved() && !solution.isRejected()) {
 
-		    _l.error("can't invoking cached api call " + api + "...");
+        _l.warning("api call cached, waiting solution ready ...");
 
-		    deferred.rejectWith(deferred,arguments);
+        solution.promise().done(function () {
 
-		});
+            _l.info("invoking cached api call " + api + "...");
 
-		return promise;
-	}
+            _.api(api, apiParams, optDataType, optType, optOverride)
 
-	// solution error
-	if (!solution.isResolved()) {
+                .success(function () {
 
-		solution.fail(function () {
+                    deferred.resolveWith(deferred,arguments);
 
-		    _l.error(arguments[1]);
+                 })
 
-		    deferred.rejectWith(deferred,arguments);
-		});
+                .error(function (){
 
-		return promise;
-	}
+                    deferred.rejectWith(deferred,arguments);
+
+                 });
+
+        }).fail(function () {
+
+            _l.error("can't invoking cached api call " + api + "...");
+
+            deferred.rejectWith(deferred,arguments);
+
+        });
+
+        return promise;
+    }
+
+    // solution error
+    if (!solution.isResolved()) {
+
+        solution.fail(function () {
+
+            _l.error(arguments[1]);
+
+            deferred.rejectWith(deferred,arguments);
+        });
+
+        return promise;
+    }
 
     _b.put("api","count",++counter);
 
     _l.info("[" + counter + "] sending weibo request...");
 
-	switch (solutionName) {
-		case 'innerauth':
-		proxyFrame = _b.get("solution", "frame");
+    switch (solutionName) {
+        case 'innerauth':
+        proxyFrame = _b.get("solution", "frame");
 
-		if (proxyFrame && proxyFrame.contentWindow &&  proxyFrame.contentWindow.apiAjax) {
+        if (proxyFrame && proxyFrame.contentWindow &&  proxyFrame.contentWindow.apiAjax) {
 
             proxyFrame.contentWindow.apiAjax(api, apiParams, optDataType, optType).complete(function () {
 
-		    	if (arguments[0] !== 200) {
+                if (arguments[0] !== 200) {
 
-		    		deferred.rejectWith(deferred,arguments);
+                    deferred.rejectWith(deferred,arguments);
 
-		    	} else {
+                } else {
 
                     deferred.resolve(arguments[3]/* response body */, arguments[2]/* elpased time */, arguments[4]/*response header*/);
-		    	}
+                }
 
-		    });
+            });
 
-		} else {
+        } else {
 
-	        _l.error(-1, "proxy frame not found");
+            _l.error(-1, "proxy frame not found");
 
-	        deferred.reject(-1,"proxy frame not found");
+            deferred.reject(-1,"proxy frame not found");
 
-		}
-		break;
-		case 'html5':
-		proxyFrame = _b.get("solution", "frame");
+        }
+        break;
+        case 'html5':
+        proxyFrame = _b.get("solution", "frame");
 
-		if (!proxyFrame) {
+        if (!proxyFrame) {
 
-	        _l.error(-1, "proxy frame not found");
+            _l.error(-1, "proxy frame not found");
 
-	        deferred.reject(-1,"proxy frame not found");
+            deferred.reject(-1,"proxy frame not found");
 
-		} else {
+        } else {
 
-				onDataBack = _b.get("api","ondataback");
+                onDataBack = _b.get("api","ondataback");
 
-				if (!onDataBack) {
+                if (!onDataBack) {
 
-					onDataBack = _b.put("api","ondataback", function (e) {
+                    onDataBack = _b.put("api","ondataback", function (e) {
 
-						var data,
+                        var data,
 
-						    id,
+                            id,
 
-							defr,
+                            defr,
 
-							response;
+                            response;
 
-						if (_b.get("uri","html5proxy").indexOf(e.origin) !== 0) {
+                        if (_b.get("uri","html5proxy").indexOf(e.origin) !== 0) {
 
-	                        _l.warn("ignore data from origin " + e.origin);
+                            _l.warn("ignore data from origin " + e.origin);
 
-						} else {
+                            return;
 
-							data = _j.fromString(e.data);
+                        }
 
-							id = data.id;
+                        // 本函数本不应该处理此种信息，这是容错逻辑
+                        // proxy.html加载的时候会发送postMessage，内容是'sucess'
+                        // 这会导致JSON解析错误，字符串不能转换为JSON对象
+                        try {
 
-							response = data.data;
+                            data = _j.fromString(e.data);
 
-							defr = _b.get("api","resultdeferred" + id);
+                        } catch (invalidJSONError) {
 
-							if (defr) {
+                            _l.warn('[T.api] invalid JSON:' + e.data);
 
-						        if (response[0] !== 200) {
+                            return;
+                        }
 
-									defr.rejectWith(defr,response);
+                        id = data.id;
 
-								} else {
+                        response = data.data;
 
-									if (response[5] == "_xml_") {
+                        if (!id || !response) {
 
-										response[3] = _x.fromString(response[3]);
+                            _l.warn('[T.api] invalid data, id and data must exists:' + data);
 
-									}
+                            return;
+                        }
 
-                                    defr.resolve(response[3]/* response body */, response[2]/* elpased time */, response[4]/*response header*/);
-								}
+                        defr = _b.get("api","resultdeferred" + id);
 
-							    _b.del("api","resultdeferred" + id);
+                        if (defr) {
 
-							} else {
+                            if (response[0] !== 200) {
 
-								_l.error("invalid api request id " + id);
+                                defr.rejectWith(defr,response);
 
-							}
-						}
+                            } else {
 
-					});
+                                if (response[5] == "_xml_") {
+
+                                    response[3] = _x.fromString(response[3]);
+
+                                }
+
+                                defr.resolve(response[3]/* response body */, response[2]/* elpased time */, response[4]/*response header*/);
+                            }
+
+                            _b.del("api","resultdeferred" + id);
+
+                        } else {
+
+                            _l.error("[T.api] invalid api request id " + id);
+
+                        }
+
+                    });
 
                     if (window.addEventListener) {
 
@@ -298,35 +338,35 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optOverride)
 
                     }
 
-				}
+                }
 
-				_b.put("api", "resultdeferred" + counter, deferred);
+                _b.put("api", "resultdeferred" + counter, deferred);
 
-				// make postMessage async
-				// IE8 has problems if not wrapped by setTimeout
-				setTimeout(function () {
+                // make postMessage async
+                // IE8 has problems if not wrapped by setTimeout
+                setTimeout(function () {
 
                     // @see http://msdn.microsoft.com/en-us/library/cc197015(v=vs.85).aspx
                     proxyFrame.contentWindow.postMessage(_j.stringify({ 
 
-                    	id: counter
+                        id: counter
 
                        ,data: [api, apiParams, optDataType, optType]
 
                     }),_b.get("uri","html5proxy"));
 
-				}, 0 );
+                }, 0 );
 
-		}
-		break;
-		case 'as3':
+        }
+        break;
+        case 'as3':
         function apiFlashAjax (api, apiParams, dataType, type) {
 
              var opts = {
 
                      type: _s.trim(type.toUpperCase())
 
-                    ,url: _b.get("uri","api") + api
+                    ,url: _b.get("uri","apiforflash") + api
 
                     ,data: _q.encode(apiParams)
 
@@ -346,22 +386,22 @@ QQWB.provide("api", function (api, apiParams, optDataType, optType, optOverride)
 
         }
 
-	 	// @see io.js onFlashRequestComplete_8df046 for api call sequence management
-	 	apiFlashAjax(api, apiParams, optDataType, optType).complete(function () {
+         // @see io.js onFlashRequestComplete_8df046 for api call sequence management
+         apiFlashAjax(api, apiParams, optDataType, optType).complete(function () {
 
-	 		if (arguments[0] !== 200) {
+             if (arguments[0] !== 200) {
 
-	 			deferred.rejectWith(deferred,arguments);
+                 deferred.rejectWith(deferred,arguments);
 
-	 		} else {
+             } else {
 
                  deferred.resolve(arguments[3]/* response body */, arguments[2]/* elpased time */, arguments[4]/*response header*/);
-	 		}
-	 	});
-		break;
-		default:
-		deferred.reject(-1, "invalid solutionName " + solutionName);
-	}
+             }
+         });
+        break;
+        default:
+        deferred.reject(-1, "invalid solutionName " + solutionName);
+    }
 
     promise.complete(function () {
 

@@ -1,21 +1,21 @@
-rd firebug-lite /s /q 
+rd firebug /s /q 
 rd pub /s /q 
 
-svn export "../" "./firebug-lite"
+svn export "../" "./firebug"
 
 md pub
-xcopy ".\firebug-lite\skin\." ".\pub\skin" /s /i
-copy "..\docs\beta\index.html" ".\pub\index.html"
+xcopy ".\firebug\skin\." ".\pub\skin" /s /i
+copy "..\test\alpha.html" ".\pub\index.html"
 copy "..\content\changelog.txt" ".\pub"
-copy ".\firebug-lite\build\*.*" ".\pub"
+copy ".\firebug\build\*.*" ".\pub"
 del ".\pub\*.bat"
 
-tar -cv --file=firebug-lite.tar firebug-lite/*
-gzip -9 < firebug-lite.tar > ./pub/firebug-lite.tar.tgz
+tar -cv --file=firebug.tar firebug/*
+gzip -9 < firebug.tar > ./pub/firebug.tar.tgz
 
-del firebug-lite.tar
+del firebug.tar
 
-rd firebug-lite /s /q 
+rd firebug /s /q 
 
 pause
 

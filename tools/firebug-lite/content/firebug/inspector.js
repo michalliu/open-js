@@ -6,8 +6,6 @@ FBL.ns(function() { with (FBL) {
 // ************************************************************************************************
 // Inspector Module
 
-var ElementCache = Firebug.Lite.Cache.Element;
-
 var inspectorTS, inspectorTimer, isInspecting;
 
 Firebug.Inspector =
@@ -118,14 +116,14 @@ Firebug.Inspector =
             //Firebug.Console.log(e.clientX, e.clientY, targ);
             Firebug.Inspector.drawOutline(targ);
             
-            if (ElementCache(targ))
+            if (targ[cacheID])
             {
-                var target = ""+ElementCache.key(targ);
+                var target = ""+targ[cacheID];
                 var lazySelect = function()
                 {
                     inspectorTS = new Date().getTime();
                     
-                    Firebug.HTML.selectTreeNode(""+ElementCache.key(targ))
+                    Firebug.HTML.selectTreeNode(""+targ[cacheID])
                 };
                 
                 if (inspectorTimer)
@@ -164,8 +162,8 @@ Firebug.Inspector =
             //Firebug.Console.log(e.clientX, e.clientY, targ);
             Firebug.Inspector.drawOutline(targ);
             
-            if (ElementCache.has(targ))
-                FBL.Firebug.HTML.selectTreeNode(""+ElementCache.key(targ));
+            if (targ[cacheID])
+                FBL.Firebug.HTML.selectTreeNode(""+targ[cacheID])
             
             lastInspecting = new Date().getTime();
         }
@@ -283,10 +281,6 @@ Firebug.Inspector =
     
     drawBoxModel: function(el)
     {
-        // avoid error when the element is not attached a document
-        if (!el || !el.parentNode)
-            return;
-        
         var box = Firebug.browser.getElementBox(el);
         
         var windowSize = Firebug.browser.getWindowSize();
