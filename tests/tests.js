@@ -139,10 +139,12 @@ module('凭据管理');
 asyncTest('交换token', function () {
     T.init({appkey:appkey,callbackurl:'./callback.html'});
 	var refreshToken = T._token.getRefreshToken();
+	var expectCalled=false;
 	if (refreshToken) {
 		T._token.exchangeForToken(function () {
 			var refreshTokenExchanged = T._token.getRefreshToken();
 			expect(2);
+			expectCalled=true;
 			ok(true,'交换token回调函数被执行');
 			notEqual(refreshToken,refreshTokenExchanged,'凭refreshtoken交换accesstoken成功');
 			start();
@@ -151,15 +153,18 @@ asyncTest('交换token', function () {
 		//TODO: 报错时服务器不支持jsonp的回调，等待服务器支持
 		T._token.exchangeForToken(function () {
 			expect(2);
+			expectCalled=true;
 			ok(true,'交换token回调函数被执行');
 			ok(true,'因refreshtoken不存在，交换token失败');
 			start();
 		});
 	}
 	setTimeout(function () {
-		expect(2); // script error
-		ok(false, '交换token请求发出后，超过5秒未接收到成功或者失败的返回，请求可能已经失败');
-		start();
+		if (!expectCalled) {
+			expect(2); // script error
+			ok(false, '交换token请求发出后，超过5秒未接收到成功或者失败的返回，请求可能已经失败');
+			start();
+		}
 	}, 5 * 1000);
 });
 
@@ -333,6 +338,7 @@ test('本地存储(localStorage)', function () {
         T.localStorage.del("TEST_LOCALSTORAGE_0");
         equal(T.localStorage.get('TEST_LOCALSTORAGE_0'),null,'删除本地存储');
     } else {
+        expect(1);
         ok(true, '不支持本地存储');
     }
 });
